@@ -192,9 +192,11 @@
         });
       }
       else if(this.options.type !== TypeSliders.SYNCING) {
-        option = $.extend(option, {
-          adaptiveHeight: true
-        });
+        if(typeof this.options.adaptiveHeight !== 'undefined') {
+          option = $.extend(option, {
+            adaptiveHeight: true
+          });
+        }
       }
 
       // Run
