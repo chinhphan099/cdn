@@ -1,0 +1,66 @@
+.products-widget {
+    margin-bottom: 20px;
+}
+
+// Product Heading
+.product-heading {
+    padding: 0 15px 5px;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 17px;
+    border-bottom: 1px solid #ddd;
+}
+
+// Product & list
+.productRadioListItem {
+    position: relative;
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+    &.default {
+        background-color: #fef46e;
+        label {
+            font-weight: bold;
+            .best-seller-text {
+                display: block;
+                color: red;
+                text-transform: uppercase;
+            }
+        }
+    }
+    .spanUnitDiscountRate {
+        display: inline;
+    }
+}
+
+.js-list-group {
+    padding: 0 15px 10px;
+    ul {
+        padding-left: 0;
+        list-style: none;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+        justify-content: space-between;
+        li {
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            width: calc(~"100% / 3 - 10px");
+            color: black;
+            cursor: pointer;
+            -webkit-transition: all 150ms ease;
+            -o-transition: all 150ms ease;
+            transition: all 150ms ease;
+            &:hover,
+            &.active {
+                border-color: #10558c;
+            }
+        }
+    }
+}
