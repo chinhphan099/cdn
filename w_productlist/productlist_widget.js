@@ -202,6 +202,7 @@
         let rootActiveText = '';
         let activeText = '';
         let indexItem = currentPackage.indexOf(_q('input[name=product]:checked').value);
+        let waitTime;
 
         if(!!titleElm) {
             rootActiveText = titleElm.innerHTML;
@@ -251,7 +252,12 @@
                 }
             }
 
-            saveActiveTabIndex();
+            if(!!waitTime) {
+                clearTimeout(waitTime);
+            }
+            waitTime = setTimeout(function() {
+                saveActiveTabIndex();
+            }, 3000);
         }
 
         function saveActiveTabIndex() {
