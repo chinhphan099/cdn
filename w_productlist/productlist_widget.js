@@ -227,6 +227,7 @@
                     }
 
                     activeTab(tabItem);
+                    saveActiveTabIndex();
                 }, false);
             }
 
@@ -246,6 +247,18 @@
                 if(_q('.js-list-group ul').dataset.packagedisplay === tabItem.dataset.package) {
                     tabItem.classList.add('active');
                     isMissingTab = false;
+                    break;
+                }
+            }
+
+            saveActiveTabIndex();
+        }
+
+        function saveActiveTabIndex() {
+            utils.localStorage().set('indexTab', -1);
+            for(let [index, tabItem] of tabItems.entries()) {
+                if(tabItem.classList.contains('active')) {
+                    utils.localStorage().set('indexTab', index);
                     break;
                 }
             }
