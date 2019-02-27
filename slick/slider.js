@@ -125,6 +125,7 @@
       var that = this,
         option,
         wistiaVideo,
+        vimeoPlayer,
         navFor = {};
 
       switch(this.options.type) {
@@ -210,7 +211,14 @@
             wistiaVideo.pause();
           }
         }
+
+        var vimeoElmId = $('.slick-current', that.element).find('.vimeo-video').attr('id');
+        if(!!vimeoElmId) {
+          vimeoPlayer = new Vimeo.Player(vimeoElmId);
+          vimeoPlayer.pause();
+        }
       });
+
       this.handle.on('afterChange.' + pluginName, function(slick, currentSlide) {
         that.setPositionArrows();
 
