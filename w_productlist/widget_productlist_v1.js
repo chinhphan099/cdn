@@ -296,7 +296,7 @@
             }
         }
 
-        function showDefaultProduct(packageDisplay, isPopup = false) {
+        function showDefaultProduct(packageDisplay, isPopup) {
             // Hide all product items
             currentPackage = packageDisplay;
             q('.productRadioListItem').addClass('hidden');
@@ -333,7 +333,7 @@
         }
 
         // Initialize
-        function init(isPopup = false) {
+        function init(isPopup) {
             setupTab();
             showDefaultProduct(packageDisplay, isPopup);
 
@@ -351,7 +351,8 @@
             }
         }
 
-        init(utils.getQueryParameter('et') === '1');
+        let isPopup = utils.getQueryParameter('et') === '1';
+        init(isPopup);
         listener();
     }
     // End Product list Category ----------------------------------------------------------------------------------------
