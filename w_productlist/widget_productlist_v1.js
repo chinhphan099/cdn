@@ -148,7 +148,7 @@
 
 
     // Product list Category ----------------------------------------------------------------------------------------
-    const getClosest = (elem, selector) => {
+    function getClosest(elem, selector) {
         if (!Element.prototype.matches) {
             Element.prototype.matches =
                 Element.prototype.matchesSelector ||
@@ -171,10 +171,10 @@
             }
         }
         return null;
-    };
+    }
 
     //create Extend Functional
-    const q = function(selector) {
+    function q(selector) {
         var qSelector = _qAll(selector);
 
         return {
@@ -189,7 +189,7 @@
                 }
             }
         }
-    };
+    }
     //End Create Extends Functional
 
     // Tab click
