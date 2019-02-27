@@ -1,0 +1,83 @@
+#set($con = $dotcontent.find($CONTENT_INODE))
+#if($EDIT_MODE)
+    <center style="color:#a9a6a6;font-size:10px;font-family:Arial;text-align:left;position:absolute;top:-11px;left:93px;right: 50px;z-index:9;line-height:0.9">
+        <span style="padding:0 2px;display:block;">
+            ProductListWidget : $!{con.title}
+        </span>
+    </center>
+#end
+
+#if($UtilMethods.isSet($productGroup))
+    <div class="js-list-group">
+        #if($con.fullSelectedText)
+            <h5>$con.fullSelectedText</h5>
+        #end
+        <ul data-packagedisplay="$!{packageDisplay}">
+            #set($groupObj = $json.generate($!{productGroup}))
+            #foreach($group in $groupObj.data)
+                <li data-package="$!{group.pidPackages}" data-replacetext="$!{group.selectedText}">$group.tabName</li>
+            #end
+        </ul>
+    </div>
+#end
+#set($specialOnly = '')
+#if($justShowSpecial == 'true')
+    #set($specialOnly = '&quot;specialOnly&quot;: true')
+#end
+#if($UtilMethods.isSet($products))
+    #set($jsonObj = $json.generate($!{products}))
+    <div id="js-widget-products" class="product-list $!{className}" data-options="{$specialOnly}">
+        <input type="hidden" id="hdfSelectedProduct" value="$!{productIdForHeading}" />
+        <div class="product-heading">
+            <div>$!{itemsLabel}</div>
+            <div>$!{pricesLabel}</div>
+        </div>
+        #foreach($prod in $jsonObj.data)
+            #set($itemCls = '')
+
+            ## Add class for Special Offer Items
+            #foreach($specialId in $specialProductId.split(','))
+                #if($prod.productId == $specialId)
+                    #set($itemCls = 'special_offer hidden ')
+                #end
+            #end
+
+            #if($prod.has('classItem'))
+                #set($itemCls = $itemCls + $prod.classItem)
+            #end
+            <div class="productRadioListItem #if($checkedProductId == $prod.productId)checked-item#end ${itemCls}">
+                <div class="w_radio">
+                    <input type="radio" id="product_$!{prod.productId}" name="product" value="$!{prod.productId}" #if($checkedProductId==$prod.productId)checked#end />
+                    <i class="icon-check"></i>
+                    <label class="js-unitDiscountRate" for="product_$!{prod.productId}">
+                        #if($prod.defaultProductTitle != '')
+                            <span class="best-seller-text">$!{prod.defaultProductTitle}</span>
+                        #end
+                        <div class="product-name">$!{prod.productName.replace('xaaax', '"')}</div>
+                    </label>
+                    <label class="productPrice" for="product_$!{prod.productId}">
+                        #if($!{showInstallmentPrice} == true)
+                            <ins class="discountedPrice_installmentpayment">
+                                <span class="installment-price">$!{installmentPriceText}</span>
+                                <span class="js-total-price"></span>
+                            </ins>
+                        #else
+                            <span class="discountedPrice"></span>
+                            <del class="fullPrice" style="display: none;"></del>
+                        #end
+                    </label>
+                    #if($prod.buttonTxt != '')
+                        <div class="order-btn">
+                            <button type="button" class="button">$!{prod.buttonTxt}</button>
+                        </div>
+                    #end
+                </div>
+            </div>
+        #end
+    </div>
+#else
+    <div id="js-widget-products" class="product-list $!{className}">No product found!</div>
+#end
+
+<link linkType="component" rel="stylesheet/less" type="text/css" href="//rawcdn.githack.com/chinhphan099/cdn/07993c19b867739c6a03481c3b96f4282549b4dc/w_productlist/widget_productlist_v1.less">
+##<script scriptType="component" src="//rawcdn.githack.com/chinhphan099/cdn/07993c19b867739c6a03481c3b96f4282549b4dc/w_productlist/widget_productlist_v1.js" defer></script>
