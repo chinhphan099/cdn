@@ -1,0 +1,229 @@
+#set($con = $dotcontent.find($CONTENT_INODE))
+#set($items = $json.generate($!{items}))
+#set($mainSlideAttr = '')
+#set($thumbSlideAttr = '')
+#set($slideCls = '')
+#set($adaptiveCls = '')
+#set($innerCls = 'w_inner')
+
+#set($effect = '')
+#set($autoplay = '')
+#set($initUnder = '')
+#set($setPositionArrows = '')
+#set($dots = '')
+#set($infinite = '')
+#set($centerPaddingSlide = '')
+#set($adaptive = '')
+#set($desktopItem = '')
+#set($tabletItem = '')
+#set($mobileItem = '')
+#set($verticalMode = '')
+#set($centerMode = '')
+
+#if($type == 'slider')
+    #set($innerCls = 'slick main-slider')
+    #if($effectFade == 'true')
+        #set($effect = '&quot;fade&quot;:true,')
+    #end
+    #if($autoPlaySlide == 'true')
+        #set($autoplay = '&quot;autoplay&quot;:true,')
+    #end
+    #if($arrowVerticalMainImage == 'true')
+        #set($setPositionArrows = '&quot;setPositionArrows&quot;:true,')
+    #end
+    #if($bullets == 'true')
+        #set($dots = '&quot;dots&quot;:true,')
+    #end
+    #if($infiniteSlide == 'true')
+        #set($infinite = '&quot;infinite&quot;:true,')
+    #end
+    #if($adaptiveHeight == 'true')
+        #set($adaptive = '&quot;adaptiveHeight&quot;:true,')
+        #set($adaptiveCls = 'adaptive-slider')
+    #end
+    #if($UtilMethods.isSet($centerPadding))
+        #set($centerPaddingSlide = '&quot;centerPadding&quot;:&quot;' + $centerPadding + '&quot;,')
+    #end
+
+    ## Get count of slide to show
+    #if($slidesToShowOnDesktop != 1 || $slidesToShowOnTablet != 1 || $slidesToShowOnMobile != 1)
+        #set($desktopItem = '&quot;desktopItems&quot;:' + $slidesToShowOnDesktop + ',')
+        #set($tabletItem = '&quot;tabletItems&quot;:' + $slidesToShowOnTablet + ',')
+        #set($mobileItem = '&quot;mobileItems&quot;:' + $slidesToShowOnMobile + ',')
+    #end
+
+    ## Ex: Init Slider at Mobile Screen
+    #if($sliderRunUnderScreenSize != '0')
+        #set($initUnder = '&quot;initUnder&quot;:' + $sliderRunUnderScreenSize + ',')
+    #end
+
+    ## Slider Class Name
+    #if($typeSlider == 'normal')
+        #set($slideCls = 'slider carousel-slider')
+    #elseif($typeSlider == 'syncing')
+        #set($slideCls = 'slider syncing-slider')
+    #end
+
+    #if($sliderMode == 'centermode')
+        #set($slideCls = 'slider centermode-slider')
+        #set($centerMode = '&quot;centermode&quot;:true' + ',')
+    #elseif($sliderMode == 'verticalmode')
+        #set($slideCls = 'slider vertical-slider')
+        #set($verticalMode = '&quot;verticalmode&quot;:true' + ',')
+    #end
+
+    #if($typeSlider == 'syncing')
+        #set($mainSlideAttr = 'data-cslider="{' +
+            $!{effect} + $!{autoplay} + $!{initUnder} + $!{setPositionArrows} + $!{infinite} + $!{verticalMode} +
+            '&quot;type&quot;:&quot;syncing&quot;,' +
+            '&quot;navFor&quot;:&quot;.thumb-slider&quot;,' +
+            '&quot;view&quot;:true}"')
+
+        #set($thumbSlideAttr = 'data-cslider="{' +
+            $!{desktopItem} + $!{tabletItem} + $!{mobileItem} + $!{initUnder} + $!{infinite} + $!{centerMode} + $!{verticalMode} + $!{centerPaddingSlide} +
+            '&quot;type&quot;:&quot;syncing&quot;,' +
+            '&quot;navFor&quot;:&quot;.main-slider&quot;}"')
+    #else
+        #set($mainSlideAttr = 'data-cslider="{' +
+            $!{effect} + $!{autoplay} + $!{initUnder} + $!{setPositionArrows} + $!{centerMode} + $!{verticalMode} + $!{adaptive} +
+            $!{dots} + $!{centerPaddingSlide} + $!{infinite} +
+            $!{desktopItem} + $!{tabletItem} + $!{mobileItem} +
+            '&quot;type&quot;:&quot;' + $typeSlider +'&quot;}"')
+    #end
+#end
+#if($EDIT_MODE)
+    <center style="color:#a9a6a6;font-size:10px;font-family:Arial;text-align:left;position:absolute;top:-11px;left:93px;right:50px;z-index:9;line-height:0.9;word-break:break-word;">
+        <span style="padding:0 2px;display:block;">
+            List Items or Slider: $!{con.title}
+        </span>
+    </center>
+#end
+<div class="$!{className}">
+    #if($UtilMethods.isSet($con.heading))
+        <h2 class="w_main_title"><span class="text">$con.heading</span></h2>
+    #end
+    #if($type == 'slider')
+        <div class="$!{slideCls} $!{adaptiveCls}" $!{mainSlideAttr}>
+    #else
+        <div class="w_outer">
+    #end
+        <div class="$!{innerCls}">
+            #foreach($item in $items.data)
+                #set($itemCls = '')
+                #if($item.has('itemClass'))
+                    #set($itemCls = $item.itemClass)
+                #end
+                <div class="w_item $itemCls">
+                    #if($UtilMethods.isSet($item.topText))
+                        <h3 class="w_toptext">$item.topText.replace('xaaax', '"')</h3>
+                    #end
+                    #if($UtilMethods.isSet($item.videoID))
+                        #if($item.videoID.indexOf('vimeo') > -1)
+                            <div class="vimeo-video img-view" data-vimeo-id="$item.videoID.split(-)[1]" id="vimeo_$item.videoID.split(-)[1]"></div>
+                            #if($UtilMethods.isSet($wistia) == false)
+                                <script src='//player.vimeo.com/api/player.js' scriptType="page" defer></script>
+                                #set($wistia = 1)
+                            #end
+                        #else
+                            <div class="responsive-embed sl_video img-view" data-videoid="$!{item.videoID}">
+                                #if($UtilMethods.isSet($wistia) == false)
+                                    <script charset='ISO-8859-1' src='//fast.wistia.com/assets/external/E-v1.js' scriptType="page" defer></script>
+                                    #set($wistia = 1)
+                                #end
+                                <div class='wistia_embed videoFoam=true wistia_async_$!{item.videoID}'></div>
+                            </div>
+                        #end
+                    #elseif($UtilMethods.isSet($item.mainImage))
+                        #set($imgs = $item.mainImage.trim().split(','))
+                        <div class="w_thumb">
+                            #if($UtilMethods.isSet($item.imageLink))
+                                <a class="w_link" href="$item.imageLink">
+                            #end
+                                #if($imgs.size() == 1)
+                                    <img src="$imgs[0]" alt="" class="img-view">
+                                #else
+                                    <picture>
+                                        #if($imgs.size() == 2)
+                                            #if($imgs[1].trim() != "")
+                                                <source media="(max-width: 991px)" srcset="$imgs[1]">
+                                            #end
+                                        #elseif($imgs.size() >= 3)
+                                            #if($imgs[1].trim() != "")
+                                                <source media="(max-width: 991px)" srcset="$imgs[1]">
+                                            #end
+                                            #if($imgs[2].trim() != "")
+                                                <source media="(max-width: 767px)" srcset="$imgs[2]">
+                                            #end
+                                        #end
+                                        <img src="$imgs[0]" alt="" class="img-view">
+                                    </picture>
+                                #end
+                            #if($UtilMethods.isSet($item.imageLink))
+                                </a>
+                            #end
+                        </div>
+                    #end
+
+                    #if($UtilMethods.isSet($wrapAllTitleAndDescription) && ($UtilMethods.isSet($item.title) || $UtilMethods.isSet($item.shortDesc)))
+                        <div class="w_content_wrap">
+                    #end
+                        #if($UtilMethods.isSet($item.title))
+                            <h4 class="w_title">$!{item.title.replace('xaaax', '"')}</h4>
+                        #end
+                        #if($UtilMethods.isSet($item.subImage))
+                            <span class="w_sub_img">
+                                <img src="$!{item.subImage}" alt="">
+                            </span>
+                        #end
+                        #if($UtilMethods.isSet($item.shortDesc))
+                            <div class="w_desc">$!{item.shortDesc.replace('xaaax', '"')}</div>
+                        #end
+                    #if($UtilMethods.isSet($wrapAllTitleAndDescription) && ($UtilMethods.isSet($item.title) || $UtilMethods.isSet($item.shortDesc)))
+                        </div>
+                    #end
+                </div>
+            #end
+        </div>
+    #if($type == 'slider')
+        <span class="load"></span>
+        </div>
+        #if($typeSlider == 'syncing')
+        <div class="$!{slideCls}" $!{thumbSlideAttr}>
+            <div class="slick thumb-slider">
+                #foreach($item in $items.data)
+                    #if($UtilMethods.isSet($item.mainImage))
+                        #set($imgs = $item.mainImage.trim().split(','))
+                        <div class="w_item">
+                            <div class="w_thumb">
+                                <img src="$imgs[0]" alt="" class="img-view">
+                            </div>
+                        </div>
+                    #end
+                #end
+            </div>
+            <span class="load"></span>
+        </div>
+        #end
+    #else
+        ## Close outer div
+        </div>
+    #end
+</div>
+
+#if($type == 'slider')
+    #if($UtilMethods.isSet($jquery) == false)
+        <script type="text/javascript" src="//d16hdrba6dusey.cloudfront.net/sitecommon/js/libs/jquery-3.3.1.min.js" scriptType="page" defer></script>
+        #set($jquery = 1)
+    #end
+    #if($UtilMethods.isSet($slick) == false)
+        #*
+        <link linkType="page" rel="stylesheet/less" type="text/css" href="/src/less/slick.less">
+        <script type="text/javascript" src="/src/js/slick.js" scriptType="page"></script>
+        <script type="text/javascript" src="/src/js/slider.js" scriptType="page"></script>
+        *#
+        <link linkType="page" rel="stylesheet/less" type="text/css" href="//rawcdn.githack.com/chinhphan099/cdn/bf2cbac3a9f070697d7f421b5bf4d517f944622c/slick/slick.less">
+        <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/5bb1af6adb508aa2b1c9ddac4d24c7420f25dff4/slick/slick.js" scriptType="page" defer></script>
+        <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/5bb1af6adb508aa2b1c9ddac4d24c7420f25dff4/slick/slider.js" scriptType="page" defer></script>
+        #set($slick = 1)
+    #end
+#end

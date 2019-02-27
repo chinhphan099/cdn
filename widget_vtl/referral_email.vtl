@@ -1,0 +1,64 @@
+#set($con = $dotcontent.find($CONTENT_INODE))
+#if($EDIT_MODE)
+    <center style="color:#a9a6a6;font-size:10px;font-family:Arial;text-align:left;position:absolute;top:-11px;left:93px;right: 50px;z-index:9;line-height:0.9">
+        <span style="padding:0 2px;display:block;">
+            Referrals Email : $!{con.title}
+        </span>
+    </center>
+#end
+<div class="referral_email">
+    <span class="gift-img"><img src="$!{con.image.uri}" alt="$!{con.saveEven}"></span>
+    <span class="text">$!{con.saveEven}</span>
+</div>
+<div class="w_modal_refer $!{con.className}">
+    <div class="w_modal_dialog">
+        <div class="w_modal_content">
+            <div class="w_modal_header">
+                <div class="w_promo_text">$!{con.promoText}</div>
+            </div>
+            <div class="w_modal_body">
+                <div class="w_content">$!{con.heading}</div>
+                <div class="form_refer">
+                    <form id="frmReferral" class="frmReferral" novalidate>
+                        <div class="form-group">
+                            <input type="text" required id="referrerName" placeholder="$!{con.enterYourFirstName}">
+                            <span class="error-message hidden">$!{siteData.messages.required}</span>
+                        </div>
+                        <div class="two-column">
+                            <label for="referFirstName1">$!{con.friendText}</label>
+                            <div class="form-group">
+                                <input type="text" required id="referFirstName1" placeholder="$!{con.firstName}">
+                                <span class="error-message hidden">$!{siteData.messages.required}</span>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" required email id="referEmail1" placeholder="$!{con.email}">
+                                <span class="error-message hidden">$!{siteData.messages.invalidEmail}</span>
+                            </div>
+                        </div>
+                        <div class="two-column">
+                            <label for="referFirstName2">$!{con.friendText2}</label>
+                            <div class="form-group">
+                                <input type="text" required id="referFirstName2" placeholder="$!{con.firstName}">
+                                <span class="error-message hidden">$!{siteData.messages.required}</span>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" required email id="referEmail2" placeholder="$!{con.email}">
+                                <span class="error-message hidden">$!{siteData.messages.invalidEmail}</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <button id="btn-yes-refer" type="button" class="btn-yes-refer">$!{con.yesButtonText}</button>
+                <div class="btn-no-refer-wrap"><a href="javascript:;" id="btn-no-refer" class="btn-no-refer">$!{con.noButtonText}</a></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var redirectLinkRefer = window.location.origin + '$!{con.redirectLink}' + window.location.search,
+        apiUrl = '//api.maropost.com/accounts/$con.maroAccountId/lists/$con.maroContactList/contacts.json?auth_token=$con.maroAuthToken',
+        emailErr = '$!{siteData.messages.invalidEmail}';
+</script>
+<link linkType="component" rel="stylesheet/less" type="text/css" href="/src/less/widget_referring.less">
+<script scriptType="component" src="/src/js/widget_referring.js" defer></script>
