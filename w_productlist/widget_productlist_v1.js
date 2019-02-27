@@ -46,7 +46,9 @@
                             const elemDiscountedPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .discountedPrice');
                             const elemFullPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .fullPrice');
 
-                            if (elemUnitDiscountRate) elemUnitDiscountRate.innerHTML = product.productPrices.UnitDiscountRate.FormattedValue;
+                            if (elemUnitDiscountRate) {
+                                elemUnitDiscountRate.innerHTML = product.productPrices.UnitDiscountRate.FormattedValue;
+                            }
                             if (elemDiscountedPrice) {
                                 for(let discountedPrice of elemDiscountedPrice) {
                                     discountedPrice.innerHTML = product.productPrices.DiscountedPrice.FormattedValue;
@@ -118,7 +120,7 @@
                     if (window.js_translate && window.js_translate.free) {
                         priceShipping = window.js_translate.free;
                     } else {
-                        priceShipping = "free";
+                        priceShipping = 'free';
                     }
                 } else {
                     priceShipping = shipping.formattedPrice;
@@ -127,7 +129,7 @@
                 if (window.js_translate && window.js_translate.free) {
                     priceShipping = window.js_translate.free;
                 } else {
-                    priceShipping = "free";
+                    priceShipping = 'free';
                 }
             }
 
@@ -201,66 +203,15 @@
         let isMissingTab = true;
         let rootActiveText = '';
         let activeText = '';
-        let indexItem = currentPackage.indexOf(_q('input[name=product]:checked').value);
+        let indexItem = currentPackage.indexOf(_q('input[name="product"]:checked').value);
         let waitTime;
 
         if(!!titleElm) {
             rootActiveText = titleElm.innerHTML;
             activeText = rootActiveText;
         }
-        function listener() {
-            for(let tabItem of tabItems) {
-                if(!!titleElm) {
-                    tabItem.addEventListener('mouseenter', function() {
-                        titleElm.innerHTML = tabItem.dataset.replacetext;
-                    }, false);
 
-                    tabItem.addEventListener('mouseleave', function() {
-                        titleElm.innerHTML = activeText;
-                    }, false);
-                }
-
-                tabItem.addEventListener('click', function() {
-                    // Update Text
-                    if(!!titleElm) {
-                        activeText = tabItem.dataset.replacetext;
-                        titleElm.innerHTML = activeText;
-                    }
-
-                    activeTab(tabItem);
-                    saveActiveTabIndex();
-                }, false);
-            }
-
-            _qById('btn-yes-exit-popup').addEventListener('click', function(e) {
-                indexItem = 0;
-                init(true);
-            }, false);
-        }
-
-        function setupTab() {
-            if(!!titleElm) {
-                activeText = rootActiveText;
-                titleElm.innerHTML = activeText;
-            }
-            q('.js-list-group li').removeClass('active');
-            for(let tabItem of tabItems) {
-                if(_q('.js-list-group ul').dataset.packagedisplay === tabItem.dataset.package) {
-                    tabItem.classList.add('active');
-                    isMissingTab = false;
-                    break;
-                }
-            }
-
-            if(!!waitTime) {
-                clearTimeout(waitTime);
-            }
-            waitTime = setTimeout(function() {
-                saveActiveTabIndex();
-            }, 3000);
-        }
-
-        function saveActiveTabIndex() {
+        const saveActiveTabIndex = () => {
             utils.localStorage().set('indexTab', -1);
             for(let [index, tabItem] of tabItems.entries()) {
                 if(tabItem.classList.contains('active')) {
@@ -268,35 +219,20 @@
                     break;
                 }
             }
-        }
-
-        function updateIndexItem() {
-            indexItem = currentPackage.indexOf(_q('input[name=product]:checked').value);
-        }
-
-        function activeTab(tabItem) {
-            let isPopup = utils.getQueryParameter('et') === '1';
-            updateIndexItem();
-
-            q('.js-list-group li').removeClass('clicked');
-            tabItem.classList.add('clicked');
-            if(!tabItem.classList.contains('active')) {
-                q('.js-list-group li').removeClass('active');
-                tabItem.classList.add('active');
-                showDefaultProduct(tabItem.dataset.package.split(','), isPopup);
-            }
-            else if(isMissingTab && tabItem.classList.contains('active')) {
-                q('.js-list-group li').removeClass('active');
-                tabItem.classList.remove('clicked');
-                if(!!titleElm) {
-                    titleElm.innerHTML = rootActiveText;
-                    activeText = rootActiveText;
+        };
+        const updateIndexItem = () => {
+            indexItem = currentPackage.indexOf(_q('input[name="product"]:checked').value);
+        };
+        const checkProduct = () => {
+            // indexItem
+            for(let [index, proId] of currentPackage.entries()) {
+                if(index === indexItem) {
+                    let input = _q('input[name="product"][value="' + proId + '"]');
+                    getClosest(input, '.productRadioListItem').querySelector('.js-unitDiscountRate').click();
                 }
-                showDefaultProduct(packageDisplay, isPopup);
             }
-        }
-
-        function showDefaultProduct(packageDisplay, isPopup) {
+        };
+        const showDefaultProduct = (packageDisplay, isPopup) => {
             // Hide all product items
             currentPackage = packageDisplay;
             q('.productRadioListItem').addClass('hidden');
@@ -320,20 +256,50 @@
             }
 
             checkProduct();
-        }
-
-        function checkProduct() {
-            // indexItem
-            for(let [index, proId] of currentPackage.entries()) {
-                if(index === indexItem) {
-                    let input = _q('input[name="product"][value="' + proId + '"]');
-                    getClosest(input, '.productRadioListItem').querySelector('.js-unitDiscountRate').click();
+        };
+        const setupTab = () => {
+            if(!!titleElm) {
+                activeText = rootActiveText;
+                titleElm.innerHTML = activeText;
+            }
+            q('.js-list-group li').removeClass('active');
+            for(let tabItem of tabItems) {
+                if(_q('.js-list-group ul').dataset.packagedisplay === tabItem.dataset.package) {
+                    tabItem.classList.add('active');
+                    isMissingTab = false;
+                    break;
                 }
             }
-        }
 
-        // Initialize
-        function init(isPopup) {
+            if(!!waitTime) {
+                clearTimeout(waitTime);
+            }
+            waitTime = setTimeout(function() {
+                saveActiveTabIndex();
+            }, 3000);
+        };
+        const activeTab = (tabItem) => {
+            let isPopup = utils.getQueryParameter('et') === '1';
+            updateIndexItem();
+
+            q('.js-list-group li').removeClass('clicked');
+            tabItem.classList.add('clicked');
+            if(!tabItem.classList.contains('active')) {
+                q('.js-list-group li').removeClass('active');
+                tabItem.classList.add('active');
+                showDefaultProduct(tabItem.dataset.package.split(','), isPopup);
+            }
+            else if(isMissingTab && tabItem.classList.contains('active')) {
+                q('.js-list-group li').removeClass('active');
+                tabItem.classList.remove('clicked');
+                if(!!titleElm) {
+                    activeText = rootActiveText;
+                    titleElm.innerHTML = activeText;
+                }
+                showDefaultProduct(packageDisplay, isPopup);
+            }
+        };
+        const init = (isPopup) => {
             setupTab();
             showDefaultProduct(packageDisplay, isPopup);
 
@@ -349,10 +315,38 @@
                 // Remove default class for defaul item (not speical_offer)
                 q('.default:not(.special_offer)').removeClass('default');
             }
-        }
+        };
+        const listener = () => {
+            for(let tabItem of tabItems) {
+                if(!!titleElm) {
+                    tabItem.addEventListener('mouseenter', function() {
+                        titleElm.innerHTML = tabItem.dataset.replacetext;
+                    }, false);
 
-        let isPopup = utils.getQueryParameter('et') === '1';
-        init(isPopup);
+                    tabItem.addEventListener('mouseleave', function() {
+                        titleElm.innerHTML = activeText;
+                    }, false);
+                }
+
+                tabItem.addEventListener('click', function() {
+                    // Update Text
+                    if(!!titleElm) {
+                        activeText = tabItem.dataset.replacetext;
+                        titleElm.innerHTML = activeText;
+                    }
+
+                    activeTab(tabItem);
+                    saveActiveTabIndex();
+                }, false);
+            }
+
+            _qById('btn-yes-exit-popup').addEventListener('click', function() {
+                indexItem = 0;
+                init(true);
+            }, false);
+        };
+
+        init(utils.getQueryParameter('et') === '1');
         listener();
     }
     // End Product list Category ----------------------------------------------------------------------------------------
