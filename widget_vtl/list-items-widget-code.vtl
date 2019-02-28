@@ -148,11 +148,11 @@
                                                 <source media="(max-width: 991px)" srcset="$imgs[1]">
                                             #end
                                         #elseif($imgs.size() >= 3)
-                                            #if($imgs[1].trim() != "")
-                                                <source media="(max-width: 991px)" srcset="$imgs[1]">
-                                            #end
                                             #if($imgs[2].trim() != "")
                                                 <source media="(max-width: 767px)" srcset="$imgs[2]">
+                                            #end
+                                            #if($imgs[1].trim() != "")
+                                                <source media="(max-width: 991px)" srcset="$imgs[1]">
                                             #end
                                         #end
                                         <img src="$imgs[0]" alt="" class="img-view">
