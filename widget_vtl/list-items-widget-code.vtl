@@ -90,7 +90,10 @@
             $!{desktopItem} + $!{tabletItem} + $!{mobileItem} +
             '&quot;type&quot;:&quot;' + $typeSlider +'&quot;}"')
     #end
+#elseif($type == 'qa')
+    #set($innerCls = 'w_qa_list')
 #end
+
 #if($EDIT_MODE)
     <center style="color:#a9a6a6;font-size:10px;font-family:Arial;text-align:left;position:absolute;top:-11px;left:93px;right:50px;z-index:9;line-height:0.9;word-break:break-word;">
         <span style="padding:0 2px;display:block;">
@@ -118,6 +121,7 @@
                         <h3 class="w_toptext">$item.topText.replace('xaaax', '"')</h3>
                     #end
                     #if($UtilMethods.isSet($item.videoID))
+                        #*
                         #if($item.videoID.indexOf('vimeo') > -1)
                             <div class="vimeo-video img-view" data-vimeo-id="$item.videoID.split(-)[1]" id="vimeo_$item.videoID.split(-)[1]"></div>
                             #if($UtilMethods.isSet($wistia) == false)
@@ -125,6 +129,7 @@
                                 #set($wistia = 1)
                             #end
                         #else
+                        *#
                             <div class="responsive-embed sl_video img-view" data-videoid="$!{item.videoID}">
                                 #if($UtilMethods.isSet($wistia) == false)
                                     <script charset='ISO-8859-1' src='//fast.wistia.com/assets/external/E-v1.js' scriptType="page" defer></script>
@@ -132,7 +137,7 @@
                                 #end
                                 <div class='wistia_embed videoFoam=true wistia_async_$!{item.videoID}'></div>
                             </div>
-                        #end
+                        ##end
                     #elseif($UtilMethods.isSet($item.mainImage))
                         #set($imgs = $item.mainImage.trim().split(','))
                         <div class="w_thumb">
@@ -216,14 +221,17 @@
         #set($jquery = 1)
     #end
     #if($UtilMethods.isSet($slick) == false)
-        #*
-        <link linkType="page" rel="stylesheet/less" type="text/css" href="/src/less/slick.less">
-        <script type="text/javascript" src="/src/js/slick.js" scriptType="page"></script>
-        <script type="text/javascript" src="/src/js/slider.js" scriptType="page"></script>
-        *#
         <link linkType="page" rel="stylesheet/less" type="text/css" href="//rawcdn.githack.com/chinhphan099/cdn/bf2cbac3a9f070697d7f421b5bf4d517f944622c/slick/slick.less">
         <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/5bb1af6adb508aa2b1c9ddac4d24c7420f25dff4/slick/slick.js" scriptType="page" defer></script>
         <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/5bb1af6adb508aa2b1c9ddac4d24c7420f25dff4/slick/slider.js" scriptType="page" defer></script>
         #set($slick = 1)
+    #end
+#end
+
+#if($type == 'qa')
+    #if($UtilMethods.isSet($qa) == false)
+        <link linkType="page" rel="stylesheet/less" type="text/css" href="//rawcdn.githack.com/chinhphan099/cdn/bffd83b4670dedd380620fd9e937202a50b4cba2/widget_qa/w_qa.less">
+        <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/bffd83b4670dedd380620fd9e937202a50b4cba2/widget_qa/w_qa.js" scriptType="page" defer></script>
+        #set($qa = 1)
     #end
 #end
