@@ -145,22 +145,22 @@
                                 <a class="w_link" href="$item.imageLink">
                             #end
                                 #if($imgs.size() == 1)
-                                    <img src="$imgs[0]" alt="" class="img-view">
+                                    <img src="$imgs[0].trim()" alt="" class="img-view">
                                 #else
                                     <picture>
                                         #if($imgs.size() == 2)
                                             #if($imgs[1].trim() != "")
-                                                <source media="(max-width: 991px)" srcset="$imgs[1]">
+                                                <source media="(max-width: 991px)" srcset="$imgs[1].trim()">
                                             #end
                                         #elseif($imgs.size() >= 3)
                                             #if($imgs[2].trim() != "")
-                                                <source media="(max-width: 767px)" srcset="$imgs[2]">
+                                                <source media="(max-width: 767px)" srcset="$imgs[2].trim()">
                                             #end
                                             #if($imgs[1].trim() != "")
-                                                <source media="(max-width: 991px)" srcset="$imgs[1]">
+                                                <source media="(max-width: 991px)" srcset="$imgs[1].trim()">
                                             #end
                                         #end
-                                        <img src="$imgs[0]" alt="" class="img-view">
+                                        <img src="$imgs[0].trim()" alt="" class="img-view">
                                     </picture>
                                 #end
                             #if($UtilMethods.isSet($item.imageLink))
@@ -200,7 +200,7 @@
                         #set($imgs = $item.mainImage.trim().split(','))
                         <div class="w_item">
                             <div class="w_thumb">
-                                <img src="$imgs[0]" alt="" class="img-view">
+                                <img src="$imgs[0].trim()" alt="" class="img-view">
                             </div>
                         </div>
                     #end
