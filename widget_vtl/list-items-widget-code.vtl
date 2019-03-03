@@ -121,15 +121,13 @@
                         <h3 class="w_toptext">$item.topText.replace('xaaax', '"')</h3>
                     #end
                     #if($UtilMethods.isSet($item.videoID))
-                        #*
                         #if($item.videoID.indexOf('vimeo') > -1)
-                            <div class="vimeo-video img-view" data-vimeo-id="$item.videoID.split(-)[1]" id="vimeo_$item.videoID.split(-)[1]"></div>
-                            #if($UtilMethods.isSet($wistia) == false)
+                            <div class="vimeo-video img-view" data-vimeo-id="$item.videoID.split('-')[1]" id="vimeo_$item.videoID.split('-')[1]"></div>
+                            #if($UtilMethods.isSet($vimeo) == false)
                                 <script src='//player.vimeo.com/api/player.js' scriptType="page" defer></script>
-                                #set($wistia = 1)
+                                #set($vimeo = 1)
                             #end
                         #else
-                        *#
                             <div class="responsive-embed sl_video img-view" data-videoid="$!{item.videoID}">
                                 #if($UtilMethods.isSet($wistia) == false)
                                     <script charset='ISO-8859-1' src='//fast.wistia.com/assets/external/E-v1.js' scriptType="page" defer></script>
@@ -137,7 +135,7 @@
                                 #end
                                 <div class='wistia_embed videoFoam=true wistia_async_$!{item.videoID}'></div>
                             </div>
-                        ##end
+                        #end
                     #elseif($UtilMethods.isSet($item.mainImage))
                         #set($imgs = $item.mainImage.trim().split(','))
                         <div class="w_thumb">
@@ -223,7 +221,11 @@
     #if($UtilMethods.isSet($slick) == false)
         <link linkType="page" rel="stylesheet/less" type="text/css" href="//rawcdn.githack.com/chinhphan099/cdn/bf2cbac3a9f070697d7f421b5bf4d517f944622c/slick/slick.less">
         <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/5bb1af6adb508aa2b1c9ddac4d24c7420f25dff4/slick/slick.js" scriptType="page" defer></script>
+        #if($UtilMethods.isSet($con.jsPath))
+        <script type="text/javascript" src="$!{con.jsPath}" scriptType="page" defer></script>
+        #else
         <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/5bb1af6adb508aa2b1c9ddac4d24c7420f25dff4/slick/slider.js" scriptType="page" defer></script>
+        #end
         #set($slick = 1)
     #end
 #end
