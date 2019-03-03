@@ -222,6 +222,7 @@
       this.handle.on('afterChange.' + pluginName, function(slick, currentSlide) {
         that.setPositionArrows();
 
+        /*
         var videoId = $('.slick-current', that.element).find('.img-view').data('videoid');
         if(!!videoId) {
           wistiaVideo = Wistia.api(videoId);
@@ -229,6 +230,7 @@
             wistiaVideo.play();
           }
         }
+        */
       });
       this.hoverBulletEvent();
       this.setPositionArrows();
