@@ -1,0 +1,257 @@
+<style>
+    #content_ifr,
+    #successText_ifr {
+        height: 300px !important;
+    }
+    .itemList {
+        margin: 10px 0px 10px 15px;
+        width: 100%;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+    }
+    .itemList li {
+        position: relative;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #cecece;
+        width: 200px;
+        margin-right: 20px;
+    }
+    .itemList .item-title {
+        font-size: 12px;
+        padding-bottom: 5px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #cecece;
+        text-transform: uppercase;
+    }
+    .itemList input, .itemList textarea {
+        border: 1px solid #cecece;
+        margin-bottom: 10px;
+        font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+        padding: 10px;
+        width: 100%;
+        resize: vertical;
+    }
+    .itemList .collapseContent {
+        display: inline-block;
+        padding: 7px 10px;
+        margin-bottom: 10px;
+        border: 1px solid #cecece;
+        color: black;
+        cursor: pointer;
+    }
+    .itemList .collapseContent:hover {
+        background-color: #f7f7f7;
+    }
+    .itemList .wrap-content {
+        border: 1px dashed #ddd;
+        padding: 10px 10px 0;
+    }
+    .itemList .wrap-content input, .itemList .wrap-content textarea {
+        border-color: #ddd;
+    }
+    .itemList textarea {
+        height: 90px;
+    }
+    .itemList .removeItem {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        color: black;
+        line-height: 0.5;
+        cursor: pointer;
+    }
+    .itemList .removeItem:hover {
+        color: #0004a7;
+    }
+    .itemList .removeItem:before {
+        content: '×';
+        font-size: 30px;
+    }
+</style>
+
+#set($con = $dotcontent.find($request.getAttribute('com.dotmarketing.contentlet.edit').inode))
+<ul id="itemList" class="itemList"></ul>
+<button dojoType="dijit.form.Button" onclick="addItem">Add Item</button>
+
+<script>
+    var count = 1;
+    var listItems = {
+        data: []
+    };
+
+    function initPage() {
+        #if($UtilMethods.isSet($con.items))
+            var items = $con.items;
+            listItems.data = items.data;
+
+            var item;
+            if(items.data.length > 0) {
+                for(var i = 0; i < items.data.length; i++) {
+                    item = items.data[i];
+                    generateItem(item);
+                }
+                updateValueToCustomField();
+                var lastItemId = items.data[items.data.length-1].id;
+                count = parseInt(lastItemId.replace('item-', '')) + 1;
+            }
+        #end
+    }
+    initPage();
+
+    function getItemById(id) {
+        var obj = null;
+        for(var i = 0; i < listItems.data.length; i++) {
+            if(listItems.data[i].id === id) {
+                obj = listItems.data[i];
+                break;
+            }
+        }
+        return obj;
+    }
+
+    function saveData(elm) {
+        var li = elm.closest('li'),
+            obj = getItemById(li.id);
+
+        if(obj) {
+            obj.title = li.querySelector('input.title').value;
+            obj.emotion = li.querySelector('input.emotion').value;
+            obj.value = parseInt(li.querySelector('input.value').value);
+            obj.color = li.querySelector('input.color').value || li.querySelector('input.color').getAttribute('data-color');
+            obj.background = li.querySelector('input.background').value || li.querySelector('input.background').getAttribute('data-background');
+        }
+        else {
+            obj = {
+                id: li.id,
+                title: li.querySelector('input.title').value,
+                emotion: li.querySelector('input.emotion').value,
+                value: parseInt(li.querySelector('input.value').value),
+                color: li.querySelector('input.color').value || li.querySelector('input.color').getAttribute('data-color'),
+                background: li.querySelector('input.background').value || li.querySelector('input.background').getAttribute('data-background')
+            };
+            listItems.data.push(obj);
+        }
+
+        updateValueToCustomField();
+    }
+    function handleValue(elm) {
+        if(elm.value === '1' || elm.value === '2') {
+            elm.style.backgroundColor = '#cbdeff';
+        }
+        else {
+            elm.style.backgroundColor = '#fff';
+        }
+    }
+
+    function createInput(className, value, inputType, placeholder) {
+        var input = document.createElement('INPUT');
+        if(typeof value !== 'undefined' && value !== '') {
+            input.value = value;
+        }
+
+        input.addEventListener('change', function(e) {
+            saveData(this);
+        });
+
+        input.setAttribute('type', inputType);
+        input.setAttribute('placeholder', placeholder);
+        input.classList.add(className);
+        if(className === 'color') {
+            input.setAttribute('data-color', '#fff');
+        }
+        if(className === 'background') {
+            input.setAttribute('data-background', '#29aae2');
+            input.style.backgroundColor = value;
+        }
+        if(className === 'value') {
+            handleValue(input);
+        }
+        input.addEventListener('keyup', function(e) {
+            if(className === 'value') {
+                handleValue(this);
+            }
+            if(className === 'background') {
+                input.style.backgroundColor = this.value;
+            }
+        });
+        return input;
+    }
+
+    function addItem() {
+        var item = {
+            id: 'item-' + count,
+            title: '',
+            emotion: '',
+            value: 0,
+            color: '',
+            background: ''
+        }
+
+        listItems.data.push(item);
+        generateItem(item);
+        updateValueToCustomField();
+        count++;
+    }
+
+    function generateItem(item) {
+        //create li
+        var li = document.createElement('li');
+        li.setAttribute('id', item.id);
+
+        // Item's heading
+        var divTitle = document.createElement('div');
+        divTitle.classList.add('item-title');
+        divTitle.innerHTML = 'Item ' + (listItems.data.indexOf(item) + 1);
+        li.appendChild(divTitle);
+
+        var titleTxt = createInput('title', item.title, 'text', 'Title');
+        li.appendChild(titleTxt);
+
+        var titleTxt = createInput('emotion', item.emotion, 'text', 'Emotion path');
+        li.appendChild(titleTxt);
+
+        var valueTxt = createInput('value', item.value, 'number', '1: Active - 0: No Active');
+        li.appendChild(valueTxt);
+
+        // Text Color
+        var colorTxt = createInput('color', item.color, 'text', 'Text Color');
+        li.appendChild(colorTxt);
+
+        // Background Field
+        var backgroundTxt = createInput('background', item.background, 'text', 'Background Color');
+        li.appendChild(backgroundTxt);
+
+        // Remove Button
+        var a = document.createElement('a'),
+            textNode = document.createTextNode('');
+
+        a.classList.add('removeItem');
+        a.appendChild(textNode);
+        li.appendChild(a);
+        bindEventRemove(a);
+
+        document.getElementById('itemList').appendChild(li);
+    }
+
+    function updateValueToCustomField() {
+        dojo.byId('items').value = JSON.stringify(listItems);
+    }
+
+    function bindEventRemove(elem) {
+        elem.addEventListener('click', function(e) {
+            e.preventDefault();
+            var li = elem.parentNode,
+                item = getItemById(li.id),
+                index = listItems.data.indexOf(item);
+
+            listItems.data.splice(index, 1);
+            document.getElementById('itemList').removeChild(li);
+            updateValueToCustomField();
+            count--;
+        });
+    }
+</script>

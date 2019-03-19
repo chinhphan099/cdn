@@ -605,11 +605,18 @@
 
     // Handler settings
     function checktypeContent(selectedVal) {
-        if(selectedVal === 'list') {
-            document.querySelector('[widgetid="mainTabContainer_tablist_optionsForSlider"]').classList.add('hide');
+        if(selectedVal === 'slider') {
+            document.querySelector('[widgetid="mainTabContainer_tablist_optionsForSlider"]').classList.remove('hide');
         }
         else {
-            document.querySelector('[widgetid="mainTabContainer_tablist_optionsForSlider"]').classList.remove('hide');
+            document.querySelector('[widgetid="mainTabContainer_tablist_optionsForSlider"]').classList.add('hide');
+        }
+
+        if(selectedVal === 'qa') {
+            dijit.byId('text40Checkbox').set('checked', true).set('disabled', true);
+        }
+        else {
+            dijit.byId('text40Checkbox').set('disabled', false);
         }
     }
     function setupLayout() {

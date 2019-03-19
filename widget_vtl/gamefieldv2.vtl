@@ -1,0 +1,86 @@
+#set($con = $dotcontent.find($CONTENT_INODE))
+#if($EDIT_MODE)
+    <center style="color:#a9a6a6;font-size:10px;font-family:Arial;text-align:left;position:absolute;top:-11px;left:93px;right: 50px;z-index:9;line-height:0.9">
+        <span style="padding:0 2px;display:block;">
+            Gamefiedv2 : $!{con.title}
+        </span>
+    </center>
+    <div>Gamefiedv2</div>
+#end
+<div class="dummy-layer"></div>
+<div class="gamefiedWrap $!{con.className} #if($EDIT_MODE)hidden#end">
+    <div class="gamefiedWrap-inner">
+        <div class="game-logo-wrap">
+            <img src="$!{con.logo.uri}" class="game-logo">
+        </div>
+        <div class="game-main">
+            <div class="w_content">
+                <div class="content-1">
+                    <div class="text-wrap">$!{con.content}</div>
+                    <div class="form-group">
+                        <input type="text" id="gamefiedEmailTxt" required email placeholder="$!{con.placeHolderText}">
+                        <span class="error-message hidden"></span>
+                    </div>
+                    <button type="button" class="green-button spin-button">$!{con.firstButton}</button>
+                </div>
+                <div class="content-bonus" style="display:none;">
+                    <div class="text-wrap">$!{con.contentBonusSpin}</div>
+                    <button type="button" class="green-button spin-button">$!{con.textSpinAgain}</button>
+                </div>
+                <div class="content-2" style="display:none;">
+                    <div class="text-wrap">$!{con.successText}</div>
+                    <button type="button" class="green-button" id="gamefied-yes">$!{con.secondButton}</button>
+                </div>
+                <div class="decline-wrap">
+                    <a href="javascript:" data-reject="$!{con.rejectOfferText}" class="no-tracking" id="gamefied-no">$!{con.declineText} <i class="icon-close"></i></a>
+                </div>
+            </div>
+            <div class="gamefied-outer">
+                <div class="gamefied-wrapper">
+                    <div class="gamefied"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var items = $con.items,
+        dataItems = items.data || [],
+        slices = [];
+    for(var i = 0, n = dataItems.length; i < n; i++) {
+        var gameItem = {
+            text: dataItems[i].title + (dataItems[i].emotion.length > 0 ? '<img src="' + dataItems[i].emotion.trim() + '">' : ''),
+            value: dataItems[i].value,
+            background: dataItems[i].background,
+            color: dataItems[i].color
+        };
+        slices.push(gameItem);
+    }
+</script>
+<style>
+    #if($UtilMethods.isSet($con.mobileBackground))
+    .gamefiedWrap {
+        background-image: url("$con.mobileBackground.uri");
+    }
+    #end
+    #if($UtilMethods.isSet($con.desktopBackground))
+    @media (min-width: 768px) {
+        .gamefiedWrap {
+            background-image: url("$con.desktopBackground.uri");
+        }
+    }
+    #end
+</style>
+
+#if($UtilMethods.isSet($jquery) == false)
+    <script type="text/javascript" src="//d16hdrba6dusey.cloudfront.net/sitecommon/js/libs/jquery-3.3.1.min.js" scriptType="page"></script>
+    #set($jquery = 1)
+#end
+#if($UtilMethods.isSet($gamefied) == false)
+    <link linkType="page" rel="stylesheet/less" type="text/css" href="//d16hdrba6dusey.cloudfront.net/sitecommon/less/widgets/widget_superwheel.less">
+    <link linkType="page" rel="stylesheet/less" type="text/css" href="/src/less/widget_gamefied_v2.less">
+    <script type="text/javascript" src="//d16hdrba6dusey.cloudfront.net/sitecommon/js/widgets/widget_superwheel.js" scriptType="page" defer></script>
+    <script type="text/javascript" src="//d16hdrba6dusey.cloudfront.net/sitecommon/js/widgets/widget_gamefied.js" scriptType="page" defer></script>
+    <script type="text/javascript" src="/src/js/widget_initgamefied_v2.js" scriptType="page" defer></script>
+    #set($gamefied = 1)
+#end
