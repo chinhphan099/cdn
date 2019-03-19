@@ -29,12 +29,19 @@
     };
 
     function changeTab(titleElm) {
-        const clickedItem = getClosest(titleElm, '.w_item');
+        const qaListElm = getClosest(titleElm, '.w_qa_list'),
+            qaItems = qaListElm.querySelectorAll('.w_item'),
+            clickedItem = getClosest(titleElm, '.w_item');
 
         if(clickedItem.classList.contains('active')) {
-            clickedItem.classList.remove('active');
+            for(let qaItem of qaItems) {
+                qaItem.classList.remove('active');
+            }
         }
         else {
+            for(let qaItem of qaItems) {
+                qaItem.classList.remove('active');
+            }
             clickedItem.classList.add('active');
         }
     }
