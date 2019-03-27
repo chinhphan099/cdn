@@ -15,10 +15,10 @@
             const unitDiscountRateLables = _qAll('.js-unitDiscountRate');
             if (unitDiscountRateLables) {
                 for(let elem of unitDiscountRateLables) {
-                    elem.innerHTML = elem.innerHTML.replace('{UnitDiscountRate}', '<span class="spanUnitDiscountRate">$00.00</span>')
-                                            .replace('{DiscountedPrice}', '<span class="discountedPrice"></span>')
-                                            .replace('{SavePrice}', '<span class="savePrice"></span>')
-                                            .replace('{FullPrice}', '<del class="fullPrice"></del>');
+                    elem.innerHTML = elem.innerHTML.replace(/{UnitDiscountRate}/gi, '<span class="spanUnitDiscountRate">$00.00</span>')
+                                            .replace(/{DiscountedPrice}/gi, '<span class="discountedPrice"></span>')
+                                            .replace(/{SavePrice}/gi, '<span class="savePrice"></span>')
+                                            .replace(/{FullPrice}/gi, '<del class="fullPrice"></del>');
                 }
             }
         }
