@@ -17,6 +17,7 @@
                 for(let elem of unitDiscountRateLables) {
                     elem.innerHTML = elem.innerHTML.replace('{UnitDiscountRate}', '<span class="spanUnitDiscountRate">$00.00</span>')
                                             .replace('{DiscountedPrice}', '<span class="discountedPrice"></span>')
+                                            .replace('{SavePrice}', '<span class="savePrice"></span>')
                                             .replace('{FullPrice}', '<del class="fullPrice"></del>');
                 }
             }
@@ -45,6 +46,10 @@
                             const elemUnitDiscountRate = _q('label[for="' + 'product_' + product.productId + '"] span.spanUnitDiscountRate');
                             const elemDiscountedPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .discountedPrice');
                             const elemFullPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .fullPrice');
+                            const elemSavePrice = _qAll('label[for="' + 'product_' + product.productId + '"] .savePrice');
+                            const fvalue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
+                            const pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
+                            const fCurrency = fvalue.replace(pValue, '######').replace(/\d/g, '');
 
                             if (elemUnitDiscountRate) {
                                 elemUnitDiscountRate.innerHTML = product.productPrices.UnitDiscountRate.FormattedValue;
@@ -57,6 +62,13 @@
                             if (elemFullPrice) {
                                 for(let fullPrice of elemFullPrice) {
                                     fullPrice.innerHTML = product.productPrices.FullRetailPrice.FormattedValue;
+                                }
+                            }
+                            if (elemSavePrice) {
+                                for(let savePrice of elemSavePrice) {
+                                    let savePriceValue = (product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value).toFixed(2);
+
+                                    savePrice.innerHTML = fCurrency.replace('######', savePriceValue);
                                 }
                             }
                         }
