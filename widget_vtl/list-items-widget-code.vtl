@@ -128,12 +128,17 @@
                                 #set($vimeo = 1)
                             #end
                         #else
-                            <div class="responsive-embed sl_video img-view" data-videoid="$!{item.videoID}">
+                            #set($videoWistia = $item.videoID.split('-'))
+                            #set($autoplay = false)
+                            #if($videoWistia.size() > 1 && $videoWistia[1] == 'autoplay')
+                                #set($autoplay = true)
+                            #end
+                            <div class="responsive-embed sl_video img-view" data-videoid="$videoWistia[0]">
                                 #if($UtilMethods.isSet($wistia) == false)
                                     <script charset='ISO-8859-1' src='//fast.wistia.com/assets/external/E-v1.js' scriptType="page" defer></script>
                                     #set($wistia = 1)
                                 #end
-                                <div class='wistia_embed videoFoam=true wistia_async_$!{item.videoID}'></div>
+                                <div class="wistia_embed videoFoam=true wistia_async_$videoWistia[0] #if($autoplay == true)autoPlay=true#end"></div>
                             </div>
                         #end
                     #elseif($UtilMethods.isSet($item.mainImage))
