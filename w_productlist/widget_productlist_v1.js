@@ -47,9 +47,9 @@
                             const elemDiscountedPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .discountedPrice');
                             const elemFullPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .fullPrice');
                             const elemSavePrice = _qAll('label[for="' + 'product_' + product.productId + '"] .savePrice');
-                            const fvalue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
+                            const fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
                             const pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
-                            const fCurrency = fvalue.replace(pValue, '######').replace(/\d/g, '');
+                            const fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
 
                             if (elemUnitDiscountRate) {
                                 elemUnitDiscountRate.innerHTML = product.productPrices.UnitDiscountRate.FormattedValue;
