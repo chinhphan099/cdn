@@ -23,10 +23,18 @@
 #set($specialOnly = '')
 #if($justShowSpecial == 'true')
     #set($specialOnly = '&quot;specialOnly&quot;: true')
+    #if($hideInstallmentText == 'true')
+        #set($specialOnly = $specialOnly + ', ')
+    #end
 #end
+#set($isHideInstallmentText = '')
+#if($hideInstallmentText == 'true')
+    #set($isHideInstallmentText = '&quot;isHideInstallmentText&quot;: true')
+#end
+
 #if($UtilMethods.isSet($products))
     #set($jsonObj = $json.generate($!{products}))
-    <div id="js-widget-products" class="product-list $!{className}" data-options="{$specialOnly}">
+    <div id="js-widget-products" class="product-list $!{className}" data-options="{$specialOnly$isHideInstallmentText}">
         <input type="hidden" id="hdfSelectedProduct" value="$!{productIdForHeading}" />
         <div class="product-heading">
             <div>$!{itemsLabel}</div>

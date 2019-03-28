@@ -1,0 +1,44 @@
+#set($con = $dotcontent.find($CONTENT_INODE))
+#if($EDIT_MODE)
+    <center style="color:#a9a6a6;font-size:10px;font-family:Arial;text-align:left;position:absolute;top:-11px;left:93px;right:50px;z-index:9;line-height:0.9;word-break:break-word;">
+        <span style="padding:0 2px;display:block;">
+            InstallmentPaymentWidget : $!{con.title}
+        </span>
+    </center>
+#end
+<div class="widget-installpayment-form #if(!$EDIT_MODE)hidden#end">
+<div class="installpayment-title">
+    <h3>$!{headingLabel}</h3>
+</div>
+<form id="frmInstallPayment" class="frmInstallPayment" novalidate>
+    <div class="form-group">
+        <label for="ddl_installpayment">$!{installmentPaymentLabel}</label>
+        <div class="custom-select">
+            <select id="ddl_installpayment" required class="ddl-installpayment">
+                <option>Select</option>
+            </select>
+        </div>
+    </div>
+</form>
+</div>
+
+<script>
+    try {
+        window.widget = window.widget ? window.widget : {};
+        window.widget.installmentpayment = {
+            selectedMonth: '$!{selectedMonth}',
+            defaultMonths: [$!{numberOfMonths}],
+            amexMonths: [$!{numberOfMonthsAmexOrElo}],
+            optionText: '$!{itemText}'
+        }
+    } catch (err) {
+        console.log('window.widget.installmentpayment: ', err);
+    }
+</script>
+
+<link linkType="component" rel="stylesheet/less" type="text/css" href="$!{s3_sitecommon}/less/widgets/widget_addressform.less">
+#if($UtilMethods.isSet($con.replaceJsFile))
+    <script scriptType="component" src="$con.replaceJsFile" defer></script>
+#else
+    <script scriptType="component" src="$!{s3_sitecommon}/js/widgets/widget_installmentpayment.js" defer></script>
+#end
