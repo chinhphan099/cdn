@@ -21,224 +21,246 @@
 #set($centerMode = '')
 
 #if($type == 'slider')
-    #set($innerCls = 'slick main-slider')
-    #if($effectFade == 'true')
-        #set($effect = '&quot;fade&quot;:true,')
-    #end
-    #if($autoPlaySlide == 'true')
-        #set($autoplay = '&quot;autoplay&quot;:true,')
-    #end
-    #if($arrowVerticalMainImage == 'true')
-        #set($setPositionArrows = '&quot;setPositionArrows&quot;:true,')
-    #end
-    #if($bullets == 'true')
-        #set($dots = '&quot;dots&quot;:true,')
-    #end
-    #if($infiniteSlide == 'true')
-        #set($infinite = '&quot;infinite&quot;:true,')
-    #end
-    #if($adaptiveHeight == 'true')
-        #set($adaptive = '&quot;adaptiveHeight&quot;:true,')
-        #set($adaptiveCls = 'adaptive-slider')
-    #end
-    #if($UtilMethods.isSet($centerPadding))
-        #set($centerPaddingSlide = '&quot;centerPadding&quot;:&quot;' + $centerPadding + '&quot;,')
-    #end
+  #set($innerCls = 'slick main-slider')
+  #if($effectFade == 'true')
+    #set($effect = '&quot;fade&quot;:true,')
+  #end
+  #if($autoPlaySlide == 'true')
+    #set($autoplay = '&quot;autoplay&quot;:true,')
+  #end
+  #if($arrowVerticalMainImage == 'true')
+    #set($setPositionArrows = '&quot;setPositionArrows&quot;:true,')
+  #end
+  #if($bullets == 'true')
+    #set($dots = '&quot;dots&quot;:true,')
+  #end
+  #if($infiniteSlide == 'true')
+    #set($infinite = '&quot;infinite&quot;:true,')
+  #end
+  #if($adaptiveHeight == 'true')
+    #set($adaptive = '&quot;adaptiveHeight&quot;:true,')
+    #set($adaptiveCls = 'adaptive-slider')
+  #end
+  #if($UtilMethods.isSet($centerPadding))
+    #set($centerPaddingSlide = '&quot;centerPadding&quot;:&quot;' + $centerPadding + '&quot;,')
+  #end
 
-    ## Get count of slide to show
-    #if($slidesToShowOnDesktop != 1 || $slidesToShowOnTablet != 1 || $slidesToShowOnMobile != 1)
-        #set($desktopItem = '&quot;desktopItems&quot;:' + $slidesToShowOnDesktop + ',')
-        #set($tabletItem = '&quot;tabletItems&quot;:' + $slidesToShowOnTablet + ',')
-        #set($mobileItem = '&quot;mobileItems&quot;:' + $slidesToShowOnMobile + ',')
-    #end
+  ## Get count of slide to show
+  #if($slidesToShowOnDesktop != 1 || $slidesToShowOnTablet != 1 || $slidesToShowOnMobile != 1)
+    #set($desktopItem = '&quot;desktopItems&quot;:' + $slidesToShowOnDesktop + ',')
+    #set($tabletItem = '&quot;tabletItems&quot;:' + $slidesToShowOnTablet + ',')
+    #set($mobileItem = '&quot;mobileItems&quot;:' + $slidesToShowOnMobile + ',')
+  #end
 
-    ## Ex: Init Slider at Mobile Screen
-    #if($sliderRunUnderScreenSize != '0')
-        #set($initUnder = '&quot;initUnder&quot;:' + $sliderRunUnderScreenSize + ',')
-    #end
+  ## Ex: Init Slider at Mobile Screen
+  #if($sliderRunUnderScreenSize != '0')
+    #set($initUnder = '&quot;initUnder&quot;:' + $sliderRunUnderScreenSize + ',')
+  #end
 
-    ## Slider Class Name
-    #if($typeSlider == 'normal')
-        #set($slideCls = 'slider carousel-slider')
-    #elseif($typeSlider == 'syncing')
-        #set($slideCls = 'slider syncing-slider')
-    #end
+  ## Slider Class Name
+  #if($typeSlider == 'normal')
+    #set($slideCls = 'slider carousel-slider')
+  #elseif($typeSlider == 'syncing')
+    #set($slideCls = 'slider syncing-slider')
+  #end
 
-    #if($sliderMode == 'centermode')
-        #set($slideCls = 'slider centermode-slider')
-        #set($centerMode = '&quot;centermode&quot;:true' + ',')
-    #elseif($sliderMode == 'verticalmode')
-        #set($slideCls = 'slider vertical-slider')
-        #set($verticalMode = '&quot;verticalmode&quot;:true' + ',')
-    #end
+  #if($sliderMode == 'centermode')
+    #set($slideCls = 'slider centermode-slider')
+    #set($centerMode = '&quot;centermode&quot;:true' + ',')
+  #elseif($sliderMode == 'verticalmode')
+    #set($slideCls = 'slider vertical-slider')
+    #set($verticalMode = '&quot;verticalmode&quot;:true' + ',')
+  #end
 
-    #if($typeSlider == 'syncing')
-        #set($mainSlideAttr = 'data-cslider="{' +
-            $!{effect} + $!{autoplay} + $!{initUnder} + $!{setPositionArrows} + $!{infinite} + $!{verticalMode} +
-            '&quot;type&quot;:&quot;syncing&quot;,' +
-            '&quot;navFor&quot;:&quot; .' + $!{className} +' .thumb-slider&quot;,' +
-            '&quot;view&quot;:true}"')
+  #if($typeSlider == 'syncing')
+    #set($mainSlideAttr = 'data-cslider="{' +
+      $!{effect} + $!{autoplay} + $!{initUnder} + $!{setPositionArrows} + $!{infinite} + $!{verticalMode} +
+      '&quot;type&quot;:&quot;syncing&quot;,' +
+      '&quot;navFor&quot;:&quot; .' + $!{className} +' .thumb-slider&quot;,' +
+      '&quot;view&quot;:true}"')
 
-        #set($thumbSlideAttr = 'data-cslider="{' +
-            $!{desktopItem} + $!{tabletItem} + $!{mobileItem} + $!{initUnder} + $!{infinite} + $!{centerMode} + $!{verticalMode} + $!{centerPaddingSlide} +
-            '&quot;type&quot;:&quot;syncing&quot;,' +
-            '&quot;navFor&quot;:&quot; .' + $!{className} +' .main-slider&quot;}"')
-    #else
-        #set($mainSlideAttr = 'data-cslider="{' +
-            $!{effect} + $!{autoplay} + $!{initUnder} + $!{setPositionArrows} + $!{centerMode} + $!{verticalMode} + $!{adaptive} +
-            $!{dots} + $!{centerPaddingSlide} + $!{infinite} +
-            $!{desktopItem} + $!{tabletItem} + $!{mobileItem} +
-            '&quot;type&quot;:&quot;' + $typeSlider +'&quot;}"')
-    #end
+    #set($thumbSlideAttr = 'data-cslider="{' +
+      $!{desktopItem} + $!{tabletItem} + $!{mobileItem} + $!{initUnder} + $!{infinite} + $!{centerMode} + $!{verticalMode} + $!{centerPaddingSlide} +
+      '&quot;type&quot;:&quot;syncing&quot;,' +
+      '&quot;navFor&quot;:&quot; .' + $!{className} +' .main-slider&quot;}"')
+  #else
+    #set($mainSlideAttr = 'data-cslider="{' +
+      $!{effect} + $!{autoplay} + $!{initUnder} + $!{setPositionArrows} + $!{centerMode} + $!{verticalMode} + $!{adaptive} +
+      $!{dots} + $!{centerPaddingSlide} + $!{infinite} +
+      $!{desktopItem} + $!{tabletItem} + $!{mobileItem} +
+      '&quot;type&quot;:&quot;' + $typeSlider +'&quot;}"')
+  #end
 #elseif($type == 'qa')
-    #set($innerCls = 'w_qa_list')
+  #set($innerCls = 'w_qa_list')
 #end
 
 #if($EDIT_MODE)
-    <center style="color:#a9a6a6;font-size:10px;font-family:Arial;text-align:left;position:absolute;top:-11px;left:93px;right:50px;z-index:9;line-height:0.9;word-break:break-word;">
-        <span style="padding:0 2px;display:block;">
-            List Items or Slider: $!{con.title}
-        </span>
-    </center>
+  <center style="color:#a9a6a6;font-size:10px;font-family:Arial;text-align:left;position:absolute;top:-11px;left:93px;right:50px;z-index:9;line-height:0.9;word-break:break-word;">
+    <span style="padding:0 2px;display:block;">
+      List Items or Slider: $!{con.title}
+    </span>
+  </center>
 #end
 <div class="$!{className}">
-    #if($UtilMethods.isSet($con.heading))
-        <h2 class="w_main_title"><span class="text">$con.heading</span></h2>
-    #end
-    #if($type == 'slider')
-        <div class="$!{slideCls} $!{adaptiveCls}" $!{mainSlideAttr}>
-    #else
-        <div class="w_outer">
-    #end
-        <div class="$!{innerCls}">
-            #foreach($item in $items.data)
-                #set($itemCls = '')
-                #if($item.has('itemClass'))
-                    #set($itemCls = $item.itemClass)
-                #end
-                <div class="w_item $itemCls">
-                    #if($UtilMethods.isSet($item.topText))
-                        <h3 class="w_toptext">$item.topText.replace('xaaax', '"')</h3>
-                    #end
-                    #if($UtilMethods.isSet($item.videoID))
-                        #if($item.videoID.indexOf('vimeo') > -1)
-                            <div class="vimeo-video img-view" data-vimeo-id="$item.videoID.split('-')[1]" id="vimeo_$item.videoID.split('-')[1]"></div>
-                            #if($UtilMethods.isSet($vimeo) == false)
-                                <script src='//player.vimeo.com/api/player.js' scriptType="page" defer></script>
-                                #set($vimeo = 1)
-                            #end
-                        #else
-                            #set($videoWistia = $item.videoID.split('-'))
-                            #set($autoplay = false)
-                            #if($videoWistia.size() > 1 && $videoWistia[1] == 'autoplay')
-                                #set($autoplay = true)
-                            #end
-                            <div class="responsive-embed sl_video img-view" data-videoid="$videoWistia[0]">
-                                #if($UtilMethods.isSet($wistia) == false)
-                                    <script charset='ISO-8859-1' src='//fast.wistia.com/assets/external/E-v1.js' scriptType="page" defer></script>
-                                    #set($wistia = 1)
-                                #end
-                                <div class="wistia_embed videoFoam=true wistia_async_$videoWistia[0] #if($autoplay == true)autoPlay=true#end"></div>
-                            </div>
-                        #end
-                    #elseif($UtilMethods.isSet($item.mainImage))
-                        #set($imgs = $item.mainImage.trim().split(','))
-                        <div class="w_thumb">
-                            #if($UtilMethods.isSet($item.imageLink))
-                                <a class="w_link" href="$item.imageLink">
-                            #end
-                                #if($imgs.size() == 1)
-                                    <img src="$imgs[0].trim()" alt="" class="img-view">
-                                #else
-                                    <picture>
-                                        #if($imgs.size() == 2)
-                                            #if($imgs[1].trim() != "")
-                                                <source media="(max-width: 991px)" srcset="$imgs[1].trim()">
-                                            #end
-                                        #elseif($imgs.size() >= 3)
-                                            #if($imgs[2].trim() != "")
-                                                <source media="(max-width: 767px)" srcset="$imgs[2].trim()">
-                                            #end
-                                            #if($imgs[1].trim() != "")
-                                                <source media="(max-width: 991px)" srcset="$imgs[1].trim()">
-                                            #end
-                                        #end
-                                        <img src="$imgs[0].trim()" alt="" class="img-view">
-                                    </picture>
-                                #end
-                            #if($UtilMethods.isSet($item.imageLink))
-                                </a>
-                            #end
-                        </div>
-                    #end
-
-                    #if($UtilMethods.isSet($wrapAllTitleAndDescription) && ($UtilMethods.isSet($item.title) || $UtilMethods.isSet($item.shortDesc)))
-                        <div class="w_content_wrap">
-                    #end
-                        #if($UtilMethods.isSet($item.title))
-                            <h4 class="w_title">$!{item.title.replace('xaaax', '"')}</h4>
-                        #end
-                        #if($UtilMethods.isSet($item.subImage))
-                            <span class="w_sub_img">
-                                <img src="$!{item.subImage}" alt="">
-                            </span>
-                        #end
-                        #if($UtilMethods.isSet($item.shortDesc))
-                            <div class="w_desc">$!{item.shortDesc.replace('xaaax', '"').replace("/c/portal/", "")}</div>
-                        #end
-                    #if($UtilMethods.isSet($wrapAllTitleAndDescription) && ($UtilMethods.isSet($item.title) || $UtilMethods.isSet($item.shortDesc)))
-                        </div>
-                    #end
-                </div>
-            #end
-        </div>
-    #if($type == 'slider')
-        <span class="load"></span>
-        </div>
-        #if($typeSlider == 'syncing')
-        <div class="$!{slideCls} thumb-wraper" $!{thumbSlideAttr}>
-            <div class="slick thumb-slider">
-                #foreach($item in $items.data)
-                    #if($UtilMethods.isSet($item.mainImage))
-                        #set($imgs = $item.mainImage.trim().split(','))
-                        <div class="w_item">
-                            <div class="w_thumb">
-                                <img src="$imgs[0].trim()" alt="" class="img-view">
-                            </div>
-                        </div>
-                    #end
-                #end
-            </div>
-            <span class="load"></span>
-        </div>
+  #if($UtilMethods.isSet($con.heading))
+    <h2 class="w_main_title"><span class="text">$con.heading</span></h2>
+  #end
+  #if($type == 'slider')
+    <div class="$!{slideCls} $!{adaptiveCls}" $!{mainSlideAttr}>
+  #else
+    <div class="w_outer">
+  #end
+    <div class="$!{innerCls}">
+      #foreach($item in $items.data)
+        #set($itemCls = '')
+        #if($item.has('itemClass'))
+          #set($itemCls = $item.itemClass)
         #end
-    #else
-        ## Close outer div
+        <div class="w_item $itemCls">
+          #if($UtilMethods.isSet($item.topText))
+            <h3 class="w_toptext">$item.topText.replaceAll('xaaax', '"')</h3>
+          #end
+          #if($UtilMethods.isSet($item.videoID))
+            #if($item.videoID.indexOf('vimeo') > -1)
+              <div class="vimeo-video img-view" data-vimeo-id="$item.videoID.split('-')[1]" id="vimeo_$item.videoID.split('-')[1]"></div>
+              #if($UtilMethods.isSet($vimeo) == false)
+                <script src='//player.vimeo.com/api/player.js' scriptType="page" defer></script>
+                #set($vimeo = 1)
+              #end
+            #else
+              #set($videoWistia = $item.videoID.split('-'))
+              #set($autoplay = false)
+              #if($videoWistia.size() > 1 && $videoWistia[1] == 'autoplay')
+                #set($autoplay = true)
+              #end
+              <div class="responsive-embed sl_video img-view" data-videoid="$videoWistia[0]">
+                #if($UtilMethods.isSet($wistia) == false)
+                  <script charset='ISO-8859-1' src='//fast.wistia.com/assets/external/E-v1.js' scriptType="page" defer></script>
+                  #set($wistia = 1)
+                #end
+                <div class="wistia_embed videoFoam=true wistia_async_$videoWistia[0] #if($autoplay == true)autoPlay=true#end"></div>
+              </div>
+            #end
+          #elseif($UtilMethods.isSet($item.mainImage))
+            #set($imgs = $item.mainImage.trim().split(','))
+            <div class="w_thumb">
+              #if($UtilMethods.isSet($item.imageLink))
+                <a class="w_link" href="$item.imageLink">
+              #end
+                #if($imgs.size() == 1)
+                  #if($lazyloadImage == 'true')
+                    <img src="$!{placeholderimage}" data-src="$imgs[0].trim()" alt="" class="img-view">
+                  #else
+                    <img src="$imgs[0].trim()" alt="" class="img-view no-lazy">
+                  #end
+                #else
+                  <picture>
+                    #if($imgs.size() == 2)
+                      #if($imgs[1].trim() != "")
+                        <source media="(max-width: 991px)" srcset="$imgs[1].trim()">
+                      #end
+                    #elseif($imgs.size() >= 3)
+                      #if($imgs[2].trim() != "")
+                        <source media="(max-width: 767px)" srcset="$imgs[2].trim()">
+                      #end
+                      #if($imgs[1].trim() != "")
+                        <source media="(max-width: 991px)" srcset="$imgs[1].trim()">
+                      #end
+                    #end
+                    #if($lazyloadImage == 'true')
+                      <img src="$!{placeholderimage}" data-src="$imgs[0].trim()" alt="" class="img-view">
+                    #else
+                      <img src="$imgs[0].trim()" alt="" class="img-view no-lazy">
+                    #end
+                  </picture>
+                #end
+              #if($UtilMethods.isSet($item.imageLink))
+                </a>
+              #end
+            </div>
+          #end
+
+          #if($UtilMethods.isSet($wrapAllTitleAndDescription) && ($UtilMethods.isSet($item.title) || $UtilMethods.isSet($item.shortDesc)))
+            <div class="w_content_wrap">
+          #end
+            #if($UtilMethods.isSet($item.title))
+              <h4 class="w_title">$!{item.title.replaceAll('xaaax', '"')}</h4>
+            #end
+            #if($UtilMethods.isSet($item.subImage))
+              <span class="w_sub_img">
+                #if($lazyloadImage == 'true')
+                  <img src="$!{placeholderimage}" data-src="$!{item.subImage}" alt="">
+                #else
+                  <img src="$!{item.subImage}" alt="" class="no-lazy">
+                #end
+              </span>
+            #end
+            #if($UtilMethods.isSet($item.shortDesc))
+              #set($replaceSrc = "src=\"$!{placeholderimage}\" data-src=\"/pub-assets/")
+              <div class="w_desc">$!{item.shortDesc.replaceAll('xaaax', '"').replaceAll("/c/portal/", "").replaceAll('src="/pub-assets/', $replaceSrc)}</div>
+
+              #*
+              #if($lazyloadImage == 'true')
+                #set($replaceSrc = "src=\"$!{placeholderimage}\" data-src=\"/pub-assets/")
+                <div class="w_desc">$!{item.shortDesc.replaceAll('xaaax', '"').replaceAll("/c/portal/", "").replaceAll('src="/pub-assets/', $replaceSrc)}</div>
+              #else
+                <div class="w_desc">$!{item.shortDesc.replaceAll('xaaax', '"').replaceAll("/c/portal/", "")}</div>
+              #end
+              *#
+            #end
+          #if($UtilMethods.isSet($wrapAllTitleAndDescription) && ($UtilMethods.isSet($item.title) || $UtilMethods.isSet($item.shortDesc)))
+            </div>
+          #end
         </div>
+      #end
+    </div>
+  #if($type == 'slider')
+    <span class="load"></span>
+    </div>
+    #if($typeSlider == 'syncing')
+    <div class="$!{slideCls} thumb-wraper" $!{thumbSlideAttr}>
+      <div class="slick thumb-slider">
+        #foreach($item in $items.data)
+          #if($UtilMethods.isSet($item.mainImage))
+            #set($imgs = $item.mainImage.trim().split(','))
+            <div class="w_item">
+              <div class="w_thumb">
+                <img src="$imgs[0].trim()" alt="" class="img-view no-lazy">
+              </div>
+            </div>
+          #end
+        #end
+      </div>
+      <span class="load"></span>
+    </div>
     #end
+  #else
+    ## Close outer div
+    </div>
+  #end
 </div>
 
 #if($type == 'slider')
-    #if($UtilMethods.isSet($jquery) == false)
-        <script type="text/javascript" src="//d16hdrba6dusey.cloudfront.net/sitecommon/js/libs/jquery-3.3.1.min.js" scriptType="page" defer></script>
-        #set($jquery = 1)
+  #if($UtilMethods.isSet($jquery) == false)
+    <script type="text/javascript" src="//d16hdrba6dusey.cloudfront.net/sitecommon/js/libs/jquery-3.3.1.min.js" scriptType="page" defer></script>
+    #set($jquery = 1)
+  #end
+  #if($UtilMethods.isSet($slick) == false)
+    <link linkType="page" rel="stylesheet/less" type="text/css" href="//rawcdn.githack.com/chinhphan099/cdn/b5aac8ac0f48e4809db0107f1c2188a952b1272f/slick/slick.less">
+    <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/5bb1af6adb508aa2b1c9ddac4d24c7420f25dff4/slick/slick.js" scriptType="page" defer></script>
+    #if($UtilMethods.isSet($con.jsPath))
+    <script type="text/javascript" src="$!{con.jsPath}" scriptType="page" defer></script>
+    #else
+    <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/3476ddea78e0cef38d400196c97400207ffd6f69/slick/slider.js" scriptType="page" defer></script>
     #end
-    #if($UtilMethods.isSet($slick) == false)
-        <link linkType="page" rel="stylesheet/less" type="text/css" href="//rawcdn.githack.com/chinhphan099/cdn/b5aac8ac0f48e4809db0107f1c2188a952b1272f/slick/slick.less">
-        <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/5bb1af6adb508aa2b1c9ddac4d24c7420f25dff4/slick/slick.js" scriptType="page" defer></script>
-        #if($UtilMethods.isSet($con.jsPath))
-        <script type="text/javascript" src="$!{con.jsPath}" scriptType="page" defer></script>
-        #else
-        <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/3476ddea78e0cef38d400196c97400207ffd6f69/slick/slider.js" scriptType="page" defer></script>
-        #end
-        #set($slick = 1)
-    #end
+    #set($slick = 1)
+  #end
 #end
 
 #if($type == 'qa')
-    #if($UtilMethods.isSet($qa) == false)
-        <link linkType="page" rel="stylesheet/less" type="text/css" href="//rawcdn.githack.com/chinhphan099/cdn/03a9fae350f6c69d8f32175fc9e869583e905226/widget_qa/w_qa.less">
-        <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/4f442e9ee348c0abd3ef2bc933bf8b3d297e5b83/widget_qa/w_qa.js" scriptType="page" defer></script>
-        #set($qa = 1)
-    #end
+  #if($UtilMethods.isSet($qa) == false)
+    <link linkType="page" rel="stylesheet/less" type="text/css" href="//rawcdn.githack.com/chinhphan099/cdn/03a9fae350f6c69d8f32175fc9e869583e905226/widget_qa/w_qa.less">
+    <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/4f442e9ee348c0abd3ef2bc933bf8b3d297e5b83/widget_qa/w_qa.js" scriptType="page" defer></script>
+    #set($qa = 1)
+  #end
 #end

@@ -607,9 +607,11 @@
     function checktypeContent(selectedVal) {
         if(selectedVal === 'slider') {
             document.querySelector('[widgetid="mainTabContainer_tablist_optionsForSlider"]').classList.remove('hide');
+            dijit.byId('text150Checkbox').set('checked', false).set('disabled', true);
         }
         else {
             document.querySelector('[widgetid="mainTabContainer_tablist_optionsForSlider"]').classList.add('hide');
+            dijit.byId('text150Checkbox').set('disabled', false);
         }
 
         if(selectedVal === 'qa') {

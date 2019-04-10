@@ -61,7 +61,8 @@
                         #if($prod.defaultProductTitle != '')
                             <span class="best-seller-text">$!{prod.defaultProductTitle}</span>
                         #end
-                        <div class="product-name">$!{prod.productName.replace('xaaax', '"')}</div>
+                        #set($replaceSrc = "src=\"$!{placeholderimage}\" data-src=\"/pub-assets/")
+                        <div class="product-name">$!{prod.productName.replaceAll('xaaax', '"').replaceAll('src="/pub-assets/', $replaceSrc)}</div>
                     </label>
                     <label class="productPrice" for="product_$!{prod.productId}">
                         #if($!{showInstallmentPrice} == true)
