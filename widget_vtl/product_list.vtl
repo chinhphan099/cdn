@@ -89,4 +89,8 @@
 #end
 
 <link linkType="component" rel="stylesheet/less" type="text/css" href="//rawcdn.githack.com/chinhphan099/cdn/07993c19b867739c6a03481c3b96f4282549b4dc/w_productlist/widget_productlist_v1.less">
+#if($UtilMethods.isSet($con.localJsFile))
+<script scriptType="component" src="$con.localJsFile" defer></script>
+#else
 <script scriptType="component" src="//rawcdn.githack.com/chinhphan099/cdn/d8b21b7b2db0db2c88d8c17db7a9959e5e941e0e/w_productlist/widget_productlist_v1.js" defer></script>
+#end

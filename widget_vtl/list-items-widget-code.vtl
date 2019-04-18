@@ -19,6 +19,7 @@
 #set($mobileItem = '')
 #set($verticalMode = '')
 #set($centerMode = '')
+##https://i.gyazo.com/646448f272ae10c0cf54905da42c5031.png
 
 #if($type == 'slider')
   #set($innerCls = 'slick main-slider')
@@ -123,6 +124,7 @@
           #if($UtilMethods.isSet($item.videoID))
             #if($item.videoID.indexOf('vimeo') > -1)
               <div class="vimeo-video img-view" data-vimeo-id="$item.videoID.split('-')[1]" id="vimeo_$item.videoID.split('-')[1]"></div>
+              <i class="icon-close hidden"></i>
               #if($UtilMethods.isSet($vimeo) == false)
                 <script src='//player.vimeo.com/api/player.js' scriptType="page" defer></script>
                 #set($vimeo = 1)
@@ -134,6 +136,7 @@
                 #set($autoplay = true)
               #end
               <div class="responsive-embed sl_video img-view" data-videoid="$videoWistia[0]">
+                <i class="icon-close hidden"></i>
                 #if($UtilMethods.isSet($wistia) == false)
                   <script charset='ISO-8859-1' src='//fast.wistia.com/assets/external/E-v1.js' scriptType="page" defer></script>
                   #set($wistia = 1)

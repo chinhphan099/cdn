@@ -16,6 +16,7 @@
             if (unitDiscountRateLables) {
                 for(let elem of unitDiscountRateLables) {
                     elem.innerHTML = elem.innerHTML.replace(/{UnitDiscountRate}/gi, '<span class="spanUnitDiscountRate">$00.00</span>')
+                                            .replace(/{UnitFullRate}/gi, '<span class="spanUnitFullRate"></span>')
                                             .replace(/{DiscountedPrice}/gi, '<span class="discountedPrice"></span>')
                                             .replace(/{SavePrice}/gi, '<span class="savePrice"></span>')
                                             .replace(/{FullPrice}/gi, '<del class="fullPrice"></del>');
@@ -44,6 +45,7 @@
                             radio.onchange = handleProductChange;
 
                             const elemUnitDiscountRate = _q('label[for="' + 'product_' + product.productId + '"] span.spanUnitDiscountRate');
+                            const elemUnitFullRate = _q('label[for="' + 'product_' + product.productId + '"] span.spanUnitFullRate');
                             const elemDiscountedPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .discountedPrice');
                             const elemFullPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .fullPrice');
                             const elemSavePrice = _qAll('label[for="' + 'product_' + product.productId + '"] .savePrice');
@@ -53,6 +55,9 @@
 
                             if (elemUnitDiscountRate) {
                                 elemUnitDiscountRate.innerHTML = product.productPrices.UnitDiscountRate.FormattedValue;
+                            }
+                            if (elemUnitFullRate) {
+                                elemUnitFullRate.innerHTML = product.productPrices.UnitFullRetailPrice.FormattedValue;
                             }
                             if (elemDiscountedPrice) {
                                 for(let discountedPrice of elemDiscountedPrice) {

@@ -11,6 +11,10 @@ class InstallmentPayment {
         utils.events.on('bindInstallmentWithAmexCard', cardType => this.bindInstallmentWithAmexCard(cardType));
     }
 
+    formatPrice(price) {
+        return price.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+    }
+
     bindInstallmentPayment(productInfo) {
         const fValue = productInfo.discountPrice.replace(/[,|.]/g, '');
         const pValue = productInfo.discountPriceValue.toString().replace(/\./, '');
@@ -33,7 +37,7 @@ class InstallmentPayment {
             let option = '', priceInstallment = '';
             for (let i = 0; i < this.months.length; i++) {
                 priceInstallment = (price / this.months[i]).toFixed(2);
-                priceInstallment = this.fCurrency.replace('######', priceInstallment.replace(/\./, ','));
+                priceInstallment = this.fCurrency.replace('######', this.formatPrice(priceInstallment));
                 option = document.createElement('option');
                 option.text = installmentpayment.optionText.replace(/N/, this.months[i]).replace(/\$price/, priceInstallment);
                 option.value = this.months[i];
