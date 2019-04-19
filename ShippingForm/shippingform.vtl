@@ -1,0 +1,236 @@
+#set($con = $dotcontent.find($CONTENT_INODE))
+#if($EDIT_MODE)
+    <center style="color:#a9a6a6;font-size:10px;font-family:Arial;text-align:left;position:absolute;top:-11px;left:93px;right:50px;z-index:9;line-height:0.9;word-break:break-word;">
+        <span style="padding:0 2px;display:block;">
+            ShippingFormWidget : $!{con.title}
+        </span>
+    </center>
+#end
+<div class="widget-shipping-form #if(!$EDIT_MODE)hidden#end">
+   <div class="shipping-title"><h3>#dotedit($!{CONTENT_INODE}, $!{headingLabel})</h3></div>
+   <form id="frmShipping" class="frmShipping" novalidate>
+      #if($!{showFirstName} == true)
+      <div class="form-group">
+         #if($EDIT_MODE)
+            <label>#dotedit($!{CONTENT_INODE}, $!{firstNameLabel})</label>
+         #else
+            <label for="shipping_firstname">$!{firstNameLabel}</label>
+         #end
+         <input id="shipping_firstname" class="shipping-firstname" type="text" maxlength="30" placeholder="$!{firstNameLabel}" required />
+         <span class="error-message hidden">$!{siteData.messages.required}</span>
+      </div>
+      #end
+
+      #if($!{showLastName} == true)
+      <div class="form-group">
+         #if($EDIT_MODE)
+            <label>#dotedit($!{CONTENT_INODE}, $!{lastNameLabel})</label>
+         #else
+            <label for="shipping_lastname">$!{lastNameLabel}</label>
+         #end
+         <input id="shipping_lastname" class="shipping-lastname" type="text" maxlength="30" placeholder="$!{lastNameLabel}" required />
+         <span class="error-message hidden">$!{siteData.messages.required}</span>
+      </div>
+      #end
+
+      #if($!{enableToSeparateField} == true)
+      <div class="shipping-seperate-col #if($!{mergeColumnAddress}==true)two-column#end #if($!{topStreetName}==true)top-street-name#end">
+         <div class="form-group hidden">
+            <input id="shipping_address1" class="shipping-address1 hidden" type="text" maxlength="80" placeholder="" />
+         </div>
+         #if($!{topStreetName} == true)
+            <div class="form-group">
+               #if($EDIT_MODE)
+                   <label>#dotedit($!{CONTENT_INODE}, $!{streetNameAddress})</label>
+               #else
+                   <label for="shipping_streetname">$!{streetNameAddress}</label>
+               #end
+               <input id="shipping_streetname" class="shipping_address_field shipping-streetname" type="text" maxlength="80" placeholder="$!{streetNameAddress}" required />
+               <span class="error-message hidden">$!{siteData.messages.required}</span>
+            </div>
+
+            <div class="form-group">
+               #if($EDIT_MODE)
+                   <label>#dotedit($!{CONTENT_INODE}, $!{streetNumberAddress})</label>
+               #else
+                   <label for="shipping_streetnumber">$!{streetNumberAddress}</label>
+               #end
+               <input id="shipping_streetnumber" class="shipping_address_field shipping-streetnumber" type="text" maxlength="80" placeholder="$!{streetNumberAddress}" required />
+               <span class="error-message hidden">$!{siteData.messages.required}</span>
+            </div>
+         #else
+            <div class="form-group">
+               #if($EDIT_MODE)
+                   <label>#dotedit($!{CONTENT_INODE}, $!{streetNumberAddress})</label>
+               #else
+                   <label for="shipping_streetnumber">$!{streetNumberAddress}</label>
+               #end
+               <input id="shipping_streetnumber" class="shipping_address_field shipping-streetnumber" type="text" maxlength="80" placeholder="$!{streetNumberAddress}" required />
+               <span class="error-message hidden">$!{siteData.messages.required}</span>
+            </div>
+
+            <div class="form-group">
+               #if($EDIT_MODE)
+                   <label>#dotedit($!{CONTENT_INODE}, $!{streetNameAddress})</label>
+               #else
+                   <label for="shipping_streetname">$!{streetNameAddress}</label>
+               #end
+               <input id="shipping_streetname" class="shipping_address_field shipping-streetname" type="text" maxlength="80" placeholder="$!{streetNameAddress}" required />
+               <span class="error-message hidden">$!{siteData.messages.required}</span>
+            </div>
+         #end
+      </div>
+      #elseif(!$UtilMethods.isSet($chinaForm))
+      <div class="form-group">
+         #if($EDIT_MODE)
+            <label>#dotedit($!{CONTENT_INODE}, $!{addressLabel})</label>
+         #else
+            <label for="shipping_address1">$!{addressLabel}</label>
+         #end
+         <input id="shipping_address1" class="shipping-address1" type="text" maxlength="80" placeholder="$!{addressLabel}" required />
+         <span class="error-message hidden">$!{siteData.messages.required}</span>
+      </div>
+      #end
+
+      #if($!{showNeighborhood} == true)
+      <div class="form-group">
+         #if($EDIT_MODE)
+            <label>#dotedit($!{CONTENT_INODE}, $!{neighborhoodLabel})</label>
+         #else
+            <label for="shipping_address2">$!{neighborhoodLabel}</label>
+         #end
+         <input id="shipping_address2" class="shipping-address2" type="text" maxlength="30" placeholder="$!{neighborhoodLabel}" required />
+         <span class="error-message hidden">$!{siteData.messages.required}</span>
+      </div>
+      #end
+
+      #if($UtilMethods.isSet($chinaForm))
+         <div class="form-group">
+            #if($EDIT_MODE)
+               <label>#dotedit($!{CONTENT_INODE}, $!{countryLabel})</label>
+            #else
+               <label for="shipping_country">$!{countryLabel}</label>
+            #end
+            <div class="custom-select">
+               <select id="shipping_country" class="shipping-country" required>
+               </select>
+            </div>
+            <span class="error-message hidden">$!{siteData.messages.required}</span>
+         </div>
+
+         <div class="form-group">
+            #if($EDIT_MODE)
+               <label>#dotedit($!{CONTENT_INODE}, $!{stateLabel})</label>
+            #else
+               <label for="shipping_province">$!{stateLabel}</label>
+            #end
+            <div class="custom-select">
+               <select id="shipping_province" class="shipping-province" required>
+               </select>
+               <span class="error-message hidden">$!{siteData.messages.required}</span>
+            </div>
+         </div>
+
+         <div class="form-group">
+            #if($EDIT_MODE)
+               <label>#dotedit($!{CONTENT_INODE}, $!{cityLabel})</label>
+            #else
+               <label for="shipping_city">$!{cityLabel}</label>
+            #end
+            <input id="shipping_city" class="shipping-city" type="text" maxlength="30" placeholder="$!{cityLabel}" required />
+            <span class="error-message hidden">$!{siteData.messages.required}</span>
+         </div>
+
+         <div class="form-group">
+            #if($EDIT_MODE)
+               <label>#dotedit($!{CONTENT_INODE}, $!{districtLabel})</label>
+            #else
+               <label for="shipping_district">$!{districtLabel}</label>
+            #end
+            <input id="shipping_district" class="shipping-district" type="text" maxlength="30" placeholder="$!{districtLabel}" />
+            <span class="error-message hidden">$!{siteData.messages.required}</span>
+         </div>
+
+         <div class="form-group">
+            #if($EDIT_MODE)
+               <label>#dotedit($!{CONTENT_INODE}, $!{addressLabel})</label>
+            #else
+               <label for="shipping_address1">$!{addressLabel}</label>
+            #end
+            <input id="shipping_address1" class="shipping-address1" type="text" maxlength="80" placeholder="$!{addressLabel}" required />
+            <span class="error-message hidden">$!{siteData.messages.required}</span>
+         </div>
+
+         <div class="form-group">
+            #if($EDIT_MODE)
+               <label>#dotedit($!{CONTENT_INODE}, $!{postcodeLabel})</label>
+            #else
+               <label for="shipping_postal">$!{postcodeLabel}</label>
+            #end
+            <input id="shipping_postal" class="shipping-postal" type="text" maxlength="10" placeholder="$!{postcodeLabel}" required />
+            <span class="error-message hidden">$!{siteData.messages.required}</span>
+         </div>
+      #else
+         <div class="form-group">
+            #if($EDIT_MODE)
+               <label>#dotedit($!{CONTENT_INODE}, $!{cityLabel})</label>
+            #else
+               <label for="shipping_city">$!{cityLabel}</label>
+            #end
+            <input id="shipping_city" class="shipping-city" type="text" maxlength="30" placeholder="$!{cityLabel}" required />
+            <span class="error-message hidden">$!{siteData.messages.required}</span>
+         </div>
+
+         <div class="form-group">
+            #if($EDIT_MODE)
+               <label>#dotedit($!{CONTENT_INODE}, $!{countryLabel})</label>
+            #else
+               <label for="shipping_country">$!{countryLabel}</label>
+            #end
+            <div class="custom-select">
+               <select id="shipping_country" class="shipping-country" required>
+               </select>
+            </div>
+            <span class="error-message hidden">$!{siteData.messages.required}</span>
+         </div>
+
+         #if($!{showState} != false)
+         <div class="two-column">
+         #end
+            <div class="form-group#if($!{showState} == false) hidden#end">
+               #if($EDIT_MODE)
+                  <label>#dotedit($!{CONTENT_INODE}, $!{stateLabel})</label>
+               #else
+                  <label for="shipping_province">$!{stateLabel}</label>
+               #end
+               <div class="custom-select">
+                  <select id="shipping_province" class="shipping-province #if($!{showState} == false)no-required#end" #if($!{showState} != false)required#end>
+                  </select>
+                  <span class="error-message hidden">$!{siteData.messages.required}</span>
+               </div>
+            </div>
+
+            <div class="form-group">
+               #if($EDIT_MODE)
+                  <label>#dotedit($!{CONTENT_INODE}, $!{postcodeLabel})</label>
+               #else
+                  <label for="shipping_postal">$!{postcodeLabel}</label>
+               #end
+               <input id="shipping_postal" class="shipping-postal" type="text" maxlength="10" placeholder="$!{postcodeLabel}" required />
+               <span class="error-message hidden">$!{siteData.messages.required}</span>
+            </div>
+         #if($!{showState} != false)
+         </div>
+         #end
+      #end
+   </form>
+</div>
+
+
+<link linkType="component" rel="stylesheet/less" type="text/css" href="$!{s3_sitecommon}/less/widgets/widget_addressform.less">
+#if($UtilMethods.isSet($localJsFile))
+<script type="module" scriptType="component" src="$localJsFile" defer></script>
+#else
+<script type="module" scriptType="component" src="$!{s3_sitecommon}/js/widgets/widget_addressform.js" defer></script>
+#end
+<script scriptType="component" src="$!{s3_sitecommon}/js/components/gg_autocomplete.js" defer></script>

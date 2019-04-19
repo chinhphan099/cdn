@@ -1,0 +1,275 @@
+#set($con = $dotcontent.find($CONTENT_INODE))
+#if($EDIT_MODE)
+    <center style="color:#a9a6a6;font-size:10px;font-family:Arial;text-align:left;position:absolute;top:-11px;left:93px;right:50px;z-index:9;line-height:0.9;word-break:break-word;">
+        <span style="padding:0 2px;display:block;">
+            BillingFormWidget : $!{con.title}
+        </span>
+    </center>
+#end
+<div class="widget-billing-form #if(!$EDIT_MODE) #if($showOrHideAsDefault == false)hidden#end #end">
+    <div class="js_choose_billing">
+        <div class="w_radio">
+            <input type="radio" id="radio_same_as_shipping" name="radio_choose_billing" checked>
+            <label for="radio_same_as_shipping">
+                $!{sameAsShippingLabel}
+            </label>
+            <i class="icon-check"></i>
+        </div>
+
+        <div class="w_radio">
+            <input type="radio" id="radio_different_shipping" name="radio_choose_billing">
+            <label for="radio_different_shipping">
+                $!{differentShippingLabel}
+            </label>
+            <i class="icon-check"></i>
+        </div>
+    </div>
+
+    <form id="frmBilling" class="frmBilling #if(!$EDIT_MODE)hidden#end" novalidate>
+        <div class="billing-title">
+            <h3>#dotedit($!{CONTENT_INODE}, $!{topHeadingLabel})</h3>
+        </div>
+        <div class="form-group">
+            #if($EDIT_MODE)
+            <label>#dotedit($!{CONTENT_INODE}, $!{emailLabel})</label>
+            #else
+            <label for="billing_email">$!{emailLabel}</label>
+            #end
+            <input id="billing_email" class="billing-email" type="text" maxlength="200" placeholder="$!{emailLabel}" required email />
+            <span class="error-message hidden">$!{siteData.messages.invalidEmail}</span>
+        </div>
+
+        <div class="billing-title">
+            <h3>#dotedit($!{CONTENT_INODE}, $!{headingLabel})</h3>
+        </div>
+        <div class="form-group">
+            #if($EDIT_MODE)
+            <label>#dotedit($!{CONTENT_INODE}, $!{firstNameLabel})</label>
+            #else
+            <label for="billing_firstname">$!{firstNameLabel}</label>
+            #end
+            <input id="billing_firstname" class="billing-firstname" type="text" maxlength="30" placeholder="$!{firstNameLabel}" required />
+            <span class="error-message hidden">$!{siteData.messages.required}</span>
+        </div>
+
+        <div class="form-group">
+            #if($EDIT_MODE)
+            <label>#dotedit($!{CONTENT_INODE}, $!{lastNameLabel})</label>
+            #else
+            <label for="billing_lastname">$!{lastNameLabel}</label>
+            #end
+            <input id="billing_lastname" class="billing-lastname" type="text" maxlength="30" placeholder="$!{lastNameLabel}" required />
+            <span class="error-message hidden">$!{siteData.messages.required}</span>
+        </div>
+
+        ##
+        #if($!{enableToSeparateField} == true)
+          <div class="billing-seperate-col #if($!{mergeColumnAddress}==true)two-column#end #if($!{topStreetName}==true)top-street-name#end">
+             <div class="form-group hidden">
+                <input id="billing_address1" class="billing-address1 hidden" type="text" maxlength="80" placeholder="" />
+             </div>
+            #if($!{topStreetName} == true)
+                <div class="form-group">
+                    #if($EDIT_MODE)
+                        <label>#dotedit($!{CONTENT_INODE}, $!{streetNameAddress})</label>
+                    #else
+                        <label for="billing_streetname">$!{streetNameAddress}</label>
+                    #end
+                    <input id="billing_streetname" class="billing_address_field billing-streetname" type="text" maxlength="80" placeholder="$!{streetNameAddress}" required />
+                    <span class="error-message hidden">$!{siteData.messages.required}</span>
+                </div>
+                <div class="form-group">
+                    #if($EDIT_MODE)
+                        <label>#dotedit($!{CONTENT_INODE}, $!{streetNumberAddress})</label>
+                    #else
+                        <label for="billing_streetnumber">$!{streetNumberAddress}</label>
+                    #end
+                    <input id="billing_streetnumber" class="billing_address_field billing-streetnumber" type="text" maxlength="80" placeholder="$!{streetNumberAddress}" required />
+                    <span class="error-message hidden">$!{siteData.messages.required}</span>
+                 </div>
+            #else
+                <div class="form-group">
+                    #if($EDIT_MODE)
+                        <label>#dotedit($!{CONTENT_INODE}, $!{streetNumberAddress})</label>
+                    #else
+                        <label for="billing_streetnumber">$!{streetNumberAddress}</label>
+                    #end
+                    <input id="billing_streetnumber" class="billing_address_field billing-streetnumber" type="text" maxlength="80" placeholder="$!{streetNumberAddress}" required />
+                    <span class="error-message hidden">$!{siteData.messages.required}</span>
+                 </div>
+
+                 <div class="form-group">
+                    #if($EDIT_MODE)
+                        <label>#dotedit($!{CONTENT_INODE}, $!{streetNameAddress})</label>
+                    #else
+                        <label for="billing_streetname">$!{streetNameAddress}</label>
+                    #end
+                    <input id="billing_streetname" class="billing_address_field billing-streetname" type="text" maxlength="80" placeholder="$!{streetNameAddress}" required />
+                    <span class="error-message hidden">$!{siteData.messages.required}</span>
+                 </div>
+            #end
+          </div>
+        #elseif(!$UtilMethods.isSet($chinaForm))
+           <div class="form-group">
+               #if($EDIT_MODE)
+               <label>#dotedit($!{CONTENT_INODE}, $!{addressLabel})</label>
+               #else
+               <label for="billing_address1">$!{addressLabel}</label>
+               #end
+               <input id="billing_address1" class="billing-address1" type="text" maxlength="80" placeholder="$!{addressLabel}" required />
+               <span class="error-message hidden">$!{siteData.messages.required}</span>
+           </div>
+        #end
+
+        #if($!{showNeighborhood} == true)
+          <div class="form-group">
+             #if($EDIT_MODE)
+                <label>#dotedit($!{CONTENT_INODE}, $!{neighborhoodLabel})</label>
+             #else
+                <label for="billing_address2">$!{neighborhoodLabel}</label>
+             #end
+             <input id="billing_address2" class="billing-address2" type="text" maxlength="30" placeholder="$!{neighborhoodLabel}" required />
+             <span class="error-message hidden">$!{siteData.messages.required}</span>
+          </div>
+        #end
+
+        #if($UtilMethods.isSet($chinaForm))
+            <div class="form-group">
+                #if($EDIT_MODE)
+                <label>#dotedit($!{CONTENT_INODE}, $!{countryLabel})</label>
+                #else
+                <label for="billing_country">$!{countryLabel}</label>
+                #end
+                <div class="custom-select">
+                    <select id="billing_country" class="billing-country" required>
+                    </select>
+                </div>
+                <span class="error-message hidden">$!{siteData.messages.required}</span>
+            </div>
+
+            <div class="form-group">
+                #if($EDIT_MODE)
+                <label>#dotedit($!{CONTENT_INODE}, $!{stateLabel})</label>
+                #else
+                <label for="billing_province">$!{stateLabel}</label>
+                #end
+                <div class="custom-select">
+                    <select id="billing_province" class="billing-province">
+                        <option value="">--</option>
+                    </select>
+                    <span class="error-message hidden">$!{siteData.messages.required}</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                #if($EDIT_MODE)
+                <label>#dotedit($!{CONTENT_INODE}, $!{cityLabel})</label>
+                #else
+                <label for="billing_city">$!{cityLabel}</label>
+                #end
+                <input id="billing_city" class="billing-city" type="text" maxlength="30" placeholder="$!{cityLabel}" required />
+                <span class="error-message hidden">$!{siteData.messages.required}</span>
+            </div>
+
+            <div class="form-group">
+                #if($EDIT_MODE)
+                <label>#dotedit($!{CONTENT_INODE}, $!{districtLabel})</label>
+                #else
+                <label for="billing_district">$!{districtLabel}</label>
+                #end
+                <input id="billing_district" class="billing-district" type="text" maxlength="30" placeholder="$!{districtLabel}" required />
+                <span class="error-message hidden">$!{siteData.messages.required}</span>
+            </div>
+
+           <div class="form-group">
+               #if($EDIT_MODE)
+               <label>#dotedit($!{CONTENT_INODE}, $!{addressLabel})</label>
+               #else
+               <label for="billing_address1">$!{addressLabel}</label>
+               #end
+               <input id="billing_address1" class="billing-address1" type="text" maxlength="80" placeholder="$!{addressLabel}" required />
+               <span class="error-message hidden">$!{siteData.messages.required}</span>
+           </div>
+
+            <div class="form-group">
+                #if($EDIT_MODE)
+                <label>#dotedit($!{CONTENT_INODE}, $!{postcodeLabel})</label>
+                #else
+                <label for="billing_postal">$!{postcodeLabel}</label>
+                #end
+                <input id="billing_postal" class="billing-postal" type="text" maxlength="10" placeholder="$!{postcodeLabel}" required />
+                <span class="error-message hidden">$!{siteData.messages.required}</span>
+            </div>
+        #else
+            <div class="form-group">
+                #if($EDIT_MODE)
+                <label>#dotedit($!{CONTENT_INODE}, $!{cityLabel})</label>
+                #else
+                <label for="billing_city">$!{cityLabel}</label>
+                #end
+                <input id="billing_city" class="billing-city" type="text" maxlength="30" placeholder="$!{cityLabel}" required />
+                <span class="error-message hidden">$!{siteData.messages.required}</span>
+            </div>
+
+            <div class="form-group">
+                #if($EDIT_MODE)
+                <label>#dotedit($!{CONTENT_INODE}, $!{countryLabel})</label>
+                #else
+                <label for="billing_country">$!{countryLabel}</label>
+                #end
+                <div class="custom-select">
+                    <select id="billing_country" class="billing-country" required>
+                    </select>
+                </div>
+                <span class="error-message hidden">$!{siteData.messages.required}</span>
+            </div>
+
+            #if($!{showState} != false)
+            <div class="two-column">
+            #end
+                <div class="form-group#if($!{showState} == false) hidden#end">
+                    #if($EDIT_MODE)
+                    <label>#dotedit($!{CONTENT_INODE}, $!{stateLabel})</label>
+                    #else
+                    <label for="billing_province">$!{stateLabel}</label>
+                    #end
+                    <div class="custom-select">
+                        <select id="billing_province" class="billing-province #if($!{showState} == false)no-required#end" #if($!{showState} != false)required#end>
+                            <option value="">--</option>
+                        </select>
+                        <span class="error-message hidden">$!{siteData.messages.required}</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    #if($EDIT_MODE)
+                    <label>#dotedit($!{CONTENT_INODE}, $!{postcodeLabel})</label>
+                    #else
+                    <label for="billing_postal">$!{postcodeLabel}</label>
+                    #end
+                    <input id="billing_postal" class="billing-postal" type="text" maxlength="10" placeholder="$!{postcodeLabel}" required />
+                    <span class="error-message hidden">$!{siteData.messages.required}</span>
+                </div>
+            #if($!{showState} != false)
+            </div>
+            #end
+        #end
+
+        <div class="form-group">
+            #if($EDIT_MODE)
+            <label>#dotedit($!{CONTENT_INODE}, $!{phoneLabel})</label>
+            #else
+            <label for="billing_phone">$!{phoneLabel}</label>
+            #end
+            <input id="billing_phone" class="billing-phone" type="tel" maxlength="17" placeholder="$!{phoneLabel}" />
+            <span class="error-message hidden">$!{siteData.messages.validPhonenumber}</span>
+        </div>
+    </form>
+</div>
+
+<link linkType="component" rel="stylesheet/less" type="text/css" href="$!{s3_sitecommon}/less/widgets/widget_billingform.less">
+#if($UtilMethods.isSet($localJsFile))
+<script type="module" scriptType="component" src="$localJsFile" defer></script>
+#else
+<script scriptType="component" src="$!{s3_sitecommon}/js/widgets/widget_billingform.js" defer></script>
+#end
