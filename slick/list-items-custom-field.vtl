@@ -641,35 +641,39 @@
         else {
             centerPadding.set('readonly', true).set('value', '');
             document.querySelector('#centerPadding_field #widget_centerPadding').style.backgroundColor = '#ececec';
-            if(!dijit.byId('text100Checkbox').get('checked')) {
-                dijit.byId('text110Checkbox').set('disabled', false);
+            if(!dijit.byId('text100Checkbox').get('checked')) { // Autoplay
+                dijit.byId('text110Checkbox').set('disabled', false); // Infinite
             }
         }
 
         if(dojo.query('input[name="text7"]:checked')[0].id === 'sliderMode2') {// Vertical mode
-            dijit.byId('text120Checkbox').set('checked', false).set('disabled', true); // Disabled Arrow Vertical
-            dijit.byId('text90Checkbox').set('checked', false).set('disabled', true); // Disabled Fade affect
+            dijit.byId('text140Checkbox').set('checked', false).set('disabled', true); // Adaptive Height
+            dijit.byId('text120Checkbox').set('checked', false).set('disabled', true); // Arrow Vertical
+            dijit.byId('text90Checkbox').set('checked', false).set('disabled', true); // Fade affect
         }
         else {
-            dijit.byId('text120Checkbox').set('disabled', false);
-            dijit.byId('text90Checkbox').set('disabled', false)
+            dijit.byId('text140Checkbox').set('disabled', false); // Adaptive Height
+            dijit.byId('text120Checkbox').set('disabled', false); // Arrow Vertical
+            dijit.byId('text90Checkbox').set('disabled', false); // Fade affect
+            if(dijit.byId('text100Checkbox').get('checked')) { // Autoplay
+                dijit.byId('text140Checkbox').set('checked', false).set('disabled', true); // Adaptive Height
+            }
         }
     }
     function checkAutoPlaySlider() {
-        if(dijit.byId('text100Checkbox').get('checked') || dojo.query('input[name="text7"]:checked')[0].id === 'sliderMode1') { // Autoplay || Center
-            dijit.byId('text110Checkbox').set('checked', true).set('disabled', true); // infinite
-            dijit.byId('text140Checkbox').set('checked', false).set('disabled', true);
+        if(dijit.byId('text100Checkbox').get('checked')) { // Auto play
+            dijit.byId('text110Checkbox').set('checked', true).set('disabled', true); // Infinite
+            dijit.byId('text140Checkbox').set('checked', false).set('disabled', true); // Adaptive Height
         }
         else {
             dijit.byId('text110Checkbox').set('disabled', false); // infinite
             dijit.byId('text140Checkbox').set('disabled', false); // Adaptive Height
-        }
-
-        if(dijit.byId('text100Checkbox').get('checked')) { // Autoplay
-            dijit.byId('text140Checkbox').set('checked', false).set('disabled', true);
-        }
-        else {
-            dijit.byId('text140Checkbox').set('disabled', false); // Adaptive Height
+            if(dojo.query('input[name="text7"]:checked')[0].id === 'sliderMode1') { // Center Mode
+                dijit.byId('text110Checkbox').set('checked', true).set('disabled', true); // infinite
+            }
+            if(dojo.query('input[name="text7"]:checked')[0].id === 'sliderMode2') { // Vertical Mode
+                dijit.byId('text140Checkbox').set('checked', false).set('disabled', true); // Adaptive Height
+            }
         }
     }
     function checkTypeSlider() {
@@ -697,6 +701,9 @@
         }
         else {
             dijit.byId('text90Checkbox').set('disabled', false);
+            if(dojo.query('input[name="text7"]:checked')[0].id === 'sliderMode2') { // Vertical Mode
+                dijit.byId('text90Checkbox').set('checked', false).set('disabled', true); // Fade
+            }
         }
     }
     function listener() {

@@ -145,24 +145,6 @@
           option = this.options.normal;
       }
 
-      // Vertical Mode
-      if(typeof this.options.verticalmode !== 'undefined') {
-        var verticalMode = {
-          vertical: true,
-          verticalSwiping: true,
-        };
-        option = $.extend(option, verticalMode);
-      }
-
-      // Center Mode
-      if(typeof this.options.centermode !== 'undefined') {
-        var centerMode = {
-          centerMode: true,
-          centerPadding: !!this.options.centerPadding ? this.options.centerPadding : 0
-        };
-        option = $.extend(option, centerMode);
-      }
-
       // Arrows
       if(typeof this.options.arrows !== 'undefined') {
         option = $.extend(option, {arrows: this.options.arrows});
@@ -187,13 +169,29 @@
         option = $.extend(option, {adaptiveHeight: this.options.adaptiveHeight});
       }
 
+      // Vertical Mode
+      if(typeof this.options.verticalmode !== 'undefined') {
+        var verticalMode = {
+          vertical: true,
+          verticalSwiping: true
+        };
+        option = $.extend(option, verticalMode);
+      }
+
+      // Center Mode
+      if(typeof this.options.centermode !== 'undefined') {
+        var centerMode = {
+          centerMode: true,
+          centerPadding: !!this.options.centerPadding ? this.options.centerPadding : 0
+        };
+        option = $.extend(option, centerMode);
+      }
+
       // Autoplay
       if(typeof this.options.autoplay !== 'undefined') {
         option = $.extend(option, {
-          infinite: true,
           autoplay: true,
-          autoplaySpeed: 3000,
-          adaptiveHeight: false
+          autoplaySpeed: 3000
         });
       }
       /*else if(this.options.type !== TypeSliders.SYNCING) {
