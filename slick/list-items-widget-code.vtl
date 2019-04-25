@@ -11,6 +11,7 @@
 #set($initUnder = '')
 #set($setPositionArrows = '')
 #set($dots = '')
+#set($arrows = '')
 #set($infinite = '')
 #set($centerPaddingSlide = '')
 #set($adaptive = '')
@@ -34,6 +35,9 @@
   #end
   #if($bullets == 'true')
     #set($dots = '&quot;dots&quot;:true,')
+  #end
+  #if($hideArrows == 'true')
+    #set($arrows = '&quot;arrows&quot;:false,')
   #end
   #if($infiniteSlide == 'true')
     #set($infinite = '&quot;infinite&quot;:true,')
@@ -74,18 +78,18 @@
   #end
 
   #if($typeSlider == 'syncing')
-    #set($mainSlideAttr = 'data-cslider="{' +
-      $!{effect} + $!{autoplay} + $!{initUnder} + $!{setPositionArrows} + $!{infinite} + $!{verticalMode} +
+    #set($mainSlideAttr = 'data-cslider="{' + $!{arrows} +
+      $!{effect} + $!{autoplay} + $!{initUnder} + $!{setPositionArrows} + $!{infinite} + $!{verticalMode} + $!{adaptive} +
       '&quot;type&quot;:&quot;syncing&quot;,' +
       '&quot;navFor&quot;:&quot; .' + $!{className} +' .thumb-slider&quot;,' +
       '&quot;view&quot;:true}"')
 
-    #set($thumbSlideAttr = 'data-cslider="{' +
+    #set($thumbSlideAttr = 'data-cslider="{' + $!{arrows} +
       $!{desktopItem} + $!{tabletItem} + $!{mobileItem} + $!{initUnder} + $!{infinite} + $!{centerMode} + $!{verticalMode} + $!{centerPaddingSlide} +
       '&quot;type&quot;:&quot;syncing&quot;,' +
       '&quot;navFor&quot;:&quot; .' + $!{className} +' .main-slider&quot;}"')
   #else
-    #set($mainSlideAttr = 'data-cslider="{' +
+    #set($mainSlideAttr = 'data-cslider="{' + $!{arrows} +
       $!{effect} + $!{autoplay} + $!{initUnder} + $!{setPositionArrows} + $!{centerMode} + $!{verticalMode} + $!{adaptive} +
       $!{dots} + $!{centerPaddingSlide} + $!{infinite} +
       $!{desktopItem} + $!{tabletItem} + $!{mobileItem} +
@@ -254,7 +258,7 @@
     #if($UtilMethods.isSet($con.jsPath))
     <script type="text/javascript" src="$!{con.jsPath}" scriptType="page" defer></script>
     #else
-    <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/3476ddea78e0cef38d400196c97400207ffd6f69/slick/slider.js" scriptType="page" defer></script>
+    <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/cbf92612c82acb36da2786721a65b12fe229cdea/slick/slider.js" scriptType="page" defer></script>
     #end
     #set($slick = 1)
   #end
