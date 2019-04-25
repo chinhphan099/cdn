@@ -197,6 +197,7 @@
 
       // Disabled adaptiveHeight
       if(this.options.type === TypeSliders.SYNCING) {
+        this.element.removeClass('adaptive-slider');
         option = $.extend(option, {
           adaptiveHeight: false
         });
