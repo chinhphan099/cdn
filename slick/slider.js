@@ -183,6 +183,10 @@
         option = $.extend(option, {infinite: this.options.infinite});
       }
 
+      if(typeof this.options.adaptiveHeight !== 'undefined') {
+        option = $.extend(option, {adaptiveHeight: this.options.adaptiveHeight});
+      }
+
       // Autoplay
       if(typeof this.options.autoplay !== 'undefined') {
         option = $.extend(option, {
@@ -192,13 +196,13 @@
           adaptiveHeight: false
         });
       }
-      else if(this.options.type !== TypeSliders.SYNCING) {
+      /*else if(this.options.type !== TypeSliders.SYNCING) {
         if(typeof this.options.adaptiveHeight !== 'undefined') {
           option = $.extend(option, {
             adaptiveHeight: true
           });
         }
-      }
+      }*/
 
       // Run
       this.handle.slick(option);
