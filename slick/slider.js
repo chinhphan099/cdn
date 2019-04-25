@@ -194,13 +194,13 @@
           autoplaySpeed: 3000
         });
       }
-      /*else if(this.options.type !== TypeSliders.SYNCING) {
-        if(typeof this.options.adaptiveHeight !== 'undefined') {
-          option = $.extend(option, {
-            adaptiveHeight: true
-          });
-        }
-      }*/
+
+      // Disabled adaptiveHeight
+      if(this.options.type === TypeSliders.SYNCING) {
+        option = $.extend(option, {
+          adaptiveHeight: false
+        });
+      }
 
       // Run
       this.handle.slick(option);
