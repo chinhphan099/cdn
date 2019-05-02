@@ -8,7 +8,7 @@
 #end
 
 #if($UtilMethods.isSet($productGroup))
-    <div class="js-list-group">
+    <div class="js-list-group $!{className}-icon">
         #if($con.fullSelectedText)
             <h5>$con.fullSelectedText</h5>
         #end
@@ -77,7 +77,7 @@
                     </label>
                     #if($prod.buttonTxt != '')
                         <div class="order-btn">
-                            <button type="button" class="button">$!{prod.buttonTxt}</button>
+                            <button type="button" class="button btn-order-now">$!{prod.buttonTxt}</button>
                         </div>
                     #end
                 </div>
@@ -92,5 +92,5 @@
 #if($UtilMethods.isSet($con.localJsFile))
 <script scriptType="component" src="$con.localJsFile" defer></script>
 #else
-<script scriptType="component" src="//rawcdn.githack.com/chinhphan099/cdn/d8b21b7b2db0db2c88d8c17db7a9959e5e941e0e/w_productlist/widget_productlist_v1.js" defer></script>
+<script scriptType="component" src="//rawcdn.githack.com/chinhphan099/cdn/32a1df4b7ea1c896b3b30b9e0eea46f0fed35853/w_productlist/widget_productlist_v1.js" defer></script>
 #end
