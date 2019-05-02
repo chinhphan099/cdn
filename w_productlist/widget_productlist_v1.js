@@ -357,10 +357,12 @@
                 }, false);
             }
 
-            _qById('btn-yes-exit-popup').addEventListener('click', function() {
-                indexItem = 0;
-                init(true);
-            }, false);
+            if(!!_qById('btn-yes-exit-popup')) {
+                _qById('btn-yes-exit-popup').addEventListener('click', function() {
+                    indexItem = 0;
+                    init(true);
+                }, false);
+            }
         };
 
         init(utils.getQueryParameter('et') === '1');
