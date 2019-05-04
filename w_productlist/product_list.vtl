@@ -15,7 +15,7 @@
         <ul data-packagedisplay="$!{packageDisplay}">
             #set($groupObj = $json.generate($!{productGroup}))
             #foreach($group in $groupObj.data)
-                <li data-package="$!{group.pidPackages}" data-replacetext="$!{group.selectedText}"><span>$group.tabName</span></li>
+                <li data-package="$!{group.pidPackages}" data-replacetext="$!{group.selectedText}"><p>$group.tabName</p></li>
             #end
         </ul>
     </div>
