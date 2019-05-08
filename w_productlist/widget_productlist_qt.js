@@ -1,4 +1,9 @@
-const quantity = (() => {
+const quantity = ((utils) => {
+    if (!utils) {
+        console.log('modules is not found');
+        return;
+    }
+
     let isChangeTab = false;
     const getVisibleItems = () => {
         let visibleElms = [];
@@ -19,6 +24,9 @@ const quantity = (() => {
 
         if(!!qt && qtNumber > 0 && qtNumber <= visibleItems.length) {
             qtNumber -= 1;
+            if(utils.getQueryParameter('et') === '1') {
+                qtNumber = 0;
+            }
 
             const listProduct = _qAll('.productRadioListItem');
             for(let itemProduct of listProduct) {
@@ -27,6 +35,9 @@ const quantity = (() => {
             visibleItems[qtNumber].classList.add('default');
             if(!isChangeTab) {
                 visibleItems[qtNumber].querySelector('input').click();
+                if(typeof exitPopup !== 'undefined') {
+                    exitPopup.handleEvents();
+                }
             }
         }
     };
@@ -72,7 +83,7 @@ const quantity = (() => {
         initial: initial,
         waitingOrderData: waitingOrderData
     }
-})();
+})(window.utils);
 
 quantity.waitingOrderData();
 window.addEventListener('DOMContentLoaded', () => {
