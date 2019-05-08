@@ -166,7 +166,9 @@ const exitPopup = (function (utils) {
     }
 
     return {
-        handleEvents: handleEvents
+        handleEvents: handleEvents,
+        handleTouchMove: handleTouchMove,
+        handleMouseOut: handleMouseOut
     }
 
 })(window.utils);
