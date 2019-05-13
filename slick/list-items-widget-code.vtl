@@ -152,7 +152,7 @@
             #set($imgs = $item.mainImage.trim().split(','))
             <div class="w_thumb">
               #if($UtilMethods.isSet($item.imageLink))
-                <a class="w_link" href="$item.imageLink">
+                <a class="w_link $!{itemCls}link" href="$item.imageLink">
               #end
                 #if($imgs.size() == 1)
                   #if($lazyloadImage == 'true')
