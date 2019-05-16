@@ -10,21 +10,26 @@
 <div class="dummy-layer"></div>
 <div class="gamefiedWrap $!{con.className} #if($EDIT_MODE)hidden#end">
     <div class="gamefiedWrap-inner">
+        #if($UtilMethods.isSet($con.logo))
         <div class="game-logo-wrap">
             <img src="$!{con.logo.uri}" class="game-logo">
         </div>
+        #end
         <div class="game-main">
             <div class="w_content">
                 <div class="content-1">
                     <div class="text-wrap">$!{con.content}</div>
+                    #if($UtilMethods.isSet($con.placeHolderText))
                     <div class="form-group">
                         <input type="text" id="gamefiedEmailTxt" required email placeholder="$!{con.placeHolderText}">
                         <span class="error-message hidden"></span>
                     </div>
+                    #end
                     <button type="button" class="green-button spin-button">$!{con.firstButton}</button>
                 </div>
                 <div class="content-2" style="display:none;">
                     <div class="text-wrap">$!{con.successText}</div>
+                    <button type="button" class="green-button" id="couponBtn">$!{con.couponButton}</button>
                     <button type="button" class="green-button" id="gamefied-yes">$!{con.secondButton}</button>
                 </div>
                 <div class="decline-wrap">
@@ -77,6 +82,10 @@
     <link linkType="page" rel="stylesheet/less" type="text/css" href="//d16hdrba6dusey.cloudfront.net/sitecommon/less/widgets/widget_gamefied.less">
     <script type="text/javascript" src="//d16hdrba6dusey.cloudfront.net/sitecommon/js/widgets/widget_superwheel.js" scriptType="page" defer></script>
     <script type="text/javascript" src="//d16hdrba6dusey.cloudfront.net/sitecommon/js/widgets/widget_gamefied.js" scriptType="page" defer></script>
+    #if($UtilMethods.isSet($con.initGamefieldJs))
+    <script type="text/javascript" src="$con.initGamefieldJs" scriptType="page" defer></script>
+    #else
     <script type="text/javascript" src="//d16hdrba6dusey.cloudfront.net/sitecommon/js/widgets/widget_initgamefied.js" scriptType="page" defer></script>
+    #end
     #set($gamefied = 1)
 #end

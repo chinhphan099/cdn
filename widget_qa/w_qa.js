@@ -1,8 +1,4 @@
-(function(utils) {
-    if (!utils) {
-        console.log('modules is not found');
-        return;
-    }
+(function() {
     const getClosest = (elem, selector) => {
         if (!Element.prototype.matches) {
             Element.prototype.matches =
@@ -47,7 +43,7 @@
     }
 
     function listener() {
-        const titleElms = _qAll('.w_qa_list .w_toptext');
+        const titleElms = document.querySelectorAll('.w_qa_list .w_toptext');
         for(let titleElm of titleElms) {
             titleElm.addEventListener('click', function(event) {
                 changeTab(event.target);
@@ -62,4 +58,4 @@
     document.addEventListener('DOMContentLoaded', function(event) {
         init();
     });
-})(window.utils);
+})();

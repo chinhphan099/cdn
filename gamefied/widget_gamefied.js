@@ -1,4 +1,4 @@
-(function (utils) {
+const gameFied = (function (utils) {
     if (!utils) {
         return;
     }
@@ -145,8 +145,8 @@
             if(_q('.txtExitpopupPrice')) {
                 _q('.txtExitpopupPrice').innerHTML = formattedValue;
             }*/
-            _q('body').classList.add('show-gamefied');
         }
+        _q('body').classList.add('show-gamefied');
         /*_q('.w_modal').style.display = 'block';*/
     }
 
@@ -154,11 +154,24 @@
         _q('body').classList.remove('show-gamefied');
         //document.getElementsByClassName('gamefiedWrap')[0].remove();
         //_q('.gamefiedWrap').style.display = 'none';
+
+        if(!!timer) {
+            clearTimeout(timer);
+        }
+        if(!!mobileTimer) {
+            clearTimeout(mobileTimer);
+        }
         document.removeEventListener('mouseout', handleMouseOut);
         window.removeEventListener('touchmove', handleTouchMove);
     }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        handleEvents();
-    });
+    return {
+        handleEvents: handleEvents,
+        handleTouchMove: handleTouchMove,
+        handleMouseOut: handleMouseOut,
+        hideGamefied: hideGamefied
+    };
 })(window.utils);
+
+document.addEventListener('DOMContentLoaded', () => {
+    gameFied.handleEvents();
+});

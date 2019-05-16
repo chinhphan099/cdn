@@ -1,0 +1,374 @@
+<style>
+    .mce-panel {
+        background: #f0f0f0 !important;
+        width: 568px;
+    }
+    .mce-btn {
+        border: 1px solid transparent !important;
+        box-shadow: none !important;
+        background: #f0f0f0 !important;
+        border-radius: 0 !important;
+    }
+    .mce-btn button {
+        line-height: normal;
+        padding: 5px 8px;
+    }
+    .mce-menubtn span {
+        line-height: normal;
+    }
+    .mce-btn:hover, .mce-btn:focus {
+        color: #333333 !important;
+        background-color: #e3e3e3 !important;
+        border-color: #cccccc !important;
+    }
+    .mce-btn.mce-active, .mce-btn.mce-active:hover {
+        background-color: #dbdbdb !important;
+        border-color: #cccccc !important;
+    }
+    .mce-abs-layout-item {
+        border-color: #ccc !important;
+    }
+    .mce-primary {
+        background-color: #006dcc !important;
+        border-color: #006dcc !important;
+    }
+    .mce-primary:hover {
+        background-color: #005fb3 !important;
+        border-color: #005fb3 !important;
+    }
+    .mce-btn-group:not(:first-child) {
+        border-left: 1px solid #d9d9d9;
+        padding-left: 2px;
+        margin-left: 2px;
+    }
+    .mce-colorbutton .mce-open,
+    .mce-splitbtn .mce-open {
+        border-right: none;
+        height: 24px;
+    }
+    .mce-toolbar:not(:first-child) {
+        padding-top: 3px;
+        border-top: 1px solid #d9d9d9;
+        margin-top: 3px;
+    }
+    .mce-colorbutton .mce-preview {
+        margin-left: -18px;
+    }
+    .mce-menu {
+        border-radius: 0;
+        margin-top: 0;
+    }
+    .mce-window {
+        border-radius: 0;
+        background: #fff !important;
+    }
+    .mce-textbox {
+        border-radius: 0;
+    }
+    .mce-textbox:focus {
+        box-shadow: none;
+        border-color: #59a5e1 !important;
+    }
+
+    .listProducts {
+        margin: 20px 0px;
+    }
+
+    .listProducts > li {
+        padding: 15px;
+        margin-top: 2px;
+        position: relative;
+        max-width: 900px;
+        background-color: #fafafa;
+        border: 1px solid #ddd;
+        border-left: 5px solid #0e80cb;
+    }
+
+    .listProducts > li:nth-child(even) {
+        background-color: #e8e8e8;
+        border-left: 5px solid #333;
+    }
+
+    .listProducts > li:nth-child(odd) {
+        background-color: #fff;
+    }
+
+    .listProducts > li label {
+        width: 200px;
+        display: inline-block;
+    }
+
+    .listProducts > li > div {
+        padding: 7px 0px;
+        display: flex;
+    }
+
+    .listProducts input {
+        width: 570px;
+        padding: 0 10px;
+        height: 35px;
+    }
+    .listProducts input[type="radio"],
+    .listProducts input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+    }
+    .listProducts select {
+        width: 150px;
+        height: 25px;
+    }
+
+    .deleteIcon {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        cursor: pointer;
+        color: #000;
+        font-size: 22px;
+        opacity: 0.5;
+        transition: opacity .3s ease;
+    }
+    .deleteIcon:hover {
+        opacity: 1;
+    }
+
+    #result {
+        margin-top: 15px;
+    }
+</style>
+
+#set($con = $dotcontent.find($request.getAttribute("com.dotmarketing.contentlet.edit").inode))
+<button dojoType="dijit.form.Button" onclick="addItem">Add Product</button>
+<ul id="listProducts" class="listProducts"></ul>
+<script>
+    var countItem = 1;
+    var listProduct = {
+        data: []
+    };
+
+    function initPage() {
+        #if($UtilMethods.isSet($con.products))
+            var items = $con.products;
+            listProduct.data = items.data;
+
+            var item;
+            if(items.data.length > 0) {
+                for(var i = 0; i < items.data.length; i++) {
+                    item = items.data[i];
+                    generateItem(item);
+                }
+                updateValueToCustomField();
+                var lastItemId = items.data[items.data.length-1].id;
+                countItem = parseInt(lastItemId.replace('item-', '')) + 1;
+            }
+        #end
+    }
+    initPage();
+
+    function getItemById(id) {
+        var obj = null;
+        for(var i = 0; i < listProduct.data.length; i++) {
+            if(listProduct.data[i].id === id) {
+                obj = listProduct.data[i];
+                break;
+            }
+        }
+
+        return obj;
+    }
+
+    function createRow(label, input, id) {
+        var div = document.createElement('div');
+        div.appendChild(label);
+        div.appendChild(input);
+        return div;
+    }
+
+    function createLabel(text) {
+        var label = document.createElement('label');
+        var textNode = document.createTextNode(text);
+        label.appendChild(textNode);
+        return label;
+    }
+
+    function generateEditor(id) {
+        tinymce.init({
+            selector: '#' + id,
+            plugins: ['link', 'lists', 'image', 'code', 'textcolor', 'table', 'paste', 'advlist', 'table', 'hr', 'autoresize'],
+            menubar: false,
+            image_dimensions: false,
+            verify_html: false,
+            relative_urls: false,
+            autoresize_bottom_margin: 10,
+            min_height: 180,
+            toolbar: [
+                'styleselect | table | alignleft aligncenter alignright alignjustify | pastetext | link unlink image | code',
+                'bold italic underline strikethrough superscript subscript | hr | numlist bullist | forecolor backcolor'
+            ],
+            paste_as_text: true,
+            setup: function(ed) {
+                ed.on('keyup blur', function() {
+                    console.log(this.id);
+                    saveData(document.querySelector('#' + this.id));
+                });
+            }
+        });
+    }
+
+    function saveData(elm) {
+        var li = elm.closest('li'),
+            order = li.id.split('-')[1],
+            obj = getItemById(li.id);
+
+        if(obj) {
+            obj.classItem = li.querySelector('input.classItem').value;
+            obj.productId = li.querySelector('input.productId').value;
+            obj.productName = tinymce.get('productName' + order).getContent().replace(/\n/gi, '').replace(/\"/gi, 'xaaax');
+            obj.defaultProductTitle = li.querySelector('input.defaultProductTitle').value;
+            obj.buttonTxt = li.querySelector('input.buttonTxt').value;
+        } else {
+            obj = {
+                id: li.id,
+                classItem: li.querySelector('input.classItem').value,
+                productId: li.querySelector('input.productId').value,
+                productName: tinymce.get('productName' + order).getContent().replace(/\n/gi, '').replace(/\"/gi, 'xaaax'),
+                defaultProductTitle: li.querySelector('input.defaultProductTitle').value,
+                buttonTxt: li.querySelector('input.buttonTxt').value
+            };
+            listProduct.data.push(obj);
+        }
+
+        updateValueToCustomField();
+    }
+
+    function createInput(className, value, inputType, order) {
+        var input = document.createElement('INPUT');
+        if(value && value !== '') {
+            input.value = value;
+        }
+
+        if(inputType && (inputType === 'radio' || inputType === 'checkbox')) {
+            if(value == true) {
+                input.setAttribute('checked', value);
+            }
+        }
+
+        input.addEventListener('change', function(e) {
+            saveData(this);
+        });
+
+        input.setAttribute('type', inputType);
+        input.setAttribute('id', className + order);
+        input.setAttribute('name', className);
+        input.classList.add(className);
+        return input;
+    }
+
+    function createTextArea(className, value, order) {
+        var textarea = document.createElement('textarea');
+        if(value && value !== '') {
+            textarea.value = value.replace(/xaaax/gi, '\"');
+        }
+
+        textarea.addEventListener('change', function(e) {
+            saveData(this);
+        });
+
+        textarea.setAttribute('id', className + order);
+        textarea.style.height = '37px';
+        textarea.classList.add(className);
+        return textarea;
+    }
+
+    function addItem() {
+        var item = {
+            id: 'item-' + countItem,
+            classItem: '',
+            productId: '',
+            productName: '',
+            defaultProductTitle: '',
+            buttonTxt: ''
+        }
+
+        listProduct.data.push(item);
+        generateItem(item);
+        updateValueToCustomField();
+        countItem++;
+    }
+
+    function generateItem(item) {
+        //create li
+        var li = document.createElement('li'),
+            order = item.id.split('-')[1];
+        li.setAttribute('id', item.id);
+
+        //row 1 : product Id
+         var label0 = createLabel('Class Name');
+        var input0 = createInput('classItem', item.classItem, 'text', order);
+        var row0 = createRow(label0, input0);
+        li.appendChild(row0);
+
+        //row 1 : product Id
+        var label1 = createLabel('Product Id');
+        var input1 = createInput('productId', item.productId, 'text', order);
+        var row1 = createRow(label1, input1);
+        li.appendChild(row1);
+
+        //row 3 : default Product Title
+        var label3_1 = createLabel('Default Text');
+        var input3_1 = createInput('defaultProductTitle', item.defaultProductTitle, 'text', order);
+        var row3_1 = createRow(label3_1, input3_1);
+        li.appendChild(row3_1);
+
+        //row 2 : product Name
+        var label2 = createLabel('Product Name');
+        var input2 = createTextArea('productName', item.productName, order);
+        var row2 = createRow(label2, input2);
+        li.appendChild(row2);
+
+        //row 5 : Button Text
+        var label5 = createLabel('Button Text');
+        var input5 = createInput('buttonTxt', item.buttonTxt, 'text', order);
+        var row5 = createRow(label5, input5);
+        li.appendChild(row5);
+
+        //remove link
+        var a = document.createElement('a');
+        a.classList.add('deleteIcon');
+        bindEventRemove(a);
+        li.appendChild(a);
+
+        document.getElementById('listProducts').appendChild(li);
+
+        generateEditor('productName' + order);
+    }
+
+    function updateValueToCustomField() {
+        //document.getElementById('result').innerHTML = JSON.stringify(listProduct.data, null, 3);
+        dojo.byId("products").value = JSON.stringify(listProduct);
+    }
+
+    function bindEventRemove(elem) {
+        elem.addEventListener('click', function(e) {
+            debugger;
+            e.preventDefault();
+            var li = elem.parentNode;
+            var item = getItemById(li.id);
+            var index = listProduct.data.indexOf(item);
+            var idNumber = li.id.split('item-')[1];
+            tinymce.get('productName' + idNumber).destroy();
+
+            if(Number(idNumber) === listProduct.data.length) {
+                countItem--;
+            }
+            listProduct.data.splice(index, 1);
+            document.getElementById('listProducts').removeChild(li);
+
+            updateValueToCustomField();
+        });
+    }
+</script>
+
+<button dojoType="dijit.form.Button" onclick="addItem">Add Product</button>
+
+<pre id="result"></pre>
