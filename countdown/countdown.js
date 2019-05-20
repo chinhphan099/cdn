@@ -56,6 +56,7 @@
     }
 
     function handleCountDown(elm, endtime) {
+        let timeinterval;
         const dayElm = elm.querySelector('.ex_day'),
             hourElm = elm.querySelector('.ex_hour'),
             minuteElm = elm.querySelector('.ex_minute'),
@@ -64,8 +65,8 @@
         function updateClock() {
             let t = timeRemaining(endtime);
             if(t.total <= 0) {
-                utils.events.emit('timeOver');
                 clearInterval(timeinterval);
+                utils.events.emit('onTimeOver');
             }
             minuteElm.innerHTML = t.minutes < 10 ? '0' + t.minutes : t.minutes;
             secondElm.innerHTML = t.seconds < 10 ? '0' + t.seconds : t.seconds;
@@ -78,7 +79,7 @@
         }
 
         updateClock(); // Run on first time
-        var timeinterval = setInterval(updateClock, 1000);
+        timeinterval = setInterval(updateClock, 1000);
     }
 
     function generateCountDown(elm, min, sec, hour, day) {
