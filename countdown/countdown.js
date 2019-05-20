@@ -3,20 +3,20 @@
     const timeHTML = `
             <div class="cd_item">
                 <div class="ex_minute"></div>
-                <div class="minute_text">${js_translate.minutes}</div>
+                <div class="minute_text">${js_translate.minutes ? js_translate.minutes : 'MINUTES'}</div>
             </div>
             <div class="cd_item">
                 <div class="semicolon">:</div>
             </div>
             <div class="cd_item">
                 <div class="ex_second"></div>
-                <div class="second_text">${js_translate.seconds}</div>
+                <div class="second_text">${js_translate.seconds ? js_translate.seconds : 'SECONDS'}</div>
             </div>
         `,
         hasHourHTML = `
                 <div class="cd_item">
                     <div class="ex_hour"></div>
-                    <div class="hour_text">${js_translate.hours}</div>
+                    <div class="hour_text">${js_translate.hours ? js_translate.hours : 'HOURS'}</div>
                 </div>
                 <div class="cd_item">
                     <div class="semicolon">:</div>
@@ -26,7 +26,7 @@
         hasDayHTML = `
                 <div class="cd_item">
                     <div class="ex_day"></div>
-                    <div class="day_text">${js_translate.days}</div>
+                    <div class="day_text">${js_translate.days ? js_translate.days : 'DAYS'}</div>
                 </div>
                 <div class="cd_item">
                     <div class="semicolon">:</div>
