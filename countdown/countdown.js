@@ -1,5 +1,10 @@
 // Callback after countdown is done: window.timeOver(); => To use: Just need define function window.timeOver
-(() => {
+((utils) => {
+    if (!utils) {
+        console.log('modules is not found');
+        return;
+    }
+
     const timeHTML = `
             <div class="cd_item">
                 <div class="ex_minute"></div>
@@ -59,9 +64,7 @@
         function updateClock() {
             let t = timeRemaining(endtime);
             if(t.total <= 0) {
-                if(typeof timeOver === 'function') {
-                    window.timeOver();
-                }
+                utils.events.emit('timeOver');
                 clearInterval(timeinterval);
             }
             minuteElm.innerHTML = t.minutes < 10 ? '0' + t.minutes : t.minutes;
@@ -136,4 +139,4 @@
     window.addEventListener('DOMContentLoaded', () => {
         initial();
     });
-})();
+})(window.utils);
