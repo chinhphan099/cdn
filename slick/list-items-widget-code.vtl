@@ -274,3 +274,11 @@
     #set($qa = 1)
   #end
 #end
+
+#if($type == 'coutdown')
+  #if($UtilMethods.isSet($coutdown) == false)
+    <link linkType="page" rel="stylesheet/less" type="text/css" href="//rawcdn.githack.com/chinhphan099/cdn/4f764add058050c81948eeedee315d6b5aaa6547/countdown/countdown.less">
+    <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/4f764add058050c81948eeedee315d6b5aaa6547/countdown/countdown.js" scriptType="page" defer></script>
+    #set($coutdown = 1)
+  #end
+#end
