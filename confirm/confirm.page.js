@@ -31,11 +31,13 @@
 
     function bindData(data) {
         console.log(data);
-
+        let dotOrComma = '.';
+        if(data.receipts[0].formattedAmount.indexOf(',') >= 0) {
+            dotOrComma = ',';
+        }
         const fvalue = data.receipts[0].formattedAmount.replace(/[,|.]/g, '');
         const pValue = data.receipts[0].amount.toFixed(2).toString().replace(/\./, '');
         const fCurrency = fvalue.replace(pValue, '######');
-        const shippingPriceFormatted = data.shippingPriceFormatted;
 
         //bind orde summary on header
         const orderSummaryElem = _qAll('.js-order-summary');
@@ -53,8 +55,8 @@
                                     .replace('orderDate', d.toISOString().split('T')[0])
                                     .replace('customerName', data.firstName + ' ' + data.lastName)
                                     .replace('customerEmail', data.customerEmail)
-                                    .replace('orderTotal', utils.formatPrice(orderTotal.toFixed(2), fCurrency, shippingPriceFormatted))
-                                    .replace('orderSaved', utils.formatPrice(confirm.orderInfo.savedTotal.toFixed(2), fCurrency, shippingPriceFormatted));
+                                    .replace('orderTotal', fCurrency.replace('######', orderTotal.toFixed(2).toString().replace('.', dotOrComma)))
+                                    .replace('orderSaved', fCurrency.replace('######', confirm.orderInfo.savedTotal.toFixed(2).toString().replace('.', dotOrComma)));
             }
         }
 
@@ -104,9 +106,7 @@
         let installmentText = '';
         if(confirm.orderInfo.installmentValue && confirm.orderInfo.installmentValue !== '') {
             const mainPrice = (data.orderPrice / confirm.orderInfo.installmentValue).toFixed(2);
-            installmentText = ' (' + confirm.orderInfo.installmentText
-                                .replace(/N/, confirm.orderInfo.installmentValue)
-                                .replace(/\$price/, utils.formatPrice(mainPrice, fCurrency, shippingPriceFormatted)) + ')';
+            installmentText = ' (' +  confirm.orderInfo.installmentText.replace(/N/, confirm.orderInfo.installmentValue).replace(/\$price/, 'R$' + mainPrice.replace(/\./, ',')) + ')';
         }
 
         let mainProductNames = (typeof mainProducts !== 'undefined') ? mainProducts : false;
@@ -131,9 +131,7 @@
         for(let i = 0; i < data.relatedOrders.length; i++) {
             if(confirm.orderInfo.installmentValue && confirm.orderInfo.installmentValue !== '') {
                 const mainPrice = (data.relatedOrders[i].orderPrice / confirm.orderInfo.installmentValue).toFixed(2);
-                installmentText = ' (' + confirm.orderInfo.installmentText
-                                    .replace(/N/, confirm.orderInfo.installmentValue)
-                                    .replace(/\$price/, utils.formatPrice(mainPrice, fCurrency, shippingPriceFormatted)) + ')';
+                installmentText = ' (' + confirm.orderInfo.installmentText.replace(/N/, confirm.orderInfo.installmentValue).replace(/\$price/, 'R$' + mainPrice.replace(/\./, ',')) + ')';
             }
 
             let itemTmp = productItemTmp.replace('{productName}', data.relatedOrders[i].productName)
