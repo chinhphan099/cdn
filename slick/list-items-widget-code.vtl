@@ -253,15 +253,15 @@
     #set($jquery = 1)
   #end
   #if($UtilMethods.isSet($slick) == false)
-    <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/5bb1af6adb508aa2b1c9ddac4d24c7420f25dff4/slick/slick.js" scriptType="page" defer></script>
+    <script type="text/javascript" src="//d16hdrba6dusey.cloudfront.net/sitecommon/js/libs/slick-v1.js" scriptType="page" defer></script>
     #set($slick = 1)
   #end
   #if($UtilMethods.isSet($cslider) == false)
-    <link linkType="page" rel="stylesheet/less" type="text/css" href="//rawcdn.githack.com/chinhphan099/cdn/b5aac8ac0f48e4809db0107f1c2188a952b1272f/slick/slick.less">
+    <link linkType="page" rel="stylesheet/less" type="text/css" href="//d16hdrba6dusey.cloudfront.net/sitecommon/less/libs/slick.less">
     #if($UtilMethods.isSet($con.jsPath))
     <script type="text/javascript" src="$!{con.jsPath}" scriptType="page" defer></script>
     #else
-    <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/8fa8d262ce54644fb5d0b948ef939312113343ba/slick/slider.js" scriptType="page" defer></script>
+    <script type="text/javascript" src="//d16hdrba6dusey.cloudfront.net/sitecommon/js/pages/slider.page.js" scriptType="page" defer></script>
     #end
     #set($cslider = 1)
   #end
@@ -269,16 +269,16 @@
 
 #if($type == 'qa')
   #if($UtilMethods.isSet($qa) == false)
-    <link linkType="page" rel="stylesheet/less" type="text/css" href="//rawcdn.githack.com/chinhphan099/cdn/03a9fae350f6c69d8f32175fc9e869583e905226/widget_qa/w_qa.less">
-    <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/23962b142777fcafb3e696394e8c18ea3a3c8036/widget_qa/w_qa.js" scriptType="page" defer></script>
+    <link linkType="page" rel="stylesheet/less" type="text/css" href="//d16hdrba6dusey.cloudfront.net/sitecommon/less/pages/w_qa.page.less">
+    <script type="text/javascript" src="//d16hdrba6dusey.cloudfront.net/sitecommon/js/pages/w_qa.page.js" scriptType="page" defer></script>
     #set($qa = 1)
   #end
 #end
 
 #if($type == 'coutdown')
   #if($UtilMethods.isSet($coutdown) == false)
-    <link linkType="page" rel="stylesheet/less" type="text/css" href="//rawcdn.githack.com/chinhphan099/cdn/4f764add058050c81948eeedee315d6b5aaa6547/countdown/countdown.less">
-    <script type="text/javascript" src="//rawcdn.githack.com/chinhphan099/cdn/7eef857cd5487ee901e24b364b12fda60642f616/countdown/countdown.js" scriptType="page" defer></script>
+    <link linkType="page" rel="stylesheet/less" type="text/css" href="//d16hdrba6dusey.cloudfront.net/sitecommon/less/pages/countdown.page.less">
+    <script type="text/javascript" src="//d16hdrba6dusey.cloudfront.net/sitecommon/js/pages/countdown.page.js" scriptType="page" defer></script>
     #set($coutdown = 1)
   #end
 #end

@@ -245,6 +245,42 @@
     .itemList .wrap-content input, .itemList .wrap-content textarea {
         border-color: #ddd;
     }
+    .itemList .wrap-ecom {
+        display: -webkit-flex;
+        display: -moz-flex;
+        display: -ms-flex;
+        display: -o-flex;
+        display: flex;
+        -ms-flex-wrap: nowrap;
+        flex-wrap: wrap;
+        -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+        justify-content: space-between;
+        margin-top: 10px;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+    }
+    .itemList .wrap-ecom h3 {
+        font-size: 13px;
+        color: #9b9b9b;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        width: 100%;
+        font-weight: normal;
+    }
+    .itemList .wrap-ecom input {
+        width: calc(50% - 30px);
+    }
+    .itemList .wrap-ecom span {
+        -webkit-box-flex: 1;
+        -ms-flex: 1 0 0px;
+        flex: 1 0 0px;
+        font-size: 12px;
+        color: #b4b4b4;
+        text-align: center;
+        padding-bottom: 10px;
+    }
     .itemList textarea {
         height: 90px;
     }
@@ -478,6 +514,9 @@
             itemClass: '',
             imageLink: '',
             topText: '',
+            proId: '',
+            proUrl: '',
+            proBtnText: '',
             title: '',
             shortDesc: '',
             subImage: '',
@@ -518,7 +557,6 @@
         imgWrap.classList.add('image-wrap');
         li.appendChild(imgWrap);
 
-
         generateImage(li.querySelector('.mainImage'));
 
         // Image's Link
@@ -556,6 +594,23 @@
 
         var shortDescTxt = createTextArea('shortDesc', item.shortDesc, 'text', 'Short Desc', order);
         wrapContent.appendChild(shortDescTxt);
+
+        // Ecommer Item
+        var wrapEcom = document.createElement('div');
+        wrapEcom.classList.add('wrap-ecom');
+        var ecomHeading = document.createElement('h3');
+        ecomHeading.innerHTML = 'Ecommerce Information';
+        wrapEcom.appendChild(ecomHeading);
+        var proId = createInput('proId', item.proId, 'text', 'Product ID', order);
+        wrapEcom.appendChild(proId);
+        var orSpan = document.createElement('span');
+        orSpan.innerHTML = 'OR';
+        wrapEcom.appendChild(orSpan);
+        var proUrl = createInput('proUrl', item.proUrl, 'text', 'Product Url', order);
+        wrapEcom.appendChild(proUrl);
+        wrapContent.appendChild(wrapEcom);
+        var proBtnText = createInput('proBtnText', item.proBtnText, 'text', 'Button Text', order);
+        wrapContent.appendChild(proBtnText);
 
         li.appendChild(wrapContent);
 
