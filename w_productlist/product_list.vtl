@@ -34,6 +34,12 @@
 
 #if($UtilMethods.isSet($products))
     #set($jsonObj = $json.generate($!{products}))
+    <script>
+    window.productIds = [];
+    #foreach($product in $jsonObj.data)
+        window.productIds.push(btoa("gid://shopify/Product/$!{product.productId}"));
+    #end
+    </script>
     <div id="js-widget-products" class="product-list $!{className}" data-options="{$specialOnly$isHideInstallmentText}">
         <input type="hidden" id="hdfSelectedProduct" value="$!{productIdForHeading}" />
         <div class="product-heading">
