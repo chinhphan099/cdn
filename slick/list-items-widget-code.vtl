@@ -205,15 +205,34 @@
             #if($UtilMethods.isSet($item.shortDesc))
               #set($replaceSrc = "src=\"$!{placeholderimage}\" data-src=\"/pub-assets/")
               <div class="w_desc">$!{item.shortDesc.replaceAll('xaaax', '"').replaceAll("/c/portal/", "").replaceAll('src="/pub-assets/', $replaceSrc)}</div>
+            #end
 
-              #*
-              #if($lazyloadImage == 'true')
-                #set($replaceSrc = "src=\"$!{placeholderimage}\" data-src=\"/pub-assets/")
-                <div class="w_desc">$!{item.shortDesc.replaceAll('xaaax', '"').replaceAll("/c/portal/", "").replaceAll('src="/pub-assets/', $replaceSrc)}</div>
-              #else
-                <div class="w_desc">$!{item.shortDesc.replaceAll('xaaax', '"').replaceAll("/c/portal/", "")}</div>
+            ## Generate Product Details Link Page
+            #if($item.has('proId'))
+              #if($item.proId != '')
+                #set($prod = $dotcontent.pull("+contentType:EcommProductitem1 +(conhost:${host.identifier} conhost:SYSTEM_HOST) +EcommProductitem1.productId:($item.proId) +EcommProductitem1.language:*${languageFolder}*",1,"modDate desc"))
+                #if($UtilMethods.isSet($prod[0]))
+                  #if($prod[0].selectCategory == 'deals')
+                    <div class="pro-link-wrap">
+                      <a href="/$!{prod[0].language}/$!{prod[0].selectCategory}/$!{prod[0].productNameUrlSlug}?deals=1" class="shop-link">
+                        <span>$!{item.proBtnText}</span>
+                      </a>
+                    </div>
+                  #else
+                    <div class="pro-link-wrap">
+                      <a href="/$!{prod[0].language}/$!{prod[0].selectCategory}/$!{prod[0].productNameUrlSlug}" class="shop-link">
+                        <span>$!{item.proBtnText}</span>
+                      </a>
+                    </div>
+                  #end
+                #end
+              #elseif($UtilMethods.isSet($item.proUrl))
+                <div class="pro-link-wrap">
+                  <a href="$!{item.proUrl}" class="shop-link">
+                    <span>$!{item.proBtnText}</span>
+                  </a>
+                </div>
               #end
-              *#
             #end
           #if($UtilMethods.isSet($wrapAllTitleAndDescription) && ($UtilMethods.isSet($item.title) || $UtilMethods.isSet($item.shortDesc)))
             </div>

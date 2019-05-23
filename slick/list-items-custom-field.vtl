@@ -240,10 +240,15 @@
     }
     .itemList .wrap-content {
         border: 1px dashed #ddd;
-        padding: 10px 10px 0;
+        padding: 10px;
     }
     .itemList .wrap-content input, .itemList .wrap-content textarea {
         border-color: #ddd;
+    }
+    .itemList .outer-ecom {
+        padding: 10px;
+        border: 1px dashed #ddd;
+        margin-top: 10px;
     }
     .itemList .wrap-ecom {
         display: -webkit-flex;
@@ -256,7 +261,6 @@
         -webkit-box-pack: justify;
         -ms-flex-pack: justify;
         justify-content: space-between;
-        margin-top: 10px;
         -webkit-box-align: center;
         -ms-flex-align: center;
         align-items: center;
@@ -435,6 +439,9 @@
             obj.title = li.querySelector('textarea.title').value.replace(/\"/gi, 'xaaax');
             obj.subImage = li.querySelector('input.subImage').value.replace(/\"/gi, 'xaaax');
             obj.shortDesc = tinymce.get('shortDesc' + order).getContent().replace(/\n/gi, '').replace(/\"/gi, 'xaaax');
+            obj.proId = li.querySelector('input.proId').value.replace(/\"/gi, 'xaaax');
+            obj.proUrl = li.querySelector('input.proUrl').value.replace(/\"/gi, 'xaaax');
+            obj.proBtnText = li.querySelector('input.proBtnText').value.replace(/\"/gi, 'xaaax');
             obj.videoID = li.querySelector('input.videoID').value.replace(/\"/gi, 'xaaax');
         }
         else {
@@ -447,6 +454,9 @@
                 title: li.querySelector('textarea.title').value.replace(/\"/gi, 'xaaax'),
                 subImage: li.querySelector('input.subImage').value.replace(/\"/gi, 'xaaax'),
                 shortDesc: tinymce.get('shortDesc' + order).getContent().replace(/\n/gi, '').replace(/\"/gi, 'xaaax'),
+                proId: li.querySelector('input.proId').value.replace(/\"/gi, 'xaaax'),
+                proUrl: li.querySelector('input.proUrl').value.replace(/\"/gi, 'xaaax'),
+                proBtnText: li.querySelector('input.proBtnText').value.replace(/\"/gi, 'xaaax'),
                 videoID: li.querySelector('input.videoID').value.replace(/\"/gi, 'xaaax')
             };
             listItems.data.push(obj);
@@ -486,7 +496,6 @@
         input.setAttribute('placeholder', placeholder);
         input.classList.add(className);
         return input;
-
     }
 
     function createTextArea(className, value, inputType, placeholder, order) {
@@ -595,24 +604,37 @@
         var shortDescTxt = createTextArea('shortDesc', item.shortDesc, 'text', 'Short Desc', order);
         wrapContent.appendChild(shortDescTxt);
 
+        li.appendChild(wrapContent);
+
         // Ecommer Item
+        var outerEcom = document.createElement('div');
+        outerEcom.classList.add('outer-ecom');
+
         var wrapEcom = document.createElement('div');
         wrapEcom.classList.add('wrap-ecom');
+
         var ecomHeading = document.createElement('h3');
         ecomHeading.innerHTML = 'Ecommerce Information';
         wrapEcom.appendChild(ecomHeading);
+
         var proId = createInput('proId', item.proId, 'text', 'Product ID', order);
         wrapEcom.appendChild(proId);
+
         var orSpan = document.createElement('span');
         orSpan.innerHTML = 'OR';
         wrapEcom.appendChild(orSpan);
+
         var proUrl = createInput('proUrl', item.proUrl, 'text', 'Product Url', order);
         wrapEcom.appendChild(proUrl);
-        wrapContent.appendChild(wrapEcom);
-        var proBtnText = createInput('proBtnText', item.proBtnText, 'text', 'Button Text', order);
-        wrapContent.appendChild(proBtnText);
 
-        li.appendChild(wrapContent);
+        // Append wrap into outer ecom
+        outerEcom.appendChild(wrapEcom);
+
+        var proBtnText = createInput('proBtnText', item.proBtnText, 'text', 'Button Text', order);
+        outerEcom.appendChild(proBtnText);
+
+        // Append outer ecom into list
+        li.appendChild(outerEcom);
 
         // Remove Button
         var a = document.createElement('a'),
@@ -621,10 +643,9 @@
         a.classList.add('removeItem');
         a.appendChild(textNode);
         li.appendChild(a);
+
         bindEventRemove(a);
-
         document.getElementById('itemList').appendChild(li);
-
         generateEditor('shortDesc' + order);
     }
 
@@ -687,7 +708,6 @@
             checktypeContent(this.get('value'));
         });
     }
-
     function checkModeSlider() {
         var centerPadding = dijit.byId('centerPadding');
         if(dojo.query('input[name="text7"]:checked')[0].id === 'sliderMode1') {// Center mode
