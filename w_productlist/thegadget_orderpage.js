@@ -35,6 +35,14 @@ const orderstPage = ((utils) => {
         for(let i = 0, n = items.length; i < n; i ++) {
             items[i].addEventListener('change', () => {
                 loadStatistical();
+                if(typeof exitPopup !== 'undefined') {
+                    if(utils.getQueryParameter('iep') === 'true' && !_qById('timeCount')) {
+                        handleExitPopup();
+                    }
+                    else {
+                        exitPopup.hidePopup();
+                    }
+                }
             }, false);
         }
     };
