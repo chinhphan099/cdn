@@ -87,6 +87,9 @@
                 //emit events
                 try {
                     const productInfo = getHiddenSelectedProduct();
+                    if(!!productInfo && productInfo.currencyCode === '') {
+                        productInfo.currencyCode = data.location.currencyCode;
+                    }
                     utils.events.emit('bindProductDiscountInfo', productInfo);
                     utils.localStorage().set('countryCode', data.location.countryCode);
                     utils.events.emit('triggerAddressForm', data.location.countryCode);
