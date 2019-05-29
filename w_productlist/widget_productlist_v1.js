@@ -19,6 +19,7 @@
                                             .replace(/{UnitFullRate}/gi, '<span class="spanUnitFullRate"></span>')
                                             .replace(/{DiscountedPrice}/gi, '<span class="discountedPrice"></span>')
                                             .replace(/{SavePrice}/gi, '<span class="savePrice"></span>')
+                                            .replace(/{ShippingFee}/gi, '<span class="jsShippingFee"></span>')
                                             .replace(/{FullPrice}/gi, '<del class="fullPrice"></del>');
                 }
             }
@@ -44,8 +45,9 @@
                             radio.setAttribute('data-product', JSON.stringify(product));
                             radio.onchange = handleProductChange;
 
-                            const elemUnitDiscountRate = _q('label[for="' + 'product_' + product.productId + '"] span.spanUnitDiscountRate');
-                            const elemUnitFullRate = _q('label[for="' + 'product_' + product.productId + '"] span.spanUnitFullRate');
+                            const elemShippingFees = _qAll('label[for="' + 'product_' + product.productId + '"] span.jsShippingFee');
+                            const elemUnitDiscountRate = _qAll('label[for="' + 'product_' + product.productId + '"] span.spanUnitDiscountRate');
+                            const elemUnitFullRate = _qAll('label[for="' + 'product_' + product.productId + '"] span.spanUnitFullRate');
                             const elemDiscountedPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .discountedPrice');
                             const elemFullPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .fullPrice');
                             const elemSavePrice = _qAll('label[for="' + 'product_' + product.productId + '"] .savePrice');
@@ -53,11 +55,33 @@
                             const pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
                             const fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
 
+                            if (elemShippingFees) {
+                                for(let elemShippingFee of elemShippingFees) {
+                                    if(product.shippings[0].price !== 0) {
+                                        if(!window.js_translate.shippingFee) {
+                                            window.js_translate.shippingFee = '{price} Shipping';
+                                        }
+                                        elemShippingFee.innerHTML = window.js_translate.shippingFee.replace('{price}', product.shippings[0].formattedPrice);
+                                    }
+                                    else {
+                                        elemShippingFee.innerHTML = !!window.js_translate.FREESHIP ? window.js_translate.FREESHIP : 'FREE SHIPPING';
+                                    }
+                                }
+                            }
                             if (elemUnitDiscountRate) {
-                                elemUnitDiscountRate.innerHTML = product.productPrices.UnitDiscountRate.FormattedValue;
+                                for(let unitDiscountRate of elemUnitDiscountRate) {
+                                    unitDiscountRate.innerHTML = product.productPrices.UnitDiscountRate.FormattedValue;
+                                }
                             }
                             if (elemUnitFullRate) {
-                                elemUnitFullRate.innerHTML = product.productPrices.UnitFullRetailPrice.FormattedValue;
+                                for(let unitFullRate of elemUnitFullRate) {
+                                    if(typeof product.productPrices.UnitFullRetailPrice !== 'undefined') {
+                                        unitFullRate.innerHTML = product.productPrices.UnitFullRetailPrice.FormattedValue;
+                                    }
+                                    else {
+                                        unitFullRate.innerHTML = product.productPrices.FullRetailPrice.FormattedValue;
+                                    }
+                                }
                             }
                             if (elemDiscountedPrice) {
                                 for(let discountedPrice of elemDiscountedPrice) {
@@ -86,7 +110,7 @@
 
                 //emit events
                 try {
-                    const productInfo = getHiddenSelectedProduct();
+                    const productInfo = getDefaultSelectedProduct();
                     if(!!productInfo && productInfo.currencyCode === '') {
                         productInfo.currencyCode = data.location.currencyCode;
                     }
@@ -128,7 +152,7 @@
     /**
      * This function is used to get hidden selected product which is used to bind shipping price and discount info
      */
-    function getHiddenSelectedProduct() {
+    function getDefaultSelectedProduct() {
         let result = null;
         try {
             const productId = _qById('hdfSelectedProduct').value;
@@ -153,17 +177,21 @@
                 }
             }
 
+            const fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
+            const pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
+            const fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
+
             result = {
                 priceShipping: priceShipping,
                 discountPrice: product.productPrices.DiscountedPrice.FormattedValue,
                 discountPriceValue: product.productPrices.DiscountedPrice.Value,
                 fullPrice: product.productPrices.FullRetailPrice.FormattedValue,
                 fullPriceValue: product.productPrices.FullRetailPrice.Value,
-                currencyCode: product.productPrices.FullRetailPrice.GlobalCurrencyCode != null ? product.productPrices.FullRetailPrice.GlobalCurrencyCode : ''
+                currencyCode: product.productPrices.FullRetailPrice.GlobalCurrencyCode != null ? product.productPrices.FullRetailPrice.GlobalCurrencyCode : '',
+                fCurrency: fCurrency
             }
-
         } catch (err) {
-            console.log('getHiddenSelectedProduct : ', err);
+            console.log('getDefaultSelectedProduct : ', err);
         }
         return result;
     }
