@@ -35,6 +35,14 @@ const orderstPage = ((utils) => {
         for(let i = 0, n = items.length; i < n; i ++) {
             items[i].addEventListener('change', () => {
                 loadStatistical();
+                if(typeof exitPopup !== 'undefined') {
+                    if(utils.getQueryParameter('iep') === 'true' && !_qById('timeCount')) {
+                        handleExitPopup();
+                    }
+                    else {
+                        exitPopup.hidePopup();
+                    }
+                }
             }, false);
         }
     };
@@ -233,8 +241,6 @@ const orderstPage = ((utils) => {
     let couponDiscount;
     const implementCoupon = (data) => {
         if(!!window.couponCodeId) {
-            const promoText = _q('.w_exit_popup .w_promo_text');
-
             const eCRM = new EmanageCRMJS({
                 webkey: siteSetting.webKey,
                 cid: siteSetting.CID,
@@ -258,7 +264,10 @@ const orderstPage = ((utils) => {
                         fCurrency = fvalue.replace(pValue, '######');
 
                     let couponPriceFormat = utils.formatPrice(data.discount, fCurrency, data.formattedMinimalPurchase);
+                    const promoText = _q('.w_exit_popup .w_promo_text');
                     promoText.innerHTML = promoText.innerHTML.replace(/{couponPrice}/g, couponPriceFormat);
+                    const couponApplyText = _q('.coupon-apply');
+                    couponApplyText.innerHTML = couponApplyText.innerHTML.replace(/{couponPrice}/g, couponPriceFormat);
                     window.additionText = window.additionText.replace(/{couponPrice}/g, couponPriceFormat);
 
                     couponDiscount = data.discount;
