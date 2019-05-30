@@ -22,6 +22,9 @@
         </ul>
     </div>
 #end
+
+## justShowSpecial type: checkbox => Just Show Special Product After Click Exitpop|true
+#*
 #set($specialOnly = '')
 #if($justShowSpecial == 'true')
     #set($specialOnly = '&quot;specialOnly&quot;: true')
@@ -29,6 +32,7 @@
         #set($specialOnly = $specialOnly + ', ')
     #end
 #end
+*#
 #set($isHideInstallmentText = '')
 #if($hideInstallmentText == 'true')
     #set($isHideInstallmentText = '&quot;isHideInstallmentText&quot;: true')
@@ -44,7 +48,7 @@
     #end
 
     </script>
-    <div id="js-widget-products" class="product-list $!{className}" data-options="{$specialOnly$isHideInstallmentText}">
+    <div id="js-widget-products" class="product-list $!{className}" data-options="{$isHideInstallmentText}">
         <input type="hidden" id="hdfSelectedProduct" value="$!{productIdForHeading}" />
         <div class="product-heading">
             <div>$!{itemsLabel}</div>

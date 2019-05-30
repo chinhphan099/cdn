@@ -1,3 +1,5 @@
+## KHÔNG edit trực tiếp file này trên Sandbox - Phải mở bằng sublime - Kéo file từ trong Network ra.
+## DON'T EDIT THIS FILE IN SANBOX
 #set($con = $dotcontent.find($CONTENT_INODE))
 #set($items = $json.generate($!{items}))
 #set($mainSlideAttr = '')
@@ -152,7 +154,7 @@
             #set($imgs = $item.mainImage.trim().split(','))
             <div class="w_thumb">
               #if($UtilMethods.isSet($item.imageLink))
-                <a class="w_link $!{itemCls}link" href="$item.imageLink">
+                <a class="w_link" href="$item.imageLink">
               #end
                 #if($imgs.size() == 1)
                   #if($lazyloadImage == 'true')
