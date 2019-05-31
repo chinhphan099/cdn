@@ -81,7 +81,14 @@
     <link linkType="page" rel="stylesheet/less" type="text/css" href="//d16hdrba6dusey.cloudfront.net/sitecommon/less/widgets/widget_superwheel.less">
     <link linkType="page" rel="stylesheet/less" type="text/css" href="//d16hdrba6dusey.cloudfront.net/sitecommon/less/widgets/widget_gamefied.less">
     <script type="text/javascript" src="//d16hdrba6dusey.cloudfront.net/sitecommon/js/widgets/widget_superwheel.js" scriptType="page" defer></script>
+    #if($UtilMethods.isSet($con.couponCode))
+    <script>
+        window.couponCodeId = '${con.couponCode}';
+        window.additionText = '${con.additionTextForCoupon}';
+    </script>
+    #else
     <script type="text/javascript" src="//d16hdrba6dusey.cloudfront.net/sitecommon/js/widgets/widget_gamefied.js" scriptType="page" defer></script>
+    #end
     #if($UtilMethods.isSet($con.initGamefieldJs))
     <script type="text/javascript" src="$con.initGamefieldJs" scriptType="page" defer></script>
     #else

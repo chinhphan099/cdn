@@ -262,7 +262,7 @@ const orderGentlePage = ((utils) => {
     };
 
     const handleExitPopupEvents = () => {
-        if(utils.getQueryParameter('iep') !== 'true' && !!_qById('timeCount')) {
+        if(utils.getQueryParameter('iep') !== 'true') {
             return;
         }
 
