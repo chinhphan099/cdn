@@ -450,6 +450,6 @@ const orderGamePage = ((utils) => {
     };
 })(window.utils);
 
-window.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     orderGamePage.initial();
 });
