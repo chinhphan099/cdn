@@ -253,7 +253,7 @@ const orderStPage = ((utils) => {
                     currentPrice = dataProduct.productPrices.DiscountedPrice.Value,
                     currentPriceFormat = dataProduct.productPrices.DiscountedPrice.FormattedValue,
                     fvalue = dataProduct.shippings[0].formattedPrice.replace(/[,|.]/g, ''),
-                    pValue = dataProduct.shippings[0].price.toString().replace(/\./, ''),
+                    pValue = dataProduct.shippings[0].price.toFixed(2).toString().replace(/\./, ''),
                     fCurrency = fvalue.replace(pValue, '######');
 
                 dataProduct.productPrices.DiscountedPrice.Value = Number((currentPrice - discount).toFixed(2));

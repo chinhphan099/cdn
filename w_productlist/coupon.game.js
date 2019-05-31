@@ -1,4 +1,4 @@
-const orderStPage = ((utils) => {
+const orderGamePage = ((utils) => {
     if (!utils) {
         console.log('utils module is not found');
         return;
@@ -253,7 +253,7 @@ const orderStPage = ((utils) => {
                     currentPrice = dataProduct.productPrices.DiscountedPrice.Value,
                     currentPriceFormat = dataProduct.productPrices.DiscountedPrice.FormattedValue,
                     fvalue = dataProduct.shippings[0].formattedPrice.replace(/[,|.]/g, ''),
-                    pValue = dataProduct.shippings[0].price.toString().replace(/\./, ''),
+                    pValue = dataProduct.shippings[0].price.toFixed(2).toString().replace(/\./, ''),
                     fCurrency = fvalue.replace(pValue, '######');
 
                 dataProduct.productPrices.DiscountedPrice.Value = Number((currentPrice - discount).toFixed(2));
@@ -367,14 +367,74 @@ const orderStPage = ((utils) => {
         _qById('billing_streetname').removeAttribute('required');
     };
 
+    const gamefield = () => {
+        $('.gamefied').superWheel({
+            slices: slices,
+            text : {
+                size: 20,
+                color: '#fff',
+                offset: 8,
+                letterSpacing: 0,
+                orientation: 'v',
+                arc: true
+            },
+            selector: 'value',
+            frame: 1,
+            type: 'spin',
+            outer: {
+                color: '#a01313',
+                width: 4
+            },
+            marker: {
+                background: '#fff',
+                animate: 1
+            },
+            width: 660,
+            duration: 3000,
+            line: {
+                width: 1,
+                color: '#fff'
+            },
+            inner: {
+                width: 3,
+                color: '#fff'
+            },
+            center: {
+                width: 5,
+                background: '#fff',
+                rotate: true
+            }
+        });
+
+        $('.gamefied').superWheel('onComplete', function(results) {
+            if(results.value === 1) {
+                $('.gamefiedWrap .content-2 .text-wrap').html($('.gamefiedWrap .content-2 .text-wrap').html().toString().replace(/\{resultText\}/gi, results.text));
+                $('.gamefiedWrap .content-1').fadeOut('fast', function() {
+                    generateCountDown();
+                    $('.gamefiedWrap .content-2').fadeIn('fast');
+                });
+                $('#gamefied-no').html($('#gamefied-no').attr('data-reject') + ' <i class="icon-close"></i>');
+            }
+        });
+    };
+
+    const onClickSpinBtn = () => {
+        _q('.spin-button').addEventListener('click', (e) => {
+            e.target.disabled = true;
+            $('.gamefied').superWheel('start', 'value', 1);
+        });
+    };
+
     const listener = () => {
         handleProductListEvent();
         onChangeMonth();
         onChangeYear();
         detectInputSelect();
+        onClickSpinBtn();
     };
 
     const initial = () => {
+        gamefield();
         waitingOrderData();
         adjustLayout();
         handleExitPopupEvents();
@@ -384,11 +444,12 @@ const orderStPage = ((utils) => {
         listener();
     };
 
+
     return {
         initial: initial
     };
 })(window.utils);
 
 window.addEventListener('DOMContentLoaded', () => {
-    orderStPage.initial();
+    orderGamePage.initial();
 });
