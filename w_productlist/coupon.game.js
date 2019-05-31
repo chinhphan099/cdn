@@ -309,8 +309,8 @@ const orderGamePage = ((utils) => {
                 isTest: utils.getQueryParameter('isCardTest') ? true : false
             });
 
-            //let apiGetCoupon = `${eCRM.Campaign.baseAPIEndpoint}/campaigns/${siteSetting.webKey}/coupons/${window.couponCodeId}?currencyCode=${data.currencyCode}`;
-            let apiGetCoupon = 'https://websales-api.tryemanagecrm.com/api/campaigns/99b1a8df-defa-4018-8ba0-4ffb4a7f0595/coupons/TGRG2019102?currencyCode=USD';
+            let apiGetCoupon = `${eCRM.Campaign.baseAPIEndpoint}/campaigns/${siteSetting.webKey}/coupons/${window.couponCodeId}?currencyCode=${data.currencyCode}`;
+            //let apiGetCoupon = 'https://websales-api.tryemanagecrm.com/api/campaigns/99b1a8df-defa-4018-8ba0-4ffb4a7f0595/coupons/TGRG2019102?currencyCode=USD';
             let setting = {
                 method: 'GET',
                 headers: {
