@@ -92,7 +92,7 @@ const orderStPage = ((utils) => {
             grandTotal = (data.shippings[0].price + data.productPrices.DiscountedPrice.Value).toFixed(2);
 
         const fvalue = shippingFee.replace(/[,|.]/g, ''),
-            pValue = data.shippings[0].price.toString().replace(/\./, ''),
+            pValue = data.shippings[0].price.toFixed(2).toString().replace(/\./, ''),
             fCurrency = fvalue.replace(pValue, '######');
 
         _q('.statistical .td-name').innerText = productNameText + ' ' + productItem.querySelector('.product-name').innerText;
@@ -301,7 +301,7 @@ const orderStPage = ((utils) => {
     };
 
     const implementCoupon = (data) => {
-        if(!!window.couponCodeId) {
+        if(!!window.couponCodeId && utils.getQueryParameter('iep') === 'true') {
             const eCRM = new EmanageCRMJS({
                 webkey: siteSetting.webKey,
                 cid: siteSetting.CID,
