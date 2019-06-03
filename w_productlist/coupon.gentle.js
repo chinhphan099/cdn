@@ -221,7 +221,8 @@ const orderGentlePage = ((utils) => {
     };
 
     const implementCoupon = (data) => {
-        if(!!window.couponCodeId && utils.getQueryParameter('iep') === 'true') {
+        // if(!!window.couponCodeId && utils.getQueryParameter('iep') === 'true') {
+        if(!!window.couponCodeId) {
             const eCRM = new EmanageCRMJS({
                 webkey: siteSetting.webKey,
                 cid: siteSetting.CID,
@@ -262,9 +263,9 @@ const orderGentlePage = ((utils) => {
     };
 
     const handleExitPopupEvents = () => {
-        if(utils.getQueryParameter('iep') !== 'true') {
+        /*if(utils.getQueryParameter('iep') !== 'true') {
             return;
-        }
+        }*/
 
         if (utils.isDevice()) {
             window.addEventListener('touchmove', handleTouchMove);
