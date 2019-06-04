@@ -399,6 +399,6 @@ const orderStPage = ((utils) => {
     };
 })(window.utils);
 
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', () => {
     orderStPage.initial();
 });

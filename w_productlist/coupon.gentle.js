@@ -284,6 +284,6 @@ const orderGentlePage = ((utils) => {
     };
 })(window.utils);
 
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', () => {
     orderGentlePage.initial();
 });

@@ -301,8 +301,8 @@ const orderGamePage = ((utils) => {
     };
 
     const implementCoupon = (data) => {
-        // if(!!window.couponCodeId && utils.getQueryParameter('iep') === 'true') {
-        if(!!window.couponCodeId) {
+        if(!!window.couponCodeId && utils.getQueryParameter('iep') !== '0') {
+        //if(!!window.couponCodeId) {
             const eCRM = new EmanageCRMJS({
                 webkey: siteSetting.webKey,
                 cid: siteSetting.CID,
@@ -344,9 +344,9 @@ const orderGamePage = ((utils) => {
     };
 
     const handleExitPopupEvents = () => {
-        /*if(utils.getQueryParameter('iep') !== 'true') {
+        if(utils.getQueryParameter('iep') === '0') {
             return;
-        }*/
+        }
 
         if (utils.isDevice()) {
             window.addEventListener('touchmove', handleTouchMove);
@@ -368,7 +368,15 @@ const orderGamePage = ((utils) => {
         _qById('billing_streetname').removeAttribute('required');
     };
 
-    const gamefield = () => {
+    const gamefield = (data) => {
+        let currency = data.fCurrency;
+        let newSlices = slices.map((obj) => {
+            if(obj.text.indexOf('$') > -1) {
+                let tmp = obj.text.replace('$', '').split(' ');
+                obj.text = currency.replace('######', tmp[0]) + ' ' + tmp[1];
+            }
+            return obj;
+        });
         $('.gamefied').superWheel({
             slices: slices,
             text : {
@@ -451,6 +459,6 @@ const orderGamePage = ((utils) => {
     };
 })(window.utils);
 
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', () => {
     orderGamePage.initial();
 });
