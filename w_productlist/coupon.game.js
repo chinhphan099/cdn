@@ -103,6 +103,7 @@ const orderGamePage = ((utils) => {
     };
 
     const waitingOrderData = () => {
+        utils.events.on('bindOrderPage', gamefield);
         utils.events.on('bindOrderPage', loadStatistical);
         utils.events.on('bindOrderPage', implementCoupon);
     };
@@ -443,7 +444,6 @@ const orderGamePage = ((utils) => {
     };
 
     const initial = () => {
-        gamefield();
         waitingOrderData();
         adjustLayout();
         handleExitPopupEvents();
