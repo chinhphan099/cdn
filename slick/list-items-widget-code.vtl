@@ -217,13 +217,13 @@
                   #if($prod[0].selectCategory == 'deals')
                     <div class="pro-link-wrap">
                       <a href="/$!{prod[0].language}/$!{prod[0].selectCategory}/$!{prod[0].productNameUrlSlug}?deals=1" class="shop-link">
-                        <span>$!{item.proBtnText}</span>
+                        <span>$!{item.proBtnText.replaceAll('xaaax', '"')}</span>
                       </a>
                     </div>
                   #else
                     <div class="pro-link-wrap">
                       <a href="/$!{prod[0].language}/$!{prod[0].selectCategory}/$!{prod[0].productNameUrlSlug}" class="shop-link">
-                        <span>$!{item.proBtnText}</span>
+                        <span>$!{item.proBtnText.replaceAll('xaaax', '"')}</span>
                       </a>
                     </div>
                   #end
@@ -231,7 +231,7 @@
               #elseif($UtilMethods.isSet($item.proUrl))
                 <div class="pro-link-wrap">
                   <a href="$!{item.proUrl}" class="shop-link">
-                    <span>$!{item.proBtnText}</span>
+                    <span>$!{item.proBtnText.replaceAll('xaaax', '"')}</span>
                   </a>
                 </div>
               #end
