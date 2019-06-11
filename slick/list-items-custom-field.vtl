@@ -68,6 +68,10 @@
         box-shadow: none;
         border-color: #59a5e1 !important;
     }
+    .mce-combobox .mce-btn button {
+        height: 28px;
+        padding: 0 8px;
+    }
     #optionsForSlider .fieldWrapper:nth-child(1),
     #optionsForSlider .fieldWrapper:nth-child(2),
     #optionsForSlider .fieldWrapper:nth-child(3),
@@ -417,6 +421,9 @@
             ],
             min_height: 180,
             paste_as_text: true,
+            file_picker_callback: function(callback, value, meta) {
+                cmsFileBrowser(callback, value, meta);
+            },
             setup: function(ed) {
                 ed.on('keyup blur', function() {
                     console.log(this.id);
