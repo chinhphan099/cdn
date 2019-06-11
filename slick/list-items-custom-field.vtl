@@ -168,6 +168,18 @@
     .image-wrap img + img {
         margin-left: 1px;
     }
+    .browse-images {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    .browse-images .img-item {
+        width: calc(100% / 3 - 10px);
+    }
     .itemList li {
         position: relative;
         padding: 10px;
@@ -383,6 +395,9 @@
         if(items.data.length > 0) {
             for(var i = 0; i < items.data.length; i++) {
                 item = items.data[i];
+                item.desktopImage = item.hasOwnProperty('desktopImage') ? item.desktopImage : '';
+                item.tabletImage = item.hasOwnProperty('tabletImage') ? item.tabletImage : '';
+                item.mobileImage = item.hasOwnProperty('mobileImage') ? item.mobileImage : '';
                 generateItem(item);
             }
             updateValueToCustomField();
@@ -440,6 +455,9 @@
 
         if(obj) {
             obj.mainImage = li.querySelector('input.mainImage').value.replace(/\"/gi, 'xaaax');
+            obj.desktopImage = li.querySelector('input.desktopImage').value.replace(/\"/gi, 'xaaax');
+            obj.tabletImage = li.querySelector('input.tabletImage').value.replace(/\"/gi, 'xaaax');
+            obj.mobileImage = li.querySelector('input.mobileImage').value.replace(/\"/gi, 'xaaax');
             obj.itemClass = li.querySelector('input.itemClass').value.replace(/\"/gi, 'xaaax');
             obj.imageLink = li.querySelector('input.imageLink').value.replace(/\"/gi, 'xaaax');
             obj.topText = li.querySelector('textarea.topText').value.replace(/\"/gi, 'xaaax');
@@ -455,6 +473,9 @@
             obj = {
                 id: li.id,
                 mainImage: li.querySelector('input.mainImage').value.replace(/\"/gi, 'xaaax'),
+                desktopImage: li.querySelector('input.desktopImage').value.replace(/\"/gi, 'xaaax'),
+                tabletImage: li.querySelector('input.tabletImage').value.replace(/\"/gi, 'xaaax'),
+                mobileImage: li.querySelector('input.mobileImage').value.replace(/\"/gi, 'xaaax'),
                 itemClass: li.querySelector('input.itemClass').value.replace(/\"/gi, 'xaaax'),
                 imageLink: li.querySelector('input.imageLink').value.replace(/\"/gi, 'xaaax'),
                 topText: li.querySelector('textarea.topText').value.replace(/\"/gi, 'xaaax'),
@@ -527,6 +548,9 @@
         var item = {
             id: 'item-' + count,
             mainImage: '',
+            desktopImage: '',
+            tabletImage: '',
+            mobileImage: '',
             itemClass: '',
             imageLink: '',
             topText: '',
@@ -567,6 +591,30 @@
         // Main Image
         var mainImageTxt = createInput('mainImage', item.mainImage, 'text', 'Desktop Image Url [, Tablet Url, Mobile Url]', order);
         li.appendChild(mainImageTxt);
+
+        // Browse Images
+        var desktopImageWrap = document.createElement('div');
+        desktopImageWrap.classList.add('img-item');
+        var desktopImageTxt = createInput('desktopImage', item.desktopImage, 'text', 'Desktop Image', order);
+        desktopImageWrap.appendChild(desktopImageTxt);
+
+        var tabletImageWrap = document.createElement('div');
+        tabletImageWrap.classList.add('img-item');
+        var tabletImageTxt = createInput('tabletImage', item.tabletImage, 'text', 'Tablet Image', order);
+        tabletImageWrap.appendChild(tabletImageTxt);
+
+        var mobileImageWrap = document.createElement('div');
+        mobileImageWrap.classList.add('img-item');
+        var mobileImageTxt = createInput('mobileImage', item.mobileImage, 'text', 'Mobile Image', order);
+        mobileImageWrap.appendChild(mobileImageTxt);
+
+        var browseImageWrap = document.createElement('div');
+        browseImageWrap.appendChild(desktopImageWrap);
+        browseImageWrap.appendChild(tabletImageWrap);
+        browseImageWrap.appendChild(mobileImageWrap);
+        browseImageWrap.classList.add('browse-images');
+        li.appendChild(browseImageWrap);
+        // End Browse Images
 
         // Images Group
         var imgWrap = document.createElement('div');
@@ -821,4 +869,15 @@
         setupLayout();
         listener();
     });
+
+/*document.getElementById('topText1').addEventListener('click', function(e) {
+    var _this = e.target;
+    cmsFileBrowserImage.show();
+    cmsFileBrowserImage.onFileSelected = function(file) {
+        _this.value = file.path + file.fileName;
+        updateValueToCustomField();
+        cmsFileBrowserImage.onFileSelected = addFileImageCallback;
+    };
+}, false);*/
 </script>
+
