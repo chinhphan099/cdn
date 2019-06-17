@@ -148,6 +148,7 @@
     }
     .image-wrap {
         margin-top: -10px;
+        margin-bottom: 10px;
         display: -webkit-box;
         display: -ms-flexbox;
         display: flex;
@@ -168,17 +169,62 @@
     .image-wrap img + img {
         margin-left: 1px;
     }
+    .img-title {
+        display: none;
+        padding-bottom: 2px;
+        color: #9b9b9b;
+    }
     .browse-images {
+        margin-bottom: 10px;
         display: -webkit-box;
         display: -ms-flexbox;
         display: flex;
+        display: none;
         -webkit-box-pack: justify;
         -ms-flex-pack: justify;
         justify-content: space-between;
-        margin-bottom: 20px;
     }
     .browse-images .img-item {
-        width: calc(100% / 3 - 10px);
+        position: relative;
+        width: calc(100% / 3 - 2px);
+        height: 37px;
+        overflow: hidden;
+    }
+    .browse-images .img-item .removeImage {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        color: black;
+        font-size: 18px;
+        line-height: 0.5;
+        cursor: pointer;
+        z-index: 2;
+        font-weight: bold;
+    }
+    .browse-images .img-item .removeImage:hover {
+        color: #0012ff;
+    }
+    .browse-images .img-item .removeImage:before {
+        content: "×";
+    }
+    .browse-images .img-item input,
+    .browse-images .img-item input:focus,
+    .browse-images .img-item input:not(:focus) {
+        padding-right: 35px;
+        margin-bottom: 0;
+        cursor: pointer;
+        text-align: left;
+        direction: rtl;
+        unicode-bidi: plaintext;
+        text-overflow: ellipsis;
+    }
+    .browse-images .img-item img {
+        position: absolute;
+        right: 1px;
+        top: 50%;
+        transform: translateY(-50%);
+        max-width: 35px;
+        max-height: 100%;
     }
     .itemList li {
         position: relative;
@@ -235,12 +281,6 @@
     .itemList textarea::-webkit-input-placeholder,
     .itemList input::-webkit-input-placeholder {
         color: #d0d0d0;
-    }
-    .itemList input.imageLink {
-        margin-top: 10px;
-    }
-    .itemList input.mainImage {
-        border-bottom: none;
     }
     .itemList .collapseContent {
         display: inline-block;
@@ -395,9 +435,6 @@
         if(items.data.length > 0) {
             for(var i = 0; i < items.data.length; i++) {
                 item = items.data[i];
-                item.desktopImage = item.hasOwnProperty('desktopImage') ? item.desktopImage : '';
-                item.tabletImage = item.hasOwnProperty('tabletImage') ? item.tabletImage : '';
-                item.mobileImage = item.hasOwnProperty('mobileImage') ? item.mobileImage : '';
                 generateItem(item);
             }
             updateValueToCustomField();
@@ -437,11 +474,11 @@
             min_height: 180,
             paste_as_text: true,
             file_picker_callback: function(callback, value, meta) {
+                cmsFileBrowserImage.onFileSelected = addFileImageCallback;
                 cmsFileBrowser(callback, value, meta);
             },
             setup: function(ed) {
                 ed.on('keyup blur', function() {
-                    console.log(this.id);
                     saveData(document.querySelector('#' + this.id));
                 });
             }
@@ -494,15 +531,54 @@
     }
 
     function generateImage(input) {
-        if(input.classList.contains('mainImage') && !!input.value) {
+        if(input.classList.contains('mainImage')) {
             var imgWrap = input.closest('li').querySelector('.image-wrap'),
                 imgs = input.value.split(',');
+
             imgWrap.innerHTML = '';
             for(var i = 0, n = imgs.length; i < n; i++) {
-                var img = document.createElement('IMG');
-                img.setAttribute('src', imgs[i].trim());
-                imgWrap.appendChild(img);
+                if(!!imgs[i].trim()) {
+                    var img = document.createElement('img');
+                    img.setAttribute('src', imgs[i].trim());
+                    imgWrap.appendChild(img);
+                }
             }
+        }
+
+        if(!!input.closest('.img-item')) {
+            var wrapImgElm = input.closest('.img-item');
+            if(!!wrapImgElm.querySelector('img')) {
+                wrapImgElm.querySelector('img').parentNode.removeChild(wrapImgElm.querySelector('img'));
+            }
+            if(!!input.value) {
+                var image = document.createElement('img');
+                image.setAttribute('src', input.value.trim());
+                wrapImgElm.appendChild(image);
+            }
+        }
+    }
+
+    function removeImage(elm) {
+        elm.addEventListener('click', function(e) {
+            var wrapElm = elm.closest('.img-item'),
+            input = wrapElm.querySelector('input');
+
+            input.value = '';
+            generateImage(input);
+            saveData(input);
+        }, false);
+    }
+
+    function browseImage(input) {
+        var parentElm = input.closest('.img-item');
+        if(!!parentElm) {
+            cmsFileBrowserImage.show();
+            cmsFileBrowserImage.onFileSelected = function(file) {
+                input.value = file.path + file.fileName;
+                saveData(input);
+                generateImage(input);
+                cmsFileBrowserImage.onFileSelected = addFileImageCallback;
+            };
         }
     }
 
@@ -518,6 +594,10 @@
             // Create Image Tag and append into image-wrap
             generateImage(input);
         });
+
+        input.addEventListener('click', function(e) {
+            browseImage(input);
+        }, false);
 
         input.setAttribute('type', inputType);
         input.setAttribute('id', className + order);
@@ -588,25 +668,60 @@
         var topTextTxt = createTextArea('topText', item.topText, 'text', 'Top text', order);
         li.appendChild(topTextTxt);
 
+        var imageTitle = document.createElement('span');
+        imageTitle.classList.add('img-title');
+        imageTitle.innerHTML = 'Enter Desktop Image Url, Tablet Image Url, Mobile Image Url';
+        li.appendChild(imageTitle);
+
         // Main Image
         var mainImageTxt = createInput('mainImage', item.mainImage, 'text', 'Desktop Image Url [, Tablet Url, Mobile Url]', order);
         li.appendChild(mainImageTxt);
 
+        // Images Group
+        var imgWrap = document.createElement('div');
+        imgWrap.classList.add('image-wrap');
+        li.appendChild(imgWrap);
+
+        generateImage(mainImageTxt);
+
+        var imageTitle2 = document.createElement('span');
+        imageTitle2.classList.add('img-title');
+        imageTitle2.innerHTML = 'Or Browse Images:';
+        li.appendChild(imageTitle2);
+
         // Browse Images
         var desktopImageWrap = document.createElement('div');
         desktopImageWrap.classList.add('img-item');
-        var desktopImageTxt = createInput('desktopImage', item.desktopImage, 'text', 'Desktop Image', order);
+        var removeDesktopImage = document.createElement('span');
+        removeDesktopImage.classList.add('removeImage');
+        var desktopImageTxt = createInput('desktopImage', item.desktopImage, 'text', 'Browse Desktop Image', order);
+        desktopImageTxt.setAttribute('readonly', true);
+        desktopImageWrap.appendChild(removeDesktopImage);
         desktopImageWrap.appendChild(desktopImageTxt);
+        removeImage(removeDesktopImage);
+        generateImage(desktopImageTxt);
 
         var tabletImageWrap = document.createElement('div');
         tabletImageWrap.classList.add('img-item');
-        var tabletImageTxt = createInput('tabletImage', item.tabletImage, 'text', 'Tablet Image', order);
+        var removeTabletImage = document.createElement('span');
+        removeTabletImage.classList.add('removeImage');
+        var tabletImageTxt = createInput('tabletImage', item.tabletImage, 'text', 'Browse Tablet Image', order);
+        tabletImageTxt.setAttribute('readonly', true);
+        tabletImageWrap.appendChild(removeTabletImage);
         tabletImageWrap.appendChild(tabletImageTxt);
+        removeImage(removeTabletImage);
+        generateImage(tabletImageTxt);
 
         var mobileImageWrap = document.createElement('div');
         mobileImageWrap.classList.add('img-item');
-        var mobileImageTxt = createInput('mobileImage', item.mobileImage, 'text', 'Mobile Image', order);
+        var removeMobileImage = document.createElement('span');
+        removeMobileImage.classList.add('removeImage');
+        var mobileImageTxt = createInput('mobileImage', item.mobileImage, 'text', 'Browse Mobile Image', order);
+        mobileImageTxt.setAttribute('readonly', true);
+        mobileImageWrap.appendChild(removeMobileImage);
         mobileImageWrap.appendChild(mobileImageTxt);
+        removeImage(removeMobileImage);
+        generateImage(mobileImageTxt);
 
         var browseImageWrap = document.createElement('div');
         browseImageWrap.appendChild(desktopImageWrap);
@@ -615,13 +730,6 @@
         browseImageWrap.classList.add('browse-images');
         li.appendChild(browseImageWrap);
         // End Browse Images
-
-        // Images Group
-        var imgWrap = document.createElement('div');
-        imgWrap.classList.add('image-wrap');
-        li.appendChild(imgWrap);
-
-        generateImage(li.querySelector('.mainImage'));
 
         // Image's Link
         var imageLinkTxt = createInput('imageLink', item.imageLink, 'text', 'Link For Main Image', order);
@@ -869,15 +977,4 @@
         setupLayout();
         listener();
     });
-
-/*document.getElementById('topText1').addEventListener('click', function(e) {
-    var _this = e.target;
-    cmsFileBrowserImage.show();
-    cmsFileBrowserImage.onFileSelected = function(file) {
-        _this.value = file.path + file.fileName;
-        updateValueToCustomField();
-        cmsFileBrowserImage.onFileSelected = addFileImageCallback;
-    };
-}, false);*/
 </script>
-
