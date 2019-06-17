@@ -152,7 +152,7 @@
             #end
           #elseif($UtilMethods.isSet($item.mainImage))
             #set($imgs = $item.mainImage.trim().split(','))
-            <div class="w_thumb">
+            <div class="w_thumb" role="thumb1">
               #if($UtilMethods.isSet($item.imageLink))
                 <a class="w_link" href="$item.imageLink">
               #end
@@ -187,6 +187,40 @@
                 </a>
               #end
             </div>
+          #elseif($item.has('desktopImage') || $item.has('tabletImage') || $item.has('mobileImage'))
+            #if($item.desktopImage != "" || $item.tabletImage != "" || $item.mobileImage != "")
+              <div class="w_thumb" role="thumb2">
+                #if($UtilMethods.isSet($item.imageLink))
+                  <a class="w_link" href="$item.imageLink">
+                #end
+
+                #if($item.desktopImage != "" && ($item.tabletImage != "" || $item.mobileImage != ""))
+                  <picture>
+                    #if($item.mobileImage != "")
+                    <source media="(max-width: 767px)" srcset="$item.mobileImage">
+                    #end
+                    #if($item.tabletImage != "")
+                    <source media="(max-width: 991px)" srcset="$item.tabletImage">
+                    #end
+                    #if($lazyloadImage == 'true')
+                      <img src="$!{placeholderimage}" data-src="$item.desktopImage" alt="" class="img-view">
+                    #else
+                      <img src="$item.desktopImage" alt="" class="img-view no-lazy">
+                    #end
+                  </picture>
+                #elseif($item.desktopImage != "")
+                  #if($lazyloadImage == 'true')
+                    <img src="$!{placeholderimage}" data-src="$item.desktopImage" alt="" class="img-view">
+                  #else
+                    <img src="$item.desktopImage" alt="" class="img-view no-lazy">
+                  #end
+                #end
+
+                #if($UtilMethods.isSet($item.imageLink))
+                  </a>
+                #end
+              </div>
+            #end
           #end
 
           #if($UtilMethods.isSet($wrapAllTitleAndDescription) && ($UtilMethods.isSet($item.title) || $UtilMethods.isSet($item.shortDesc)))
