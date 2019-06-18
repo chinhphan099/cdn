@@ -152,7 +152,7 @@
             #end
           #elseif($UtilMethods.isSet($item.mainImage))
             #set($imgs = $item.mainImage.trim().split(','))
-            <div class="w_thumb" role="thumb1">
+            <div class="w_thumb">
               #if($UtilMethods.isSet($item.imageLink))
                 <a class="w_link" href="$item.imageLink">
               #end
@@ -189,7 +189,7 @@
             </div>
           #elseif($item.has('desktopImage') || $item.has('tabletImage') || $item.has('mobileImage'))
             #if($item.desktopImage != "" || $item.tabletImage != "" || $item.mobileImage != "")
-              <div class="w_thumb" role="thumb2">
+              <div class="w_thumb">
                 #if($UtilMethods.isSet($item.imageLink))
                   <a class="w_link" href="$item.imageLink">
                 #end
