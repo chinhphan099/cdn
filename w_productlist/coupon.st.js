@@ -1,3 +1,11 @@
+Element.prototype.appendBefore = function (element) {
+    element.parentNode.insertBefore(this, element);
+}, false;
+
+Element.prototype.appendAfter = function (element) {
+    element.parentNode.insertBefore(this, element.nextSibling);
+}, false;
+
 const orderStPage = ((utils) => {
     if (!utils) {
         console.log('utils module is not found');
@@ -82,22 +90,67 @@ const orderStPage = ((utils) => {
         }
     };
 
+    const getWarrantyPrice = (fCurrency, taxes) => {
+        let wPrice = 0, wFormatPrice = false;
+
+        if(_qById('txtProductWarranty').checked) {
+            const checkedItem = _q('.productRadioListItem input:checked'),
+                data = JSON.parse(checkedItem.dataset.product),
+                warrantyRate = [0.1, 0.2, 0.2, 0.2, 0.2, 0.3, 0.5, 0.15, 0.25, 0.35, 0.4, 0.45, 0.55, 0.6],
+                funnelId = _qById('txtProductWarranty').value,
+                funnelPrice = warrantyRate[parseInt(funnelId) - 1];
+
+            let warrantyPrice = (Math.round(100 * data.productPrices.DiscountedPrice.Value * funnelPrice) / 100).toFixed(2);
+            wPrice = Number(warrantyPrice);
+
+            wFormatPrice = utils.formatPrice(warrantyPrice, fCurrency, taxes);
+        }
+
+        return {wPrice, wFormatPrice};
+    };
+
+    const onChangeWarranty = () => {
+        _qById('txtProductWarranty').addEventListener('change', function (e) {
+            loadStatistical();
+        });
+    };
+
     const productNameText = _q('.statistical .td-name').innerText;
     const loadStatistical = () => {
         const checkedItem = _q('.productRadioListItem input:checked'),
             productItem = getClosest(checkedItem, '.productRadioListItem'),
             data = JSON.parse(checkedItem.dataset.product),
             shippingFee = data.shippings[0].formattedPrice,
-            taxes = data.productPrices.Surcharge.FormattedValue,
-            grandTotal = (data.shippings[0].price + data.productPrices.DiscountedPrice.Value).toFixed(2);
+            taxes = data.productPrices.Surcharge.FormattedValue;
 
         const fvalue = shippingFee.replace(/[,|.]/g, ''),
             pValue = data.shippings[0].price.toFixed(2).toString().replace(/\./, ''),
             fCurrency = fvalue.replace(pValue, '######');
 
+        const warranty = getWarrantyPrice(fCurrency, taxes),
+            grandTotal = (data.shippings[0].price + data.productPrices.DiscountedPrice.Value + warranty.wPrice).toFixed(2);
+
         _q('.statistical .td-name').innerText = productNameText + ' ' + productItem.querySelector('.product-name').innerText;
         _q('.statistical .td-price').innerText = utils.formatPrice(data.productPrices.DiscountedPrice.Value, fCurrency, taxes);
         _q('.statistical .td-shipping').innerText = shippingFee;
+
+        if(!!_q('.tr-warranty')) {
+            let trWarranty = _q('.tr-warranty');
+            trWarranty.parentNode.removeChild(trWarranty);
+        }
+        if(!!warranty.wFormatPrice) {
+            let trShipping = getClosest(_q('.statistical .td-shipping'), 'tr'),
+                warrantyElm = document.createElement('tr');
+
+            warrantyElm.classList.add('tr-warranty');
+            warrantyElm.innerHTML = `
+                <td>${js_translate.warranty}</td>
+                <td>${warranty.wFormatPrice}</td>
+            `;
+
+            warrantyElm.appendAfter(trShipping);
+        }
+
         _q('.statistical .td-taxes-fees').innerText = taxes;
         _q('.statistical .grand-total').innerText = utils.formatPrice(grandTotal, fCurrency, taxes);
     };
@@ -378,6 +431,7 @@ const orderStPage = ((utils) => {
 
     const listener = () => {
         handleProductListEvent();
+        onChangeWarranty();
         onChangeMonth();
         onChangeYear();
         onFocusCreditCard();
