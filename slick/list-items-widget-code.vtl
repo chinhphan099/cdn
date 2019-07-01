@@ -108,7 +108,13 @@
     </span>
   </center>
 #end
-<div class="$!{className}">
+
+#set($themeCls = '')
+#if($UtilMethods.isSet($con.selectThemeList))
+  #set($themeCls = 'w_theme_' + $con.selectThemeList)
+#end
+
+<div class="$!{className} $!{themeCls}">
   #if($UtilMethods.isSet($con.heading))
     <h2 class="w_main_title"><span class="text">$con.heading</span></h2>
   #end
@@ -336,4 +342,8 @@
     <script type="text/javascript" src="//d16hdrba6dusey.cloudfront.net/sitecommon/js/pages/countdown.page.js" scriptType="page" defer></script>
     #set($coutdown = 1)
   #end
+#end
+
+#if($UtilMethods.isSet($con.selectThemeList))
+  #dotParse("//SiteCommon/vtl/contenttypes/generate_theme_list_style.vtl")
 #end

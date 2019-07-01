@@ -1,0 +1,7 @@
+#if ($con.selectThemeList == 1 && $UtilMethods.isSet($theme_list_1) == false)
+    <link linkType="page" rel="stylesheet/less" type="text/css" href="//d16hdrba6dusey.cloudfront.net/sitecommon/less/contenttypes/theme_list_1.less">
+    #set($theme_list_1 = 1)
+#elseif ($con.selectThemeList == 2 && $UtilMethods.isSet($theme_list_2) == false)
+    <link linkType="page" rel="stylesheet/less" type="text/css" href="//d16hdrba6dusey.cloudfront.net/sitecommon/less/contenttypes/theme_list_2.less">
+    #set($theme_list_2 = 1)
+#end

@@ -1,0 +1,126 @@
+<style>
+    /* div[widgetid="mainTabContainer_tablist_chooseTheme"] {
+        display: none !important;
+    } */
+    .chosen-theme .img-title,
+    .chosen-theme .mainImage,
+    .chosen-theme .image-wrap,
+    .chosen-theme .outer-ecom,
+    .qa-items.chosen-theme .img-title,
+    .qa-items.chosen-theme .image-wrap,
+    .qa-items.chosen-theme .img-title,
+    .qa-items.chosen-theme .browse-images,
+    .qa-items.chosen-theme .imageLink,
+    .qa-items.chosen-theme .outer-ecom,
+    .qa-items.chosen-theme .subImage,
+    .qa-items.chosen-theme .mainImage {
+        display: none !important;
+    }
+    .selected-img {
+        width: 400px;
+        display: none;
+        border: 1px solid #C5C5C5;
+        padding: 10px;
+    }
+    .show-info {
+        position: relative;
+        margin-top: 5px;
+        border: solid 1px #C5C5C5;
+        width: 181px;
+        height: 34px;
+        padding: 0 10px;
+        line-height: 34px;
+        cursor: pointer;
+    }
+    .show-info:before {
+        position: absolute;
+        top: calc(50% - 3px);
+        right: 10px;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #5B5B5B;
+        content: "";
+        height: 0;
+        width: 0;
+    }
+    .cf-ccform ul {
+        list-style-type: none;
+        border: 1px solid #C5C5C5;
+        width: 400px;
+        margin: -1px 0 0;
+        padding: 0px;
+        display: none;
+        max-height: 400px;
+        overflow: hidden;
+        overflow-y: auto;
+    }
+    .cf-ccform img {
+        max-width: 100%;
+    }
+    .cf-ccform ul.active {
+        display: block;
+    }
+    .cf-ccform li {
+        padding: 15px;
+        cursor: pointer;
+    }
+    .cf-ccform ul li + li {
+        border-top: 1px solid #ccc;
+    }
+</style>
+
+#set($con = $dotcontent.find($request.getAttribute("com.dotmarketing.contentlet.edit").inode))
+<div class="cf-ccform">
+    <img src="" class="selected-img">
+    <div class="show-info" onclick="showTheme();">
+        <span>Choose theme</span>
+    </div>
+    <ul>
+        <li data-value="0" onclick="chooseTheme(this);">No, I do not want!</li>
+        <li data-value="1" onclick="chooseTheme(this);"><img src="https://d16hdrba6dusey.cloudfront.net/sitecommon/images/select_theme/theme-1.jpg"></li>
+        <li data-value="2" onclick="chooseTheme(this);"><img src="https://d16hdrba6dusey.cloudfront.net/sitecommon/images/select_theme/theme-2.jpg"></li>
+    </ul>
+</div>
+
+<script>
+    #if($UtilMethods.isSet($con.selectThemeList))
+        function initSelectTheme() {
+            var selectedTheme = '$con.selectThemeList';
+            var selectedImage = document.querySelector('.cf-ccform .selected-img');
+            selectedImage.src = `https://d16hdrba6dusey.cloudfront.net/sitecommon/images/select_theme/theme-${selectedTheme}.jpg`;
+            selectedImage.style.display = 'block';
+            handleItemFields(true);
+        }
+        window.addEventListener('load', function() {
+            initSelectTheme();
+        });
+    #end
+    function showTheme() {
+        document.querySelector('.cf-ccform ul').classList.toggle('active');
+    }
+
+    function handleItemFields(isChosenTheme) {
+        if(isChosenTheme) {
+            document.querySelector('#listItems').classList.add('chosen-theme');
+        }
+        else {
+            document.querySelector('#listItems').classList.remove('chosen-theme');
+        }
+    }
+
+    function chooseTheme(self) {
+        const selectedImage = document.querySelector('.cf-ccform .selected-img');
+        if(self.querySelector('img')) {
+            selectedImage.src = self.querySelector('img').src;
+            selectedImage.style.display = 'block';
+            dojo.byId('selectThemeList').value = self.dataset.value;
+            handleItemFields(true);
+        }
+        else {
+            dojo.byId('selectThemeList').value = '';
+            selectedImage.style.display = 'none';
+            handleItemFields(false);
+        }
+        document.querySelector('.cf-ccform ul').classList.remove('active');
+    }
+</script>

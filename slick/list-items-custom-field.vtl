@@ -72,6 +72,9 @@
         height: 28px;
         padding: 0 8px;
     }
+    #widget_className {
+        width: 362px;
+    }
     #optionsForSlider .fieldWrapper:nth-child(1),
     #optionsForSlider .fieldWrapper:nth-child(2),
     #optionsForSlider .fieldWrapper:nth-child(3),
@@ -169,7 +172,8 @@
     .image-wrap img + img {
         margin-left: 1px;
     }
-    .img-title {
+    .img-title,
+    .img-title2 {
         display: block;
         padding-bottom: 2px;
         color: #9b9b9b;
@@ -684,8 +688,8 @@
         generateImage(mainImageTxt);
 
         var imageTitle2 = document.createElement('span');
-        imageTitle2.classList.add('img-title');
-        imageTitle2.innerHTML = 'Or Browse Images:';
+        imageTitle2.classList.add('img-title2');
+        imageTitle2.innerHTML = 'Browse Images:';
         li.appendChild(imageTitle2);
 
         // Browse Images
@@ -845,6 +849,12 @@
 
     // Handler settings
     function checktypeContent(selectedVal) {
+        document.querySelector('#listItems').classList.remove('list-items');
+        document.querySelector('#listItems').classList.remove('coutdown-items');
+        document.querySelector('#listItems').classList.remove('slider-items');
+        document.querySelector('#listItems').classList.remove('qa-items');
+        document.querySelector('#listItems').classList.add(selectedVal + '-items');
+
         if(selectedVal === 'slider') {
             document.querySelector('[widgetid="mainTabContainer_tablist_optionsForSlider"]').classList.remove('hide');
             dijit.byId('text150Checkbox').set('checked', false).set('disabled', true);
