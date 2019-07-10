@@ -33,9 +33,18 @@
     #end
 #end
 *#
+
 #set($isHideInstallmentText = '')
 #if($hideInstallmentText == 'true')
     #set($isHideInstallmentText = '&quot;isHideInstallmentText&quot;: true')
+    #if($updateBestSellerPriceOnHeading == 'true')
+        #set($isHideInstallmentText = $isHideInstallmentText + ', ')
+    #end
+#end
+
+#set($isUpdateHeadingPrice = '')
+#if($updateBestSellerPriceOnHeading == 'true')
+    #set($isUpdateHeadingPrice = '&quot;isUpdateHeadingPrice&quot;: true')
 #end
 
 #if($UtilMethods.isSet($products))
@@ -48,7 +57,7 @@
     #end
 
     </script>
-    <div id="js-widget-products" class="product-list $!{className}" data-options="{$isHideInstallmentText}">
+    <div id="js-widget-products" class="product-list $!{className}" data-options="{$isHideInstallmentText $isUpdateHeadingPrice}">
         <input type="hidden" id="hdfSelectedProduct" value="$!{productIdForHeading}" />
         <div class="product-heading">
             <div>$!{itemsLabel}</div>

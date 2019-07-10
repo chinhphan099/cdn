@@ -347,6 +347,27 @@
                 showDefaultProduct(packageDisplay, isPopup);
             }
         };
+        const updateHeadingPrice = () => {
+            let bestSellerIdx = packageDisplay.indexOf(_qById('hdfSelectedProduct').value),
+                bestSellerElm = _qById('product_' + currentPackage[bestSellerIdx]),
+                bestSellerData = JSON.parse(bestSellerElm.dataset.product),
+                bestSellerDiscountPrice = bestSellerData.productPrices.DiscountedPrice.FormattedValue,
+                bestSellerFullPrice = bestSellerData.productPrices.FullRetailPrice.FormattedValue;
+
+            const textDiscountPriceElms = _qAll('.js-sale-off-heading .textDiscountPrice');
+            if(!!textDiscountPriceElms) {
+                for(let textDiscountPriceElm of textDiscountPriceElms) {
+                    textDiscountPriceElm.innerText = bestSellerDiscountPrice;
+                }
+            }
+
+            const textFullPriceElms = _qAll('.js-sale-off-heading .textFullPrice');
+            if(!!textFullPriceElms) {
+                for(let textFullPriceElm of textFullPriceElms) {
+                    textFullPriceElm.innerText = bestSellerFullPrice;
+                }
+            }
+        };
         const init = (isPopup) => {
             setupTab();
             showDefaultProduct(packageDisplay, isPopup);
@@ -385,6 +406,11 @@
 
                     activeTab(tabItem);
                     saveActiveTabIndex();
+
+                    let options = JSON.parse(_qById('js-widget-products').dataset.options);
+                    if(options.hasOwnProperty('isUpdateHeadingPrice')) {
+                        updateHeadingPrice();
+                    }
                 }, false);
             }
 
