@@ -22,6 +22,7 @@
 #set($mobileItem = '')
 #set($verticalMode = '')
 #set($centerMode = '')
+#set($noRedirectCls = '')
 ##https://i.gyazo.com/c587f75eb8c1d3f0755561695ab44c65.png
 
 #if($type == 'slider')
@@ -128,6 +129,9 @@
         #set($itemCls = '')
         #if($item.has('itemClass'))
           #set($itemCls = $item.itemClass)
+          #if($itemCls.indexOf('no-redirect') > -1)
+            #set($noRedirectCls = "no-redirect")
+          #end
         #end
         <div class="w_item $itemCls">
           #if($UtilMethods.isSet($item.topText))
@@ -160,7 +164,7 @@
             #set($imgs = $item.mainImage.trim().split(','))
             <div class="w_thumb">
               #if($UtilMethods.isSet($item.imageLink))
-                <a class="w_link" href="$item.imageLink">
+                <a class="w_link $!{noRedirectCls}" href="$item.imageLink">
               #end
                 #if($imgs.size() == 1)
                   #if($lazyloadImage == 'true')
@@ -197,7 +201,7 @@
             #if($item.desktopImage != "" || $item.tabletImage != "" || $item.mobileImage != "")
               <div class="w_thumb">
                 #if($UtilMethods.isSet($item.imageLink))
-                  <a class="w_link" href="$item.imageLink">
+                  <a class="w_link $!{noRedirectCls}" href="$item.imageLink">
                 #end
 
                 #if($item.desktopImage != "" && ($item.tabletImage != "" || $item.mobileImage != ""))
