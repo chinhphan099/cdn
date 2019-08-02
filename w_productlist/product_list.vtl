@@ -111,6 +111,10 @@
     <div id="js-widget-products" class="product-list $!{className}">No product found!</div>
 #end
 
+#if($UtilMethods.isSet($secondWebkey) && $secondWebkey != "")
+    <script>window.secondWebkey = '$!{secondWebkey}'</script>
+#end
+
 <link linkType="component" rel="stylesheet/less" type="text/css" href="//d16hdrba6dusey.cloudfront.net/sitecommon/less/widgets/widget_productlist_v1.less">
 #if($UtilMethods.isSet($con.localJsFile))
 <script scriptType="component" src="$con.localJsFile" defer></script>
