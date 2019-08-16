@@ -1,0 +1,66 @@
+#set($con = $dotcontent.find($CONTENT_INODE))
+
+#if($EDIT_MODE)
+  <center style="color:#a9a6a6;font-size:10px;font-family:Arial;text-align:left;position:absolute;top:-11px;left:93px;right:50px;z-index:9;line-height:0.9;word-break:break-word;">
+    <span style="padding:0 2px;display:block;">
+      Floating Bar: $!{con.title}
+    </span>
+  </center>
+#end
+
+## Default Values
+    #set($positionCls = 'floating-bottom')
+    #set($urlPath = 'javascript:;')
+    #set($isHideDekstop = '')
+    #set($alwayVisible = '')
+    #set($bgColor = '#19AF42')
+
+## Position to show Floating Bar: Top / Bottom
+    #if($position == 'top')
+        #set($positionCls = 'floating-top')
+    #end
+
+## Get url value
+    #if($UtilMethods.isSet($con.url))
+        #set($urlPath = '$con.url')
+    #end
+
+## Hidden On Desktop
+    #if($hideOnDesktop == 'true')
+        #set($isHideDekstop = 'hidden-md-up')
+    #end
+
+## Is Alway Visible
+    #if($isAlwayVisible == 'true')
+        #set($alwayVisible = 'floating-force-show')
+    #end
+
+## Background Color
+    #if($UtilMethods.isSet($con.backgroundColor))
+        #set($bgColor = $con.backgroundColor)
+    #end
+
+## Center Content
+    #if($centerContentOnDesktop == 'true')
+        #set($justifyCenter = 'justify-center')
+    #end
+
+<div class="floating-bar $positionCls $!{isHideDekstop} $!{alwayVisible} $!{justifyCenter}" data-class="$!{con.hideFloatingWhenTheViewContainsElements}" data-ticktopelm="$!{con.tickElement}" data-tickbottomelm="$!{con.tickElementBottom}">
+    <div class="container">
+        <div class="inner">
+            #if($UtilMethods.isSet($con.descText))
+            <div class="floating-desc">$con.descText</div>
+            #end
+            #if($UtilMethods.isSet($con.buttonText))
+            <a href="$url" class="btn-floating-bar" style="background-color: $bgColor">$con.buttonText</a>
+            #end
+        </div>
+    </div>
+</div>
+
+<link linkType="component" rel="stylesheet/less" type="text/css" href="$!{s3_sitecommon}/less/widgets/widget_floating_bar.less">
+#if($UtilMethods.isSet($localJsFile))
+<script type="module" scriptType="component" src="$localJsFile" defer></script>
+#else
+<script type="module" scriptType="component" src="$!{s3_sitecommon}/js/widgets/widget_floating_bar.js" defer></script>
+#end
