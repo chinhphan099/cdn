@@ -28,9 +28,11 @@
                 for(const elm of elms) {
                     let bodyRect = document.body.getBoundingClientRect(),
                         elemRect = elm.getBoundingClientRect(),
-                        tickY = elemRect.top - bodyRect.top;
+                        tickTopY = elemRect.top - bodyRect.top,
+                        tickBotY = tickTopY + elemRect.height;
 
-                    elmPositions.push(tickY);
+                    elmPositions.push(tickTopY);
+                    elmPositions.push(tickBotY);
                 }
             }
         }
@@ -42,6 +44,15 @@
 
             if(winTop >= tickTopY) {
                 floatingElm.classList.add('floating-visible');
+                if(!!clsNames[0]) {
+                    let isInScreen = isInScreenView(winTop, winBot, elmPositions);
+                    if(isInScreen) {
+                        floatingElm.classList.remove('floating-visible');
+                    }
+                    else {
+                        floatingElm.classList.add('floating-visible');
+                    }
+                }
             }
             else {
                 floatingElm.classList.remove('floating-visible');
@@ -54,18 +65,18 @@
 
             if(winBot >= tickBottomY) {
                 floatingElm.classList.add('floating-visible');
+                if(!!clsNames[0]) {
+                    let isInScreen = isInScreenView(winTop, winBot, elmPositions);
+                    if(isInScreen) {
+                        floatingElm.classList.remove('floating-visible');
+                    }
+                    else {
+                        floatingElm.classList.add('floating-visible');
+                    }
+                }
             }
             else {
                 floatingElm.classList.remove('floating-visible');
-            }
-        }
-        if(winTop > 350 && !!clsNames[0]) {
-            let isInScreen = isInScreenView(winTop, winBot, elmPositions);
-            if(isInScreen) {
-                floatingElm.classList.remove('floating-visible');
-            }
-            else {
-                floatingElm.classList.add('floating-visible');
             }
         }
     }
