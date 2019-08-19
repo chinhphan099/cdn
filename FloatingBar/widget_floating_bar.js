@@ -31,8 +31,7 @@
                         tickTopY = elemRect.top - bodyRect.top,
                         tickBotY = tickTopY + elemRect.height;
 
-                    elmPositions.push(tickTopY);
-                    elmPositions.push(tickBotY);
+                    elmPositions.push(tickTopY, tickBotY);
                 }
             }
         }
