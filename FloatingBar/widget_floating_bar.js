@@ -1,9 +1,4 @@
-((utils) => {
-    if (!utils) {
-        console.log('utils module is not found');
-        return;
-    }
-
+(() => {
     function isInScreenView(winTop, winBot, elmPositions) {
         let ret = false;
         for(const elmPos of elmPositions) {
@@ -16,15 +11,15 @@
     }
 
     function floatingBar() {
-        const floatingElm = _q('.floating-bar'),
+        const floatingElm = document.querySelector('.floating-bar'),
             winTop = window.pageYOffset,
             winBot = winTop + window.innerHeight,
-            clsNames = floatingElm.dataset.class.split(',').map((cls) => {return cls.trim()}),
+            clsNames = floatingElm.dataset.class.split(',').map((cls) => {return cls.trim();}),
             elmPositions = [];
 
         if(!!clsNames[0]) {
             for(const clsName of clsNames) {
-                const elms = _qAll(clsName);
+                const elms = document.querySelectorAll(clsName);
                 for(const elm of elms) {
                     let bodyRect = document.body.getBoundingClientRect(),
                         elemRect = elm.getBoundingClientRect(),
@@ -38,7 +33,7 @@
 
         if(!!floatingElm.dataset.ticktopelm) {
             let bodyRect = document.body.getBoundingClientRect(),
-                elemRect = _q(floatingElm.dataset.ticktopelm).getBoundingClientRect(),
+                elemRect = document.querySelector(floatingElm.dataset.ticktopelm).getBoundingClientRect(),
                 tickTopY = elemRect.top - bodyRect.top;
 
             if(winTop >= tickTopY) {
@@ -59,7 +54,7 @@
         }
         else if(!!floatingElm.dataset.tickbottomelm) {
             let bodyRect = document.body.getBoundingClientRect(),
-                elemRect = _q(floatingElm.dataset.tickbottomelm).getBoundingClientRect(),
+                elemRect = document.querySelector(floatingElm.dataset.tickbottomelm).getBoundingClientRect(),
                 tickBottomY = elemRect.top - bodyRect.top;
 
             if(winBot >= tickBottomY) {
@@ -80,18 +75,18 @@
         }
     }
 
-    function initial() {
-        floatingBar();
-        listener();
-    }
-
     function listener() {
         window.addEventListener('scroll', () => {
             floatingBar();
         });
     }
 
+    function initial() {
+        floatingBar();
+        listener();
+    }
+
     window.addEventListener('load', () => {
         initial();
     });
-})(window.utils);
+})();

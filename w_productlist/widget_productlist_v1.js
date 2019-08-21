@@ -35,6 +35,8 @@
             isTest: utils.getQueryParameter('isCardTest') ? true : false
         });
 
+        const countryCodeIndex = utils.localStorage().get('countryCodeIndex');
+
         eCRM.Campaign.getProducts(function (data) {
             if (!(data instanceof Error) && data.prices.length > 0) {
                 console.log(data);
@@ -115,8 +117,14 @@
                         productInfo.currencyCode = data.location.currencyCode;
                     }
                     utils.events.emit('bindProductDiscountInfo', productInfo);
-                    utils.localStorage().set('countryCode', data.location.countryCode);
-                    utils.events.emit('triggerAddressForm', data.location.countryCode);
+                    if(!countryCodeIndex) {
+                        utils.localStorage().set('countryCode', data.location.countryCode);
+                        utils.events.emit('triggerAddressForm', data.location.countryCode);
+                    }
+                    else {
+                        utils.localStorage().set('countryCode', countryCodeIndex);
+                    }
+                    utils.localStorage().set('currencyCode', productInfo.currencyCode);
                     utils.events.emit('triggerProductBannerSidebar', productInfo);
                     utils.events.emit('triggerWarranty', getSelectedProduct());
                     utils.events.emit('bindOrderPage', productInfo);
@@ -157,7 +165,7 @@
         try {
             const productId = _qById('hdfSelectedProduct').value;
             const product = JSON.parse(_qById('product_' + productId).dataset.product);
-            let priceShipping = '';
+            let priceShipping = '', shippingValue = 0;
             if (product.shippings.length > 0) {
                 var shipping = product.shippings[0];
                 if (shipping.price == 0) {
@@ -168,6 +176,7 @@
                     }
                 } else {
                     priceShipping = shipping.formattedPrice;
+                    shippingValue = shipping.price;
                 }
             } else {
                 if (window.js_translate && window.js_translate.free) {
@@ -183,6 +192,7 @@
 
             result = {
                 priceShipping: priceShipping,
+                shippingValue: shippingValue,
                 discountPrice: product.productPrices.DiscountedPrice.FormattedValue,
                 discountPriceValue: product.productPrices.DiscountedPrice.Value,
                 fullPrice: product.productPrices.FullRetailPrice.FormattedValue,

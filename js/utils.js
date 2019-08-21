@@ -20,7 +20,7 @@
         }
 
         //custom event : support IE 11
-        if (typeof window.CustomEvent !== "function") {
+        if (typeof window.CustomEvent !== 'function') {
             function CustomEvent(event, params) {
                 params = params || { bubbles: false, cancelable: false, detail: null };
                 var evt = document.createEvent('CustomEvent');
@@ -47,6 +47,31 @@
 
     global._createElem = (elem) => {
         return document.createElement(elem);
+    }
+
+    global._getClosest = (elem, selector) => {
+        if (!Element.prototype.matches) {
+            Element.prototype.matches =
+                Element.prototype.matchesSelector ||
+                Element.prototype.mozMatchesSelector ||
+                Element.prototype.msMatchesSelector ||
+                Element.prototype.oMatchesSelector ||
+                Element.prototype.webkitMatchesSelector ||
+                function(s) {
+                    let matches = (this.document || this.ownerDocument).querySelectorAll(s),
+                        i = matches.length;
+                    while (--i >= 0 && matches.item(i) !== this) {}
+                    return i > -1;
+                }
+        }
+
+        // Get the closest matching element
+        for ( ; elem && elem !== document; elem = elem.parentNode ) {
+            if (elem.matches(selector)) {
+                return elem;
+            }
+        }
+        return null;
     }
 
     async function callAjax(url, options = {}) {
@@ -137,7 +162,7 @@
         input.classList.add('input-error');
         input.classList.remove('input-valid');
         if (input.closest('.form-group').querySelector('.error-message')) {
-            input.closest('.form-group').querySelector('.error-message').classList.remove("hidden");
+            input.closest('.form-group').querySelector('.error-message').classList.remove('hidden');
         }
     }
 
@@ -145,7 +170,7 @@
         input.classList.remove('input-error');
         input.classList.add('input-valid');
         if (input.closest('.form-group').querySelector('.error-message')) {
-            input.closest('.form-group').querySelector('.error-message').classList.add("hidden");
+            input.closest('.form-group').querySelector('.error-message').classList.add('hidden');
         }
     }
 
@@ -190,7 +215,7 @@
                 for (let i = 0; i < this.length; i += 4) {
                     if (vls.length < 4) {
                         if (vls.length > 0 && vls.length < 3) {
-                            vls.push("****");
+                            vls.push('****');
                         } else {
                             vls.push(this.substring(i, i + 4));
                         }
@@ -240,7 +265,7 @@
         for (const i of Object.keys(elems)) {
             const elem = elems[i];
             elem.classList.remove('input-error');
-            elem.parentElement.getElementsByClassName('error-message')[0].classList.add("hidden");
+            elem.parentElement.getElementsByClassName('error-message')[0].classList.add('hidden');
         }
     }
 
@@ -248,7 +273,7 @@
     function localStorage() {
         return {
             get: (key) => {
-                if (typeof (Storage) !== "undefined") {
+                if (typeof (Storage) !== 'undefined') {
                     return window.localStorage.getItem(key);
                 } else {
                     console.log('Sorry! No Web Storage support ....');
@@ -256,14 +281,14 @@
                 }
             },
             set: (key, value) => {
-                if (typeof (Storage) !== "undefined") {
+                if (typeof (Storage) !== 'undefined') {
                     window.localStorage.setItem(key, value);
                 } else {
                     console.log('Sorry! No Web Storage support ...');
                 }
             },
             remove: (item) => {
-                if (typeof (Storage) !== "undefined") {
+                if (typeof (Storage) !== 'undefined') {
                     window.localStorage.removeItem(item);
                 } else {
                     console.log('Sorry! No Web Storage support ...');
@@ -278,16 +303,16 @@
      * @param {string} target - example : _blank, _self, ...
      */
     function redirectPage(page, target) {
-        const currentQueryString = location.search.length > 0 ? location.search.substr(1) : "";
-        //const pageQueryString = (page.indexOf("?") > 0) ? page.substr(page.indexOf("?") + 1) : "";
+        const currentQueryString = location.search.length > 0 ? location.search.substr(1) : '';
+        //const pageQueryString = (page.indexOf('?') > 0) ? page.substr(page.indexOf('?') + 1) : '';
 
-        if (page.indexOf("?") > 0) {
+        if (page.indexOf('?') > 0) {
             page += (currentQueryString !== '' ? '&' + currentQueryString : '');
         } else {
             page += (currentQueryString !== '' ? '?' + currentQueryString : '');
         }
 
-        if (typeof target !== 'undefined' && target == "_blank") {
+        if (typeof target !== 'undefined' && target == '_blank') {
             window.open(page);
         } else {
             window.location = page;
@@ -298,16 +323,16 @@
     function removeParamFromUrl(key, paramsStr) {
         let param, params_arr = [];
         if (paramsStr !== '') {
-            params_arr = paramsStr.split("&");
+            params_arr = paramsStr.split('&');
             for (let i = params_arr.length - 1; i >= 0; i--) {
-                param = params_arr[i].split("=")[0];
+                param = params_arr[i].split('=')[0];
                 if (param === key) {
                     params_arr.splice(i, 1);
                 }
             }
         }
 
-        return params_arr.join("&");
+        return params_arr.join('&');
     }
 
     /**
@@ -320,7 +345,7 @@
             href = location.href.substr(location.href.indexOf('?'));
         }
 
-        const value = href.match(new RegExp("[\?\&]" + param + "=([^\&]*)(\&?)", "i"));
+        const value = href.match(new RegExp('[\?\&]' + param + '=([^\&]*)(\&?)', 'i'));
         return value ? value[1] : null;
     }
 
@@ -349,7 +374,6 @@
 
     //events - a super-basic Javascript (publish subscribe) pattern
     const events = (function () {
-
         const events = {};
 
         function on(eventName, fn) {
@@ -381,7 +405,6 @@
             off: off,
             emit: emit
         };
-
     })();
 
     function removeClassOfSelector(selector, className) {
@@ -409,12 +432,26 @@
                 continue;
             }
             let href = link.getAttribute('href');
+            let hrefParams = '';
+            if(!!href && href.indexOf('?') > -1) {
+                hrefParams = href.split('?')[1];
+            }
+            if(!!window.siteSetting && !!window.siteSetting.redirectURL && window.siteSetting.redirectURL.trim() !== ''){
+                if(href && href.indexOf('contact-us') < 0 && href.indexOf('terms') < 0 && href.indexOf('policy') < 0 && href.indexOf('affiliate') < 0 && href.indexOf('usermanual') < 0 && href.indexOf('javascript') < 0 && href.indexOf('www') < 0 && href.indexOf('//') < 0 && link.className.indexOf('no-redirect') < 0) {
+                    href = window.siteSetting.redirectURL;
+                }
+            }
             if (href && href.trim() !== '' && href.indexOf('javascript') < 0) {
-                const currentQueryString = location.search.length > 0 ? location.search.substr(1) : "";
-                if (href.indexOf("?") > 0) {
+                const currentQueryString = location.search.length > 0 ? location.search.substr(1) : '';
+                if (href.indexOf('?') > 0) {
                     href += (currentQueryString !== '' ? '&' + currentQueryString : '');
                 } else {
                     href += (currentQueryString !== '' ? '?' + currentQueryString : '');
+                }
+                if (href.indexOf('?') > 0) {
+                    href += (hrefParams !== '' ? '&' + hrefParams : '');
+                } else {
+                    href += (hrefParams !== '' ? '?' + hrefParams : '');
                 }
                 link.href = href;
             }
@@ -434,6 +471,27 @@
         }
     }
 
+    //Format Date
+    function formatDate(formatString,splitSymbol){
+        var date = (new Date()).toISOString().split('T')[0];
+        var result = '',
+            arrDate = date.split('-')
+            var splitSymbol = splitSymbol ? splitSymbol : '-';
+
+        switch(formatString){
+            case 'dd/mm/yyyy':
+                result = arrDate[2] + splitSymbol + arrDate[1] + splitSymbol + arrDate[0];
+                break;
+            case 'mm/dd/yyyy':
+                result = arrDate[1] + splitSymbol + arrDate[2] + splitSymbol + arrDate[0];
+                break;
+            default:
+            result = date;
+        }
+
+        return result;
+    }
+
     function fireCakePixel() {
         const orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
         const pixelUrl = 'https://#DOMAIN/p.ashx?o=#S4&e=#EVENT&t=TRANSACTION_ID&r=#S5';
@@ -451,14 +509,14 @@
             }
 
             if (orderInfo && orderInfo.orderNumber && !isCakePixelFired && domain) {
-                let url = pixelUrl.replace("TRANSACTION_ID", orderInfo.orderNumber);
+                let url = pixelUrl.replace('TRANSACTION_ID', orderInfo.orderNumber);
                 const s4 = utils.getQueryParameter('s4') || '';
                 const s5 = utils.getQueryParameter('s5') || '';
                 const event = utils.getQueryParameter('event') || '';
-                url = url.replace("#S4", s4);
-                url = url.replace("#S5", s5);
-                url = url.replace("#EVENT", event);
-                url = url.replace("#DOMAIN", domain);
+                url = url.replace('#S4', s4);
+                url = url.replace('#S5', s5);
+                url = url.replace('#EVENT', event);
+                url = url.replace('#DOMAIN', domain);
 
                 const iframe = document.createElement('iframe');
                 iframe.src = url;
@@ -477,7 +535,7 @@
 
     function fireEverFlow() {
         const orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
-		const everFlowUrl = 'https://#DOMAIN/?nid=#NETWORK_ID&oid=#OFFER_ID&transaction_id=#TRANSACTION_ID&adv1=#ADV1&coupon_code=#CC&sub1=#S1&sub2=#S2&sub3=#S3&sub4=#S4&sub5=#S5';
+        const everFlowUrl = 'https://#DOMAIN/?nid=#NETWORK_ID&oid=#OFFER_ID&transaction_id=#TRANSACTION_ID&adv1=#ADV1&coupon_code=#CC&sub1=#S1&sub2=#S2&sub3=#S3&sub4=#S4&sub5=#S5';
         try {
             let isEverFlowFired = false;
             if (utils.localStorage().get('isEverFlowFired')) {
@@ -490,24 +548,24 @@
                 const offer_id = utils.getQueryParameter('S4') || '';
                 const transaction_id = utils.getQueryParameter('S5') || '';
                 const network_id = utils.getQueryParameter('NETWORK_ID') || '';
-				const coupon_code = utils.getQueryParameter('CC') || '';
+                const coupon_code = utils.getQueryParameter('CC') || '';
                 const sub1 = utils.getQueryParameter('S1') || '';
                 const sub2 = utils.getQueryParameter('S2') || '';
                 const sub3 = utils.getQueryParameter('S3') || '';
                 const sub4 = utils.getQueryParameter('S4') || '';
                 const sub5 = utils.getQueryParameter('S5') || '';
 
-				let url = everFlowUrl.replace("#ADV1", orderInfo.orderNumber);
-                url = url.replace("#NETWORK_ID", network_id);
-                url = url.replace("#OFFER_ID", offer_id);
-                url = url.replace("#TRANSACTION_ID", transaction_id);
-                url = url.replace("#DOMAIN", domain);
-				url = url.replace("#CC", coupon_code);
-                url = url.replace("#S1", sub1);
-                url = url.replace("#S2", sub2);
-                url = url.replace("#S3", sub3);
-                url = url.replace("#S4", sub4);
-                url = url.replace("#S5", sub5);
+                let url = everFlowUrl.replace('#ADV1', orderInfo.orderNumber);
+                url = url.replace('#NETWORK_ID', network_id);
+                url = url.replace('#OFFER_ID', offer_id);
+                url = url.replace('#TRANSACTION_ID', transaction_id);
+                url = url.replace('#DOMAIN', domain);
+                url = url.replace('#CC', coupon_code);
+                url = url.replace('#S1', sub1);
+                url = url.replace('#S2', sub2);
+                url = url.replace('#S3', sub3);
+                url = url.replace('#S4', sub4);
+                url = url.replace('#S5', sub5);
 
                 const iframe = document.createElement('iframe');
                 iframe.src = url;
@@ -522,6 +580,50 @@
         } catch (err) {
             console.log('error: ', err);
         }
+    }
+
+    function firePicksell() {
+        //Fire picksell
+        if(typeof $picksell !== 'undefined') {
+            let isPicksellFired = utils.localStorage().get('isPicksellFired');
+            if(!isPicksellFired) {
+                const orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
+                if(orderInfo && orderInfo.orderTotalFull) {
+                    $picksell.trackingConversion(orderInfo.orderTotalFull);
+                    utils.localStorage().set('isPicksellFired', true);
+                }
+            }
+        }
+    }
+
+    function createCookie(name, value, days) {
+        var expires = '';
+        if(days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            expires = '; expires=' + date.toUTCString();
+        }
+        document.cookie = name + '=' + value + expires + '; path=/';
+    }
+
+    function readCookie(name) {
+        var nameEQ = name + '=',
+            ca = document.cookie.split(';');
+
+        for(var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) === ' ') {
+                c = c.substring(1, c.length);
+            }
+            if (c.indexOf(nameEQ) === 0) {
+                return c.substring(nameEQ.length, c.length);
+            }
+        }
+        return null;
+    }
+
+    function eraseCookie(name) {
+        createCookie(name, '', -1);
     }
 
     global.utils = {
@@ -546,7 +648,12 @@
         convertHref: convertHref,
         isDevice: isDevice,
         showAjaxLoading: showAjaxLoading,
+        formatDate: formatDate,
         fireCakePixel: fireCakePixel,
-        fireEverFlow: fireEverFlow
+        fireEverFlow: fireEverFlow,
+        firePicksell: firePicksell,
+        createCookie: createCookie,
+        readCookie: readCookie,
+        eraseCookie: eraseCookie
     }
 })(window, document);
