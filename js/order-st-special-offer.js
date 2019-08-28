@@ -267,6 +267,7 @@ Element.prototype.appendAfter = function (element) {
 
                 handleCountDown('timeCount', deadline);
                 _q('.w_modal').style.display = 'block';
+                utils.createCookie('isHidePopup', 'true', 1);
             }
         }, 50);
     }
@@ -473,7 +474,7 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function handleExitPopupEvents() {
-        if(utils.getQueryParameter('iep') !== 'true') {
+        if(utils.getQueryParameter('iep') !== 'true' || !!utils.readCookie('isHidePopup')) {
             return;
         }
 
