@@ -1,4 +1,4 @@
-(() => {
+((utils) => {
     if (!utils) {
         console.log('utils module is not found');
         return;

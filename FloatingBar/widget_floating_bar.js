@@ -1,4 +1,9 @@
-(() => {
+((utils) => {
+    if (!utils) {
+        console.log('utils module is not found');
+        return;
+    }
+
     function isInScreenView(winTop, winBot, elmPositions) {
         let ret = false;
         for(const elmPos of elmPositions) {
@@ -10,66 +15,71 @@
         return ret;
     }
 
+    function getElmPosition(clsNames) {
+        let elmPositions = [];
+
+        for(const clsName of clsNames) {
+            const elms = _qAll(clsName);
+
+            for(const elm of elms) {
+                let bodyRect = document.body.getBoundingClientRect(),
+                    elemRect = elm.getBoundingClientRect(),
+                    tickTopY = elemRect.top - bodyRect.top,
+                    tickBotY = tickTopY + elemRect.height;
+
+                elmPositions.push(tickTopY, tickBotY);
+            }
+        }
+        return elmPositions;
+    }
+
     function floatingBar() {
-        const floatingElm = document.querySelector('.floating-bar'),
+        let elmPositions;
+        const floatingElm = _q('.floating-bar'),
             winTop = window.pageYOffset,
             winBot = winTop + window.innerHeight,
-            clsNames = floatingElm.dataset.class.split(',').map((cls) => {return cls.trim();}),
-            elmPositions = [];
+            clsNames = floatingElm.dataset.class.split(',').map((cls) => {return cls.trim()});
 
         if(!!clsNames[0]) {
-            for(const clsName of clsNames) {
-                const elms = document.querySelectorAll(clsName);
-                for(const elm of elms) {
-                    let bodyRect = document.body.getBoundingClientRect(),
-                        elemRect = elm.getBoundingClientRect(),
-                        tickTopY = elemRect.top - bodyRect.top,
-                        tickBotY = tickTopY + elemRect.height;
-
-                    elmPositions.push(tickTopY, tickBotY);
-                }
-            }
+            elmPositions = getElmPosition(clsNames);
         }
 
+        let elmTick, winPos;
         if(!!floatingElm.dataset.ticktopelm) {
-            let bodyRect = document.body.getBoundingClientRect(),
-                elemRect = document.querySelector(floatingElm.dataset.ticktopelm).getBoundingClientRect(),
-                tickTopY = elemRect.top - bodyRect.top;
-
-            if(winTop >= tickTopY) {
-                floatingElm.classList.add('floating-visible');
-                if(!!clsNames[0]) {
-                    let isInScreen = isInScreenView(winTop, winBot, elmPositions);
-                    if(isInScreen) {
-                        floatingElm.classList.remove('floating-visible');
-                    }
-                    else {
-                        floatingElm.classList.add('floating-visible');
-                    }
-                }
-            }
-            else {
-                floatingElm.classList.remove('floating-visible');
-            }
+            elmTick = floatingElm.dataset.ticktopelm;
+            winPos = winTop;
         }
         else if(!!floatingElm.dataset.tickbottomelm) {
-            let bodyRect = document.body.getBoundingClientRect(),
-                elemRect = document.querySelector(floatingElm.dataset.tickbottomelm).getBoundingClientRect(),
-                tickBottomY = elemRect.top - bodyRect.top;
+            elmTick = floatingElm.dataset.tickbottomelm;
+            winPos = winBot;
+        }
 
-            if(winBot >= tickBottomY) {
-                floatingElm.classList.add('floating-visible');
-                if(!!clsNames[0]) {
-                    let isInScreen = isInScreenView(winTop, winBot, elmPositions);
-                    if(isInScreen) {
+        let bodyRect = document.body.getBoundingClientRect(),
+            elemRect = _q(elmTick).getBoundingClientRect(),
+            tickPos = elemRect.top - bodyRect.top;
+
+        if(winPos >= tickPos) {
+            if(!clsNames[0]) {
+                if(!floatingElm.classList.contains('floating-visible')) {
+                    floatingElm.classList.add('floating-visible');
+                }
+            }
+            else {
+                let isInScreen = isInScreenView(winTop, winBot, elmPositions);
+                if(isInScreen) {
+                    if(floatingElm.classList.contains('floating-visible')) {
                         floatingElm.classList.remove('floating-visible');
                     }
-                    else {
+                }
+                else {
+                    if(!floatingElm.classList.contains('floating-visible')) {
                         floatingElm.classList.add('floating-visible');
                     }
                 }
             }
-            else {
+        }
+        else {
+            if(floatingElm.classList.contains('floating-visible')) {
                 floatingElm.classList.remove('floating-visible');
             }
         }
@@ -89,4 +99,4 @@
     window.addEventListener('load', () => {
         initial();
     });
-})();
+})(window.utils);
