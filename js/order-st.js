@@ -17,20 +17,8 @@ Element.prototype.appendAfter = function (element) {
     let isPopupShowed = false;
     let couponDiscount;
     let typeCoupon;
-
-    async function fetchUrl(url, setting) {
-        const response = await fetch(url, setting)
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                })
-                .catch(err => {
-                    console.log('Error: ', err)
-                });
-
-        return response;
-    }
+    let timedPopup;
+    let fCurrency;
 
     function hidePopup() {
         if(!!_q('.w_modal')) {
@@ -106,16 +94,15 @@ Element.prototype.appendAfter = function (element) {
     }
 
     const productNameText = _q('.statistical .td-name').innerText;
-    function loadStatistical() {
+    function loadStatistical(dataResponse) {
+        if(!!dataResponse) {
+            fCurrency = dataResponse.fCurrency;
+        }
         const checkedItem = _q('.productRadioListItem input:checked'),
             productItem = _getClosest(checkedItem, '.productRadioListItem'),
             data = JSON.parse(checkedItem.dataset.product),
             shippingFee = data.shippings[0].formattedPrice,
             taxes = data.productPrices.Surcharge.FormattedValue;
-
-        const fvalue = shippingFee.replace(/[,|.]/g, ''),
-            pValue = data.shippings[0].price.toFixed(2).toString().replace(/\./, ''),
-            fCurrency = fvalue.replace(pValue, '######');
 
         const warranty = getWarrantyPrice(fCurrency, taxes),
             grandTotal = (data.shippings[0].price + data.productPrices.DiscountedPrice.Value + warranty.wPrice).toFixed(2);
@@ -154,7 +141,7 @@ Element.prototype.appendAfter = function (element) {
 
     function waitingOrderData() {
         utils.events.on('bindOrderPage', loadStatistical);
-        // utils.events.on('bindOrderPage', implementCoupon);
+        utils.events.on('bindOrderPage', implementCoupon);
     }
 
     // Month and Year Dropdown
@@ -236,6 +223,9 @@ Element.prototype.appendAfter = function (element) {
         if (!_q('.w_modal')) {
             return;
         }
+        if(!!timedPopup) {
+            clearTimeout(timedPopup);
+        }
         const countdownElm = document.createElement('div');
         countdownElm.id = 'timeCount';
         countdownElm.innerHTML = `
@@ -267,11 +257,22 @@ Element.prototype.appendAfter = function (element) {
 
                 handleCountDown('timeCount', deadline);
                 _q('.w_modal').style.display = 'block';
-                utils.createCookie('isHidePopup', 'true', 1);
+                // utils.createCookie('isHidePopup', 'true', 1);
             }
         }, 50);
     }
     // End Count down
+
+    function onMouseOuted() {
+        if(isPopupShowed === true) {
+            return;
+        }
+        const product = _q('input[name="product"]:checked').dataset.product;
+        if (!!product) {
+            document.removeEventListener('mouseout', handleMouseOut);
+            generateCountDown();
+        }
+    }
 
     function handleMouseOut(e) {
         if(isPopupShowed === true) {
@@ -279,11 +280,7 @@ Element.prototype.appendAfter = function (element) {
         }
 
         if ((e.pageY - window.pageYOffset) <= 0) {
-            const product = _q('input[name="product"]:checked').dataset.product;
-            if (!!product) {
-                document.removeEventListener('mouseout', handleMouseOut);
-                generateCountDown();
-            }
+            onMouseOuted();
         }
     }
 
@@ -292,15 +289,10 @@ Element.prototype.appendAfter = function (element) {
             return;
         }
 
-        const productListEle = _qById('js-widget-products'),
-            rect = productListEle.getBoundingClientRect();
-
-        if (rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)) {
-            window.removeEventListener('touchmove', handleTouchMove);
-            mobileTimer = setTimeout(() => {
-                generateCountDown();
-            }, 5000);
-        }
+        window.removeEventListener('touchmove', handleTouchMove);
+        mobileTimer = setTimeout(() => {
+            generateCountDown();
+        }, 5000);
     }
 
     function reImplementProductList(discount) {
@@ -309,10 +301,7 @@ Element.prototype.appendAfter = function (element) {
             if(!!items[i].dataset.product) {
                 let dataProduct = JSON.parse(items[i].dataset.product),
                     currentPrice = dataProduct.productPrices.DiscountedPrice.Value,
-                    currentPriceFormat = dataProduct.productPrices.DiscountedPrice.FormattedValue,
-                    fvalue = dataProduct.shippings[0].formattedPrice.replace(/[,|.]/g, ''),
-                    pValue = dataProduct.shippings[0].price.toFixed(2).toString().replace(/\./, ''),
-                    fCurrency = fvalue.replace(pValue, '######');
+                    currentPriceFormat = dataProduct.productPrices.DiscountedPrice.FormattedValue;
 
                 if(typeCoupon === 'Money Amount') {
                     dataProduct.productPrices.DiscountedPrice.Value = Number((currentPrice - discount).toFixed(2));
@@ -386,11 +375,10 @@ Element.prototype.appendAfter = function (element) {
         const selectedProd = _q('.productRadioListItem.checked-item');
         const specialProduct = _q('.productRadioListItem.special_offer');
 
-        if(selectedProd && specialProduct) {
+        if(specialProduct) {
             if(_q('.coupon-apply')) {
                 _q('.coupon-apply').style.display = 'block';
             }
-            selectedProd.classList.remove('default');
             const selected_default_text = selectedProd.querySelector('.best-seller-text');
             if(selected_default_text) {
                 selected_default_text.parentNode.removeChild(selected_default_text);
@@ -411,8 +399,12 @@ Element.prototype.appendAfter = function (element) {
     function onActiveCoupon() {
         _qById('couponBtn').addEventListener('click', (e) => {
             e.target.disabled = true;
-            // afterActiveCoupon();
-            showSpecialItem();
+            if(_q('.productRadioListItem.special_offer')) {
+                showSpecialItem();
+            }
+            else {
+                afterActiveCoupon();
+            }
             loadStatistical();
             hidePopup();
         }, false);
@@ -425,88 +417,86 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function implementCoupon(data) {
-        if(!!window.couponCodeId && utils.getQueryParameter('iep') === 'true') {
-            const eCRM = new EmanageCRMJS({
-                webkey: siteSetting.webKey,
-                cid: siteSetting.CID,
-                lang: '',
-                isTest: utils.getQueryParameter('isCardTest') ? true : false
-            });
+        fCurrency = data.fCurrency;
+        if(!!window.couponCodeId && utils.getQueryParameter('iep') === 'true' && !!_q('.w_modal')) {
+            if(!window.couponValue.trim()) {
+                return;
+            }
+            let couponValFormat = window.couponValue;
+            let couponVal = couponDiscount = Number(couponValFormat.replace('%', ''));
 
-            let apiGetCoupon = `${eCRM.Campaign.baseAPIEndpoint}/campaigns/${siteSetting.webKey}/coupons/${window.couponCodeId}?currencyCode=${data.currencyCode}`;
-            let setting = {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X_CID': siteSetting.CID
-                }
-            };
-            fetchUrl(apiGetCoupon, setting).then((dataCoupon) => {
-                if(!!dataCoupon) {
-                    let couponPriceFormat = dataCoupon.discount + '%';
-                    if(dataCoupon.discountType === 'Money Amount') {
-                        couponPriceFormat = utils.formatPrice(dataCoupon.discount, data.fCurrency, dataCoupon.formattedMinimalPurchase);
-                    }
+            if(window.couponValue.indexOf('%') === -1) {
+                typeCoupon = 'Money Amount';
+                couponValFormat = utils.formatPrice(couponVal, fCurrency, data.shippingValue.toString());
+            }
+            const promoText = _q('.w_exit_popup .w_promo_text');
+            if(!!promoText) {
+                promoText.innerHTML = promoText.innerHTML.replace(/{couponPrice}/g, couponValFormat);
+            }
 
-                    const promoText = _q('.w_exit_popup .w_promo_text');
-                    if(!!promoText) {
-                        promoText.innerHTML = promoText.innerHTML.replace(/{couponPrice}/g, couponPriceFormat);
-                    }
+            const couponApplyText = _q('.coupon-apply');
+            if(!!couponApplyText) {
+                couponApplyText.innerHTML = couponApplyText.innerHTML.replace(/{couponPrice}/g, couponValFormat);
+            }
+            window.additionText = window.additionText.replace(/{couponPrice}/g, couponValFormat);
 
-                    const couponApplyText = _q('.coupon-apply');
-                    if(!!couponApplyText) {
-                        couponApplyText.innerHTML = couponApplyText.innerHTML.replace(/{couponPrice}/g, couponPriceFormat);
-                    }
-                    window.additionText = window.additionText.replace(/{couponPrice}/g, couponPriceFormat);
-
-                    couponDiscount = dataCoupon.discount;
-                    typeCoupon = dataCoupon.discountType;
-
-                    if(!!_qById('couponBtn')) {
-                        onActiveCoupon();
-                    }
-                    if(!!_qById('close-expopup')) {
-                        onCloseExitPopup();
-                    }
-                }
-            });
+            if(!!_qById('couponBtn')) {
+                onActiveCoupon();
+            }
+            if(!!_qById('close-expopup')) {
+                onCloseExitPopup();
+            }
         }
     }
 
     function handleExitPopupEvents() {
-        if(utils.getQueryParameter('iep') !== 'true' || !!utils.readCookie('isHidePopup')) {
+        if(utils.getQueryParameter('iep') !== 'true'  || !_q('.w_modal') || !!utils.readCookie('isHidePopup')) {
             return;
         }
 
         if (utils.isDevice()) {
             window.addEventListener('touchmove', handleTouchMove);
         }
-        document.addEventListener('mouseout', handleMouseOut);
-
-        // Add event for Button within Exit popup - Buy 2 get 1
-        if(!!_qById('couponBtn')) {
-            onActiveCoupon();
-        }
-        if(!!_qById('close-expopup')) {
-            onCloseExitPopup();
+        else {
+            document.addEventListener('mouseout', handleMouseOut);
         }
     }
 
     function adjustLayout() {
         let billingEmail = _getClosest(_qById('billing_email'), '.form-group');
-        billingEmail.parentNode.removeChild(billingEmail);
+        if(!!billingEmail) {
+            billingEmail.parentNode.removeChild(billingEmail);
+        }
 
         let billingFullName = _q('.billing-full-name');
-        billingFullName.parentNode.removeChild(billingFullName);
+        if(!!billingFullName) {
+            billingFullName.parentNode.removeChild(billingFullName);
+        }
 
         let billingPhone = _getClosest(_qById('billing_phone'), '.form-group');
-        billingPhone.parentNode.removeChild(billingPhone);
+        if(!!billingPhone) {
+            billingPhone.parentNode.removeChild(billingPhone);
+        }
     }
 
     function changePlaceholderInput() {
         // For order of BR
         if(_q('.widget-shipping-form input#shipping_cep')) {
             _q('.widget-shipping-form input#shipping_cep').placeholder = "Cep: 01310-000";
+        }
+    }
+
+    function popupTimed() {
+        const timer = !!utils.getQueryParameter('timed') ? Number(utils.getQueryParameter('timed')) * 1000 : null;
+        if(!!timer && !!_q('.w_modal')) {
+            timedPopup = setTimeout(function() {
+                if (utils.isDevice()) {
+                    handleTouchMove();
+                }
+                else {
+                    onMouseOuted();
+                }
+            }, timer);
         }
     }
 
@@ -529,7 +519,10 @@ Element.prototype.appendAfter = function (element) {
         listener();
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('load', () => {
+        popupTimed();
+    });
+    document.addEventListener('DOMContentLoaded', () => {
         initial();
     });
 })(window.utils);
