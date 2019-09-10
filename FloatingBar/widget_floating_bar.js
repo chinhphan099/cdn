@@ -1,9 +1,4 @@
-((utils) => {
-    if (!utils) {
-        console.log('utils module is not found');
-        return;
-    }
-
+(() => {
     function isInScreenView(winTop, winBot, elmPositions) {
         let ret = false;
         for(const elmPos of elmPositions) {
@@ -19,15 +14,17 @@
         let elmPositions = [];
 
         for(const clsName of clsNames) {
-            const elms = _qAll(clsName);
+            const elms = document.querySelectorAll(clsName);
 
             for(const elm of elms) {
-                let bodyRect = document.body.getBoundingClientRect(),
-                    elemRect = elm.getBoundingClientRect(),
-                    tickTopY = elemRect.top - bodyRect.top,
-                    tickBotY = tickTopY + elemRect.height;
+                if(!!(elm.offsetWidth || elm.offsetHeight || elm.getClientRects().length)) {
+                    let bodyRect = document.body.getBoundingClientRect(),
+                        elemRect = elm.getBoundingClientRect(),
+                        tickTopY = elemRect.top - bodyRect.top,
+                        tickBotY = tickTopY + elemRect.height;
 
-                elmPositions.push(tickTopY, tickBotY);
+                    elmPositions.push(tickTopY, tickBotY);
+                }
             }
         }
         return elmPositions;
@@ -35,10 +32,10 @@
 
     function floatingBar() {
         let elmPositions;
-        const floatingElm = _q('.floating-bar'),
+        const floatingElm = document.querySelector('.floating-bar'),
             winTop = window.pageYOffset,
             winBot = winTop + window.innerHeight,
-            clsNames = floatingElm.dataset.class.split(',').map((cls) => {return cls.trim()});
+            clsNames = floatingElm.dataset.class.split(',').map((cls) => {return cls.trim();});
 
         if(!!clsNames[0]) {
             elmPositions = getElmPosition(clsNames);
@@ -55,7 +52,7 @@
         }
 
         let bodyRect = document.body.getBoundingClientRect(),
-            elemRect = _q(elmTick).getBoundingClientRect(),
+            elemRect = document.querySelector(elmTick).getBoundingClientRect(),
             tickPos = elemRect.top - bodyRect.top;
 
         if(winPos >= tickPos) {
@@ -99,4 +96,4 @@
     window.addEventListener('load', () => {
         initial();
     });
-})(window.utils);
+})();
