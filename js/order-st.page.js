@@ -309,9 +309,19 @@ Element.prototype.appendAfter = function (element) {
                     dataProduct.productPrices.DiscountedPrice.FormattedValue = utils.formatPrice((currentPrice * (100 - discount) / 100).toFixed(2), fCurrency, dataProduct.shippings[0].formattedPrice);
                 }
 
-                let priceElm = _getClosest(items[i], '.productRadioListItem').querySelector('.productPrice .discountedPrice');
-                if(!!priceElm) {
-                    priceElm.innerHTML = `${dataProduct.productPrices.DiscountedPrice.FormattedValue} <del style="color: grey; font-size: 0.9em; font-weight: normal;">${currentPriceFormat}</del>`;
+                let priceElms = _getClosest(items[i], '.productRadioListItem').querySelectorAll('.discountedPrice');
+                if(!!priceElms) {
+                    for(let priceElm of priceElms) {
+                        priceElm.innerHTML = `${dataProduct.productPrices.DiscountedPrice.FormattedValue} <del style="color: grey; font-size: 0.9em; font-weight: normal;">${currentPriceFormat}</del>`;
+                    }
+                }
+
+                let savePriceElms = _getClosest(items[i], '.productRadioListItem').querySelectorAll('.savePrice');
+                if(!!savePriceElms) {
+                    for(let savePriceElm of savePriceElms) {
+                        let savePrice = (dataProduct.productPrices.FullRetailPrice.Value - dataProduct.productPrices.DiscountedPrice.Value).toFixed(2);
+                        savePriceElm.innerHTML = fCurrency.replace('######', savePrice);
+                    }
                 }
 
                 let nameElm = _getClosest(items[i], '.productRadioListItem').querySelector('.product-name p');
