@@ -50,7 +50,7 @@ Element.prototype.appendAfter = function (element) {
         timeinterval = setInterval(updateClock, 1000);
     }
     function generateCountDown() {
-        if (!_q('.w_modal') || !!isPopupShowing) {
+        if (!_q('.coupon-popup') || !!isPopupShowing) {
             return;
         }
         const countdownElm = document.createElement('div');
@@ -79,7 +79,7 @@ Element.prototype.appendAfter = function (element) {
                     deadline = new Date(currentTime + time_in_minutes * 60 * 1000);
 
                 handleCountDown('timeCount', deadline);
-                _q('.w_modal').style.display = 'block';
+                _q('.coupon-popup').style.display = 'block';
                 // utils.createCookie('isHidePopup', 'true', 1);
             }
         }, 50);
@@ -115,13 +115,15 @@ Element.prototype.appendAfter = function (element) {
 
     function hidePopup(isOver) {
         isPopupShowing = false;
-        if(!!_q('.w_modal')) {
-            _q('.w_modal').style.display = 'none';
+        if(!!_q('.coupon-popup')) {
+            _q('.coupon-popup').style.display = 'none';
         }
         if(_qById('timeCount')) {
             _qById('timeCount').parentNode.removeChild(_qById('timeCount'));
         }
-        _qById('couponBtn').disabled = false;
+        if(!!_qById('couponBtn')) {
+            _qById('couponBtn').disabled = false;
+        }
         if(!!isOver) {
             clearTimeout(mobileTimer);
             clearTimeout(timedPopup);
@@ -417,7 +419,7 @@ Element.prototype.appendAfter = function (element) {
 
     function implementCoupon(data) {
         fCurrency = data.fCurrency;
-        if(!!window.couponCodeId && utils.getQueryParameter('iep') === 'true' && !!_q('.w_modal')) {
+        if(!!window.couponCodeId && utils.getQueryParameter('iep') === 'true' && !!_q('.coupon-popup')) {
             if(!window.couponValue.trim()) {
                 return;
             }
@@ -450,7 +452,7 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function handleExitPopupEvents() {
-        if(utils.getQueryParameter('iep') !== 'true' || !_q('.w_modal') || !!utils.readCookie('isHidePopup')) {
+        if(utils.getQueryParameter('iep') !== 'true' || !_q('.coupon-popup') || !!utils.readCookie('isHidePopup')) {
             return;
         }
 
@@ -488,7 +490,7 @@ Element.prototype.appendAfter = function (element) {
 
     function popupTimed() {
         const timer = !!utils.getQueryParameter('timed') ? Number(utils.getQueryParameter('timed')) * 1000 : null;
-        if(!!timer && !!_q('.w_modal')) {
+        if(!!timer && !!_q('.coupon-popup')) {
             timedPopup = setTimeout(function() {
                 const product = _q('input[name="product"]:checked').dataset.product;
                 if (!!product) {
