@@ -297,7 +297,11 @@
             #set($imgs = $item.mainImage.trim().split(','))
             <div class="w_item">
               <div class="w_thumb">
-                <img src="$imgs[0].trim()" alt="" class="img-view no-lazy">
+                #if($lazyloadImage == 'true')
+                  <img src="$!{placeholderimage}" data-src="$imgs[0].trim()" alt="" class="img-view">
+                #else
+                  <img src="$imgs[0].trim()" alt="" class="img-view no-lazy">
+                #end
               </div>
             </div>
           #end

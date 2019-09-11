@@ -236,7 +236,7 @@
         border: 1px solid #cecece;
         border-bottom-color: #737373;
         width: calc(50% - 10px);
-        min-width: 600px;
+        min-width: 500px;
     }
     .itemList .item-title {
         font-size: 12px;
@@ -596,6 +596,7 @@
 
             // Create Image Tag and append into image-wrap
             generateImage(input);
+            checkContainVideo();
         });
 
         input.addEventListener('click', function(e) {
@@ -857,11 +858,11 @@
 
         if(selectedVal === 'slider') {
             document.querySelector('[widgetid="mainTabContainer_tablist_optionsForSlider"]').classList.remove('hide');
-            dijit.byId('text150Checkbox').set('checked', false).set('disabled', true);
+            // dijit.byId('text150Checkbox').set('checked', false).set('disabled', true);
         }
         else {
             document.querySelector('[widgetid="mainTabContainer_tablist_optionsForSlider"]').classList.add('hide');
-            dijit.byId('text150Checkbox').set('disabled', false);
+            // dijit.byId('text150Checkbox').set('disabled', false);
         }
 
         if(selectedVal === 'qa') {
@@ -935,6 +936,18 @@
             dijit.byId('text130Checkbox').set('disabled', false); // Bullets
         }
     }
+    function checkContainVideo() {
+        var videoIDTxts = document.querySelectorAll('.videoID');
+        for(var videoIDTxt of videoIDTxts) {
+            if(!!videoIDTxt.value) {
+                dijit.byId('text90Checkbox').set('checked', true).set('disabled', true);
+                break;
+            }
+            else {
+                dijit.byId('text90Checkbox').set('disabled', false);
+            }
+        }
+    }
     function checkfadeSlider() {
         var slidesToShowOnDesktopVal = dijit.byId('slidesToShowOnDesktop').get('value'),
             slidesToShowOnTabletVal = dijit.byId('slidesToShowOnTablet').get('value'),
@@ -942,23 +955,25 @@
 
         if(dijit.byId('typeSlider').get('value') == 'normal') {
             if(slidesToShowOnDesktopVal === '1' && slidesToShowOnTabletVal === '1' && slidesToShowOnMobileVal === '1') {
-                dijit.byId('text90Checkbox').set('disabled', false);
+                dijit.byId('text90Checkbox').set('disabled', false); // Fade affect
             }
             else {
-                dijit.byId('text90Checkbox').set('checked', false).set('disabled', true);
+                dijit.byId('text90Checkbox').set('checked', false).set('disabled', true); // Fade affect
             }
         }
         else {
-            dijit.byId('text90Checkbox').set('disabled', false);
+            dijit.byId('text90Checkbox').set('disabled', false); // Fade affect
             if(dojo.query('input[name="text7"]:checked')[0].id === 'sliderMode2') { // Vertical Mode
-                dijit.byId('text90Checkbox').set('checked', false).set('disabled', true); // Fade
+                dijit.byId('text90Checkbox').set('checked', false).set('disabled', true); // Fade affect
             }
         }
+        checkContainVideo();
     }
     function listener() {
         checkModeSlider();
         dojo.query('input[name="text7"]').on('change', function () { // Slider Mode
             checkModeSlider();
+            checkfadeSlider();
         });
 
         checkAutoPlaySlider();
@@ -966,8 +981,8 @@
             checkAutoPlaySlider();
         });
 
-        checkfadeSlider();
         checkTypeSlider();
+        checkfadeSlider();
         dijit.byId('typeSlider').on('change', function () { // Type Slider
             checkTypeSlider();
             checkfadeSlider();

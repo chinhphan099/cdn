@@ -305,7 +305,7 @@
     }
   };
 
-  $(function() {
+  $(window).on('load', function() {
     $('[data-' + pluginName + ']')[pluginName]();
   });
 
