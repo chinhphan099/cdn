@@ -1,0 +1,70 @@
+#set($content = $dotcontent.find($CONTENT_INODE))
+#if($EDIT_MODE)
+    <center style="color:blue;font-size:13px">Widget Name: [Site]BlackFridayBanner <br>Title: $!{widgetTitle}</center>
+#end
+#set($linkCls="unlink")
+#set($linkUrl="javascript:;")
+#if($UtilMethods.isSet($orderLink))
+    #set($linkCls="")
+    #set($linkUrl=$orderLink)
+#end
+<div class="cm_banner $!{content.className}" style="display: none;#if($EDIT_MODE)position: static;#end" data-begindate="$date.format('yyyy-MM-dd', $content.beginDate)" data-enddate="$date.format('yyyy-MM-dd', $content.endDate)">
+    <span class="cm_close">x</span>
+    <div class="cm_inner">
+        <div class="cm_item cm_bgd-black">
+            <div class="cm_inner-wrap">
+                <div class="cm_logo">
+                    <img src="$!{content.logoMegaSale.uri}" alt="$!{content.eventName}" class="no-lazy">
+                </div>
+                <div class="cm_desc">
+                    <h2>$!{content.eventName}</h2>
+                    <h3>$!{content.textSale} - <a href="$!{linkUrl}" class="tracking-link $!{linkCls}">$!{content.saleUpToText}</a></h3>
+                </div>
+            </div>
+        </div>
+        <div class="cm_item cm_bgd-blue">
+            <div class="cm_group">
+                <div class="left-text">
+                    <h3>$!{content.dealsChangeText}</h3>
+                    <h4>$!{content.discountNowText}</h4>
+                </div>
+                <div class="cm_countdown">
+                    <div class="text-container">
+                        <div class="cm_hours">00</div>
+                        <div class="cm_hours-text">$!{content.hours}</div>
+                    </div>
+                    <div class="text-container">
+                        <div class="cm_semicolon">:</div>
+                    </div>
+                    <div class="text-container">
+                        <div class="cm_minutes">00</div>
+                        <div class="cm_minutes-text">$!{content.minutes}</div>
+                    </div>
+                    <div class="text-container">
+                        <div class="cm_semicolon">:</div>
+                    </div>
+                    <div class="text-container">
+                        <div class="cm_seconds">00</div>
+                        <div class="cm_seconds-text">$!{content.seconds}</div>
+                    </div>
+                </div>
+                <h4 class="cm_discount-text">$!{content.discountNowText}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+#*
+<script type="text/javascript">
+    var beginDate = new Date('$date.format("yyyy-MM-dd", $content.beginDate)');
+    var endDate = new Date('$date.format("yyyy-MM-dd", $content.endDate)');
+</script>
+*#
+#if($UtilMethods.isSet($banner) == false)
+    <link linkType="component" rel="stylesheet/less" type="text/css" href="$!{s3_sitecommon}/less/widgets/widget_black_friday_banner.less">
+    #if($UtilMethods.isSet($content.jsPath))
+    <script scriptType="component" src="$content.jsPath" defer></script>
+    #else
+    <script scriptType="component" src="$!{s3_sitecommon}/js/widgets/widget_event_banner.js" defer></script>
+    #end
+    #set($banner = 1)
+#end

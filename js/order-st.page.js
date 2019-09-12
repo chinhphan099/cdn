@@ -167,6 +167,9 @@ Element.prototype.appendAfter = function (element) {
         if(!!dataResponse) {
             fCurrency = dataResponse.fCurrency;
         }
+        if(!fCurrency) {
+            return;
+        }
         const checkedItem = _q('.productRadioListItem input:checked'),
             productItem = _getClosest(checkedItem, '.productRadioListItem'),
             data = JSON.parse(checkedItem.dataset.product),
@@ -214,14 +217,14 @@ Element.prototype.appendAfter = function (element) {
         let checkQT = false;
         for (let input of inputs) {
             input.addEventListener('click', function () {
-                if(!!utils.getQueryParameter('qt') && !checkQT) {
-                    checkQT = true;
-                    return;
-                }
                 checkIsSpecialItem();
             });
 
             input.addEventListener('change', (e) => {
+                if(!!utils.getQueryParameter('qt') && !checkQT) {
+                    checkQT = true;
+                    return;
+                }
                 isClickedInput = true;
                 hidePopup(true);
                 if(!!e.target.dataset.product) {
