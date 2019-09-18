@@ -781,18 +781,18 @@
         wrapEcom.classList.add('wrap-ecom');
 
         var ecomHeading = document.createElement('h3');
-        ecomHeading.innerHTML = 'Ecommerce Information';
+        ecomHeading.innerHTML = 'Button Link';
         wrapEcom.appendChild(ecomHeading);
 
-        var proId = createInput('proId', item.proId, 'text', 'Product ID', order);
-        wrapEcom.appendChild(proId);
+        var proUrl = createInput('proUrl', item.proUrl, 'text', 'Url', order);
+        wrapEcom.appendChild(proUrl);
 
         var orSpan = document.createElement('span');
         orSpan.innerHTML = 'OR';
         wrapEcom.appendChild(orSpan);
 
-        var proUrl = createInput('proUrl', item.proUrl, 'text', 'Product Url', order);
-        wrapEcom.appendChild(proUrl);
+        var proId = createInput('proId', item.proId, 'text', 'Product ID', order);
+        wrapEcom.appendChild(proId);
 
         // Append wrap into outer ecom
         outerEcom.appendChild(wrapEcom);
