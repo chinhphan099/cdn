@@ -146,7 +146,7 @@ Element.prototype.appendAfter = function (element) {
     function getWarrantyPrice(fCurrency, taxes) {
         let wPrice = 0, wFormatPrice = false;
 
-        if(_qById('txtProductWarranty').checked) {
+        if(!!_qById('txtProductWarranty') && _qById('txtProductWarranty').checked) {
             const checkedItem = _q('.productRadioListItem input:checked'),
                 data = JSON.parse(checkedItem.dataset.product),
                 warrantyRate = [0.1, 0.2, 0.2, 0.2, 0.2, 0.3, 0.5, 0.15, 0.25, 0.35, 0.4, 0.45, 0.55, 0.6],
@@ -193,7 +193,7 @@ Element.prototype.appendAfter = function (element) {
 
             warrantyElm.classList.add('tr-warranty');
             warrantyElm.innerHTML = `
-                <td>${js_translate.warranty}</td>
+                <td>${js_translate.warranty || 'Warranty:'}</td>
                 <td>${warranty.wFormatPrice}</td>
             `;
 
@@ -243,9 +243,11 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function onChangeWarranty() {
-        _qById('txtProductWarranty').addEventListener('change', function() {
-            loadStatistical();
-        });
+        if(!!_qById('txtProductWarranty')) {
+            _qById('txtProductWarranty').addEventListener('change', function() {
+                loadStatistical();
+            });
+        }
     }
 
     // Month and Year Dropdown
