@@ -33,16 +33,15 @@ Element.prototype.appendAfter = function (element) {
             'seconds': seconds
         };
     }
-    function handleCountDown(id, endtime) {
-        const clock = document.getElementById(id),
-            minuteElm = clock.querySelector('.ex-minute'),
-            secondElm = clock.querySelector('.ex-second');
-
+    function handleCountDown(endtime) {
         function updateClock() {
             let t = timeRemaining(endtime);
             if(t.total <= 0) {
                 clearInterval(timeinterval);
             }
+
+            const minuteElm = _q('.coupon-popup').querySelector('.ex-minute'),
+                secondElm = _q('.coupon-popup').querySelector('.ex-second');
             minuteElm.innerHTML = t.minutes < 10 ? '0' + t.minutes : t.minutes;
             secondElm.innerHTML = t.seconds < 10 ? '0' + t.seconds : t.seconds;
         }
@@ -70,19 +69,13 @@ Element.prototype.appendAfter = function (element) {
         `;
         _q('.w_promo_text').insertBefore(countdownElm, document.getElementById('couponBtn'));
 
-        let checkPriceCoupOn = setInterval(function() {
-            if(_qById('couponBtn').innerHTML.indexOf('{couponPrice}') === -1) {
-                clearInterval(checkPriceCoupOn);
+        // Begin Coutdown
+        let currentTime = Date.parse(new Date()),
+            deadline = new Date(currentTime + time_in_minutes * 60 * 1000);
 
-                // Begin Coutdown
-                let currentTime = Date.parse(new Date()),
-                    deadline = new Date(currentTime + time_in_minutes * 60 * 1000);
-
-                handleCountDown('timeCount', deadline);
-                _q('.coupon-popup').style.display = 'block';
-                // utils.createCookie('isHidePopup', 'true', 1);
-            }
-        }, 50);
+        handleCountDown(deadline);
+        _q('.coupon-popup').style.display = 'block';
+        // utils.createCookie('isHidePopup', 'true', 1);
         isPopupShowing = true;
     }
     // End Count down
@@ -92,11 +85,11 @@ Element.prototype.appendAfter = function (element) {
             return;
         }
         if ((e.pageY - window.pageYOffset) <= 0) {
-            const product = _q('input[name="product"]:checked').dataset.product;
-            if (!!product) {
+            // const product = _q('input[name="product"]:checked').dataset.product;
+            // if (!!product) {
                 document.removeEventListener('mouseout', handleMouseOut);
                 generateCountDown();
-            }
+            // }
         }
     }
 
@@ -106,10 +99,10 @@ Element.prototype.appendAfter = function (element) {
         }
         window.removeEventListener('touchmove', handleTouchMove);
         mobileTimer = setTimeout(() => {
-            const product = _q('input[name="product"]:checked').dataset.product;
-            if (!!product) {
+            // const product = _q('input[name="product"]:checked').dataset.product;
+            // if (!!product) {
                 generateCountDown();
-            }
+            // }
         }, 5000);
     }
 
@@ -124,6 +117,7 @@ Element.prototype.appendAfter = function (element) {
         if(!!_qById('couponBtn')) {
             _qById('couponBtn').disabled = false;
         }
+        clearInterval(timeinterval);
         if(!!isOver) {
             clearTimeout(mobileTimer);
             clearTimeout(timedPopup);
@@ -409,6 +403,7 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function onActiveCoupon() {
+        _qById('couponBtn').classList.remove('disabled');
         _qById('couponBtn').addEventListener('click', (e) => {
             e.target.disabled = true;
             if(_q('.productRadioListItem.special_offer')) {
@@ -454,6 +449,14 @@ Element.prototype.appendAfter = function (element) {
             const couponApplyText = _q('.coupon-apply');
             if(!!couponApplyText) {
                 couponApplyText.innerHTML = couponApplyText.innerHTML.replace(/{couponPrice}/g, couponValFormat);
+            }
+
+            // New Code
+            const jsImageLoadings = _qAll('.w_exit_popup .js-img-loading');
+            if(!!jsImageLoadings) {
+                for(const jsImageLoading of jsImageLoadings) {
+                    jsImageLoading.innerText = couponValFormat;
+                }
             }
             window.additionText = window.additionText.replace(/{couponPrice}/g, couponValFormat);
 
@@ -507,10 +510,10 @@ Element.prototype.appendAfter = function (element) {
         const timer = !!utils.getQueryParameter('timed') ? Number(utils.getQueryParameter('timed')) * 1000 : null;
         if(!!timer && !!_q('.coupon-popup')) {
             timedPopup = setTimeout(function() {
-                const product = _q('input[name="product"]:checked').dataset.product;
-                if (!!product) {
+                // const product = _q('input[name="product"]:checked').dataset.product;
+                // if (!!product) {
                     generateCountDown();
-                }
+                // }
             }, timer);
         }
     }

@@ -130,7 +130,7 @@
         else {
             return false;
         }
-    };
+    }
 
     function validateInput(input) {
         if (input.attributes['required'] != undefined && input.value.trim() === '') {
@@ -156,6 +156,36 @@
         } else {
             removeInputError(input);
         }
+    }
+
+    function validateCheckbox(input) {
+        if (input.attributes['required'] != undefined) {
+            if(!input.checked) {
+                addInputError(input);
+            }
+            else {
+                removeInputError(input);
+            }
+        }
+    }
+
+    function validForm(formId) {
+        const form = document.forms[formId];
+        if (form) {
+            const inputs = form.getElementsByTagName('input');
+            if (inputs && inputs.length > 0) {
+                for (let input of inputs) {
+                    if(input.type === 'checkbox') {
+                        validateCheckbox(input);
+                    }
+                    else {
+                        validateInput(input);
+                    }
+                }
+            }
+        }
+        let isValid = _q(`#${formId} input.input-error`) ? false : true;
+        return isValid;
     }
 
     function addInputError(input) {
@@ -634,6 +664,8 @@
         validatePhoneBr: validatePhoneBr,
         maskNumber: maskNumber,
         validateInput: validateInput,
+        validateCheckbox: validateCheckbox,
+        validForm: validForm,
         addInputError: addInputError,
         removeInputError: removeInputError,
         resetForm: resetForm,
