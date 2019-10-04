@@ -506,6 +506,15 @@ Element.prototype.appendAfter = function (element) {
         }
     }
 
+    function onFocusCreditCard() {
+        // For order-v3
+        if(_q('.step-4-wrap')) {
+            _qById('creditcard_creditcardnumber').addEventListener('focus', () => {
+                _q('.step-4-wrap').classList.remove('hidden');
+            }, false);
+        }
+    }
+
     function popupTimed() {
         const timer = !!utils.getQueryParameter('timed') ? Number(utils.getQueryParameter('timed')) * 1000 : null;
         if(!!timer && !!_q('.coupon-popup')) {
@@ -530,6 +539,7 @@ Element.prototype.appendAfter = function (element) {
         onClickInputSelect();
         handleExitPopupEvents();
         changePlaceholderInput();
+        onFocusCreditCard();
     }
 
     function initial() {
