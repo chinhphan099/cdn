@@ -527,9 +527,16 @@ Element.prototype.appendAfter = function (element) {
         }
     }
 
+    function updateCurrencyPrice(data) {
+        if(!!_q('.discount-text .price')) {
+            _q('.discount-text .price').innerText = data.fCurrency.replace('######', _q('.discount-text .price').innerText);
+        }
+    }
+
     function waitingOrderData() {
         utils.events.on('bindOrderPage', loadStatistical);
         utils.events.on('bindOrderPage', implementCoupon);
+        utils.events.on('bindOrderPage', updateCurrencyPrice);
     }
 
     function listener() {
