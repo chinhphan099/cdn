@@ -12,15 +12,16 @@
     function replaceUserString() {
         //Product List Widget
         if (_qById('js-widget-products')) {
+            const iconPriceLoading = '';
             const unitDiscountRateLables = _qAll('.js-unitDiscountRate');
             if (unitDiscountRateLables) {
                 for(let elem of unitDiscountRateLables) {
-                    elem.innerHTML = elem.innerHTML.replace(/{UnitDiscountRate}/gi, '<span class="spanUnitDiscountRate">$00.00</span>')
+                    elem.innerHTML = elem.innerHTML.replace(/{UnitDiscountRate}/gi, `<span class="spanUnitDiscountRate">${iconPriceLoading}</span>`)
                                             .replace(/{UnitFullRate}/gi, '<span class="spanUnitFullRate"></span>')
-                                            .replace(/{DiscountedPrice}/gi, '<span class="discountedPrice"></span>')
-                                            .replace(/{SavePrice}/gi, '<span class="savePrice"></span>')
+                                            .replace(/{DiscountedPrice}/gi, `<span class="discountedPrice">${iconPriceLoading}</span>`)
+                                            .replace(/{SavePrice}/gi, `<span class="savePrice">${iconPriceLoading}</span>`)
                                             .replace(/{ShippingFee}/gi, '<span class="jsShippingFee"></span>')
-                                            .replace(/{FullPrice}/gi, '<del class="fullPrice"></del>');
+                                            .replace(/{FullPrice}/gi, `<del class="fullPrice">${iconPriceLoading}</del>`);
                 }
             }
         }
@@ -35,107 +36,145 @@
             isTest: utils.getQueryParameter('isCardTest') ? true : false
         });
 
+        // eCRM.Campaign.getProducts(function (data) {
+        //     bindProducts(data);
+        // });
+
+        if(utils.checkLocalPrices(siteSetting.webKey)) {
+            const strPrices = utils.localStorage().get(siteSetting.webKey);
+            if(strPrices) {
+                const data = JSON.parse(strPrices);
+                console.log('get prices from LS');
+                bindProducts(data);
+            }
+        } else {
+            eCRM.Campaign.getProducts(function (data) {
+                bindProducts(data);
+                //store prices in local storage
+                data.timestamp = new Date().toISOString();
+                utils.localStorage().set(siteSetting.webKey, JSON.stringify(data));
+            });
+        }
+    }
+    initWidgetProducts();
+
+    function bindProducts(data) {
         const countryCodeIndex = utils.localStorage().get('countryCodeIndex');
+        if (!(data instanceof Error) && data.prices.length > 0) {
+            console.log(data);
+            Array.prototype.slice.call(data.prices).forEach(product => {
+                try {
+                    const radio = _qById('product_' + product.productId);
+                    if (radio) {
+                        radio.setAttribute('data-product', JSON.stringify(product));
+                        radio.onchange = handleProductChange;
 
-        eCRM.Campaign.getProducts(function (data) {
-            if (!(data instanceof Error) && data.prices.length > 0) {
-                console.log(data);
-                Array.prototype.slice.call(data.prices).forEach(product => {
-                    try {
-                        const radio = _qById('product_' + product.productId);
-                        if (radio) {
-                            radio.setAttribute('data-product', JSON.stringify(product));
-                            radio.onchange = handleProductChange;
+                        const elemShippingFees = _qAll('label[for="' + 'product_' + product.productId + '"] span.jsShippingFee');
+                        const elemUnitDiscountRate = _qAll('label[for="' + 'product_' + product.productId + '"] span.spanUnitDiscountRate');
+                        const elemUnitFullRate = _qAll('label[for="' + 'product_' + product.productId + '"] span.spanUnitFullRate');
+                        const elemDiscountedPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .discountedPrice');
+                        const elemFullPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .fullPrice');
+                        const elemSavePrice = _qAll('label[for="' + 'product_' + product.productId + '"] .savePrice');
+                        const fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
+                        const pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
+                        const fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
 
-                            const elemShippingFees = _qAll('label[for="' + 'product_' + product.productId + '"] span.jsShippingFee');
-                            const elemUnitDiscountRate = _qAll('label[for="' + 'product_' + product.productId + '"] span.spanUnitDiscountRate');
-                            const elemUnitFullRate = _qAll('label[for="' + 'product_' + product.productId + '"] span.spanUnitFullRate');
-                            const elemDiscountedPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .discountedPrice');
-                            const elemFullPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .fullPrice');
-                            const elemSavePrice = _qAll('label[for="' + 'product_' + product.productId + '"] .savePrice');
-                            const fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
-                            const pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
-                            const fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
+                        // Hidden all image loading
+                        // productRadioListItem
+                        // querySelector('.js-img-loading').classList.add('hidden');
+                        const imgLoadings = _qAll('.productRadioListItem .js-img-loading');
+                        for(const imgLoading of imgLoadings) {
+                            imgLoading.classList.add('hidden');
+                        }
 
-                            if (elemShippingFees) {
-                                for(let elemShippingFee of elemShippingFees) {
-                                    if(product.shippings[0].price !== 0) {
-                                        if(!window.js_translate.shippingFee) {
-                                            window.js_translate.shippingFee = '{price} Shipping';
-                                        }
-                                        elemShippingFee.innerHTML = window.js_translate.shippingFee.replace('{price}', product.shippings[0].formattedPrice);
+                        if (elemShippingFees) {
+                            for(let elemShippingFee of elemShippingFees) {
+                                let shippingFeeText = '';
+                                if(product.shippings[0].price !== 0) {
+                                    if(!window.js_translate.shippingFee) {
+                                        window.js_translate.shippingFee = '{price} Shipping';
                                     }
-                                    else {
-                                        elemShippingFee.innerHTML = !!window.js_translate.FREESHIP ? window.js_translate.FREESHIP : 'FREE SHIPPING';
-                                    }
+                                    shippingFeeText = window.js_translate.shippingFee.replace('{price}', product.shippings[0].formattedPrice);
                                 }
-                            }
-                            if (elemUnitDiscountRate) {
-                                for(let unitDiscountRate of elemUnitDiscountRate) {
-                                    unitDiscountRate.innerHTML = product.productPrices.UnitDiscountRate.FormattedValue;
+                                else {
+                                    shippingFeeText = !!window.js_translate.FREESHIP ? window.js_translate.FREESHIP : 'FREE SHIPPING';
                                 }
-                            }
-                            if (elemUnitFullRate) {
-                                for(let unitFullRate of elemUnitFullRate) {
-                                    if(typeof product.productPrices.UnitFullRetailPrice !== 'undefined') {
-                                        unitFullRate.innerHTML = product.productPrices.UnitFullRetailPrice.FormattedValue;
-                                    }
-                                    else {
-                                        unitFullRate.innerHTML = product.productPrices.FullRetailPrice.FormattedValue;
-                                    }
-                                }
-                            }
-                            if (elemDiscountedPrice) {
-                                for(let discountedPrice of elemDiscountedPrice) {
-                                    discountedPrice.innerHTML = product.productPrices.DiscountedPrice.FormattedValue;
-                                }
-                            }
-                            if (elemFullPrice) {
-                                for(let fullPrice of elemFullPrice) {
-                                    fullPrice.innerHTML = product.productPrices.FullRetailPrice.FormattedValue;
-                                }
-                            }
-                            if (elemSavePrice) {
-                                for(let savePrice of elemSavePrice) {
-                                    let savePriceValue = (product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value).toFixed(2);
-
-                                    savePrice.innerHTML = fCurrency.replace('######', savePriceValue);
-                                }
+                                let shippingFeeTextNode = document.createTextNode(shippingFeeText);
+                                elemShippingFee.appendChild(shippingFeeTextNode);
                             }
                         }
-                    } catch (err) {
-                        console.log(err);
-                    }
-                });
+                        if (elemUnitDiscountRate) {
+                            for(let unitDiscountRate of elemUnitDiscountRate) {
+                                let unitDiscountRateTextNode = document.createTextNode(product.productPrices.UnitDiscountRate.FormattedValue);
+                                unitDiscountRate.appendChild(unitDiscountRateTextNode);
+                            }
+                        }
+                        if (elemUnitFullRate) {
+                            for(let unitFullRate of elemUnitFullRate) {
+                                let unitFullRateText = '';
+                                if(typeof product.productPrices.UnitFullRetailPrice !== 'undefined') {
+                                    unitFullRateText = product.productPrices.UnitFullRetailPrice.FormattedValue;
+                                }
+                                else {
+                                    unitFullRateText = product.productPrices.FullRetailPrice.FormattedValue;
+                                }
 
-                siteSetting.countryCode = data.location.countryCode;
-
-                //emit events
-                try {
-                    const productInfo = getDefaultSelectedProduct();
-                    if(!!productInfo && productInfo.currencyCode === '') {
-                        productInfo.currencyCode = data.location.currencyCode;
+                                let unitFullRateTextNode = document.createTextNode(unitFullRateText);
+                                unitFullRate.appendChild(unitFullRateTextNode);
+                            }
+                        }
+                        if (elemDiscountedPrice) {
+                            for(let discountedPrice of elemDiscountedPrice) {
+                                let discountedPriceTextNode = document.createTextNode(product.productPrices.DiscountedPrice.FormattedValue);
+                                discountedPrice.appendChild(discountedPriceTextNode);
+                            }
+                        }
+                        if (elemFullPrice) {
+                            for(let fullPrice of elemFullPrice) {
+                                let fullPriceTextNode = document.createTextNode(product.productPrices.FullRetailPrice.FormattedValue);
+                                fullPrice.appendChild(fullPriceTextNode);
+                            }
+                        }
+                        if (elemSavePrice) {
+                            for(let savePrice of elemSavePrice) {
+                                let savePriceValue = (product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value).toFixed(2);
+                                let savePriceText = fCurrency.replace('######', savePriceValue);
+                                let savePriceTextNode = document.createTextNode(savePriceText);
+                                savePrice.appendChild(savePriceTextNode);
+                            }
+                        }
                     }
-                    utils.events.emit('bindProductDiscountInfo', productInfo);
-                    if(!countryCodeIndex) {
-                        utils.localStorage().set('countryCode', data.location.countryCode);
-                        utils.events.emit('triggerAddressForm', data.location.countryCode);
-                    }
-                    else {
-                        utils.localStorage().set('countryCode', countryCodeIndex);
-                    }
-                    utils.localStorage().set('currencyCode', productInfo.currencyCode);
-                    utils.events.emit('triggerProductBannerSidebar', productInfo);
-                    utils.events.emit('triggerWarranty', getSelectedProduct());
-                    utils.events.emit('bindOrderPage', productInfo);
-                    utils.events.emit('triggerInstallmentPayment', productInfo);
                 } catch (err) {
                     console.log(err);
                 }
+            });
+
+            siteSetting.countryCode = data.location.countryCode;
+
+            //emit events
+            try {
+                const productInfo = getDefaultSelectedProduct();
+                if(!!productInfo && productInfo.currencyCode === '') {
+                    productInfo.currencyCode = data.location.currencyCode;
+                }
+                utils.events.emit('bindProductDiscountInfo', productInfo);
+                if(!countryCodeIndex) {
+                    utils.localStorage().set('countryCode', data.location.countryCode);
+                    utils.events.emit('triggerAddressForm', data.location.countryCode);
+                }
+                else {
+                    utils.localStorage().set('countryCode', countryCodeIndex);
+                }
+                utils.localStorage().set('currencyCode', productInfo.currencyCode);
+                utils.events.emit('triggerProductBannerSidebar', productInfo);
+                utils.events.emit('triggerWarranty', getSelectedProduct());
+                utils.events.emit('bindOrderPage', productInfo);
+                utils.events.emit('triggerInstallmentPayment', productInfo);
+            } catch (err) {
+                console.log(err);
             }
-        });
+        }
     }
-    initWidgetProducts();
 
     function handleProductChange() {
         const productInfo = getSelectedProduct();
