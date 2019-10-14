@@ -75,7 +75,7 @@ Element.prototype.appendAfter = function (element) {
 
         handleCountDown(deadline);
         _q('.coupon-popup').style.display = 'block';
-        // utils.createCookie('isHidePopup', 'true', 1);
+        utils.createCookie('isHidePopup', 'true', 1);
         isPopupShowing = true;
     }
     // End Count down
@@ -432,7 +432,7 @@ Element.prototype.appendAfter = function (element) {
 
     function implementCoupon(data) {
         fCurrency = data.fCurrency;
-        if(!!window.couponCodeId && utils.getQueryParameter('iep') !== '0' && !!_q('.coupon-popup')) {
+        if(!!window.couponCodeId && utils.getQueryParameter('iep') === 'true' && !!_q('.coupon-popup')) {
             if(!window.couponValue.trim()) {
                 return;
             }
@@ -473,7 +473,7 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function handleExitPopupEvents() {
-        if(utils.getQueryParameter('iep') === '0' || !_q('.coupon-popup') || !!utils.readCookie('isHidePopup')) {
+        if(utils.getQueryParameter('iep') !== 'true' || !_q('.coupon-popup') || !!utils.readCookie('isHidePopup')) {
             return;
         }
 

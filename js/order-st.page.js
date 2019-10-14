@@ -363,6 +363,9 @@ Element.prototype.appendAfter = function (element) {
             fullPrice: productInfo.productPrices.FullRetailPrice.FormattedValue,
             fullPriceValue: productInfo.productPrices.FullRetailPrice.Value
         });
+
+        // Warranty
+        utils.events.emit('triggerWarranty', productInfo);
     }
 
     function getVisibleItems() {
