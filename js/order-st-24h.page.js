@@ -547,7 +547,12 @@ Element.prototype.appendAfter = function (element) {
         onChangeMonth();
         onChangeYear();
         onClickInputSelect();
-        handleExitPopupEvents();
+        if(utils.getQueryParameter('loader') === '1') {
+            utils.events.on('bindDoneLoader', handleExitPopupEvents);
+        }
+        else {
+            handleExitPopupEvents();
+        }
         changePlaceholderInput();
         onFocusCreditCard();
     }
