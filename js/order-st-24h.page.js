@@ -265,7 +265,7 @@ Element.prototype.appendAfter = function (element) {
 
         for(let i = 0, n = opts.length; i < n; i++) {
             if(_qById('yearddl').value === curYear.toString()) {
-                if(Number(opts[i].value) <= curMonth) {
+                if(Number(opts[i].value) < curMonth) {
                     opts[i].disabled = true;
                     opts[i].selected = false;
                 }
