@@ -36,8 +36,13 @@ Element.prototype.appendAfter = function (element) {
     function handleCountDown(endtime) {
         function updateClock() {
             let t = timeRemaining(endtime);
-            if(t.total <= 0) {
+            if(t.total < 0) {
+                let timeCountElm = _q('.coupon-popup #timeCount');
+                if(!!(timeCountElm.offsetWidth || timeCountElm.offsetHeight || timeCountElm.getClientRects().length)) {
+                    _qById('close-expopup').click();
+                }
                 clearInterval(timeinterval);
+                return;
             }
 
             const minuteElm = _q('.coupon-popup').querySelector('.ex-minute'),
@@ -75,7 +80,6 @@ Element.prototype.appendAfter = function (element) {
 
         handleCountDown(deadline);
         _q('.coupon-popup').style.display = 'block';
-        // utils.createCookie('isHidePopup', 'true', 1);
         isPopupShowing = true;
     }
     // End Count down
@@ -473,7 +477,7 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function handleExitPopupEvents() {
-        if(utils.getQueryParameter('iep') !== 'true' || !_q('.coupon-popup') || !!utils.readCookie('isHidePopup')) {
+        if(utils.getQueryParameter('iep') !== 'true' || !_q('.coupon-popup')) {
             return;
         }
 
@@ -568,7 +572,7 @@ Element.prototype.appendAfter = function (element) {
     }
 
     window.addEventListener('load', () => {
-        if(!utils.readCookie('isHidePopup') && !isClickedInput) {
+        if(!isClickedInput) {
             popupTimed();
         }
     });

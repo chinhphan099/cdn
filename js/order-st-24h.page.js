@@ -36,8 +36,13 @@ Element.prototype.appendAfter = function (element) {
     function handleCountDown(endtime) {
         function updateClock() {
             let t = timeRemaining(endtime);
-            if(t.total <= 0) {
+            if(t.total < 0) {
+                let timeCountElm = _q('.coupon-popup #timeCount');
+                if(!!(timeCountElm.offsetWidth || timeCountElm.offsetHeight || timeCountElm.getClientRects().length)) {
+                    _qById('close-expopup').click();
+                }
                 clearInterval(timeinterval);
+                return;
             }
 
             const minuteElm = _q('.coupon-popup').querySelector('.ex-minute'),
