@@ -1,20 +1,20 @@
 (function (utils) {
-    if (!utils) {
+    if(!utils) {
         console.log('modules is not found');
         return;
     }
 
-    if (!siteSetting) {
+    if(!siteSetting) {
         console.log('window.siteSetting object is not found');
         return;
     }
 
     function replaceUserString() {
         //Product List Widget
-        if (_qById('js-widget-products')) {
+        if(_qById('js-widget-products')) {
             const iconPriceLoading = '';
             const unitDiscountRateLables = _qAll('.js-unitDiscountRate');
-            if (unitDiscountRateLables) {
+            if(unitDiscountRateLables) {
                 for(let elem of unitDiscountRateLables) {
                     elem.innerHTML = elem.innerHTML.replace(/{UnitDiscountRate}/gi, `<span class="spanUnitDiscountRate">${iconPriceLoading}</span>`)
                                             .replace(/{UnitFullRate}/gi, '<span class="spanUnitFullRate"></span>')
@@ -40,32 +40,63 @@
         //     bindProducts(data);
         // });
 
-        if(utils.checkLocalPrices(siteSetting.webKey)) {
-            const strPrices = utils.localStorage().get(siteSetting.webKey);
-            if(strPrices) {
-                const data = JSON.parse(strPrices);
-                console.log('get prices from LS');
-                bindProducts(data);
+        if(utils.checkCamp(siteSetting.webKey)) {
+            let campProducts = localStorage.getItem('campproducts');
+            if(campProducts) {
+                campProducts = JSON.parse(campProducts);
+                const camps = campProducts.camps.filter(item => {
+                    return item[siteSetting.webKey];
+                });
+
+                if(camps.length > 0) {
+                    console.log('get prices from LS');
+                    bindProducts(camps[0][siteSetting.webKey]);
+                }
             }
         } else {
             eCRM.Campaign.getProducts(function (data) {
                 bindProducts(data);
-                //store prices in local storage
-                data.timestamp = new Date().toISOString();
-                utils.localStorage().set(siteSetting.webKey, JSON.stringify(data));
+
+                //store camp in local storage
+                let campProducts = localStorage.getItem('campproducts');
+                if(campProducts) {
+                    campProducts = JSON.parse(campProducts);
+                } else {
+                    campProducts = {
+                        camps: []
+                    }
+                }
+
+                if(typeof data.prices !== 'undefined') {
+                    data.timestamp = new Date().toISOString();
+                    const camps = campProducts.camps.filter(item => {
+                        return item[siteSetting.webKey];
+                    });
+
+                    let camp = {};
+                    if(camps.length > 0) {
+                        camp = camps[0];
+                        camp[siteSetting.webKey] = data;
+                    } else {
+                        camp[siteSetting.webKey] = data;
+                        campProducts.camps.push(camp);
+                    }
+
+                    localStorage.setItem('campproducts', JSON.stringify(campProducts));
+                }
             });
         }
     }
     initWidgetProducts();
 
     function bindProducts(data) {
+        console.log(data);
         const countryCodeIndex = utils.localStorage().get('countryCodeIndex');
-        if (!(data instanceof Error) && data.prices.length > 0) {
-            console.log(data);
+        if(!(data instanceof Error) && data.prices.length > 0) {
             Array.prototype.slice.call(data.prices).forEach(product => {
                 try {
                     const radio = _qById('product_' + product.productId);
-                    if (radio) {
+                    if(radio) {
                         radio.setAttribute('data-product', JSON.stringify(product));
                         radio.onchange = handleProductChange;
 
@@ -73,6 +104,7 @@
                         const elemUnitDiscountRate = _qAll('label[for="' + 'product_' + product.productId + '"] span.spanUnitDiscountRate');
                         const elemUnitFullRate = _qAll('label[for="' + 'product_' + product.productId + '"] span.spanUnitFullRate');
                         const elemDiscountedPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .discountedPrice');
+                        const elemTotalDiscountPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .spanTotalDiscountPriceElm');
                         const elemFullPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .fullPrice');
                         const elemSavePrice = _qAll('label[for="' + 'product_' + product.productId + '"] .savePrice');
                         const fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
@@ -87,7 +119,7 @@
                             imgLoading.classList.add('hidden');
                         }
 
-                        if (elemShippingFees) {
+                        if(elemShippingFees) {
                             for(let elemShippingFee of elemShippingFees) {
                                 let shippingFeeText = '';
                                 if(product.shippings[0].price !== 0) {
@@ -103,13 +135,13 @@
                                 elemShippingFee.appendChild(shippingFeeTextNode);
                             }
                         }
-                        if (elemUnitDiscountRate) {
+                        if(elemUnitDiscountRate) {
                             for(let unitDiscountRate of elemUnitDiscountRate) {
                                 let unitDiscountRateTextNode = document.createTextNode(product.productPrices.UnitDiscountRate.FormattedValue);
                                 unitDiscountRate.appendChild(unitDiscountRateTextNode);
                             }
                         }
-                        if (elemUnitFullRate) {
+                        if(elemUnitFullRate) {
                             for(let unitFullRate of elemUnitFullRate) {
                                 let unitFullRateText = '';
                                 if(typeof product.productPrices.UnitFullRetailPrice !== 'undefined') {
@@ -123,19 +155,27 @@
                                 unitFullRate.appendChild(unitFullRateTextNode);
                             }
                         }
-                        if (elemDiscountedPrice) {
+                        if(elemDiscountedPrice) {
                             for(let discountedPrice of elemDiscountedPrice) {
                                 let discountedPriceTextNode = document.createTextNode(product.productPrices.DiscountedPrice.FormattedValue);
                                 discountedPrice.appendChild(discountedPriceTextNode);
                             }
                         }
-                        if (elemFullPrice) {
+                        if(elemTotalDiscountPrice) {
+                            for(let totalDiscountPrice of elemTotalDiscountPrice) {
+                                let totalDiscountPriceValue = (product.productPrices.DiscountedPrice.Value + product.shippings[0].price).toFixed(2);
+                                let totalDiscountPriceText = fCurrency.replace('######', totalDiscountPriceValue);
+                                let totalDiscountPriceTextNode = document.createTextNode(totalDiscountPriceText);
+                                totalDiscountPrice.appendChild(totalDiscountPriceTextNode);
+                            }
+                        }
+                        if(elemFullPrice) {
                             for(let fullPrice of elemFullPrice) {
                                 let fullPriceTextNode = document.createTextNode(product.productPrices.FullRetailPrice.FormattedValue);
                                 fullPrice.appendChild(fullPriceTextNode);
                             }
                         }
-                        if (elemSavePrice) {
+                        if(elemSavePrice) {
                             for(let savePrice of elemSavePrice) {
                                 let savePriceValue = (product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value).toFixed(2);
                                 let savePriceText = fCurrency.replace('######', savePriceValue);
@@ -170,6 +210,7 @@
                 utils.events.emit('triggerWarranty', getSelectedProduct());
                 utils.events.emit('bindOrderPage', productInfo);
                 utils.events.emit('triggerInstallmentPayment', productInfo);
+                utils.events.emit('triggerQuantity', data);
             } catch (err) {
                 console.log(err);
             }
@@ -189,7 +230,7 @@
 
     function getSelectedProduct() {
         const product = _q('input[name="product"]:checked').dataset.product;
-        if (product) {
+        if(product) {
             return JSON.parse(product);
         } else {
             return null;
@@ -205,10 +246,10 @@
             const productId = _qById('hdfSelectedProduct').value;
             const product = JSON.parse(_qById('product_' + productId).dataset.product);
             let priceShipping = '', shippingValue = 0;
-            if (product.shippings.length > 0) {
+            if(product.shippings.length > 0) {
                 var shipping = product.shippings[0];
-                if (shipping.price == 0) {
-                    if (window.js_translate && window.js_translate.free) {
+                if(shipping.price == 0) {
+                    if(window.js_translate && window.js_translate.free) {
                         priceShipping = window.js_translate.free;
                     } else {
                         priceShipping = 'free';
@@ -218,7 +259,7 @@
                     shippingValue = shipping.price;
                 }
             } else {
-                if (window.js_translate && window.js_translate.free) {
+                if(window.js_translate && window.js_translate.free) {
                     priceShipping = window.js_translate.free;
                 } else {
                     priceShipping = 'free';
@@ -248,24 +289,24 @@
 
     // Product list Category ----------------------------------------------------------------------------------------
     function getClosest(elem, selector) {
-        if (!Element.prototype.matches) {
+        if(!Element.prototype.matches) {
             Element.prototype.matches =
                 Element.prototype.matchesSelector ||
                 Element.prototype.mozMatchesSelector ||
                 Element.prototype.msMatchesSelector ||
                 Element.prototype.oMatchesSelector ||
                 Element.prototype.webkitMatchesSelector ||
-                function(s) {
+                function (s) {
                     let matches = (this.document || this.ownerDocument).querySelectorAll(s),
                         i = matches.length;
-                    while (--i >= 0 && matches.item(i) !== this) {}
+                    while (--i >= 0 && matches.item(i) !== this) { }
                     return i > -1;
                 }
         }
 
         // Get the closest matching element
-        for ( ; elem && elem !== document; elem = elem.parentNode ) {
-            if (elem.matches(selector)) {
+        for(; elem && elem !== document; elem = elem.parentNode) {
+            if(elem.matches(selector)) {
                 return elem;
             }
         }
@@ -277,12 +318,12 @@
         var qSelector = _qAll(selector);
 
         return {
-            addClass: function(className) {
+            addClass: function (className) {
                 for(let elm of qSelector) {
                     elm.classList.add(className);
                 }
             },
-            removeClass: function(className) {
+            removeClass: function (className) {
                 for(let elm of qSelector) {
                     elm.classList.remove(className);
                 }
@@ -371,7 +412,7 @@
             if(!!waitTime) {
                 clearTimeout(waitTime);
             }
-            waitTime = setTimeout(function() {
+            waitTime = setTimeout(function () {
                 saveActiveTabIndex();
             }, 3000);
         };
@@ -437,16 +478,16 @@
         const listener = () => {
             for(let tabItem of tabItems) {
                 if(!!titleElm) {
-                    tabItem.addEventListener('mouseenter', function() {
+                    tabItem.addEventListener('mouseenter', function () {
                         titleElm.innerHTML = tabItem.dataset.replacetext;
                     }, false);
 
-                    tabItem.addEventListener('mouseleave', function() {
+                    tabItem.addEventListener('mouseleave', function () {
                         titleElm.innerHTML = activeText;
                     }, false);
                 }
 
-                tabItem.addEventListener('click', function() {
+                tabItem.addEventListener('click', function () {
                     // Update Text
                     if(!!titleElm) {
                         activeText = tabItem.dataset.replacetext;
@@ -464,7 +505,7 @@
             }
 
             if(!!_qById('btn-yes-exit-popup')) {
-                _qById('btn-yes-exit-popup').addEventListener('click', function() {
+                _qById('btn-yes-exit-popup').addEventListener('click', function () {
                     indexItem = 0;
                     init(true);
                 }, false);
