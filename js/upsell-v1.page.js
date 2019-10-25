@@ -1,6 +1,4 @@
 (function (utils) {
-    console.log('upsell.page.js');
-
     if (!utils) {
         console.log('modules is not found');
         return;
@@ -8,7 +6,7 @@
 
     window.upsell_productindex = 0;
 
-    let upsell = {
+    window.upsell = {
         orderInfo: JSON.parse(utils.localStorage().get('orderInfo')),
         products: [],
         mainWebKey: siteSetting.webKey,
@@ -118,7 +116,6 @@
         if (location.href.split('special-offer-', 2).length > 1) {
             upParam = 'up_' + location.href.split('special-offer-', 2)[1].split('.html', 1) + '=1';
         }
-
         return upParam;
     }
 

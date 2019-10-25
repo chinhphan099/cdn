@@ -9,6 +9,8 @@
         return;
     }
 
+    window.isNotCallApiUpsell = true;
+
     function replaceUserString() {
         //Product List Widget
         if(_qById('js-widget-products')) {
