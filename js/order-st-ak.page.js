@@ -546,6 +546,18 @@ Element.prototype.appendAfter = function (element) {
         utils.events.on('bindOrderPage', updateCurrencyPrice);
     }
 
+    function hiddenElementByParamUrl(){
+        //Hidden CountDown Timer in coupon box
+        if(utils.getQueryParameter('timer') === "0"){
+            _q('body').classList.add('timer-hidden');
+        }
+
+        //Hidden Comment in Banner
+        if(utils.getQueryParameter('comment') === "0"){
+            _q('body').classList.add('comment-hidden');
+        }
+    }
+
     function listener() {
         onChangeWarranty();
         onChangeMonth();
@@ -569,6 +581,7 @@ Element.prototype.appendAfter = function (element) {
         setExpirationValue();
         checkIsSpecialItem();
         listener();
+        hiddenElementByParamUrl();
     }
 
     window.addEventListener('load', () => {

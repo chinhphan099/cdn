@@ -561,6 +561,18 @@ Element.prototype.appendAfter = function (element) {
         onFocusCreditCard();
     }
 
+    function hiddenElementByParamUrl(){
+        //Hidden CountDown Timer in coupon box
+        if(utils.getQueryParameter('timer') === "0"){
+            _q('body').classList.add('timer-hidden');
+        }
+
+        //Hidden Comment in Banner
+        if(utils.getQueryParameter('comment') === "0"){
+            _q('body').classList.add('comment-hidden');
+        }
+    }
+
     function initial() {
         waitingOrderData();
         adjustLayout();
@@ -569,6 +581,7 @@ Element.prototype.appendAfter = function (element) {
         setExpirationValue();
         checkIsSpecialItem();
         listener();
+        hiddenElementByParamUrl();
     }
 
     window.addEventListener('load', () => {

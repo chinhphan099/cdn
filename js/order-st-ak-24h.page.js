@@ -437,7 +437,7 @@ Element.prototype.appendAfter = function (element) {
 
     function implementCoupon(data) {
         fCurrency = data.fCurrency;
-        if(!!window.couponCodeId && utils.getQueryParameter('iep') === 'true' && !!_q('.coupon-popup')) {
+        if(!!window.couponCodeId && utils.getQueryParameter('iep') !== '0' && !!_q('.coupon-popup')) {
             if(!window.couponValue.trim()) {
                 return;
             }
@@ -478,7 +478,7 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function handleExitPopupEvents() {
-        if(utils.getQueryParameter('iep') !== 'true' || !_q('.coupon-popup') || !!utils.readCookie('isHidePopup')) {
+        if(utils.getQueryParameter('iep') === '0' || !_q('.coupon-popup') || !!utils.readCookie('isHidePopup')) {
             return;
         }
 
