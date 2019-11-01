@@ -4,7 +4,7 @@
     }
 
     const prodArr = [];
-    const productNameText = _q('.statistical .td-name').innerText || '';
+    const productNameText = !!_q('.statistical .td-name') && _q('.statistical .td-name').innerText || '';
     function implementSelectedProduct(data) {
         window.upsell_productindex = prodArr.indexOf(data.productId);
 

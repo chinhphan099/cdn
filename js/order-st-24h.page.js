@@ -546,6 +546,7 @@ Element.prototype.appendAfter = function (element) {
         utils.events.on('bindOrderPage', implementCoupon);
         utils.events.on('bindOrderPage', updateCurrencyPrice);
     }
+    waitingOrderData();
 
     function hiddenElementByParamUrl(){
         //Hidden CountDown Timer in coupon box
@@ -575,7 +576,6 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function initial() {
-        waitingOrderData();
         adjustLayout();
         implementYearDropdown();
         implementMonthDropdown();

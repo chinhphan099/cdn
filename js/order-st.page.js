@@ -545,6 +545,7 @@ Element.prototype.appendAfter = function (element) {
         utils.events.on('bindOrderPage', implementCoupon);
         utils.events.on('bindOrderPage', updateCurrencyPrice);
     }
+    waitingOrderData();
 
     function listener() {
         onChangeWarranty();
@@ -574,7 +575,6 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function initial() {
-        waitingOrderData();
         adjustLayout();
         implementYearDropdown();
         implementMonthDropdown();
