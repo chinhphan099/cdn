@@ -269,31 +269,51 @@ Element.prototype.appendAfter = function (element) {
         const d = new Date(),
             curYear = d.getFullYear(),
             curMonth = d.getMonth() + 1,
-            opts = _qAll('#monthddl option');
+            monthDdl = _q('#monthddl');
 
-        for(let i = 0, n = opts.length; i < n; i++) {
-            if(_qById('yearddl').value === curYear.toString()) {
-                if(Number(opts[i].value) < curMonth) {
-                    opts[i].disabled = true;
-                    opts[i].selected = false;
-                }
-            }
-            else {
-                opts[i].disabled = false;
-            }
+        if(_qById('yearddl').value === curYear.toString() && Number(monthDdl.value) < curMonth) {
+            monthDdl.value = curMonth;
         }
     }
     function setExpirationValue() {
         _qById('creditcard_expirydate').value = _qById('monthddl').value + '/' + _qById('yearddl').value.toString().substr(2);
+        console.log(_qById('creditcard_expirydate').value);
     }
+    let tmpYear = 0, tmpMonth = 0;
     function onChangeMonth() {
         _qById('monthddl').addEventListener('change', function() {
+            tmpMonth = 0;
+            const currentMonth = new Date().getMonth() + 1,
+                currentYear = new Date().getFullYear(),
+                monthSelected = Number(_qById('monthddl').value),
+                yearSelected = Number(_qById('yearddl').value);
+
+            if(monthSelected < currentMonth && currentYear === yearSelected) {
+                tmpYear = yearSelected;
+                _qById('yearddl').value = yearSelected + 1;
+            }
+            if(monthSelected >= currentMonth && !!tmpYear) {
+                _qById('yearddl').value = tmpYear;
+            }
             setExpirationValue();
         }, false);
     }
     function onChangeYear() {
         _qById('yearddl').addEventListener('change', function() {
-            implementMonthDropdown();
+            tmpYear = 0;
+            /*const currentMonth = new Date().getMonth() + 1,
+                currentYear = new Date().getFullYear(),
+                monthSelected = _qById('monthddl').value,
+                yearSelected = Number(_qById('yearddl').value);
+
+            if(yearSelected === currentYear && Number(monthSelected) < currentMonth) {
+                tmpMonth = monthSelected;
+                _qById('monthddl').value = currentMonth;
+            }
+            if(yearSelected > currentYear && !!tmpMonth) {
+                _qById('monthddl').value = tmpMonth;
+            }*/
+            implementMonthDropdown(); // Comment this row if open above comment
             setExpirationValue();
         }, false);
     }
