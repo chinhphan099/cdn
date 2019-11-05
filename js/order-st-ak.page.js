@@ -171,15 +171,19 @@ Element.prototype.appendAfter = function (element) {
         const checkedItem = _q('.productRadioListItem input:checked'),
             productItem = _getClosest(checkedItem, '.productRadioListItem'),
             data = JSON.parse(checkedItem.dataset.product),
-            shippingFee = data.shippings[0].formattedPrice,
             taxes = data.productPrices.Surcharge.FormattedValue;
+        let shippingFee = data.shippings[0].formattedPrice;
 
         const warranty = getWarrantyPrice(fCurrency, taxes),
             grandTotal = (data.shippings[0].price + data.productPrices.DiscountedPrice.Value + warranty.wPrice).toFixed(2);
 
+        if(data.shippings[0].price === 0 && !!js_translate.freeCap) {
+            shippingFee = `<b>${js_translate.freeCap}</b>`;
+        }
+
         _q('.statistical .td-name').innerHTML = productNameText + ' ' + productItem.querySelector('.product-name p').innerHTML;
         _q('.statistical .td-price').innerText = utils.formatPrice(data.productPrices.DiscountedPrice.Value.toFixed(2), fCurrency, taxes);
-        _q('.statistical .td-shipping').innerText = shippingFee;
+        _q('.statistical .td-shipping').innerHTML = shippingFee;
 
         if(!!_q('.tr-warranty')) {
             let trWarranty = _q('.tr-warranty');
@@ -549,12 +553,12 @@ Element.prototype.appendAfter = function (element) {
 
     function hiddenElementByParamUrl(){
         //Hidden CountDown Timer in coupon box
-        if(utils.getQueryParameter('timer') === "0"){
+        if(utils.getQueryParameter('timer') === '0') {
             _q('body').classList.add('timer-hidden');
         }
 
         //Hidden Comment in Banner
-        if(utils.getQueryParameter('comment') === "0"){
+        if(utils.getQueryParameter('comment') === '0') {
             _q('body').classList.add('comment-hidden');
         }
     }
