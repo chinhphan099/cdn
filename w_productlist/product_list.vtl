@@ -47,16 +47,17 @@
     #set($isUpdateHeadingPrice = '&quot;isUpdateHeadingPrice&quot;: true')
 #end
 
-#if($UtilMethods.isSet($products))
+#set($loadingImg = '<span class="js-img-loading"><img src="' + $!{placeholderimage} + '" width="20" height="10" data-src="//d16hdrba6dusey.cloudfront.net/sitecommon/images/loading-price-v1.gif"></span>')
 
+#if($UtilMethods.isSet($products))
     #set($jsonObj = $json.generate($!{products}))
     <script>
     window.productIds = [];
     #foreach($product in $jsonObj.data)
         window.productIds.push(btoa("gid://shopify/Product/$!{product.productId}"));
     #end
-
     </script>
+
     <div id="js-widget-products" class="product-list $!{className}" data-options="{$isHideInstallmentText $isUpdateHeadingPrice}">
         <input type="hidden" id="hdfSelectedProduct" value="$!{productIdForHeading}" />
         <div class="product-heading">
@@ -85,7 +86,17 @@
                             <span class="best-seller-text">$!{prod.defaultProductTitle}</span>
                         #end
                         #set($replaceSrc = "src=\"$!{placeholderimage}\" data-src=\"/pub-assets/")
-                        <div class="product-name">$!{prod.productName.replaceAll('xaaax', '"').replaceAll('src="/pub-assets/', $replaceSrc)}</div>
+                        #set($fullPriceElm = '<del class="fullPrice">' + $loadingImg + '</del>')
+                        #set($shippingFeeElm = '<span class="jsShippingFee">' + $loadingImg + '</span>')
+                        #set($savePriceElm = '<span class="savePrice">' + $loadingImg + '</span>')
+                        #set($discountedPriceElm = '<span class="discountedPrice">' + $loadingImg + '</span>')
+                        #set($unitFullRateElm = '<span class="spanUnitFullRate">' + $loadingImg + '</span>')
+                        #set($unitDiscountRateElm = '<span class="spanUnitDiscountRate">' + $loadingImg + '</span>')
+                        #set($totalDiscountPriceElm = '<span class="spanTotalDiscountPriceElm">' + $loadingImg + '</span>')
+                        #set($installmentPriceElm = '<span class="spanInstallmentPriceElm">' + $loadingImg + '</span>')
+                        <div class="product-name">
+                            $prod.productName.replaceAll('xaaax', '"').replaceAll('src="/pub-assets/', $replaceSrc).replaceAll('\{FullPrice\}', $fullPriceElm).replaceAll('\{fullPrice\}', $fullPriceElm).replaceAll('\{ShippingFee\}', $shippingFeeElm).replaceAll('\{SavePrice\}', $savePriceElm).replaceAll('\{DiscountedPrice\}', $discountedPriceElm).replaceAll('\{discountedPrice\}', $discountedPriceElm).replaceAll('\{UnitFullRate\}', $unitFullRateElm).replaceAll('\{UnitDiscountRate\}', $unitDiscountRateElm).replaceAll('\{totalDiscountPrice\}', $totalDiscountPriceElm).replaceAll('\{installmentprice\}', $installmentPriceElm)
+                        </div>
                     </label>
                     <label class="productPrice" for="product_$!{prod.productId}">
                         #if($!{showInstallmentPrice} == true)
@@ -94,8 +105,8 @@
                                 <span class="js-total-price"></span>
                             </ins>
                         #else
-                            <span class="discountedPrice"></span>
-                            <del class="fullPrice" style="display: none;"></del>
+                            <span class="discountedPrice">$loadingImg</span>
+                            <del class="fullPrice" style="display: none;">$loadingImg</del>
                         #end
                     </label>
                     #if($prod.buttonTxt != '')
@@ -114,7 +125,9 @@
 #if($UtilMethods.isSet($secondWebkey) && $secondWebkey != "")
     <script>window.secondWebkey = '$!{secondWebkey}'</script>
 #end
-
+#if($UtilMethods.isSet($thirdWebkey) && $thirdWebkey != "")
+    <script>window.thirdWebkey = '$!{thirdWebkey}'</script>
+#end
 <link linkType="component" rel="stylesheet/less" type="text/css" href="//d16hdrba6dusey.cloudfront.net/sitecommon/less/widgets/widget_productlist_v1.less">
 #if($UtilMethods.isSet($con.localJsFile))
 <script scriptType="component" src="$con.localJsFile" defer></script>
