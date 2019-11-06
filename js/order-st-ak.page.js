@@ -279,28 +279,28 @@ Element.prototype.appendAfter = function (element) {
         _qById('creditcard_expirydate').value = _qById('monthddl').value + '/' + _qById('yearddl').value.toString().substr(2);
         console.log(_qById('creditcard_expirydate').value);
     }
-    let tmpYear = 0, tmpMonth = 0;
+    // let tmpYear = 0, tmpMonth = 0;
     function onChangeMonth() {
         _qById('monthddl').addEventListener('change', function() {
-            tmpMonth = 0;
+            // tmpMonth = 0;
             const currentMonth = new Date().getMonth() + 1,
                 currentYear = new Date().getFullYear(),
                 monthSelected = Number(_qById('monthddl').value),
                 yearSelected = Number(_qById('yearddl').value);
 
             if(monthSelected < currentMonth && currentYear === yearSelected) {
-                tmpYear = yearSelected;
+                // tmpYear = yearSelected;
                 _qById('yearddl').value = yearSelected + 1;
             }
-            if(monthSelected >= currentMonth && !!tmpYear) {
+            /*if(monthSelected >= currentMonth && !!tmpYear) {
                 _qById('yearddl').value = tmpYear;
-            }
+            }*/
             setExpirationValue();
         }, false);
     }
     function onChangeYear() {
         _qById('yearddl').addEventListener('change', function() {
-            tmpYear = 0;
+            // tmpYear = 0;
             /*const currentMonth = new Date().getMonth() + 1,
                 currentYear = new Date().getFullYear(),
                 monthSelected = _qById('monthddl').value,
@@ -335,11 +335,20 @@ Element.prototype.appendAfter = function (element) {
                     dataProduct.productPrices.DiscountedPrice.Value = Number((currentPrice * (100 - discount) / 100).toFixed(2));
                     dataProduct.productPrices.DiscountedPrice.FormattedValue = utils.formatPrice((currentPrice * (100 - discount) / 100).toFixed(2), fCurrency, dataProduct.shippings[0].formattedPrice);
                 }
+                dataProduct.productPrices.UnitDiscountRate.Value = (dataProduct.productPrices.DiscountedPrice.Value / dataProduct.quantity).toFixed(2);
+                dataProduct.productPrices.UnitDiscountRate.FormattedValue = utils.formatPrice(dataProduct.productPrices.UnitDiscountRate.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
 
                 let priceElms = _getClosest(items[i], '.productRadioListItem').querySelectorAll('.discountedPrice');
                 if(!!priceElms) {
                     for(let priceElm of priceElms) {
                         priceElm.innerHTML = `${dataProduct.productPrices.DiscountedPrice.FormattedValue} <del style="color: grey; font-size: 0.9em; font-weight: normal;">${currentPriceFormat}</del>`;
+                    }
+                }
+
+                let unitPriceElms = _getClosest(items[i], '.productRadioListItem').querySelectorAll('.spanUnitDiscountRate');
+                if(!!unitPriceElms) {
+                    for(let unitPriceElm of unitPriceElms) {
+                        unitPriceElm.innerHTML = dataProduct.productPrices.UnitDiscountRate.FormattedValue;
                     }
                 }
 
