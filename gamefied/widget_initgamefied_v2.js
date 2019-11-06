@@ -7,8 +7,14 @@
   var saveEmailToServer = function(emailElem) {
     if (!emailElem.classList.contains('input-error')) {
       if (window.siteSetting && window.siteSetting.campaignName !== '') {
-        const url = `https://sales-prod.tryemanagecrm.com/api/customers/${siteSetting.webKey}`;
-        //const url = `https://websales-api.tryemanagecrm.com/api/customers/${siteSetting.webKey}`;
+        const eCRM = new EmanageCRMJS({
+          webkey: siteSetting.webKey,
+          cid: siteSetting.CID,
+          lang: '',
+          isTest: utils.getQueryParameter('isCardTest') ? true : false
+        });
+
+        const url = `${eCRM.Order.baseAPIEndpoint}/customers/${siteSetting.webKey}`;
         const options = {
           method: 'POST',
           data: {
@@ -29,10 +35,13 @@
     }
   };
 
-  _q('#gamefiedEmailTxt').addEventListener('blur', function (e) {
-    utils.validateInput(this);
-    saveEmailToServer(this);
-  });
+  // trigger event blur
+    if(!!_q('#gamefiedEmailTxt')) {
+      _q('#gamefiedEmailTxt').addEventListener('blur', function (e) {
+        utils.validateInput(this);
+        saveEmailToServer(this);
+      });
+    }
 
   let isFirstSpin = true;
   $(document).on('click', '.spin-button', function(e) {

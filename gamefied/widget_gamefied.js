@@ -3,14 +3,6 @@ const gameFied = (function (utils) {
         return;
     }
 
-    /*
-    function replaceBracketsStrings() {
-        const promoText = _q('.w_exit_popup .w_promo_text');
-        promoText.innerHTML = promoText.innerHTML.replace(/{exitpopup_price}/g, '<span class='txtExitpopupPrice'></span>');
-    }
-    replaceBracketsStrings();
-    */
-
     let timer = null;
     let mobileTimer = null;
 
@@ -90,12 +82,6 @@ const gameFied = (function (utils) {
                 selected_default_text.parentNode.removeChild(selected_default_text);
             }
 
-            // Hidden all product items
-            /*const items = _qAll('.productRadioListItem');
-            for (let item of items) {
-                item.classList.add('hidden');
-            }*/
-
             // Show Special product item
             specialProduct.classList.remove('hidden');
             specialProduct.classList.add('default');
@@ -138,22 +124,11 @@ const gameFied = (function (utils) {
     }
 
     function showGamefied() {
-        const specialProduct = _q('.productRadioListItem.special_offer input');
-        if(specialProduct) {
-            /*const product = JSON.parse(specialProduct.dataset.product);
-            const formattedValue = product.productPrices.DiscountedPrice.FormattedValue;
-            if(_q('.txtExitpopupPrice')) {
-                _q('.txtExitpopupPrice').innerHTML = formattedValue;
-            }*/
-        }
         _q('body').classList.add('show-gamefied');
-        /*_q('.w_modal').style.display = 'block';*/
     }
 
     function hideGamefied() {
         _q('body').classList.remove('show-gamefied');
-        //document.getElementsByClassName('gamefiedWrap')[0].remove();
-        //_q('.gamefiedWrap').style.display = 'none';
 
         if(!!timer) {
             clearTimeout(timer);

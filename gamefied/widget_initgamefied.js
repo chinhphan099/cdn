@@ -3,12 +3,18 @@
     console.log('utils module is not found');
     return;
   }
-
+  //save email to CRM khi user enter
   var saveEmailToServer = function(emailElem) {
     if (!emailElem.classList.contains('input-error')) {
       if (window.siteSetting && window.siteSetting.campaignName !== '') {
-        const url = `https://sales-prod.tryemanagecrm.com/api/customers/${siteSetting.webKey}`;
-        //const url = `https://websales-api.tryemanagecrm.com/api/customers/${siteSetting.webKey}`;
+        const eCRM = new EmanageCRMJS({
+          webkey: siteSetting.webKey,
+          cid: siteSetting.CID,
+          lang: '',
+          isTest: utils.getQueryParameter('isCardTest') ? true : false
+        });
+
+        const url = `${eCRM.Order.baseAPIEndpoint}/customers/${siteSetting.webKey}`;
         const options = {
           method: 'POST',
           data: {
