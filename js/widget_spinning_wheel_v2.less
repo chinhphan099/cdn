@@ -83,6 +83,53 @@
     }
   }
 }
+@keyframes slideRight {
+  0% {
+    left: -50px;
+  }
+  90% {
+    left: 10px;
+  }
+  100% {
+    left: 0px;
+  }
+}
+.floating-spin-button {
+  padding: 8px;
+  position: fixed;
+  top: 50%;
+  left: -50px;
+  font-size: 16px;
+  color: white;
+  background-color: rgba(128,0,15,0.8);
+  cursor: pointer;
+  transform: rotate(-90deg);
+  transform-origin: top left;
+  border-radius: 0 0 6px 6px;
+  animation: slideRight 300ms 3s forwards ease;
+  line-height: 1;
+  white-space: nowrap;
+  &.active {}
+  span {
+    display: none;
+  }
+  &:after {
+    content: "";
+    background: url("/pub-assets/fileuploads/images/spin-icon.png") 0 0 no-repeat;
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  @media (min-width: 768px) {
+    padding: 10px 15px;
+    span {
+      display: inline-block;
+      padding-right: 7px;
+      vertical-align: middle;
+    }
+  }
+}
 .superWheel .sWheel-center {
   background-color: white;
 }

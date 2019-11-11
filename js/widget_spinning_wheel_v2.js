@@ -1,5 +1,5 @@
 // Handle Show and Hide SpinWheel
-(function (utils) {
+(function(utils) {
   if (!utils) {
     return;
   }
@@ -20,15 +20,20 @@
     }, timeOutDesktop);
 
     //yes button click
-    _qById('gamefied-yes').addEventListener('click', function (e) {
+    _qById('gamefied-yes').addEventListener('click', function(e) {
       e.preventDefault();
       handleYesButton();
     });
 
     //no button click
-    _qById('gamefied-no').addEventListener('click', function (e) {
+    _qById('gamefied-no').addEventListener('click', function(e) {
       e.preventDefault();
       hideSpinningWheel();
+    });
+
+    _q('.floating-spin-button').addEventListener('click', function() {
+      showSpinningWheel();
+      _q('.floating-spin-button').classList.add('hidden');
     });
   }
 
@@ -95,7 +100,7 @@
 })(window.utils);
 
 // Handle functions for SpinWheel
-(function (utils) {
+(function(utils) {
   if (!utils) {
     console.log('utils module is not found');
     return;
@@ -133,7 +138,7 @@
   };
 
   if(!!_q('#gamefiedEmailTxt')) {
-    _q('#gamefiedEmailTxt').addEventListener('blur', function (e) {
+    _q('#gamefiedEmailTxt').addEventListener('blur', function(e) {
       utils.validateInput(this);
       saveEmailToServer(this);
     });

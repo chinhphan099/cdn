@@ -106,6 +106,10 @@
     }
 
     function applyCouponCode(product) {
+        let activeCouponFrom = Number(utils.getQueryParameter('activeFrom') || window.activeFrom);
+        if(typeof activeCouponFrom === 'number' && activeCouponFrom > product.productPrices.DiscountedPrice.Value) {
+            return product;
+        }
         let discountedPrice, unitDiscountRate;
         const fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
         const pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
@@ -574,11 +578,16 @@
                     break;
                 }
             }
-            if(!isValid) {
-                errorPrlMsg.classList.remove('hidden');
+            if(!!errorPrlMsg) {
+                if(!isValid) {
+                    errorPrlMsg.classList.remove('hidden');
+                }
+                else {
+                    errorPrlMsg.classList.add('hidden');
+                }
             }
             else {
-                errorPrlMsg.classList.add('hidden');
+                isValid = true;
             }
             return isValid;
         };
