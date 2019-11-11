@@ -20,6 +20,9 @@
                 <li data-package="$!{group.pidPackages}" data-replacetext="$!{group.selectedText}"><p>$group.tabName</p></li>
             #end
         </ul>
+        #if($UtilMethods.isSet($con.productListErrorMsg))
+        <div class="prl-error hidden"><p>$con.productListErrorMsg</p></div>
+        #end
     </div>
 #end
 

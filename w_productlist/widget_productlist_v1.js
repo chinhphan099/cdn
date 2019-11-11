@@ -57,8 +57,6 @@
             }
         } else {
             eCRM.Campaign.getProducts(function (data) {
-                bindProducts(data);
-
                 //store camp in local storage
                 let campProducts = localStorage.getItem('campproducts');
                 if(campProducts) {
@@ -86,10 +84,51 @@
 
                     localStorage.setItem('campproducts', JSON.stringify(campProducts));
                 }
+                bindProducts(data);
             });
         }
     }
     initWidgetProducts();
+
+    function afterActiveCoupon(input, couponValFormat) {
+        const couponApplyText = _q('.coupon-apply');
+        const parentItem = _getClosest(input, '.productRadioListItem');
+        if(!!couponApplyText) {
+            couponApplyText.innerHTML = couponApplyText.innerHTML.replace(/{couponPrice}/g, couponValFormat);
+            _q('.coupon-apply').style.display = 'block';
+        }
+
+        if(!!parentItem.querySelector('.product-name') && !!window.additionText) {
+            window.additionText = window.additionText.replace(/{couponPrice}/g, couponValFormat);
+            const nameElm = parentItem.querySelector('.product-name p');
+            nameElm.innerHTML = `${nameElm.innerHTML} ${window.additionText}`;
+        }
+    }
+
+    function applyCouponCode(product) {
+        let discountedPrice, unitDiscountRate;
+        const fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
+        const pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
+        const fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
+        const shippingFee = product.shippings[0].formattedPrice;
+        const couponValue = Number(utils.getQueryParameter('couponValue').replace('percent', ''));
+        let couponValFormat = utils.formatPrice(couponValue, fCurrency, shippingFee);
+        if(utils.getQueryParameter('couponValue').indexOf('percent') > -1) {
+            couponValFormat = utils.getQueryParameter('couponValue').replace('percent', '%');
+            discountedPrice = (product.productPrices.DiscountedPrice.Value * (100 - couponValue) / 100).toFixed(2);
+        }
+        else {
+            discountedPrice = (product.productPrices.DiscountedPrice.Value - couponValue).toFixed(2);
+        }
+        product.productPrices.DiscountedPrice.Value = Number(discountedPrice);
+        product.productPrices.DiscountedPrice.FormattedValue = utils.formatPrice(discountedPrice, fCurrency, shippingFee);
+        product.productPrices.UnitDiscountRate.Value = Number((discountedPrice / product.quantity).toFixed(2));
+        product.productPrices.UnitDiscountRate.FormattedValue = utils.formatPrice(product.productPrices.UnitDiscountRate.Value, fCurrency, shippingFee);
+
+        afterActiveCoupon(_qById('product_' + product.productId), couponValFormat);
+
+        return product;
+    }
 
     function bindProducts(data) {
         console.log(data);
@@ -99,6 +138,10 @@
                 try {
                     const radio = _qById('product_' + product.productId);
                     if(radio) {
+                        if(!!utils.getQueryParameter('couponCode') && !!utils.getQueryParameter('couponValue')) {
+                            // Apply coupon Code
+                            product = applyCouponCode(product);
+                        }
                         radio.setAttribute('data-product', JSON.stringify(product));
                         radio.onchange = handleProductChange;
 
@@ -424,6 +467,9 @@
 
             q('.js-list-group li').removeClass('clicked');
             tabItem.classList.add('clicked');
+            if(!!_q('.prl-error')) {
+                _q('.prl-error').classList.add('hidden');
+            }
             if(!tabItem.classList.contains('active')) {
                 q('.js-list-group li').removeClass('active');
                 tabItem.classList.add('active');
@@ -516,6 +562,30 @@
 
         init(utils.getQueryParameter('et') === '1');
         listener();
+
+        //export isValidProductList
+        const isValidProductList = () => {
+            let isValid = false;
+            const tabPackages= _qAll('.js-list-group li'),
+                errorPrlMsg = _q('.prl-error');
+            for(const tabPackage of tabPackages) {
+                if(tabPackage.classList.contains('active')) {
+                    isValid = true;
+                    break;
+                }
+            }
+            if(!isValid) {
+                errorPrlMsg.classList.remove('hidden');
+            }
+            else {
+                errorPrlMsg.classList.add('hidden');
+            }
+            return isValid;
+        };
+        window.widget = window.widget ? window.widget : {};
+        window.widget.productlist = {
+            isValidProductList: isValidProductList,
+        };
     }
     // End Product list Category ----------------------------------------------------------------------------------------
 })(window.utils);
