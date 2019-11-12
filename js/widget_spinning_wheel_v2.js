@@ -106,7 +106,7 @@
     return;
   }
   //save email to CRM khi user enter
-  var saveEmailToServer = function(emailElem) {
+  function saveEmailToServer(emailElem) {
     if (!emailElem.classList.contains('input-error')) {
       if (window.siteSetting && window.siteSetting.campaignName !== '') {
         const eCRM = new EmanageCRMJS({
@@ -135,36 +135,59 @@
         console.log('siteSetting is null');
       }
     }
-  };
+  }
 
-  if(!!_q('#gamefiedEmailTxt')) {
-    _q('#gamefiedEmailTxt').addEventListener('blur', function(e) {
-      utils.validateInput(this);
-      saveEmailToServer(this);
+  function listener() {
+    if(!!_q('#gamefiedEmailTxt')) {
+      _q('#gamefiedEmailTxt').addEventListener('blur', function(e) {
+        utils.validateInput(this);
+        saveEmailToServer(this);
+      });
+    }
+    $(document).on('click', '.spin-button', function(e) {
+      if(!!$('#gamefiedEmailTxt').length) {
+        if(!!$('#gamefiedEmailTxt').val() && !$('#gamefiedEmailTxt').hasClass('input-error')) {
+          $('.gamefied').superWheel('start', 'value', 1);
+          if(!!$('#customer_email')) {
+            $('#customer_email').val($('#gamefiedEmailTxt').val());
+          }
+          $(this).prop('disabled', true);
+        }
+        else {
+          $('#gamefiedEmailTxt').addClass('invalid').delay(1000).queue(function() {
+            $(this).removeClass('invalid').dequeue();
+          });
+        }
+      }
+      else {
+        $('.gamefied').superWheel('start', 'value', 1);
+      }
     });
   }
 
-  $(document).on('click', '.spin-button', function(e) {
-    if(!!$('#gamefiedEmailTxt').length) {
-      if(!!$('#gamefiedEmailTxt').val() && !$('#gamefiedEmailTxt').hasClass('input-error')) {
-        $('.gamefied').superWheel('start', 'value', 1);
-        if(!!$('#customer_email')) {
-          $('#customer_email').val($('#gamefiedEmailTxt').val());
-        }
-        $(this).prop('disabled', true);
-      }
-      else {
-        $('#gamefiedEmailTxt').addClass('invalid').delay(1000).queue(function() {
-          $(this).removeClass('invalid').dequeue();
-        });
-      }
-    }
-    else {
-      $('.gamefied').superWheel('start', 'value', 1);
-    }
-  });
+  function implementPrice(elms, currency, discountPrice) {
+    elms.each(function() {
+      var price = Number($(this).text()),
+        formatPrice = utils.formatPrice(price, currency, discountPrice);
+      $(this).text(formatPrice);
+    });
+  }
 
-  setTimeout(function() {
+  function init(currency, discountPrice) {
+    if(!!currency && discountPrice) {
+      for(var i = 0, n = slices.length; i < n; i++) {
+        var text = document.createElement('p');
+        $(text).html(slices[i].text);
+        implementPrice($(text).find('.currency'), currency, discountPrice);
+
+        var resultText = document.createElement('p');
+        $(resultText).html(slices[i].resultText);
+        implementPrice($(resultText).find('.currency'), currency, discountPrice);
+
+        slices[i].text = $(text).html();
+        slices[i].resultText = $(resultText).html();
+      }
+    }
     $('.gamefied').superWheel({
       slices: slices,
       text : {
@@ -203,8 +226,9 @@
 
     $('.gamefied').superWheel('onComplete', function(results) {
       if(results.value === 1) {
-        console.log(results);
-        $('.gamefiedWrap .content-2 .text-wrap').html($('.gamefiedWrap .content-2 .text-wrap').html().toString().replace(/\{resultText\}/gi, results.resultText));
+        $('.gamefiedWrap .content-2 .text-wrap').each(function() {
+          $(this).html($(this).html().toString().replace(/\{resultText\}/gi, results.resultText));
+        });
         $('.gamefiedWrap .content-1').fadeOut('fast', function() {
           $('.gamefiedWrap .content-2').fadeIn('fast');
         });
@@ -212,5 +236,20 @@
         utils.localStorage().set('getParams', results.link);
       }
     });
-  }, 2000);
+
+    listener();
+  }
+
+  utils.events.on('bindOrderPage', function(data) {
+    implementPrice($('.text-wrap .currency'),data.fCurrency, data.discountPrice);
+
+    if(!!window.siteSetting.webKey) {
+      init(data.fCurrency, data.discountPrice);
+    }
+    else {
+      setTimeout(function() {
+        init();
+      }, 2000);
+    }
+  });
 })(window.utils);
