@@ -12,7 +12,7 @@ Element.prototype.appendAfter = function (element) {
         return;
     }
 
-    const time_in_minutes = 5; // 5 minutes countdown
+    const time_in_minutes = window.time_in_minutes ? Number(window.time_in_minutes) : 5;
     let mobileTimer;
     let couponDiscount;
     let typeCoupon;
@@ -277,7 +277,6 @@ Element.prototype.appendAfter = function (element) {
     }
     function setExpirationValue() {
         _qById('creditcard_expirydate').value = _qById('monthddl').value + '/' + _qById('yearddl').value.toString().substr(2);
-        console.log(_qById('creditcard_expirydate').value);
     }
     // let tmpYear = 0, tmpMonth = 0;
     function onChangeMonth() {
@@ -423,6 +422,7 @@ Element.prototype.appendAfter = function (element) {
 
         if(specialProduct) {
             if(_q('.coupon-apply')) {
+                _q('.coupon-apply .title').innerText = js_translate.activeB2g1 || 'YOUR BUY 2 GET 1 FREE COUPON HAS BEEN APPROVED';
                 _q('.coupon-apply').style.display = 'block';
             }
             const selected_default_text = selectedProd.querySelector('.best-seller-text');
@@ -434,6 +434,11 @@ Element.prototype.appendAfter = function (element) {
             const visibleItems = getVisibleItems();
             for(let i = 0, n = visibleItems.length; i < n; i++) {
                 visibleItems[i].classList.remove('default');
+                visibleItems[i].classList.remove('special');
+                visibleItems[i].classList.remove('checked-item');
+                if(!!visibleItems[i].querySelector('.best-seller-text')) {
+                    visibleItems[i].querySelector('.best-seller-text').parentNode.removeChild(visibleItems[i].querySelector('.best-seller-text'));
+                }
             }
 
             specialProduct.classList.remove('hidden');
@@ -446,10 +451,20 @@ Element.prototype.appendAfter = function (element) {
         _qById('couponBtn').classList.remove('disabled');
         _qById('couponBtn').addEventListener('click', (e) => {
             e.target.disabled = true;
-            if(_q('.productRadioListItem.special_offer')) {
+            if(!window.couponCodeId && !!_q('.w_exit_popup').classList.contains('coupon-popup-no-time')) {
+                hidePopup(true);
+                if(!!_q('.installment-box') && !_q('.installment-box').classList.contains('hidden')) {
+                    _q('.installment-box').scrollIntoView({behavior: 'smooth'});
+                }
+                else if(!!_q('.orderst-form') && !_q('.orderst-form').classList.contains('hidden')) {
+                    _q('.orderst-form').scrollIntoView({behavior: 'smooth'});
+                }
+                return;
+            }
+            else if(_q('.productRadioListItem.special_offer') && !_q('.w_exit_popup').classList.contains('coupon-popup-new')) {
                 showSpecialItem();
             }
-            else {
+            else if(!!window.couponCodeId) {
                 afterActiveCoupon();
             }
             loadStatistical();
@@ -469,7 +484,7 @@ Element.prototype.appendAfter = function (element) {
 
     function implementCoupon(data) {
         fCurrency = data.fCurrency;
-        if(!!window.couponCodeId && utils.getQueryParameter('iep') === 'true' && !!_q('.coupon-popup')) {
+        if(!!window.couponCodeId && (utils.getQueryParameter('iep') === 'true' || !!_q('.nightowls') || !!_q('.gamefiedWrap')) && !!_q('.coupon-popup')) {
             if(!window.couponValue.trim()) {
                 return;
             }
@@ -510,7 +525,7 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function handleExitPopupEvents() {
-        if(utils.getQueryParameter('iep') !== 'true' || !_q('.coupon-popup')) {
+        if(utils.getQueryParameter('iep') !== 'true' || !_q('.coupon-popup') || utils.getQueryParameter('et') === '1') {
             return;
         }
 
@@ -523,6 +538,9 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function adjustLayout() {
+        if(_q('.productRadioListItem.special_offer') && utils.getQueryParameter('et') === '1') {
+            showSpecialItem();
+        }
         let billingEmail = _getClosest(_qById('billing_email'), '.form-group');
         if(!!billingEmail) {
             billingEmail.parentNode.removeChild(billingEmail);
@@ -595,7 +613,7 @@ Element.prototype.appendAfter = function (element) {
         onFocusCreditCard();
     }
 
-    function hiddenElementByParamUrl(){
+    function hiddenElementByParamUrl() {
         //Hidden CountDown Timer in coupon box
         if(utils.getQueryParameter('timer') === '0') {
             _q('body').classList.add('timer-hidden');
@@ -618,7 +636,7 @@ Element.prototype.appendAfter = function (element) {
     }
 
     window.addEventListener('load', () => {
-        if(!isClickedInput) {
+        if(!isClickedInput && utils.getQueryParameter('iep') !== '0') {
             popupTimed();
         }
     });
