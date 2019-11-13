@@ -191,9 +191,9 @@
     $('.gamefied').superWheel({
       slices: slices,
       text : {
-        size: 20,
+        size: 16,
         color: '#fff',
-        offset: 8,
+        offset: 5,
         letterSpacing: 0,
         orientation: 'v',
         arc: true
@@ -208,18 +208,18 @@
         background: "red",
         animate: 1
       },
-      width: 620,
+      width: 600,
       line: {
-        width: 1,
+        width: 0,
         color: "#fff"
       },
       inner: {
         width: 3,
-        color: "#fff"
+        color: "#997611"
       },
       center: {
         width: 10,
-        background: '#FFAB36',
+        background: '#D6A616',
         rotate: true
       }
     });
