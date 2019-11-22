@@ -451,6 +451,9 @@ Element.prototype.appendAfter = function (element) {
         if(_qAll('.js-list-group li').length > 1) {
             _qAll('.js-list-group li')[1].click();
         }
+        if(_q('.free-gift-apply')) {
+            _q('.free-gift-apply').style.display = 'block';
+        }
     }
 
     function onActiveCoupon() {
