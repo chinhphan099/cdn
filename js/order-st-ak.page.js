@@ -101,13 +101,14 @@ Element.prototype.appendAfter = function (element) {
         if(!!isPopupShowing) {
             return;
         }
+        const mbTimer = !!window.pendingTimeOnMobile ? Number(window.pendingTimeOnMobile) * 1000 : 5000;
         window.removeEventListener('touchmove', handleTouchMove);
         mobileTimer = setTimeout(() => {
             // const product = _q('input[name="product"]:checked').dataset.product;
             // if (!!product) {
                 generateCountDown();
             // }
-        }, 5000);
+        }, mbTimer);
     }
 
     function hidePopup(isOver) {
