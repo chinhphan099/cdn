@@ -447,11 +447,20 @@ Element.prototype.appendAfter = function (element) {
         }
     }
 
+    function activePackageGift() {
+        if(_qAll('.js-list-group li').length > 1) {
+            _qAll('.js-list-group li')[1].click();
+        }
+    }
+
     function onActiveCoupon() {
         _qById('couponBtn').classList.remove('disabled');
         _qById('couponBtn').addEventListener('click', (e) => {
             e.target.disabled = true;
-            if(!window.couponCodeId && !!_q('.w_exit_popup').classList.contains('coupon-popup-no-time')) {
+            if(!!_q('.w_exit_popup').classList.contains('gift-popup')) {
+                activePackageGift();
+            }
+            else if(!window.couponCodeId && !!_q('.w_exit_popup').classList.contains('coupon-popup-no-time')) {
                 hidePopup(true);
                 if(!!_q('.installment-box') && !_q('.installment-box').classList.contains('hidden')) {
                     _q('.installment-box').scrollIntoView({behavior: 'smooth'});
@@ -508,10 +517,8 @@ Element.prototype.appendAfter = function (element) {
 
             // New Code
             const jsImageLoadings = _qAll('.w_exit_popup .js-img-loading');
-            if(!!jsImageLoadings) {
-                for(const jsImageLoading of jsImageLoadings) {
-                    jsImageLoading.innerText = couponValFormat;
-                }
+            for(const jsImageLoading of jsImageLoadings) {
+                jsImageLoading.innerText = couponValFormat;
             }
             window.additionText = window.additionText.replace(/{couponPrice}/g, couponValFormat);
 
@@ -588,6 +595,10 @@ Element.prototype.appendAfter = function (element) {
     function updateCurrencyPrice(data) {
         if(!!_q('.discount-text .price')) {
             _q('.discount-text .price').innerText = data.fCurrency.replace('######', _q('.discount-text .price').innerText);
+        }
+        const currencyItems = _qAll('.w_exit_popup .currency');
+        for(const currencyItem of currencyItems) {
+            currencyItem.innerText = utils.formatPrice(currencyItem.innerText, data.fCurrency, data.discountPrice);
         }
     }
 
