@@ -1,11 +1,6 @@
 @color0: #ffffff;
 @color1: #63ffff;
 
-.hide-holiday-banner {
-    .holiday-banner {
-        display: none !important;
-    }
-}
 .show-holiday-banner {
     height: auto;
     body {
@@ -21,6 +16,11 @@
     z-index: 1000;
     font-family: "Arimo", Arial, sans-serif;
     color: white;
+    &.has-floating-btn {
+        -webkit-transition: bottom 150ms 50ms ease;
+        -o-transition: bottom 150ms 50ms ease;
+        transition: bottom 150ms 50ms ease;
+    }
     h2, h3, h4, h5, li, p {
         color: inherit;
         font-family: inherit;
