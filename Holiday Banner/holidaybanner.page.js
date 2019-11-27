@@ -83,11 +83,13 @@
     }
 
     function checkFloating() {
-        if(!!_q('.floating-bar').classList.contains('floating-visible')) {
-            adjustPosition(_q('.floating-bar').clientHeight);
-        }
-        else {
-            adjustPosition(0);
+        if(!!_q('.floating-bar')) {
+            if(!!_q('.floating-bar').classList.contains('floating-visible')) {
+                adjustPosition(_q('.floating-bar').clientHeight);
+            }
+            else {
+                adjustPosition(0);
+            }
         }
     }
 

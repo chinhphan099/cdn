@@ -57,16 +57,16 @@
                 Element.prototype.msMatchesSelector ||
                 Element.prototype.oMatchesSelector ||
                 Element.prototype.webkitMatchesSelector ||
-                function(s) {
+                function (s) {
                     let matches = (this.document || this.ownerDocument).querySelectorAll(s),
                         i = matches.length;
-                    while (--i >= 0 && matches.item(i) !== this) {}
+                    while (--i >= 0 && matches.item(i) !== this) { }
                     return i > -1;
                 }
         }
 
         // Get the closest matching element
-        for ( ; elem && elem !== document; elem = elem.parentNode ) {
+        for (; elem && elem !== document; elem = elem.parentNode) {
             if (elem.matches(selector)) {
                 return elem;
             }
@@ -102,7 +102,7 @@
     }
 
     function formatPrice(price, fCurrency, shippingPriceFormatted) {
-        if(shippingPriceFormatted.indexOf(',') > -1) {
+        if (shippingPriceFormatted.indexOf(',') > -1) {
             return fCurrency.replace('######', price.toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')); // x.xxx.xxx,xx
         }
         return fCurrency.replace('######', price.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')); // x,xxx,xxx.xx
@@ -160,7 +160,7 @@
 
     function validateCheckbox(input) {
         if (input.attributes['required'] != undefined) {
-            if(!input.checked) {
+            if (!input.checked) {
                 addInputError(input);
             }
             else {
@@ -175,7 +175,7 @@
             const inputs = form.getElementsByTagName('input');
             if (inputs && inputs.length > 0) {
                 for (let input of inputs) {
-                    if(input.type === 'checkbox') {
+                    if (input.type === 'checkbox') {
                         validateCheckbox(input);
                     }
                     else {
@@ -423,11 +423,26 @@
         }
 
         function emit(eventName, data) {
-            if (events[eventName]) {
-                Array.prototype.slice.call(events[eventName]).forEach(function (fn) {
-                    fn(data);
-                });
-            }
+            let count = 0;
+            const timer = setInterval(() => {
+                count++;
+                if (count >= 50) { //20 * 200 = 10 seconds
+                    clearInterval(timer);
+                }
+
+                if (events[eventName]) {
+                    clearInterval(timer);
+                    Array.prototype.slice.call(events[eventName]).forEach(function (fn) {
+                        fn(data);
+                    });
+                }
+            }, 200);
+
+            // if (events[eventName]) {
+            //     Array.prototype.slice.call(events[eventName]).forEach(function (fn) {
+            //         fn(data);
+            //     });
+            // }
         }
 
         return {
@@ -463,11 +478,11 @@
             }
             let href = link.getAttribute('href');
             let hrefParams = '';
-            if(!!href && href.indexOf('?') > -1) {
+            if (!!href && href.indexOf('?') > -1) {
                 hrefParams = href.split('?')[1];
             }
-            if(!!window.siteSetting && !!window.siteSetting.redirectURL && window.siteSetting.redirectURL.trim() !== ''){
-                if(href && href.indexOf('contact-us') < 0 && href.indexOf('terms') < 0 && href.indexOf('policy') < 0 && href.indexOf('affiliate') < 0 && href.indexOf('usermanual') < 0 && href.indexOf('javascript') < 0 && href.indexOf('www') < 0 && href.indexOf('//') < 0 && link.className.indexOf('no-redirect') < 0) {
+            if (!!window.siteSetting && !!window.siteSetting.redirectURL && window.siteSetting.redirectURL.trim() !== '') {
+                if (href && href.indexOf('contact-us') < 0 && href.indexOf('terms') < 0 && href.indexOf('policy') < 0 && href.indexOf('affiliate') < 0 && href.indexOf('usermanual') < 0 && href.indexOf('javascript') < 0 && href.indexOf('www') < 0 && href.indexOf('//') < 0 && link.className.indexOf('no-redirect') < 0) {
                     href = window.siteSetting.redirectURL;
                 }
             }
@@ -478,10 +493,14 @@
                 } else {
                     href += (currentQueryString !== '' ? '?' + currentQueryString : '');
                 }
-                if (href.indexOf('?') > 0) {
-                    href += (hrefParams !== '' ? '&' + hrefParams : '');
-                } else {
-                    href += (hrefParams !== '' ? '?' + hrefParams : '');
+                if (!!window.siteSetting && !!window.siteSetting.redirectURL && window.siteSetting.redirectURL.trim() !== '') {
+                    if (href && href.indexOf('contact-us') < 0 && href.indexOf('terms') < 0 && href.indexOf('policy') < 0 && href.indexOf('affiliate') < 0 && href.indexOf('usermanual') < 0 && href.indexOf('javascript') < 0 && href.indexOf('www') < 0 && href.indexOf('//') < 0 && link.className.indexOf('no-redirect') < 0) {
+                        if (href.indexOf('?') > 0) {
+                            href += (hrefParams !== '' ? '&' + hrefParams : '');
+                        } else {
+                            href += (hrefParams !== '' ? '?' + hrefParams : '');
+                        }
+                    }
                 }
                 link.href = href;
             }
@@ -502,13 +521,13 @@
     }
 
     //Format Date
-    function formatDate(formatString,splitSymbol){
+    function formatDate(formatString, splitSymbol) {
         var date = (new Date()).toISOString().split('T')[0];
         var result = '',
             arrDate = date.split('-')
-            var splitSymbol = splitSymbol ? splitSymbol : '-';
+        var splitSymbol = splitSymbol ? splitSymbol : '-';
 
-        switch(formatString){
+        switch (formatString) {
             case 'dd/mm/yyyy':
                 result = arrDate[2] + splitSymbol + arrDate[1] + splitSymbol + arrDate[0];
                 break;
@@ -516,7 +535,7 @@
                 result = arrDate[1] + splitSymbol + arrDate[2] + splitSymbol + arrDate[0];
                 break;
             default:
-            result = date;
+                result = date;
         }
 
         return result;
@@ -614,11 +633,11 @@
 
     function firePicksell() {
         //Fire picksell
-        if(typeof $picksell !== 'undefined') {
+        if (typeof $picksell !== 'undefined') {
             let isPicksellFired = utils.localStorage().get('isPicksellFired');
-            if(!isPicksellFired) {
+            if (!isPicksellFired) {
                 const orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
-                if(orderInfo && orderInfo.orderTotalFull) {
+                if (orderInfo && orderInfo.orderTotalFull) {
                     $picksell.trackingConversion(orderInfo.orderTotalFull);
                     utils.localStorage().set('isPicksellFired', true);
                 }
@@ -626,11 +645,120 @@
         }
     }
 
+    //check and fire gtm convertion event for order pages
+    function fireMainOrderToGTMConversion() {
+        try {
+            const orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
+            let isMainOrderToGTMConversionFired = false;
+            if (utils.localStorage().get('isMainOrderToGTMConversionFired')) {
+                isMainOrderToGTMConversionFired = true;
+            }
+
+            if (orderInfo && orderInfo.orderNumber && !isMainOrderToGTMConversionFired) {
+                window.dataLayer = window.dataLayer || [];
+                let counter = 1;
+                const timer = setInterval(() => {
+                    if(counter > 10) {
+                        window.dataLayer.push({
+                            'event': 'Conversion',
+                            'orderId': orderInfo.orderNumber,
+                            'price': orderInfo.orderTotal
+                        });
+                        clearInterval(timer);
+                    }
+
+                    if(window._EA_ID) {
+                        window.dataLayer.push({
+                            'event': 'Conversion',
+                            'fpid': window._EA_ID,
+                            'orderId': orderInfo.orderNumber,
+                            'price': orderInfo.orderTotalFull ? orderInfo.orderTotalFull : ''
+                        });
+                        clearInterval(timer);
+                    }
+
+                    counter++;
+                }, 200);
+
+                utils.localStorage().set('isMainOrderToGTMConversionFired', true);
+                console.log('fireMainOrderToGTMConversion fire event Conversion');
+            }
+        } catch (err) {
+            console.log('error: ', err);
+        }
+    }
+
+    //check and fire gtm convertion event for order pages
+    function fireMainOrderToGTMConversionV2() {
+        try {
+            const orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
+            if (orderInfo && orderInfo.orderNumber) {
+                window.dataLayer = window.dataLayer || [];
+                let counter = 1;
+                const timer = setInterval(() => {
+                    if(counter > 10) {
+                        window.dataLayer.push({
+                            'event': 'Conversion',
+                            'orderId': orderInfo.orderNumber,
+                            'price': orderInfo.orderTotal
+                        });
+                        clearInterval(timer);
+                    }
+
+                    if(window._EA_ID) {
+                        window.dataLayer.push({
+                            'event': 'Conversion',
+                            'fpid': window._EA_ID,
+                            'orderId': orderInfo.orderNumber,
+                            'price': orderInfo.orderTotalFull ? orderInfo.orderTotalFull : ''
+                        });
+                        clearInterval(timer);
+                    }
+
+                    counter++;
+                }, 200);
+
+                console.log('fireMainOrderToGTMConversionV2 fire event Conversion');
+            }
+        } catch (err) {
+            console.log('error: ', err);
+        }
+    }
+
+    //check and fire gtm purchase event for upsell
+    function fireGtmPurchaseEvent() {
+        try {
+            const fireUpsellForGTMPurchase = utils.localStorage().get('fireUpsellForGTMPurchase');
+            if (fireUpsellForGTMPurchase && fireUpsellForGTMPurchase !== '') {
+                window.dataLayer = window.dataLayer || [];
+                let counter = 1;
+                const timer = setInterval(() => {
+                    if(counter > 10) {
+                        window.dataLayer.push({ 'event': `Upsell "${fireUpsellForGTMPurchase}"` });
+                        clearInterval(timer);
+                    }
+
+                    if(window._EA_ID) {
+                        window.dataLayer.push({ 'event': `Upsell "${fireUpsellForGTMPurchase}"`, 'fpid': window._EA_ID });
+                        clearInterval(timer);
+                    }
+
+                    counter++;
+                }, 200);
+
+                utils.localStorage().remove('fireUpsellForGTMPurchase');
+                console.log('fireUpsellForGTMPurchase fire with event: Upsell ', fireUpsellForGTMPurchase);
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
     function createCookie(name, value, days) {
         var expires = '';
-        if(days) {
+        if (days) {
             var date = new Date();
-            date.setTime(date.getTime() + (days*24*60*60*1000));
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
             expires = '; expires=' + date.toUTCString();
         }
         document.cookie = name + '=' + value + expires + '; path=/';
@@ -640,7 +768,7 @@
         var nameEQ = name + '=',
             ca = document.cookie.split(';');
 
-        for(var i = 0; i < ca.length; i++) {
+        for (var i = 0; i < ca.length; i++) {
             var c = ca[i];
             while (c.charAt(0) === ' ') {
                 c = c.substring(1, c.length);
@@ -656,7 +784,186 @@
         createCookie(name, '', -1);
     }
 
+    function checkCamp(webKey) {
+        let isExisted = true;
+        let campProducts = utils.localStorage().get('campproducts');
+        if (campProducts) {
+            try {
+                campProducts = JSON.parse(campProducts);
+                const camps = campProducts.camps.filter(item => {
+                    return item[webKey];
+                });
+
+                if (camps.length > 0) {
+                    const beforeDate = new Date(camps[0][webKey].timestamp);
+                    const newDate = new Date();
+                    const res = Math.abs(newDate - beforeDate) / 1000;
+                    const minutes = Math.floor(res / 60);
+                    //console.log('check time of keeping prices in local storage: ', minutes);
+                    if (minutes > 1) isExisted = false;
+                } else {
+                    isExisted = false;
+                }
+            } catch (err) {
+                console.log(err);
+                isExisted = false;
+            }
+        } else {
+            isExisted = false;
+        }
+        return isExisted;
+    }
+
+    //save informations to local storage for upsells
+    function saveInfoToLocalForUpsells(responseData, upsell) {
+        let _getUpParam = () => {
+            let upParam = '';
+            if (location.href.split('special-offer-', 2).length > 1) {
+                upParam = 'up_' + location.href.split('special-offer-', 2)[1].split('.html', 1);
+            }
+            return upParam;
+        };
+
+        let _handleLastUpsellOrError = () => {
+            let upParam = '';
+            if (location.href.split('special-offer-', 2).length > 1) {
+                upParam = '?up_' + location.href.split('special-offer-', 2)[1].split('.html', 1);
+
+                if (upsell.orderInfo.isUpsellOrdered == 1) {
+                    upParam += '=1';
+                } else {
+                    upParam += '=0';
+                }
+            }
+
+            let redirectUrl = siteSetting.successUrl;
+            utils.redirectPage(redirectUrl + upParam);
+        };
+
+        if (responseData != null && responseData.success) {
+            //store param in localStorage to fire gtm event of purchase
+            //const upsellCampaignName = typeof upsell.upsellCampaignName !== 'undefined' ? upsell.upsellCampaignName : _getUpParam();
+            utils.localStorage().set('fireUpsellForGTMPurchase', _getUpParam());
+
+            utils.localStorage().set('paypal_isMainOrder', 'upsell');
+
+            upsell.orderInfo.upsellIndex += 1;
+            const savedOfUpsell = upsell.products[window.upsell_productindex].productPrices.FullRetailPrice.Value - upsell.products[window.upsell_productindex].productPrices.DiscountedPrice.Value;
+            upsell.orderInfo.savedTotal += savedOfUpsell;
+            upsell.orderInfo.isUpsellOrdered = 1;
+            utils.localStorage().set('orderInfo', JSON.stringify(upsell.orderInfo));
+
+            utils.localStorage().set('webkey_to_check_paypal', upsell.upsellWebKey);
+
+            if (responseData.callBackUrl) {
+                document.location = responseData.callBackUrl;
+            } else if (responseData.paymentContinueResult && responseData.paymentContinueResult.actionUrl !== "") {
+                document.location = responseData.paymentContinueResult.actionUrl;
+            } else if (upsell.orderInfo.upsellIndex < upsell.orderInfo.upsells.length) {
+                let upsellUrl = upsell.orderInfo.upsells[upsell.orderInfo.upsellIndex].upsellUrl;
+                const redirectUrl = upsellUrl.substring(upsellUrl.lastIndexOf('/') + 1, upsellUrl.indexOf('?') >= 0 ? upsellUrl.indexOf('?') : upsellUrl.length);
+                utils.redirectPage(redirectUrl + '?' + _getUpParam() + '=1');
+            } else {
+                _handleLastUpsellOrError();
+            }
+        } else {
+            _handleLastUpsellOrError();
+        }
+    }
+
+    //Filter first of Error field to excute event scrollIntoView - Animation will not work on IE browser
+    function focusErrorInputField(){
+        try {
+            //get first error input
+            let input = _qAll('.input-error')[0];
+
+            if(!!input) {
+                input.scrollIntoView({behavior: "smooth", block: "center"});
+
+                //set timer to detect Element in center view of screen then excute focus event for input
+                let timerFocus = setInterval(function(){
+                    if(input.getBoundingClientRect().bottom > 0 && (window.innerHeight/2 + input.getBoundingClientRect().height/2)  < input.getBoundingClientRect().bottom){
+                        clearInterval(timerFocus);
+                        input.focus();
+                    }
+                },100);
+            }
+        } catch(err){
+            console.log(err);
+        }
+    }
+
+    function saveUserInfoWithFingerprint() {
+        try {
+            let firstName = _qById('customer_firstname') ? _qById('customer_firstname').value : _qById('shipping_firstname')? _qById('shipping_firstname').value : '';
+            let lastName = _qById('customer_lastname') ? _qById('customer_lastname').value : _qById('shipping_lastname') ? _qById('shipping_lastname').value : '';
+            let emailElem = _qById('customer_email');
+            if(window._EA_ID && firstName !== '' && lastName !== '' && emailElem && !emailElem.classList.contains('input-error')) {
+                const url = `https://ctrwow-dev-fingerprint-microservice.azurewebsites.net/api/userinfo/${window._EA_ID}?code=5twg5EUTiWQLF2LzvHYonk6PsRREMi7qjRlRGCQSNJqHCaxsYVlgsA==`;
+                const options = {
+                    method: 'POST',
+                    data: {
+                        'userInfo': {
+                            'firstName': firstName,
+                            'lastName': lastName,
+                            'email': emailElem.value
+                        }
+                    }
+                }
+
+                utils.callAjax(url, options).then((result) => {
+                    console.log(result);
+                })
+                .catch(error => console.log(error));
+            }
+        } catch(err) {
+            console.log('saveUserInfoWithFingerprint error: ', err);
+        }
+    }
+
+    //Common Upsell classs is used in all sites
+    class CommonUpsell {
+        fireMainOrderToGTMConversion() {
+            utils.fireMainOrderToGTMConversion();
+        }
+
+        fireGtmPurchaseEvent() {
+            utils.fireGtmPurchaseEvent();
+        }
+
+        init() {
+            this.fireMainOrderToGTMConversion();
+            this.fireGtmPurchaseEvent();
+        }
+    }
+
+    //Common Order classs is used in all sites
+    class CommonOrder {
+        init() {
+            //console.log('nothing in common');
+        }
+    }
+
+    //Common Confirm classs is used in all sites
+    class CommonConfirm {
+        fireMainOrderToGTMConversion() {
+            utils.fireMainOrderToGTMConversion();
+        }
+
+        fireGtmPurchaseEvent() {
+            utils.fireGtmPurchaseEvent();
+        }
+
+        init() {
+            this.fireMainOrderToGTMConversion();
+            this.fireGtmPurchaseEvent();
+        }
+    }
+
     global.utils = {
+        CommonUpsell: CommonUpsell,
+        CommonOrder: CommonOrder,
+        CommonConfirm: CommonConfirm,
         callAjax: callAjax,
         getCurrencySymbol: getCurrencySymbol,
         formatPrice: formatPrice,
@@ -684,8 +991,15 @@
         fireCakePixel: fireCakePixel,
         fireEverFlow: fireEverFlow,
         firePicksell: firePicksell,
+        fireMainOrderToGTMConversion: fireMainOrderToGTMConversion,
+        fireMainOrderToGTMConversionV2: fireMainOrderToGTMConversionV2,
+        fireGtmPurchaseEvent: fireGtmPurchaseEvent,
         createCookie: createCookie,
         readCookie: readCookie,
-        eraseCookie: eraseCookie
+        eraseCookie: eraseCookie,
+        checkCamp: checkCamp,
+        saveInfoToLocalForUpsells: saveInfoToLocalForUpsells,
+        focusErrorInputField: focusErrorInputField,
+        saveUserInfoWithFingerprint: saveUserInfoWithFingerprint
     }
 })(window, document);

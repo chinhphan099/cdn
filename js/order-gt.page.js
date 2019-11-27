@@ -118,11 +118,13 @@
     }
 
     function onActiveCoupon() {
-        _qById('couponBtn').addEventListener('click', (e) => {
-            if(!_q('.productRadioListItem.special_offer')) {
-                installment();
-            }
-        }, false);
+        if(!!_qById('couponBtn')) {
+            _qById('couponBtn').addEventListener('click', (e) => {
+                if(!_q('.productRadioListItem.special_offer')) {
+                    installment();
+                }
+            }, false);
+        }
     }
 
     function viewDetailsInstallmentsEvents() {

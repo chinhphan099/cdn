@@ -456,6 +456,7 @@ Element.prototype.appendAfter = function (element) {
         if(_q('.free-gift-apply')) {
             _q('.free-gift-apply').style.display = 'block';
         }
+        utils.localStorage().set('isActiveFreeGift', 'true');
     }
 
     function onActiveCoupon() {
