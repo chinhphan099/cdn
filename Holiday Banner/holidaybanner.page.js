@@ -44,9 +44,11 @@
                 min = Math.floor((countdown - (hours * 60 * 60 * 1000)) / (60 * 1000)),
                 sec = Math.floor((countdown - (min *60 * 1000) - (hours * 60 * 60 * 1000)) / 1000);
 
-            elm.querySelector('.h_hours').innerText = hours < 10 ? '0' + hours : hours;
-            elm.querySelector('.h_minutes').innerText = min < 10 ? '0' + min : min;
-            elm.querySelector('.h_seconds').innerText = sec < 10 ? '0' + sec : sec;
+            if(!!elm.querySelector('.h_hours')) {
+                elm.querySelector('.h_hours').innerText = hours < 10 ? '0' + hours : hours;
+                elm.querySelector('.h_minutes').innerText = min < 10 ? '0' + min : min;
+                elm.querySelector('.h_seconds').innerText = sec < 10 ? '0' + sec : sec;
+            }
         }, 1000);
 
         // Add event for Close button
