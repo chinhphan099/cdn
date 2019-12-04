@@ -5,6 +5,17 @@
 
     const prodArr = [];
     const productNameText = !!_q('.statistical .td-name') && _q('.statistical .td-name').innerText || '';
+    function replaceBracketsStrings() {
+        const allElements = _qAll('body *');
+        for(let elem of allElements) {
+            if(elem.children.length === 0 || elem.tagName.toLowerCase() === 'span') {
+                elem.innerHTML = elem.innerHTML.replace(/{unitprice}/g, '<span class="spanUnitUpsellPrice"></span>');
+                elem.innerHTML = elem.innerHTML.replace(/{unitfullprice}/g, '<span class="spanUnitFullPrice"></span>');
+            }
+        }
+    }
+    replaceBracketsStrings();
+
     function implementSelectedProduct(data) {
         window.upsell_productindex = prodArr.indexOf(data.productId);
 
@@ -17,6 +28,16 @@
         const spanFullPriceElems = _qAll('.spanFullPrice');
         for(let spanFullPrice of spanFullPriceElems) {
             spanFullPrice.innerHTML = data.fullPrice;
+        }
+
+        const spanUnitPriceElems = _qAll('.spanUnitUpsellPrice');
+        for(let spanUnitPriceElem of spanUnitPriceElems) {
+            spanUnitPriceElem.innerHTML = data.unitDiscountPrice;
+        }
+
+        const spanUnitFullPriceElems = _qAll('.spanUnitFullPrice');
+        for(let spanUnitFullPriceElem of spanUnitFullPriceElems) {
+            spanUnitFullPriceElem.innerHTML = data.unitFullPrice;
         }
 
         // Update statistical informations
@@ -49,6 +70,13 @@
             }
         }
 
+        let unitFullRateText = product.productPrices.FullRetailPrice.FormattedValue,
+            unitFullRateValue = product.productPrices.FullRetailPrice.Value;
+        if(typeof product.productPrices.UnitFullRetailPrice !== 'undefined') {
+            unitFullRateText = product.productPrices.UnitFullRetailPrice.FormattedValue;
+            unitFullRateValue = product.productPrices.UnitFullRetailPrice.Value;
+        }
+
         result = {
             productId: product.productId,
             productName: _getClosest(checkedItem, '.productRadioListItem').querySelector('.product-name p').innerHTML,
@@ -56,8 +84,12 @@
             shippingValue: shippingValue,
             discountPrice: product.productPrices.DiscountedPrice.FormattedValue,
             discountPriceValue: product.productPrices.DiscountedPrice.Value,
+            unitDiscountPrice: product.productPrices.UnitDiscountRate.FormattedValue,
+            unitDiscountPriceValue: product.productPrices.UnitDiscountRate.Value,
             fullPrice: product.productPrices.FullRetailPrice.FormattedValue,
             fullPriceValue: product.productPrices.FullRetailPrice.Value,
+            unitFullPrice: unitFullRateText,
+            unitFullPriceValue: unitFullRateValue,
             currencyCode: product.productPrices.FullRetailPrice.GlobalCurrencyCode != null ? product.productPrices.FullRetailPrice.GlobalCurrencyCode : '',
             fCurrency: fCurrency
         };

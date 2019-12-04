@@ -45,35 +45,21 @@
                 pValue = products.prices[0].shippings[0].price.toFixed(2).toString().replace(/\./, ''),
                 fCurrency = fvalue.replace(pValue, '######');
 
-            upsell.products = products.prices.filter((price) => {
-                if(upsell.orderInfo.quantity === price.quantity) {
-                    if(utils.localStorage().get('isSpecialOffer') === 'true') {
-                        if(price.sku.match(/_/g).length === 2) {
-                            return true;
-                        }
-                    }
-                    else if(!price.sku.match(/_/g) || price.sku.match(/_/g).length < 2) {
-                        return true;
-                    }
-                }
-                else {
-                    return false;
-                }
-            });
-            console.log(upsell.products);
+            upsell.products = products.prices;
+
             _q('.js-basic-upsell-cta-button').classList.remove('disabled');
 
             const spanUpsellPriceElems = _qAll('.spanUpsellPrice');
             for(let spanUpsellPrice of spanUpsellPriceElems) {
-                let upgradeDiscountPrice = upsell.products[0].productPrices.DiscountedPrice.Value - upsell.orderInfo.orderTotal;
-                upgradeDiscountPrice = upgradeDiscountPrice + upgradeDiscountPrice * upsell.orderInfo.lifetimeRate;
+                let upgradeDiscountPrice = upsell.products[0].productPrices.DiscountedPrice.Value - upsell.orderInfo.upsellPriceToUpgrade;
+                // upgradeDiscountPrice = upgradeDiscountPrice + upgradeDiscountPrice * upsell.orderInfo.lifetimeRate;
                 spanUpsellPrice.innerHTML = utils.formatPrice(upgradeDiscountPrice.toFixed(2), fCurrency, upsell.products[0].shippings[0].formattedPrice);
             }
 
             const spanFullPriceElems = _qAll('.spanFullPrice');
             for(let spanFullPrice of spanFullPriceElems) {
                 let upgradeFullPrice = upsell.products[0].productPrices.FullRetailPrice.Value;
-                upgradeFullPrice = upgradeFullPrice + upgradeFullPrice * upsell.orderInfo.lifetimeRate;
+                // upgradeFullPrice = upgradeFullPrice + upgradeFullPrice * upsell.orderInfo.lifetimeRate;
                 spanFullPrice.innerHTML = utils.formatPrice(upgradeFullPrice.toFixed(2), fCurrency, upsell.products[0].shippings[0].formattedPrice);
             }
         });
@@ -86,15 +72,18 @@
             Array.prototype.slice.call(ctaButtons).forEach(ele => {
                 ele.addEventListener('click', function (e) {
                     e.preventDefault();
-                    upgradeOrder();
+                    upgradeUpsell();
                 });
             });
         }
 
-        _q('.js-btn-no-thanks').addEventListener('click', function (e) {
-            e.preventDefault();
-            cancelUpsellOrder();
-        });
+        const noThankBtns = _qAll('.js-btn-no-thanks');
+        for(let noThankBtn of noThankBtns) {
+            noThankBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                cancelUpsellOrder();
+            });
+        }
     }
     let Helpers = {
         _ajaxError: function(response) {
@@ -156,34 +145,12 @@
         orderInfo.orderTotal = upsell.products[0].productPrices.DiscountedPrice.Value;
         orderInfo.savedTotal = upsell.products[0].productPrices.FullRetailPrice.Value - orderInfo.orderTotal;
         orderInfo.orderedProducts.sku = upsell.products[0].sku;
-        /*orderInfo = {
-            'upsells': orderResponse.upsells,
-            'upsellIndex': 0,
-            'countryCode': siteSetting.countryCode, //siteSetting.countryCode is bind from widget_productlist.js
-            'orderNumber': orderResponse.orderNumber,
-            'cusEmail': _qById('customer_email').value,
-            'cardId': orderResponse.cardId,
-            'paymentProcessorId': orderResponse.paymentProcessorId,
-            'addressId': orderResponse.customerResult.shippingAddressId,
-            'orderTotal': product.productPrices.DiscountedPrice.Value,
-            'savedTotal': product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value,
-            'quantity': product.quantity,
-            'orderedProducts': [
-                {
-                    type: 'main',
-                    sku: product.sku,
-                    name: _qById('productname_' + product.productId) ? _qById('productname_' + product.productId).value : ''
-                }
-            ],
-            installmentValue: _qById('ddl_installpayment') ? _qById('ddl_installpayment').value : '',
-            installmentText: (window.widget && window.widget.installmentpayment) ? window.widget.installmentpayment.optionText : ''
-        };*/
 
         utils.localStorage().set('orderInfo', JSON.stringify(orderInfo));
         return orderInfo;
     }
 
-    function upgradeOrder() {
+    function upgradeUpsell() {
         // const upsellData = getUpsellData();
         let pay = {
             cardId: upsell.orderInfo.cardId
@@ -208,7 +175,7 @@
         utils.showAjaxLoading();
 
         // Chinh
-        const postAPI = `${eCRM.Order.baseAPIEndpoint}/orders/${upsell.orderInfo.orderNumber}/${upsell.products[0].productId}`;
+        const postAPI = `${eCRM.Order.baseAPIEndpoint}/orders/${localStorage.getItem('upsellOrderNumber')}/${upsell.products[0].productId}`;
         const orderData = {
             "productId": upsell.orderInfo.orderedProducts[0].pid,
             "shippingMethodId": upsell.products[window.upsell_productindex].shippings.length > 0 ? upsell.products[window.upsell_productindex].shippings[0].shippingMethodId: null,
@@ -336,6 +303,14 @@
         return upsellData;
     }
 
+    function changeStatusUpsell() {
+        eCRM.Order.updateUpsellsStatus(upsell.orderInfo.orderNumber, function (result) {
+            if(result) {
+                console.log('upsells status is updated');
+            }
+        });
+    }
+
     function cancelUpsellOrder() {
         //update localStorage
         upsell.orderInfo.isUpsellOrdered = 0;
@@ -372,5 +347,6 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         handleBasicUpsellCTAButton();
+        changeStatusUpsell();
     });
 })(window.utils);

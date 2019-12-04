@@ -844,11 +844,12 @@
             //store param in localStorage to fire gtm event of purchase
             //const upsellCampaignName = typeof upsell.upsellCampaignName !== 'undefined' ? upsell.upsellCampaignName : _getUpParam();
             utils.localStorage().set('fireUpsellForGTMPurchase', _getUpParam());
-
             utils.localStorage().set('paypal_isMainOrder', 'upsell');
+            utils.localStorage().set('upsellOrderNumber', responseData.orderNumber);
 
             upsell.orderInfo.upsellIndex += 1;
             const savedOfUpsell = upsell.products[window.upsell_productindex].productPrices.FullRetailPrice.Value - upsell.products[window.upsell_productindex].productPrices.DiscountedPrice.Value;
+            upsell.orderInfo.upsellPriceToUpgrade = upsell.products[window.upsell_productindex].productPrices.DiscountedPrice.Value;
             upsell.orderInfo.savedTotal += savedOfUpsell;
             upsell.orderInfo.isUpsellOrdered = 1;
             utils.localStorage().set('orderInfo', JSON.stringify(upsell.orderInfo));
@@ -899,7 +900,8 @@
             let lastName = _qById('customer_lastname') ? _qById('customer_lastname').value : _qById('shipping_lastname') ? _qById('shipping_lastname').value : '';
             let emailElem = _qById('customer_email');
             if(window._EA_ID && firstName !== '' && lastName !== '' && emailElem && !emailElem.classList.contains('input-error')) {
-                const url = `https://ctrwow-dev-fingerprint-microservice.azurewebsites.net/api/userinfo/${window._EA_ID}?code=5twg5EUTiWQLF2LzvHYonk6PsRREMi7qjRlRGCQSNJqHCaxsYVlgsA==`;
+                //const url = `https://ctrwow-dev-fingerprint-microservice.azurewebsites.net/api/userinfo/${window._EA_ID}?code=5twg5EUTiWQLF2LzvHYonk6PsRREMi7qjRlRGCQSNJqHCaxsYVlgsA==`; test env
+                const url = `https://ctrwow-prod-fingerprint-microservice.azurewebsites.net/api/userinfo/${window._EA_ID}?code=hjQxSRcBk48Gii/2xmzwb2d08D1sazWO3qzOLwiRwndnSQ3w9zNITw==`; //prod env
                 const options = {
                     method: 'POST',
                     data: {

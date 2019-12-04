@@ -232,6 +232,9 @@
         })
         .then(result => {
             if (result && result.success) {
+                //store param in localStorage to fire gtm event of purchase
+                utils.localStorage().set('fireUpsellForGTMPurchase', getUpParam().split('=')[0]);
+
                 let orderInfo = saveInforForUpsellPage(result);
                 utils.localStorage().set('paypal_isMainOrder', 'main');
                 utils.localStorage().set('webkey_to_check_paypal', upsell.upsellWebKey);
@@ -358,6 +361,14 @@
     utils.fireCakePixel();
     utils.fireEverFlow();
     utils.firePicksell();
+
+    /*--------start : run common upsell------------*/
+    const CommonUpsell = utils.CommonUpsell;
+    class Upsell extends CommonUpsell {
+    }
+    const insUpsell = new Upsell();
+    insUpsell.init();
+    /*--------/end : run common upsell------------*/
 
     document.addEventListener('DOMContentLoaded', function () {
         handleBasicUpsellCTAButton();
