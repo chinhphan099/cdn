@@ -1,6 +1,4 @@
 (function (utils) {
-    console.log();
-
     if (!utils) {
         console.log('modules is not found');
         return;
@@ -11,6 +9,8 @@
         mainWebKey: siteSetting.webKey,
         CID: siteSetting.CID
     };
+
+    if(!confirm.orderInfo) return;
 
     const eCRM = new EmanageCRMJS({
         webkey: confirm.mainWebKey,
@@ -33,13 +33,11 @@
 
     function bindData(data) {
         console.log(data);
-        let dotOrComma = '.';
-        if(data.receipts[0].formattedAmount.indexOf(',') >= 0) {
-            dotOrComma = ',';
-        }
+
         const fvalue = data.receipts[0].formattedAmount.replace(/[,|.]/g, '');
         const pValue = data.receipts[0].amount.toFixed(2).toString().replace(/\./, '');
         const fCurrency = fvalue.replace(pValue, '######');
+        const shippingPriceFormatted = data.shippingPriceFormatted;
 
         //bind orde summary on header
         const orderSummaryElem = _qAll('.js-order-summary');
@@ -50,43 +48,37 @@
                 let orderTotal = data.orderPrice;
 
                 for(let i = 0; i < data.relatedOrders.length; i++ ) {
-                    if(data.relatedOrders[i].orderStatus !== 'Cancel') {
-                        orderTotal += data.relatedOrders[i].orderPrice;
-                    }
+                    orderTotal += data.relatedOrders[i].orderPrice;
                 }
 
                 orderSummaryElem[i].innerHTML = orderSummaryElem[i].innerHTML.replace('orderNumber', data.orderNumber)
-                                    .replace('orderDate', utils.formatDate(js_translate.dateFormat,js_translate.splitSymbol))
+                                    .replace('orderDate', d.toISOString().split('T')[0])
                                     .replace('customerName', data.firstName + ' ' + data.lastName)
                                     .replace('customerEmail', data.customerEmail)
                                     .replace('orderTotalValue', orderTotal.toFixed(2))
                                     .replace('currencyCode', data.currencyCode)
-                                    .replace('orderTotal', fCurrency.replace('######', orderTotal.toFixed(2).toString().replace('.', dotOrComma)))
-                                    .replace('orderSaved', fCurrency.replace('######', confirm.orderInfo.savedTotal.toFixed(2).toString().replace('.', dotOrComma)));
+                                    .replace('orderTotal', utils.formatPrice(orderTotal.toFixed(2), fCurrency, shippingPriceFormatted))
+                                    .replace('orderSaved', utils.formatPrice(confirm.orderInfo.savedTotal.toFixed(2), fCurrency, shippingPriceFormatted));
             }
         }
 
         //bind shipping address
         const shippingElem = _q('.js-shippingaddress');
-        if(shippingElem) {
-            const shippingTmp = `<div class="receipt-details">
-                                    <span>${data.shippingAddress.firstName} ${data.shippingAddress.lastName}</span>
-                                    <span>${data.shippingAddress.address1}</span>
-                                    <span>${data.shippingAddress.city} ${data.shippingAddress.state} ${data.shippingAddress.countryCode}</span>
-                                    <span>${data.shippingAddress.zipCode}</span>
-                                </div>`;
-            shippingElem.innerHTML += shippingTmp;
-        }
         const billingElem = _q('.js-billingaddress');
-        if(billingElem) {
-            const billingTmp = `<div class="receipt-details">
-                                    <span>${data.billingAddress.firstName} ${data.billingAddress.lastName}</span>
-                                    <span>${data.billingAddress.address1}</span>
-                                    <span>${data.billingAddress.city} ${data.billingAddress.state} ${data.billingAddress.countryCode}</span>
-                                    <span>${data.billingAddress.zipCode}</span>
-                                </div>`;
-            billingElem.innerHTML += billingTmp;
-        }
+        const shippingTmp = `<div class="receipt-details">
+                                <span>${data.shippingAddress.firstName} ${data.shippingAddress.lastName}</span>
+                                <span>${data.shippingAddress.address1}</span>
+                                <span>${data.shippingAddress.city} ${data.shippingAddress.state} ${data.shippingAddress.countryCode}</span>
+                                <span>${data.shippingAddress.zipCode}</span>
+                            </div>`;
+        const billingTmp = `<div class="receipt-details">
+                                <span>${data.billingAddress.firstName} ${data.billingAddress.lastName}</span>
+                                <span>${data.billingAddress.address1}</span>
+                                <span>${data.billingAddress.city} ${data.billingAddress.state} ${data.billingAddress.countryCode}</span>
+                                <span>${data.billingAddress.zipCode}</span>
+                            </div>`;
+        shippingElem.innerHTML += shippingTmp;
+        billingElem.innerHTML += billingTmp;
 
         //bind product list
         let shipping = "Shipping",
@@ -116,7 +108,9 @@
         let installmentText = '';
         if(confirm.orderInfo.installmentValue && confirm.orderInfo.installmentValue !== '') {
             const mainPrice = (data.orderPrice / confirm.orderInfo.installmentValue).toFixed(2);
-            installmentText = ' (' +  confirm.orderInfo.installmentText.replace(/N/, confirm.orderInfo.installmentValue).replace(/\$price/, 'R$' + mainPrice.replace(/\./, ',')) + ')';
+            installmentText = ' (' + confirm.orderInfo.installmentText
+                                .replace(/N/, confirm.orderInfo.installmentValue)
+                                .replace(/\$price/, utils.formatPrice(mainPrice, fCurrency, shippingPriceFormatted)) + ')';
         }
 
         let mainProductNames = (typeof mainProducts !== 'undefined') ? mainProducts : false;
@@ -124,7 +118,7 @@
 
         let listProduct = productItemTmp.replace('{productName}', data.productName)
                                 .replace(/\{productPrice\}/g, data.orderProductPriceFormatted)
-                                .replace(/\{productTotal\}/g, `${data.orderPriceFormatted}${installmentText}`)
+                                .replace(/\{productTotal\}/g, `${data.orderPriceFormatted}<em>${installmentText}</em>`)
                                 .replace('{shippingPrice}', data.shippingPriceFormatted)
                                 .replace('{midDescriptor}', data.receipts[0].midDescriptor ? data.receipts[0].midDescriptor : 'Paypal')
                                 .replace(/\{orderNumber\}/g, data.orderNumber);
@@ -139,16 +133,16 @@
         }
 
         for(let i = 0; i < data.relatedOrders.length; i++) {
-            if(data.relatedOrders[i].orderStatus === 'Cancel') continue;
-
             if(confirm.orderInfo.installmentValue && confirm.orderInfo.installmentValue !== '') {
                 const mainPrice = (data.relatedOrders[i].orderPrice / confirm.orderInfo.installmentValue).toFixed(2);
-                installmentText = ' (' + confirm.orderInfo.installmentText.replace(/N/, confirm.orderInfo.installmentValue).replace(/\$price/, 'R$' + mainPrice.replace(/\./, ',')) + ')';
+                installmentText = ' (' + confirm.orderInfo.installmentText
+                                    .replace(/N/, confirm.orderInfo.installmentValue)
+                                    .replace(/\$price/, utils.formatPrice(mainPrice, fCurrency, shippingPriceFormatted)) + ')';
             }
 
             let itemTmp = productItemTmp.replace('{productName}', data.relatedOrders[i].productName)
                                 .replace(/\{productPrice\}/g, data.relatedOrders[i].orderProductPriceFormatted)
-                                .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}${installmentText}`)
+                                .replace(/\{productTotal\}/g, data.relatedOrders[i].orderPriceFormatted)
                                 .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
                                 .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
                                 .replace(/\{orderNumber\}/g, data.relatedOrders[i].orderNumber);
@@ -162,9 +156,7 @@
         }
         const ul = document.createElement('ul');
         ul.innerHTML = listProduct;
-        let receiptList = _q('.receipt-list');
-        if(receiptList)
-           receiptList.appendChild(ul);
+        _q('.receipt-list').appendChild(ul);
     }
 
     //Fire Cake Pixel
@@ -172,11 +164,12 @@
     utils.fireEverFlow();
     utils.firePicksell();
 
-    /*--------start : run common confirm------------*/
+    /*--------start : run common Confirm------------*/
     const CommonConfirm = utils.CommonConfirm;
-    class Confirm extends CommonConfirm {
+    class ConfirmV2 extends CommonConfirm {
     }
-    const insConfirm = new Confirm();
-    insConfirm.init();
-    /*--------/end : run common confirm------------*/
+    const isConfirmV2 = new ConfirmV2();
+    isConfirmV2.init();
+    /*--------/end : run common Confirm------------*/
+
 })(window.utils);
