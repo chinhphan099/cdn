@@ -177,13 +177,11 @@
         // Chinh
         const postAPI = `${eCRM.Order.baseAPIEndpoint}/orders/${localStorage.getItem('upsellOrderNumber')}/${upsell.products[0].productId}`;
         const orderData = {
-            "productId": upsell.orderInfo.orderedProducts[0].pid,
+            // "productId": upsell.orderInfo.orderedProducts[0].pid,
             "shippingMethodId": upsell.products[window.upsell_productindex].shippings.length > 0 ? upsell.products[window.upsell_productindex].shippings[0].shippingMethodId: null,
             "comment": "",
             "useShippingAddressForBilling": true,
-            "customer": {
-                email: upsell.orderInfo.cusEmail
-            },
+            "customer": {email: upsell.orderInfo.cusEmail},
             "payment": pay,
             "funnelBoxId": 0,
             "shippingAddress": upsell.orderInfo.addressId != null ? { id: upsell.orderInfo.addressId } : null,
