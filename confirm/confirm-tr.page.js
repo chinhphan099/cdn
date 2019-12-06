@@ -48,11 +48,13 @@
                 let orderTotal = data.orderPrice;
 
                 for(let i = 0; i < data.relatedOrders.length; i++ ) {
-                    orderTotal += data.relatedOrders[i].orderPrice;
+                    if(data.relatedOrders[i].orderStatus !== 'Cancel') {
+                        orderTotal += data.relatedOrders[i].orderPrice;
+                    }
                 }
 
                 orderSummaryElem[i].innerHTML = orderSummaryElem[i].innerHTML.replace('orderNumber', data.orderNumber)
-                                    .replace('orderDate', d.toISOString().split('T')[0])
+                                    .replace('orderDate', utils.formatDate(js_translate.dateFormat, js_translate.splitSymbol))
                                     .replace('customerName', data.firstName + ' ' + data.lastName)
                                     .replace('customerEmail', data.customerEmail)
                                     .replace('orderTotal', fCurrency.replace('######', orderTotal.toFixed(2).toString().replace('.', dotOrComma)))
@@ -129,6 +131,8 @@
         }
 
         for(let i = 0; i < data.relatedOrders.length; i++) {
+            if(data.relatedOrders[i].orderStatus === 'Cancel') continue;
+
             if(confirm.orderInfo.installmentValue && confirm.orderInfo.installmentValue !== '') {
                 const mainPrice = (data.relatedOrders[i].orderPrice / confirm.orderInfo.installmentValue).toFixed(2);
                 installmentText = ' (' + confirm.orderInfo.installmentText.replace(/N/, confirm.orderInfo.installmentValue).replace(/\$price/, 'R$' + mainPrice.replace(/\./, ',')) + ')';
@@ -150,13 +154,16 @@
         }
         const ul = document.createElement('ul');
         ul.innerHTML = listProduct;
-        _q('.receipt-list').appendChild(ul);
+        let receiptList = _q('.receipt-list');
+        if(receiptList) {
+           receiptList.appendChild(ul);
+        }
     }
 
     //Fire Cake Pixel
     utils.fireCakePixel();
     utils.fireEverFlow();
-  utils.firePicksell();
+    utils.firePicksell();
 
   /*--------start : run common confirm------------*/
     const CommonConfirm = utils.CommonConfirm;
