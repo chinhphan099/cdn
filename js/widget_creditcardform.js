@@ -268,6 +268,19 @@
         _qById('creditcard_cvv').addEventListener('change', function () {
             validateCVV(this);
         });
+
+        //Name on card
+        if(!!_qById('creditcard_nameoncard')) {
+            _qById('creditcard_nameoncard').addEventListener('keyup', function () {
+                utils.validateInput(this);
+            });
+            _qById('creditcard_nameoncard').addEventListener('blur', function () {
+                utils.validateInput(this);
+            });
+            _qById('creditcard_nameoncard').addEventListener('change', function () {
+                utils.validateInput(this);
+            });
+        }
     }
 
     //Installment payment : only for Brazil
@@ -287,6 +300,9 @@
         validateCreditCardNumber(_qById('creditcard_creditcardnumber'));
         validateExpireDate(_qById('creditcard_expirydate'));
         validateCVV(_qById('creditcard_cvv'));
+        if(!!_qById('creditcard_nameoncard')) {
+            utils.validateInput(_qById('creditcard_nameoncard'));
+        }
 
         isValid = _q('#frmCreditCard input.input-error') ? false : true;
 
