@@ -89,9 +89,10 @@
             expiration = expiremonth.value + '/' + expireyear.value;
         }
 
+        const shippingIndex = (typeof window.shippingIndex === 'number' && window.shippingIndex !== -1) ? window.shippingIndex : 0;
         const orderData = {
             'couponCode': couponCode,
-            'shippingMethodId': product.shippings.length > 0 ? product.shippings[0].shippingMethodId : null,
+            'shippingMethodId': product.shippings.length > 0 ? product.shippings[shippingIndex].shippingMethodId : null,
             'comment': '',
             'useShippingAddressForBilling': useShippingAddressForBilling,
             'productId': product.productId,
