@@ -1,12 +1,7 @@
-((utils) => {
-    if (!utils) {
-        console.log('utils module is not found');
-        return;
-    }
-
+(() => {
     const templateFomo = document.querySelector('.w_fomo_wrapper').innerHTML;
 
-    const fetchUrl = async (url) => {
+    async function fetchUrl(url) {
         const response = await fetch(url)
                 .then(response => {
                     if (response.ok) {
@@ -18,21 +13,23 @@
                 });
 
         return response;
-    };
+    }
 
-    const initial = () => {
-        fetchUrl(window.js_translate.dataUrl).then((data) => {
-            if(!_q('.edit_mode') && !!data) {
-                bindFomo(data);
-            }
-        });
-    };
+    function getQueryParameter(param) {
+        let href = '';
+        if (location.href.indexOf('?')) {
+            href = location.href.substr(location.href.indexOf('?'));
+        }
 
-    const isMobile = () => {
+        const value = href.match(new RegExp('[\?\&]' + param + '=([^\&]*)(\&?)', 'i'));
+        return value ? value[1] : '';
+    }
+
+    function isMobile() {
         return /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    };
+    }
 
-    const bindFomo = (data) => {
+    function bindFomo(data) {
         let count = 1;
         let fomoPopup = setInterval(function() {
             createNotifyItem(data);
@@ -41,9 +38,9 @@
             }
             count++;
         }, 15000, count);
-    };
+    }
 
-    const createNotifyItem = (data) => {
+    function createNotifyItem(data) {
         const firstName = data.firstNames[Math.floor(Math.random() * data.firstNames.length)],
             lastName = data.lastNames[Math.floor(Math.random() * data.lastNames.length)],
             location = data.locations[Math.floor(Math.random() * data.locations.length)],
@@ -76,9 +73,19 @@
         setTimeout(function () {
             dailogFomo.classList.remove('notify');
         }, 5400);
-    };
+    }
+
+    function initial() {
+        fetchUrl(window.js_translate.dataUrl).then((data) => {
+            if(!_q('.edit_mode') && !!data) {
+                bindFomo(data);
+            }
+        });
+    }
 
     window.addEventListener('DOMContentLoaded', () => {
-        initial();
+        if(getQueryParameter('fomo') !== '0') {
+            initial();
+        }
     });
-})(window.utils);
+})();
