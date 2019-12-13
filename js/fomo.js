@@ -77,7 +77,7 @@
 
     function initial() {
         fetchUrl(window.js_translate.dataUrl).then((data) => {
-            if(!_q('.edit_mode') && !!data) {
+            if(!document.querySelector('.edit_mode') && !!data) {
                 bindFomo(data);
             }
         });
