@@ -15,6 +15,23 @@
         return response;
     }
 
+    function q(selector) {
+        var qSelector = document.querySelectorAll(selector);
+
+        return {
+            addClass: function(className) {
+                for(let elm of qSelector) {
+                    elm.classList.add(className);
+                }
+            },
+            removeClass: function(className) {
+                for(let elm of qSelector) {
+                    elm.classList.remove(className);
+                }
+            }
+        }
+    }
+
     function getQueryParameter(param) {
         let href = '';
         if (location.href.indexOf('?')) {
@@ -45,10 +62,10 @@
             lastName = data.lastNames[Math.floor(Math.random() * data.lastNames.length)],
             location = data.locations[Math.floor(Math.random() * data.locations.length)],
             randTime = Math.floor((Math.random() * 40) + 5);
-        let fomoHTML = templateFomo.replace('{firstName}', firstName)
-                                    .replace('{lastName}', lastName)
-                                    .replace('{location}', location)
-                                    .replace('{randTime}', randTime);
+        let fomoHTML = templateFomo.replace(/\{firstName\}/g, firstName)
+                                    .replace(/\{lastName\}/g, lastName)
+                                    .replace(/\{location\}/g, location)
+                                    .replace(/\{randTime\}/g, randTime);
 
         //Add unit to fomo
         const randUnit = Math.floor(Math.random() * 3) + 1;
@@ -68,6 +85,16 @@
 
         const dailogFomo = document.querySelector('.w_fomo_wrapper');
         dailogFomo.innerHTML = fomoHTML;
+
+        // Handle show product name
+        const productNameElms = document.querySelectorAll('.w_fomo_wrapper .p-name');
+        if(productNameElms.length > 1) {
+            q('.w_fomo_wrapper .p-name').addClass('hidden');
+            let randomNumber = Math.floor(Math.random() * productNameElms.length);
+            productNameElms[randomNumber].classList.remove('hidden');
+            console.log(productNameElms, randomNumber);
+        }
+
         dailogFomo.classList.add('notify');
 
         setTimeout(function () {
