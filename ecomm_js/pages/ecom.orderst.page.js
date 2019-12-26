@@ -54,16 +54,16 @@ class OrderSt {
 
     // Event Functions
     faqEvent() {
-        if(!document.querySelector('.faqs')) {
+        if(!document.querySelector('.faq')) {
             return;
         }
-        document.querySelector('.faqs .text span').addEventListener('click', () => {
-            if(document.querySelector('.faqs .w_outer').classList.contains('visible')) {
-                document.querySelector('.faqs .w_outer').classList.remove('visible');
+        document.querySelector('.faq .text span').addEventListener('click', () => {
+            if(document.querySelector('.faq .w_outer').classList.contains('visible')) {
+                document.querySelector('.faq .w_outer').classList.remove('visible');
             }
             else {
-                document.querySelector('.faqs .w_outer').classList.add('visible');
-                document.querySelector('.faqs').scrollIntoView({behavior: 'smooth'});
+                document.querySelector('.faq .w_outer').classList.add('visible');
+                document.querySelector('.faq').scrollIntoView({behavior: 'smooth'});
             }
         });
     }
