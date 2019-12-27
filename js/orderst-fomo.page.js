@@ -92,7 +92,6 @@
             q('.w_fomo_wrapper .p-name').addClass('hidden');
             let randomNumber = Math.floor(Math.random() * productNameElms.length);
             productNameElms[randomNumber].classList.remove('hidden');
-            console.log(productNameElms, randomNumber);
         }
 
         dailogFomo.classList.add('notify');
