@@ -20,6 +20,7 @@ Element.prototype.appendAfter = function (element) {
     let timedPopup;
     let timeinterval;
     let isPopupShowing = false;
+    window.shippingIndex = 0;
 
     // Count down
     function timeRemaining(endtime) {
@@ -161,6 +162,53 @@ Element.prototype.appendAfter = function (element) {
         return {wPrice, wFormatPrice};
     }
 
+    function implementDeliveryOptions(data) {
+        if(!_q('.delivery-options') || !_q('[name="deliveryOptions"]:checked')) {
+            return;
+        }
+
+        // Add index into shippings data then ascending short shipping array base on price form low to high
+        let shippings = data.shippings.map((obj, index) => {
+            obj.index = index;
+            return obj;
+        }).sort(function(a, b) {
+            return a.price - b.price;
+        });
+
+        // Set value for delivery options base on field index of Ascending array shipping
+        const deliveryRadios = _qAll('.delivery-options input[type="radio"]');
+        Array.prototype.slice.call(deliveryRadios).forEach((deliveryRadio, i) => {
+            if(!shippings[i]) {
+                return;
+            }
+            deliveryRadio.value = shippings[i].index;
+
+            const shippingFees = _getClosest(deliveryRadio, '.w_radio').querySelectorAll('.shipping-fee');
+            Array.prototype.slice.call(shippingFees).forEach((shippingFee) => {
+                shippingFee.querySelector('.js-img-loading').classList.add('hidden');
+                let shippingFormated = shippings[i].formattedPrice;
+                if(shippings[i].price === 0) {
+                    shippingFormated = `<b>${js_translate.freeCap || 'FREE'}</b>`;
+                }
+                shippingFee.querySelector('.sf').innerHTML = shippingFormated;
+            });
+        });
+
+        window.shippingIndex = Number(_q('[name="deliveryOptions"]:checked').value);
+    }
+
+    function onChangeDeliveryOptions() {
+        const deliveryRadios = _qAll('.delivery-options input[type="radio"]');
+        if(deliveryRadios.length === 0) {
+            return;
+        }
+        Array.prototype.slice.call(deliveryRadios).forEach((deliveryRadio, i) => {
+            deliveryRadio.addEventListener('click', () => {
+                loadStatistical();
+            });
+        });
+    }
+
     const productNameText = _q('.statistical .td-name').innerText;
     function loadStatistical(dataResponse) {
         if(!!dataResponse) {
@@ -173,12 +221,14 @@ Element.prototype.appendAfter = function (element) {
             productItem = _getClosest(checkedItem, '.productRadioListItem'),
             data = JSON.parse(checkedItem.dataset.product),
             taxes = data.productPrices.Surcharge.FormattedValue;
-        let shippingFee = data.shippings[0].formattedPrice;
+
+        implementDeliveryOptions(data);
+        let shippingFee = data.shippings[window.shippingIndex].formattedPrice;
 
         const warranty = getWarrantyPrice(fCurrency, taxes),
-            grandTotal = (data.shippings[0].price + data.productPrices.DiscountedPrice.Value + warranty.wPrice).toFixed(2);
+            grandTotal = (data.shippings[window.shippingIndex].price + data.productPrices.DiscountedPrice.Value + warranty.wPrice).toFixed(2);
 
-        if(data.shippings[0].price === 0 && !!js_translate.freeCap) {
+        if(data.shippings[window.shippingIndex].price === 0 && !!js_translate.freeCap) {
             shippingFee = `<b>${js_translate.freeCap}</b>`;
         }
 
@@ -220,7 +270,7 @@ Element.prototype.appendAfter = function (element) {
         let checkQT = false;
         for (let input of inputs) {
             input.addEventListener('click', function () {
-                checkIsSpecialItem();
+                // checkIsSpecialItem(); // Existing on order.page.js
             });
 
             input.addEventListener('change', (e) => {
@@ -449,7 +499,11 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function activePackageGift() {
-        if(_qAll('.js-list-group li').length > 1) {
+        //Check if have product for gift and holiday
+        if(utils.getQueryParameter('pid') == 2 && _qAll('.js-list-group li').length > 2) {
+            _qAll('.js-list-group li')[2].click();
+        }
+        else {
             _qAll('.js-list-group li')[1].click();
         }
         if(_q('.free-gift-apply')) {
@@ -541,6 +595,14 @@ Element.prototype.appendAfter = function (element) {
             return;
         }
 
+        //Check if have param of product gift or product holiday
+        if(utils.getQueryParameter('pid') == 2 && !!_q('.gift-popup .holiday')) {
+           _q('.gift-popup .holiday').classList.add('hidden');
+        }
+        else if(_q('.gift-popup .gift')) {
+            _q('.gift-popup .gift').classList.add('hidden');
+        }
+
         if (utils.isDevice()) {
             window.addEventListener('touchmove', handleTouchMove);
         }
@@ -619,6 +681,7 @@ Element.prototype.appendAfter = function (element) {
         onChangeMonth();
         onChangeYear();
         onClickInputSelect();
+        onChangeDeliveryOptions();
         if(utils.getQueryParameter('loader') === '1') {
             utils.events.on('bindDoneLoader', handleExitPopupEvents);
         }
@@ -646,7 +709,7 @@ Element.prototype.appendAfter = function (element) {
         implementYearDropdown();
         implementMonthDropdown();
         setExpirationValue();
-        checkIsSpecialItem();
+        // checkIsSpecialItem();
         listener();
         hiddenElementByParamUrl();
     }
