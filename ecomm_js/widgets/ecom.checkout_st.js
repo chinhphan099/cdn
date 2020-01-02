@@ -3,6 +3,8 @@ import Utils from '../common/utils.js';
 import CreditCardPayment from '../common/creditcard_payment.js';
 import PaypalPayment from '../common/paypal_payment.js';
 import CheckoutValidate from '../common/checkoutValidation.js';
+import OrderSt from '../pages/ecom.orderst.page.js';
+import ProductList from '../widgets/ecom_widget_productlist.js';
 
 class Checkout {
     constructor() {
@@ -405,6 +407,11 @@ class Checkout {
 
     // Init
     init() {
+        const orderSt = new OrderSt();
+        orderSt.init();
+        const productList = new ProductList();
+        productList.init();
+
         this.getLocation();
         this.getCountries();
         this.implementYearDropdown();
@@ -415,6 +422,5 @@ class Checkout {
         });
     }
 }
-
 const checkout = new Checkout();
 checkout.init();

@@ -1,7 +1,7 @@
 import { constants } from '../common/constant.js';
 import Utils from '../common/utils.js';
 
-class OrderSt {
+export default class OrderSt {
     constructor() {
         this.isClickedInput = false;
         this.isClickedYesButton = false;
@@ -235,5 +235,3 @@ class OrderSt {
         });
     }
 }
-const orderSt = new OrderSt();
-orderSt.init();

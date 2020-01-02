@@ -1,7 +1,7 @@
 import { constants } from '../common/constant.js';
 import Utils from '../common/utils.js';
 
-class ProductList {
+export default class ProductList {
     constructor() {
         this.isPopup = Utils.getQueryParameter('et') === '1';
         this.packages = [];
@@ -718,5 +718,3 @@ class ProductList {
         });
     }
 }
-const productList = new ProductList();
-productList.init();
