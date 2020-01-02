@@ -1,7 +1,7 @@
-import { constants } from '../js/common/constant.js';
-import Utils from '../js/common/utils.js';
-import CakePixel from '../js/common/cakepixel.js';
-import EverFlow from '../js/common/everflow.js';
+import { constants } from '../common/constant.js';
+import Utils from '../common/utils.js';
+import CakePixel from '../common/cakepixel.js';
+import EverFlow from '../common/everflow.js';
 
 class Confirm {
     constructor() {
