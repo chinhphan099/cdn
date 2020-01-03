@@ -1,4 +1,4 @@
-// Count Down
+/* Count Down */
 ((utils) => {
     if (!utils) {
         console.log('modules is not found');
@@ -61,7 +61,12 @@
             hourElm = elm.querySelector('.ex_hour'),
             minuteElm = elm.querySelector('.ex_minute'),
             secondElm = elm.querySelector('.ex_second'),
-            milisecondElm = elm.querySelector('.ex_milisecond');
+            milisecondElm = elm.querySelector('.ex_milisecond'),
+            dayTextElm = elm.querySelector('.day_text'),
+            hourTextElm = elm.querySelector('.hour_text'),
+            minuteTextElm = elm.querySelector('.minute_text'),
+            secondTextElm = elm.querySelector('.second_text'),
+            miliTextElm = elm.querySelector('.miliseconds_text');
 
         function updateClock() {
             if(miliseconds < 1) {
@@ -84,6 +89,22 @@
             }
             if(dayElm) {
                 dayElm.innerHTML = t.days < 10 ? '0' + t.days : t.days;
+            }
+
+            if(dayTextElm) {
+                dayTextElm.innerHTML = js_translate.days ? js_translate.days : 'DAYS';
+            }
+            if(hourTextElm) {
+                hourTextElm.innerHTML = js_translate.hours ? js_translate.hours : 'HOURS';
+            }
+            if(minuteTextElm) {
+                minuteTextElm.innerHTML = js_translate.minutes ? js_translate.minutes : 'MINUTES';
+            }
+            if(secondTextElm) {
+                secondTextElm.innerHTML = js_translate.seconds ? js_translate.seconds : 'SECONDS';
+            }
+            if(miliTextElm) {
+                miliTextElm.innerHTML = js_translate.milis ? js_translate.milis : 'MILISECONDS';
             }
         }
 
@@ -163,7 +184,7 @@
     });
 })(window.utils);
 
-// Count Up
+/* Count Up */
 ((utils) => {
     if (!utils) {
         console.log('modules is not found');
@@ -227,7 +248,12 @@
             hourElm = elm.querySelector('.ex_hour'),
             minuteElm = elm.querySelector('.ex_minute'),
             secondElm = elm.querySelector('.ex_second'),
-            milisecondElm = elm.querySelector('.ex_milisecond');
+            milisecondElm = elm.querySelector('.ex_milisecond'),
+            dayTextElm = elm.querySelector('.day_text'),
+            hourTextElm = elm.querySelector('.hour_text'),
+            minuteTextElm = elm.querySelector('.minute_text'),
+            secondTextElm = elm.querySelector('.second_text'),
+            miliTextElm = elm.querySelector('.miliseconds_text');
 
         function updateClock() {
             ++miliseconds;
@@ -250,6 +276,22 @@
             }
             if(dayElm) {
                 dayElm.innerHTML = t.days < 10 ? '0' + t.days : t.days;
+            }
+
+            if(dayTextElm) {
+                dayTextElm.innerHTML = js_translate.days ? js_translate.days : 'DAYS';
+            }
+            if(hourTextElm) {
+                hourTextElm.innerHTML = js_translate.hours ? js_translate.hours : 'HOURS';
+            }
+            if(minuteTextElm) {
+                minuteTextElm.innerHTML = js_translate.minutes ? js_translate.minutes : 'MINUTES';
+            }
+            if(secondTextElm) {
+                secondTextElm.innerHTML = js_translate.seconds ? js_translate.seconds : 'SECONDS';
+            }
+            if(miliTextElm) {
+                miliTextElm.innerHTML = js_translate.milis ? js_translate.milis : 'MILISECONDS';
             }
         }
 
