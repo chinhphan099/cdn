@@ -82,6 +82,12 @@
         shippingElem.innerHTML += shippingTmp;
         billingElem.innerHTML += billingTmp;
 
+        /*--------add address2 to form------------*/
+        if(!!data.shippingAddress.address2) {
+           shippingElem.querySelectorAll('span')[2].insertAdjacentHTML('beforebegin', `<span>${data.billingAddress.address2}</span>`);
+           billingElem.querySelectorAll('span')[2].insertAdjacentHTML('beforebegin', `<span>${data.billingAddress.address2}</span>`);
+        }
+
         //bind product list
         let shipping = "Shipping",
             total = "Total",
@@ -120,7 +126,7 @@
 
         let listProduct = productItemTmp.replace('{productName}', data.productName)
                                 .replace(/\{productPrice\}/g, data.orderProductPriceFormatted)
-                                .replace(/\{productTotal\}/g, `${data.orderPriceFormatted}${installmentText}`)
+                                .replace(/\{productTotal\}/g, `${data.orderPriceFormatted}<em>${installmentText}</em>`)
                                 .replace('{shippingPrice}', data.shippingPriceFormatted)
                                 .replace('{midDescriptor}', data.receipts[0].midDescriptor ? data.receipts[0].midDescriptor : 'Paypal')
                                 .replace(/\{orderNumber\}/g, data.orderNumber);
@@ -146,7 +152,7 @@
 
             let itemTmp = productItemTmp.replace('{productName}', data.relatedOrders[i].productName)
                                 .replace(/\{productPrice\}/g, data.relatedOrders[i].orderProductPriceFormatted)
-                                .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}${installmentText}`)
+                                .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}<em>${installmentText}</em>`)
                                 .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
                                 .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
                                 .replace(/\{orderNumber\}/g, data.relatedOrders[i].orderNumber);
@@ -163,6 +169,10 @@
         let receiptList = _q('.receipt-list');
         if(receiptList) {
            receiptList.appendChild(ul);
+        }
+
+        if(!!utils.localStorage().get('additionTextConfirmName')) {
+            _q('.receipt-list ul .item').querySelector('.inner span').insertAdjacentText('beforeend', ' ' + utils.localStorage().get('additionTextConfirmName'));
         }
     }
 
