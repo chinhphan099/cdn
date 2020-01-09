@@ -19,7 +19,7 @@
         if(isInstallment) {
             window.widget.installmentpayment = {
                 selectedMonth: '4',
-                optionText: '4 installments of $price every two weeks no interest'
+                optionText: js_translate.installmentOptionText || '4 installments of $price every two weeks no interest'
             };
         }
         else {

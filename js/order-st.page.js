@@ -233,6 +233,12 @@ Element.prototype.appendAfter = function (element) {
         }
 
         _q('.statistical .td-name').innerHTML = productNameText + ' ' + productItem.querySelector('.product-name p').innerHTML;
+        if(!!window.additionTextSumary && _q('.statistical').classList.contains('coupon-actived')) {
+            if(!!_q('.statistical .td-name .text-coupon')) {
+                _q('.statistical .td-name .text-coupon').parentNode.removeChild(_q('.statistical .td-name .text-coupon'));
+            }
+            _q('.statistical .td-name').insertAdjacentHTML('beforeend', ' ' + window.additionTextSumary.replace('{priceCoupOn}', fCurrency.replace('######', window.couponValue)));
+        }
         _q('.statistical .td-price').innerText = utils.formatPrice(data.productPrices.DiscountedPrice.Value.toFixed(2), fCurrency, taxes);
         _q('.statistical .td-shipping').innerHTML = shippingFee;
 
@@ -411,7 +417,7 @@ Element.prototype.appendAfter = function (element) {
                 }
 
                 let nameElm = _getClosest(items[i], '.productRadioListItem').querySelector('.product-name p');
-                nameElm.innerHTML = `${nameElm.innerHTML} ${window.additionText}`;
+                nameElm.innerHTML = `${nameElm.innerHTML} <span class="text-coupon">${window.additionText}</span>`;
 
                 items[i].setAttribute('data-product', JSON.stringify(dataProduct));
             }
@@ -431,15 +437,23 @@ Element.prototype.appendAfter = function (element) {
         if(_q('.coupon-apply')) {
             _q('.coupon-apply').style.display = 'block';
         }
-        if(!_qById('couponCode')) {
-            let couponCodeElm = document.createElement('input');
-            couponCodeElm.id = 'couponCode';
-            couponCodeElm.type = 'hidden';
-            _q('body').appendChild(couponCodeElm);
+        if(!!_q('.statistical')) {
+            _q('.statistical').classList.add('coupon-actived');
         }
-        _qById('couponCode').value = window.couponCodeId;
+        if(!_q('.coupon-popup').classList.contains('coupon-popup-future')) {
+            if(!_qById('couponCode')) {
+                let couponCodeElm = document.createElement('input');
+                couponCodeElm.id = 'couponCode';
+                couponCodeElm.type = 'hidden';
+                _q('body').appendChild(couponCodeElm);
+            }
+            _qById('couponCode').value = window.couponCodeId;
 
-        reImplementProductList(couponDiscount);
+            reImplementProductList(couponDiscount);
+        }
+        else {
+            utils.localStorage().set('additionTextConfirmName', window.additionTextSumary);
+        }
         loadStatistical();
 
         // Installment
@@ -580,6 +594,7 @@ Element.prototype.appendAfter = function (element) {
                 jsImageLoading.innerText = couponValFormat;
             }
             window.additionText = window.additionText.replace(/{couponPrice}/g, couponValFormat);
+            window.additionTextSumary = window.additionTextSumary.replace(/{couponPrice}/g, couponValFormat);
 
             if(!!_qById('couponBtn')) {
                 onActiveCoupon();
