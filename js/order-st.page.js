@@ -594,7 +594,9 @@ Element.prototype.appendAfter = function (element) {
                 jsImageLoading.innerText = couponValFormat;
             }
             window.additionText = window.additionText.replace(/{couponPrice}/g, couponValFormat);
-            window.additionTextSumary = window.additionTextSumary.replace(/{couponPrice}/g, couponValFormat);
+            if(!!window.additionTextSumary) {
+                window.additionTextSumary = window.additionTextSumary.replace(/{couponPrice}/g, couponValFormat);
+            }
 
             if(!!_qById('couponBtn')) {
                 onActiveCoupon();
