@@ -134,6 +134,12 @@
         return product;
     }
 
+    function syncDiscountVsFullPrice(product) {
+        product.productPrices.DiscountedPrice.Value = product.productPrices.FullRetailPrice.Value;
+        product.productPrices.DiscountedPrice.FormattedValue = product.productPrices.FullRetailPrice.FormattedValue
+        return product;
+    }
+
     function bindProducts(data) {
         console.log(data);
         const countryCodeIndex = utils.localStorage().get('countryCodeIndex');
@@ -142,6 +148,10 @@
                 try {
                     const radio = _qById('product_' + product.productId);
                     if(radio) {
+                        let options = JSON.parse(_qById('js-widget-products').dataset.options);
+                        if(options.hasOwnProperty('isUseFullPrice')) {
+                            product = syncDiscountVsFullPrice(product);
+                        }
                         if(!!utils.getQueryParameter('couponCode') && !!utils.getQueryParameter('couponValue')) {
                             // Apply coupon Code
                             product = applyCouponCode(product);
@@ -243,6 +253,10 @@
             //emit events
             try {
                 const productInfo = getDefaultSelectedProduct();
+                const currencyElms = _qAll('.jsCurrencyNumber');
+                Array.prototype.slice.call(currencyElms).forEach(currencyElm => {
+                    currencyElm.innerText = productInfo.fCurrency.replace('######', currencyElm.innerText);
+                });
                 if(!!productInfo && productInfo.currencyCode === '') {
                     productInfo.currencyCode = data.location.currencyCode;
                 }
@@ -275,6 +289,20 @@
             fullPrice: productInfo.productPrices.FullRetailPrice.FormattedValue,
             fullPriceValue: productInfo.productPrices.FullRetailPrice.Value
         });
+
+        //Enable Active Class for new  Checked Product
+        let productListWidget = _qById('js-widget-products'),
+            checkedProducts = _qAll('.productRadioListItem.checked-item');
+
+        if( productListWidget.dataset.activeclass != undefined ){
+            //Remove all ActiveClass for curent checked products
+            for(let item of checkedProducts){
+                item.classList.remove('checked-item');
+            }
+
+            //Add ActiveClass for new checked product
+            _getClosest(this,'.productRadioListItem').classList.add('checked-item');
+        }
     }
 
     function getSelectedProduct() {
@@ -335,33 +363,6 @@
         return result;
     }
 
-
-    // Product list Category ----------------------------------------------------------------------------------------
-    function getClosest(elem, selector) {
-        if(!Element.prototype.matches) {
-            Element.prototype.matches =
-                Element.prototype.matchesSelector ||
-                Element.prototype.mozMatchesSelector ||
-                Element.prototype.msMatchesSelector ||
-                Element.prototype.oMatchesSelector ||
-                Element.prototype.webkitMatchesSelector ||
-                function (s) {
-                    let matches = (this.document || this.ownerDocument).querySelectorAll(s),
-                        i = matches.length;
-                    while (--i >= 0 && matches.item(i) !== this) { }
-                    return i > -1;
-                }
-        }
-
-        // Get the closest matching element
-        for(; elem && elem !== document; elem = elem.parentNode) {
-            if(elem.matches(selector)) {
-                return elem;
-            }
-        }
-        return null;
-    }
-
     //create Extend Functional
     function q(selector) {
         var qSelector = _qAll(selector);
@@ -415,7 +416,7 @@
             for(let [index, proId] of currentPackage.entries()) {
                 if(index === indexItem) {
                     let input = _q('input[name="product"][value="' + proId + '"]');
-                    getClosest(input, '.productRadioListItem').querySelector('.js-unitDiscountRate').click();
+                    _getClosest(input, '.productRadioListItem').querySelector('.js-unitDiscountRate').click();
                 }
             }
         };
@@ -426,7 +427,7 @@
 
             for(let proId of packageDisplay) {
                 let inputElm = _qById('product_' + proId);
-                let proItem = getClosest(inputElm, '.productRadioListItem');
+                let proItem = _getClosest(inputElm, '.productRadioListItem');
 
                 let options = JSON.parse(_qById('js-widget-products').dataset.options);
                 if(isPopup) {
