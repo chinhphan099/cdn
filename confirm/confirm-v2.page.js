@@ -97,7 +97,7 @@
             total = js_translate.total;
             charges_statement = js_translate.product_charges_statement_confirm_page;
         }
-        const productItemTmp = `<li class="item">
+        let productItemTmp = `<li class="item">
                                     <div class="inner">
                                         <span>{productName}</span>
                                         <span>{productPrice}</span>
@@ -111,7 +111,26 @@
                                         <span>{productTotal}</span>
                                     </div>
                                     <div class="inner"><span>${charges_statement}</span></div>
+                                </li>`,
+            productItemMainTmp = productItemTmp;
+        if(utils.localStorage().get('preOrder') === 'true') {
+            let pre_order_product_charges_statement_confirm_page = js_translate.pre_order_product_charges_statement_confirm_page || 'Your deposit will be processed for {productTotal} ({orderNumber}) and will appear as {midDescriptor}. You will be charged the price of the products when they ship.';
+            productItemMainTmp = `<li class="item">
+                                    <div class="inner">
+                                        <span>{productName}</span>
+                                        <span>{productPrice}</span>
+                                    </div>
+                                    <div class="inner">
+                                        <span>${shipping}</span>
+                                        <span>{shippingPrice}</span>
+                                    </div>
+                                    <div class="inner">
+                                        <span>${total}</span>
+                                        <span>{productTotal}</span>
+                                    </div>
+                                    <div class="inner"><span>${pre_order_product_charges_statement_confirm_page}</span></div>
                                 </li>`;
+        }
         //Installment Payment : only for Brazil
         let installmentText = '';
         if(confirm.orderInfo.installmentValue && confirm.orderInfo.installmentValue !== '') {
@@ -124,7 +143,7 @@
         let mainProductNames = (typeof mainProducts !== 'undefined') ? mainProducts : false;
         let upsellProductNames = (typeof upsellProducts !== 'undefined') ? upsellProducts : false;
 
-        let listProduct = productItemTmp.replace('{productName}', data.productName)
+        let listProduct = productItemMainTmp.replace('{productName}', data.productName)
                                 .replace(/\{productPrice\}/g, data.orderProductPriceFormatted)
                                 .replace(/\{productTotal\}/g, `${data.orderPriceFormatted}<em>${installmentText}</em>`)
                                 .replace('{shippingPrice}', data.shippingPriceFormatted)
@@ -189,4 +208,9 @@
     isConfirmV2.init();
     /*--------/end : run common confirm------------*/
 
+    window.addEventListener('DOMContentLoaded', () => {
+        if(utils.localStorage().get('preOrder') === 'true') {
+            _q('.receipt-list .title').innerHTML = js_translate.pre_order_title || 'ITEMS PRE-ORDERED';
+        }
+    });
 })(window.utils);
