@@ -101,7 +101,7 @@ Element.prototype.appendAfter = function (element) {
         if(!!isPopupShowing) {
             return;
         }
-        const mbTimer = !!window.pendingTimeOnMobile ? Number(window.pendingTimeOnMobile) * 1000 : 5000;
+        const mbTimer = window.pendingTimeOnMobile !== '0' ? Number(window.pendingTimeOnMobile) * 1000 : 5000;
         window.removeEventListener('touchmove', handleTouchMove);
         mobileTimer = setTimeout(() => {
             // const product = _q('input[name="product"]:checked').dataset.product;
