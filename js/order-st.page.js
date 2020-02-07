@@ -331,7 +331,7 @@ Element.prototype.appendAfter = function (element) {
             monthDdl = _q('#monthddl');
 
         if(_qById('yearddl').value === curYear.toString() && Number(monthDdl.value) < curMonth) {
-            monthDdl.value = curMonth;
+            monthDdl.value = (curMonth < 10 ? ('0' + curMonth.toString()) : curMonth);
         }
     }
     function setExpirationValue() {
@@ -550,6 +550,9 @@ Element.prototype.appendAfter = function (element) {
             }
             else if(!!window.couponCodeId) {
                 afterActiveCoupon();
+                if(!!_qById('couponCode') && !!_qById('couponCode').value && !!window.couponValue) {
+                    utils.localStorage().set('couponValue', window.couponValue);
+                }
             }
             loadStatistical();
             hidePopup(true);
