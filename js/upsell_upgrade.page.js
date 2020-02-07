@@ -64,15 +64,35 @@
             _q('.js-basic-upsell-cta-button').classList.remove('disabled');
 
             const spanUpsellPriceElems = _qAll('.spanUpsellPrice');
+            const couponValue = utils.localStorage().get('couponValue');
             for(let spanUpsellPrice of spanUpsellPriceElems) {
-                let upgradeDiscountPrice = upsell.products[0].productPrices.DiscountedPrice.Value - upsell.orderInfo.orderTotal;
+                let upgradeDiscountPrice = upsell.products[0].productPrices.DiscountedPrice.Value;
+                if(!!couponValue) {
+                    if(couponValue.indexOf('%') > -1) {
+                        let percentDiscount = Number(couponValue.relace('%', ''));
+                        upgradeDiscountPrice = upgradeDiscountPrice - upgradeDiscountPrice * percentDiscount / 100;
+                    }
+                    else {
+                        upgradeDiscountPrice = upgradeDiscountPrice - Number(couponValue);
+                    }
+                }
                 upgradeDiscountPrice = upgradeDiscountPrice + upgradeDiscountPrice * upsell.orderInfo.lifetimeRate;
+                upgradeDiscountPrice = upgradeDiscountPrice - upsell.orderInfo.orderTotal;
                 spanUpsellPrice.innerHTML = utils.formatPrice(upgradeDiscountPrice.toFixed(2), fCurrency, upsell.products[0].shippings[0].formattedPrice);
             }
 
             const spanFullPriceElems = _qAll('.spanFullPrice');
             for(let spanFullPrice of spanFullPriceElems) {
                 let upgradeFullPrice = upsell.products[0].productPrices.FullRetailPrice.Value;
+                if(!!couponValue) {
+                    if(couponValue.indexOf('%') > -1) {
+                        let percentDiscount = Number(couponValue.relace('%', ''));
+                        upgradeFullPrice = upgradeFullPrice - upgradeFullPrice * percentDiscount / 100;
+                    }
+                    else {
+                        upgradeFullPrice = upgradeFullPrice - Number(couponValue);
+                    }
+                }
                 upgradeFullPrice = upgradeFullPrice + upgradeFullPrice * upsell.orderInfo.lifetimeRate;
                 spanFullPrice.innerHTML = utils.formatPrice(upgradeFullPrice.toFixed(2), fCurrency, upsell.products[0].shippings[0].formattedPrice);
             }
