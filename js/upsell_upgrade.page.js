@@ -193,7 +193,13 @@
             pay = {
                 paymentProcessorId: 5
             };
+        } else {
+            //add installment
+            if (!!upsell.orderInfo.installmentValue && upsell.orderInfo.installmentValue !== ''){
+                pay.Instalments = upsell.orderInfo.installmentValue;
+            }
         }
+
         let replacedParam = location.search.replace(/\?|\&*paymentId=[^&]*/g, '').replace(/\?|\&*token=[^&]*/g, '').replace(/\?|\&*PayerID=[^&]*/g, '');
         pay.callBackParam = replacedParam !== '' ? '?' + replacedParam + '&' + getUpParam() : '?' + getUpParam();
 
@@ -236,7 +242,7 @@
                 utils.localStorage().set('fireUpsellForGTMPurchase', getUpParam().split('=')[0]);
 
                 let orderInfo = saveInforForUpsellPage(result);
-                utils.localStorage().set('paypal_isMainOrder', 'main');
+                utils.localStorage().set('paypal_isMainOrder', 'upsell');
                 utils.localStorage().set('webkey_to_check_paypal', upsell.upsellWebKey);
 
                 if(result.upsells.length < 1 && orderInfo.upsells.length > 0) {
@@ -245,7 +251,7 @@
                 if (result.callBackUrl) {
                     document.location = result.callBackUrl;
                 }
-                else if (result.paymentContinueResult && result.paymentContinueResult.actionUrl !== "") {
+                else if (result.paymentContinueResult && result.paymentContinueResult.actionUrl !== '') {
                     document.location = result.paymentContinueResult.actionUrl;
                 }
                 else if (upsell.orderInfo.upsellIndex < upsell.orderInfo.upsells.length) {
