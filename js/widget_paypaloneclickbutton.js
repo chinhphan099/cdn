@@ -103,7 +103,7 @@
                 "lastName": null
             },
             "payment": {
-                paymentProcessorId: 5
+                paymentProcessorId: !!window.paymentProcessorId ? window.paymentProcessorId : 5
             },
             "shippingAddress": null,
             "billingAddress": null,
@@ -149,6 +149,9 @@
             lifetimeRate = 0,
             productWarranty = 0;
 
+        const fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
+        const pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
+
         if(product.shippings != null && product.shippings.length > 0) {
             shippingFee = product.shippings[0].price;
         }
@@ -161,9 +164,13 @@
         }
         if(_q("#txtMiniUpsellPID") != null) {
             if(_q("#txtMiniUpsellPID").checked == true) {
-                productWarranty = parseFloat(_q(".warrantyDiscountPrice").dataset.warrantydiscountprice);
+                if(!!_q(".warrantyDiscountPrice")){
+                    productWarranty = parseFloat(_q(".warrantyDiscountPrice").dataset.warrantydiscountprice);
+                }
             }
         }
+
+        const fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
         var orderInfo = {
             'orderParams': location.search.substr(1),
             'upsells': orderResponse.upsells,
@@ -180,6 +187,8 @@
             'orderTotalFull': product.productPrices.DiscountedPrice.Value + shippingFee + lifetimePrice + productWarranty,
             'savedTotal': product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value,
             'quantity': product.quantity,
+            'feeShipping': shippingFee,
+            'fCurrency': fCurrency,
             'orderedProducts': [
                 {
                     sku: product.sku,
