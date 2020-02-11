@@ -34,7 +34,10 @@
     }
 
     function placeMainOrder() {
-        const paymenttype = 'paypal';
+        let paymenttype = 'paypal';
+        if(window.paymentProcessorId === 31) {
+            paymenttype = 'paypal31';
+        }
         const paypalLoading = _q('.paypal-loading-overlay');
         const checkProductListValue = window.widget.productlist !== undefined ? window.widget.productlist.isValidProductList() : true;
 
