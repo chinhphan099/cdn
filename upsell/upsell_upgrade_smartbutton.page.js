@@ -82,7 +82,7 @@
 
     function handleBasicUpsellCTAButton() {
 		var tmp = JSON.parse(utils.localStorage().get('orderInfo'));
-        if(tmp && tmp.paymentProcessorId == 5){
+        if(tmp && (tmp.paymentProcessorId == 5 || tmp.paymentProcessorId == 31)){
             const paymenttype = 'paypal';
             //set paypal sandbox(test) or production(live)
             var checkIsTest = utils.getQueryParameter('isCardTest') ? 'sandbox' : 'production';
@@ -281,9 +281,9 @@
             cardId: upsell.orderInfo.cardId
         };
 
-        if (upsell.orderInfo.paymentProcessorId == "5") {
+        if (upsell.orderInfo.paymentProcessorId == "5" || upsell.orderInfo.paymentProcessorId == "31") {
             pay = {
-                paymentProcessorId: 5
+                paymentProcessorId: Number(upsell.orderInfo.paymentProcessorId)
             };
         }
         let replacedParam = location.search.replace(/\?|\&*paymentId=[^&]*/g, '').replace(/\?|\&*token=[^&]*/g, '').replace(/\?|\&*PayerID=[^&]*/g, '');
@@ -389,9 +389,9 @@
             cardId: upsell.orderInfo.cardId
         };
 
-        if (upsell.orderInfo.paymentProcessorId == "5") {
+        if (upsell.orderInfo.paymentProcessorId == "5" || upsell.orderInfo.paymentProcessorId == "31") {
             pay = {
-                paymentProcessorId: 5
+                paymentProcessorId: Number(upsell.orderInfo.paymentProcessorId)
             };
         }else{
 			//add installment
