@@ -383,10 +383,12 @@
         }
     }
 
-    //Fire Cake Pixel
+    utils.checkAffAndFireEvents();
+
+    /*//Fire Cake Pixel
     utils.fireCakePixel();
     utils.fireEverFlow();
-    utils.firePicksell();
+    utils.firePicksell();*/
 
     /*--------start : run common upsell------------*/
     const CommonUpsell = utils.CommonUpsell;
