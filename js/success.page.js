@@ -57,7 +57,11 @@
             if (successPage.orderInfo.paymentProcessorId == '31') {
                 trackingNumber = paypal.getToken();
             } else {
-                trackingNumber = paypal.getTransactionNumber();
+                if(!!utils.getQueryParameter('paymentId')) {
+                    trackingNumber = paypal.getTransactionNumber();
+                } else {
+                    trackingNumber = paypal.getToken();
+                }
             }
 
             debugger;
