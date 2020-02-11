@@ -89,7 +89,7 @@
             // if (result != null && result.success) {
             //     //store param in localStorage to fire gtm event of purchase
             //     utils.localStorage().set('fireUpsellForGTMPurchase', getUpParam().split('=')[0]);
-                
+
             //     utils.localStorage().set('paypal_isMainOrder', 'upsell');
 
             //     saveInforForUpsellPage(result);
@@ -223,11 +223,11 @@
     utils.fireEverFlow();
     utils.firePicksell();
     */
-	
+
     /*--------start : run common upsell------------*/
     const CommonUpsell = utils.CommonUpsell;
-    class Upsell extends CommonUpsell {         
-    }    
+    class Upsell extends CommonUpsell {
+    }
     const insUpsell = new Upsell();
     insUpsell.init();
     /*--------/end : run common upsell------------*/

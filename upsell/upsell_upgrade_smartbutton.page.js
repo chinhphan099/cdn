@@ -99,7 +99,7 @@
 					paypal.FUNDING.IDEAL,
 					paypal.FUNDING.MYBANK,
 					paypal.FUNDING.SOFORT
-				];			
+				];
 			}
             document.querySelectorAll('.js-btn-place-upsell-order').forEach(function(selector) {
                 (selector.getElementsByTagName("button"))[0].classList.add("hidden");
@@ -123,15 +123,15 @@
             		    const upsellData = getUpsellData();
             		    /*upsellData = eCRM.Order._beforeSubmitUpsellOrder(upsellData);
             		    var isCardTest = eCRM.isTest == true ? '?behaviorId=2' : ''; */
-            		    
+
             		    if (!upsellData || upsellData === '') {
                             console.log('Please provide valid order data!');
                             return;
                         }
                         const url = `${eCRM.Order.baseAPIEndpoint}/orders/${upsell.orderInfo.orderNumber}/${upsell.products[0].productId}`;
                         const postUpsellData = eCRM.Order._beforeSubmitUpsellOrder(upsellData);
-            		    
-            		    
+
+
             		    return paypal.request({
             		        method: 'post',
         					url: url,
@@ -142,33 +142,33 @@
             		    }).then(function(result){
             		        if (result != null && result.success) {
                                 utils.localStorage().set('paypal_isMainOrder', 'upsell');
-                
+
                                 saveInforForUpsellPage(result);
                                 utils.localStorage().set('webkey_to_check_paypal', upsell.upsellWebKey);
-                
+
                             } else {
                                 handleLastUpsellOrError();
                             }
-                            
+
                             return result.trackingNumber;
             		    });
             		},
-            		
+
             		onAuthorize: function(data, actions) {
             			 window.location = data.returnUrl;
             		},
-            		
+
             		onCancel: function(data, actions) {
             			 utils.redirectPage(siteSetting.declineUrl);
             		},
-            		
+
             		onError: function(err) {
             			 utils.redirectPage(siteSetting.declineUrl);
             		}
-            
+
             	}, selector);
             });
-            
+
         }
 		else{
 			const ctaButtons = _qAll('.js-btn-place-upsell-order');
@@ -181,7 +181,7 @@
 				});
 			}
 		}
-        
+
 
         _q('.js-btn-no-thanks').addEventListener('click', function (e) {
             e.preventDefault();
@@ -326,7 +326,7 @@
             if (result && result.success) {
 				//store param in localStorage to fire gtm event of purchase
                 utils.localStorage().set('fireUpsellForGTMPurchase', getUpParam().split('=')[0]);
-				
+
                 let orderInfo = saveInforForUpsellPage(result);
                 utils.localStorage().set('paypal_isMainOrder', 'upsell');
                 utils.localStorage().set('webkey_to_check_paypal', upsell.upsellWebKey);
@@ -454,15 +454,19 @@
         }
     }
 
+    utils.checkAffAndFireEvents();
+
+    /*
     //Fire Cake Pixel
     utils.fireCakePixel();
     utils.fireEverFlow();
     utils.firePicksell();
-	
+    */
+
 	/*--------start : run common upsell------------*/
     const CommonUpsell = utils.CommonUpsell;
-    class Upsell extends CommonUpsell {         
-    }    
+    class Upsell extends CommonUpsell {
+    }
     const insUpsell = new Upsell();
     insUpsell.init();
     /*--------/end : run common upsell------------*/

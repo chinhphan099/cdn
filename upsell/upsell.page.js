@@ -166,8 +166,8 @@
 				pay.Instalments = upsell.orderInfo.installmentValue;
 			}
 		}
-		
-		
+
+
 
         //add callback param to server to keep track
         let replacedParam = location.search.replace(/\?|\&*paymentId=[^&]*/g, '').replace(/\?|\&*token=[^&]*/g, '').replace(/\?|\&*PayerID=[^&]*/g, '');
@@ -224,13 +224,13 @@
         } else {
             handleLastUpsellOrError();
         }
-    }   
+    }
 
     utils.checkAffAndFireEvents();
 
     /*
     //Fire Cake Pixel
-    //utils.fireCakePixel();
+    utils.fireCakePixel();
     utils.fireEverFlow();
     utils.firePicksell();
     */

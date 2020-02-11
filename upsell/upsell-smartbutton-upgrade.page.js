@@ -366,8 +366,8 @@
 				pay.Instalments = upsell.orderInfo.installmentValue;
 			}
 		}
-		
-		
+
+
         let replacedParam = location.search.replace(/\?|\&*paymentId=[^&]*/g, '').replace(/\?|\&*token=[^&]*/g, '').replace(/\?|\&*PayerID=[^&]*/g, '');
         pay.callBackParam = replacedParam !== '' ? '?' + replacedParam + '&' + getUpParam() : '?' + getUpParam();
 
@@ -420,10 +420,14 @@
         }
     }
 
+    utils.checkAffAndFireEvents();
+
+    /*
     //Fire Cake Pixel
     utils.fireCakePixel();
     utils.fireEverFlow();
     utils.firePicksell();
+    */
 
     /*--------start : run common upsell------------*/
     const CommonUpsell = utils.CommonUpsell;

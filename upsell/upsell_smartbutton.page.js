@@ -21,14 +21,14 @@
         isTest: utils.getQueryParameter('isCardTest') ? true : false
     });
 
-    function replaceBracketsStrings() {              
+    function replaceBracketsStrings() {
         const allElements = _qAll('body *');
         for(let elem of allElements) {
-            if(elem.children.length === 0 || elem.tagName.toLowerCase() === 'span') {                
+            if(elem.children.length === 0 || elem.tagName.toLowerCase() === 'span') {
                 elem.innerHTML = elem.innerHTML.replace(/{price}/g, '<span class="spanUpsellPrice"></span>');
                 elem.innerHTML = elem.innerHTML.replace(/{fullprice}/g, '<span class="spanFullPrice"></span>');
             }
-        }                        
+        }
     }
     replaceBracketsStrings();
 
@@ -39,7 +39,7 @@
             lang: '',
             isTest: utils.getQueryParameter('isCardTest') ? true : false
         });
-        
+
         eCRM2.Campaign.getProducts(function (products) {
             upsell.products = products.prices;
             console.log(products.prices);
@@ -76,7 +76,7 @@
 					paypal.FUNDING.IDEAL,
 					paypal.FUNDING.MYBANK,
 					paypal.FUNDING.SOFORT
-				];			
+				];
 			}
             document.querySelectorAll('.js-btn-place-upsell-order').forEach(function(selector) {
                 (selector.getElementsByTagName("button"))[0].classList.add("hidden");
@@ -100,7 +100,7 @@
             		    const upsellData = getUpsellData();
             		    /*upsellData = eCRM.Order._beforeSubmitUpsellOrder(upsellData);
             		    var isCardTest = eCRM.isTest == true ? '?behaviorId=2' : ''; */
-            		    
+
             		    if (!upsellData || upsellData === '') {
                             console.log('Please provide valid order data!');
                             return;
@@ -114,8 +114,8 @@
                             }
                         }
                         const postUpsellData = eCRM.Order._beforeSubmitUpsellOrder(upsellData);
-            		    
-            		    
+
+
             		    return paypal.request({
             		        method: 'post',
         					url: url,
@@ -126,33 +126,33 @@
             		    }).then(function(result){
             		        if (result != null && result.success) {
                                 utils.localStorage().set('paypal_isMainOrder', 'upsell');
-                
+
                                 saveInforForUpsellPage(result);
                                 utils.localStorage().set('webkey_to_check_paypal', upsell.upsellWebKey);
-                
+
                             } else {
                                 handleLastUpsellOrError();
                             }
-                            
+
                             return result.trackingNumber;
             		    });
             		},
-            		
+
             		onAuthorize: function(data, actions) {
             			 window.location = data.returnUrl;
             		},
-            		
+
             		onCancel: function(data, actions) {
             			 utils.redirectPage(siteSetting.declineUrl);
             		},
-            		
+
             		onError: function(err) {
             			 utils.redirectPage(siteSetting.declineUrl);
             		}
-            
+
             	}, selector);
             });
-            
+
         }
         else{
             const ctaButtons = _qAll('.js-btn-place-upsell-order');
@@ -163,7 +163,7 @@
                         placeUpsellOrder();
                     });
                 });
-            } 
+            }
         }
         _q('.js-btn-no-thanks').addEventListener('click', function (e) {
             e.preventDefault();
@@ -187,10 +187,10 @@
             //         document.location = result.callBackUrl;
             //     } else if (result.paymentContinueResult && result.paymentContinueResult.actionUrl !== "") {
             //         document.location = result.paymentContinueResult.actionUrl;
-            //     } else if (upsell.orderInfo.upsellIndex < upsell.orderInfo.upsells.length) {                    
+            //     } else if (upsell.orderInfo.upsellIndex < upsell.orderInfo.upsells.length) {
             //         let upsellUrl = upsell.orderInfo.upsells[upsell.orderInfo.upsellIndex].upsellUrl;
             //         const redirectUrl = upsellUrl.substring(upsellUrl.lastIndexOf('/') + 1, upsellUrl.indexOf('?') >= 0 ? upsellUrl.indexOf('?') : upsellUrl.length);
-            //         utils.redirectPage(redirectUrl + '?' + getUpParam());                    
+            //         utils.redirectPage(redirectUrl + '?' + getUpParam());
             //     } else {
             //         handleLastUpsellOrError();
             //     }
@@ -221,7 +221,7 @@
             }
         }
 
-        let redirectUrl = siteSetting.successUrl;        
+        let redirectUrl = siteSetting.successUrl;
         utils.redirectPage(redirectUrl + upParam);
     }
 
@@ -231,7 +231,7 @@
         upsell.orderInfo.savedTotal += savedOfUpsell;
         upsell.orderInfo.isUpsellOrdered = 1;
         utils.localStorage().set('orderInfo', JSON.stringify(upsell.orderInfo));
-    }    
+    }
 
     function getUpsellData() {
         let pay = {
@@ -289,7 +289,7 @@
         let upParam = '';
         if (location.href.split('special-offer-', 2).length > 1) {
             upParam = 'up_' + location.href.split('special-offer-', 2)[1].split('.html', 1) + '=0';
-        }       
+        }
 
         upsell.orderInfo.upsellIndex += 1;
         utils.localStorage().set('orderInfo', JSON.stringify(upsell.orderInfo));
@@ -303,19 +303,23 @@
         }
     }
 
+    utils.checkAffAndFireEvents();
+
+    /*
     //Fire Cake Pixel
     utils.fireCakePixel();
     utils.fireEverFlow();
     utils.firePicksell();
+    */
 
 	/*--------start : run common upsell------------*/
     const CommonUpsell = utils.CommonUpsell;
-    class Upsell extends CommonUpsell {         
-    }    
+    class Upsell extends CommonUpsell {
+    }
     const insUpsell = new Upsell();
     insUpsell.init();
     /*--------/end : run common upsell------------*/
-	
+
     document.addEventListener('DOMContentLoaded', function () {
         handleBasicUpsellCTAButton();
     });

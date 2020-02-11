@@ -81,7 +81,7 @@
         let upsellData;
         try {
             upsellData = getUpsellData();
-        } catch(err) {            
+        } catch(err) {
             console.log('error placeUpsellOrder: ', err);
             return;
         }
@@ -97,7 +97,7 @@
             }
         } else {
             utils.showAjaxLoading();
-        }            
+        }
 
         eCRM.Order.placeUpsellOrder(upsellData, upsell.upsellWebKey, function (result) {
             if (result != null && result.success) {
@@ -136,8 +136,8 @@
 
         var systemZoom = width / window.screen.availWidth;
         var left = (width - w) / 2 / systemZoom + dualScreenLeft;
-        var top = (height - h) / 2 / systemZoom + dualScreenTop;       
-        
+        var top = (height - h) / 2 / systemZoom + dualScreenTop;
+
         var newWindow = window.open(url, title, 'scrollbars=yes, width=' + w / systemZoom + ', height=' + h / systemZoom + ', top=' + top + ', left=' + left);
 
         // Puts focus on the newWindow
@@ -243,15 +243,19 @@
         }
     }
 
+    utils.checkAffAndFireEvents();
+
+    /*
     //Fire Cake Pixel
     utils.fireCakePixel();
     utils.fireEverFlow();
     utils.firePicksell();
+    */
 
     /*--------start : run common upsell------------*/
     const CommonUpsell = utils.CommonUpsell;
-    class Upsell extends CommonUpsell {         
-    }    
+    class Upsell extends CommonUpsell {
+    }
     const insUpsell = new Upsell();
     insUpsell.init();
     /*--------/end : run common upsell------------*/
