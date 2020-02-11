@@ -369,7 +369,14 @@
         let upParam = '';
         if (location.href.split('special-offer-', 2).length > 1) {
             upParam = 'up_' + location.href.split('special-offer-', 2)[1].split('.html', 1) + '=0';
-                                                                                                                                                                                                                                                                                                                                              edirectUrl = upsellUrl.substring(upsellUrl.lastIndexOf('/') + 1, upsellUrl.indexOf('?') >= 0 ? upsellUrl.indexOf('?') : upsellUrl.length);
+        }
+
+        upsell.orderInfo.upsellIndex += 1;
+        utils.localStorage().set('orderInfo', JSON.stringify(upsell.orderInfo));
+
+        if (upsell.orderInfo.upsellIndex < upsell.orderInfo.upsells.length) {
+            let upsellUrl = upsell.orderInfo.upsells[upsell.orderInfo.upsellIndex].upsellUrl;
+            const redirectUrl = upsellUrl.substring(upsellUrl.lastIndexOf('/') + 1, upsellUrl.indexOf('?') >= 0 ? upsellUrl.indexOf('?') : upsellUrl.length);
             utils.redirectPage(redirectUrl + '?' + upParam);
         } else {
             handleLastUpsellOrError();
