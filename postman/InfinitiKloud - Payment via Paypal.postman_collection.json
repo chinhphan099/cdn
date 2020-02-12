@@ -1,0 +1,302 @@
+{
+	"info": {
+		"_postman_id": "fb560898-9588-43f6-bf01-98d3ba467c69",
+		"name": "InfinitiKloud - Payment via Paypal",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Order",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X_CID",
+						"value": "584EA331-0CD2-4C48-85D9-737F9DDDFA0B",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"billingAddress\": null,\r\n    \"comment\": \"\",\r\n    \"couponCode\": null,\r\n    \"customer\": {\r\n    \t\"email\": null,\r\n        \"phoneNumber\": null,\r\n        \"firstName\": null,\r\n        \"lastName\": null\r\n    },\r\n    \"funnelBoxId\": 0,\r\n    \"payment\": {\"paymentProcessorId\": 5},\r\n    \"productId\": 1089,\r\n    \"shippingAddress\": null,\r\n    \"shippingMethodId\": 3,\r\n    \"useShippingAddressForBilling\": true\r\n}"
+				},
+				"url": {
+					"raw": "https://sales-prod.tryemanagecrm.com/api/orders/7b91b3bc-78bb-479a-b6dd-ddfcd9133088?behaviorId=2",
+					"protocol": "https",
+					"host": [
+						"sales-prod",
+						"tryemanagecrm",
+						"com"
+					],
+					"path": [
+						"api",
+						"orders",
+						"7b91b3bc-78bb-479a-b6dd-ddfcd9133088"
+					],
+					"query": [
+						{
+							"key": "behaviorId",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Success Order Paypal",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X_CID",
+						"type": "text",
+						"value": "584EA331-0CD2-4C48-85D9-737F9DDDFA0B"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"paymentProcessorId\": 5,\r\n    \"trackingCountryCode\": \"\",\r\n    \"trackingLanguageCountryCode\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "https://websales-api.tryemanagecrm.com/api/orders/7b91b3bc-78bb-479a-b6dd-ddfcd9133088?trackingNumber=PAYID-LU4X55A4V997022DB9976215&isTest=true",
+					"protocol": "https",
+					"host": [
+						"websales-api",
+						"tryemanagecrm",
+						"com"
+					],
+					"path": [
+						"api",
+						"orders",
+						"7b91b3bc-78bb-479a-b6dd-ddfcd9133088"
+					],
+					"query": [
+						{
+							"key": "trackingNumber",
+							"value": "PAYID-LU4X55A4V997022DB9976215"
+						},
+						{
+							"key": "isTest",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Upsell Upgrade",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X_CID",
+						"value": "584EA331-0CD2-4C48-85D9-737F9DDDFA0B",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"campaignUpsell\": {\r\n        \"webKey\": \"0dccf37f-db92-428c-8b5c-3105d35263db\",\r\n        \"relatedOrderNumber\": \"66760414\"\r\n    },\r\n    \"antiFraud\": {\"sessionId\": \"91236688bd054bce80d6588b28433c9d\"},\r\n    \"customer\": {\"email\": null},\r\n    \"funnelBoxId\": 0,\r\n    \"payment\": {\"paymentProcessorId\": 5, \"callBackParam\": \"?mainFrame=1&previewPage=2&com.dotmarketing.htmlpa…otmarketing.persona.id=&isCardTest=1&up_upgrade=1\"},\r\n    \"productId\": 1089,\r\n    \"shippingAddress\": null,\r\n    \"shippingMethodId\": 9,\r\n    \"useShippingAddressForBilling\": true\r\n}"
+				},
+				"url": {
+					"raw": "https://sales-prod.tryemanagecrm.com/api/orders/68388164/1093",
+					"protocol": "https",
+					"host": [
+						"sales-prod",
+						"tryemanagecrm",
+						"com"
+					],
+					"path": [
+						"api",
+						"orders",
+						"68388164",
+						"1093"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Success paypal Upsell Upgrade",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X_CID",
+						"value": "PAYID-LUOC25A86M143180S977015R",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"paymentProcessorId\": 5,\r\n    \"trackingCountryCode\": \"\",\r\n    \"trackingLanguageCountryCode\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "https://websales-api.tryemanagecrm.com/api/orders/7b91b3bc-78bb-479a-b6dd-ddfcd9133088?trackingNumber=PAYID-LUNPSCA25W624718A358691H&isTest=true",
+					"protocol": "https",
+					"host": [
+						"websales-api",
+						"tryemanagecrm",
+						"com"
+					],
+					"path": [
+						"api",
+						"orders",
+						"7b91b3bc-78bb-479a-b6dd-ddfcd9133088"
+					],
+					"query": [
+						{
+							"key": "trackingNumber",
+							"value": "PAYID-LUNPSCA25W624718A358691H"
+						},
+						{
+							"key": "isTest",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Upsell v2",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "X_CID",
+						"value": "584EA331-0CD2-4C48-85D9-737F9DDDFA0B",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"antiFraud\": {\"sessionId\": \"91236688bd054bce80d6588b28433c9d\"},\r\n    \"campaignUpsell\": {\r\n        \"webKey\": \"83b628f6-1a3d-4be1-a93f-fe7251ea4e8c\",\r\n        \"relatedOrderNumber\": \"66838939\"\r\n    },\r\n    \"comment\": \"\",\r\n    \"customer\": {\"email\": null},\r\n    \"funnelBoxId\": 0,\r\n    \"payment\": {\"paymentProcessorId\": 5, \"callBackParam\": \"?mainFrame=1&previewPage=2&com.dotmarketing.htmlpa….dotmarketing.persona.id=&isCardTest=1&up_alarm=1\"},\r\n    \"productId\": 1086,\r\n    \"shippingAddress\": null,\r\n    \"shippingMethodId\": 9,\r\n    \"useShippingAddressForBilling\": true\r\n}"
+				},
+				"url": {
+					"raw": "https://sales-prod.tryemanagecrm.com/api/orders/83b628f6-1a3d-4be1-a93f-fe7251ea4e8c?behaviorId=2",
+					"protocol": "https",
+					"host": [
+						"sales-prod",
+						"tryemanagecrm",
+						"com"
+					],
+					"path": [
+						"api",
+						"orders",
+						"83b628f6-1a3d-4be1-a93f-fe7251ea4e8c"
+					],
+					"query": [
+						{
+							"key": "behaviorId",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Success paypal Upsell v2",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X_CID",
+						"value": "584EA331-0CD2-4C48-85D9-737F9DDDFA0B",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"paymentProcessorId\": 5,\r\n    \"trackingCountryCode\": \"\",\r\n    \"trackingLanguageCountryCode\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "https://websales-api.tryemanagecrm.com/api/orders/7b91b3bc-78bb-479a-b6dd-ddfcd9133088?trackingNumber=PAYID-LUKKKQY2RD1770968047772P&isTest=true",
+					"protocol": "https",
+					"host": [
+						"websales-api",
+						"tryemanagecrm",
+						"com"
+					],
+					"path": [
+						"api",
+						"orders",
+						"7b91b3bc-78bb-479a-b6dd-ddfcd9133088"
+					],
+					"query": [
+						{
+							"key": "trackingNumber",
+							"value": "PAYID-LUKKKQY2RD1770968047772P"
+						},
+						{
+							"key": "isTest",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "43dda7cc-d115-430a-a8c6-ec471656d4c6",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "b9632825-3248-442b-a727-d69afaac969f",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

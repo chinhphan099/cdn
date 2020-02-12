@@ -1,0 +1,48 @@
+{
+	"info": {
+		"_postman_id": "a8dd47e4-ac07-43ba-ab1c-79b4b7730ae3",
+		"name": "EComm",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Shopping Cart",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "X_CID",
+						"value": "584EA331-0CD2-4C48-85D9-737F9DDDFA0B",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"product\":{\"productId\":\"1086\",\"price\":\"49.99\",\"quantity\":\"1\",\"shippingMethodId\":\"9\"}}"
+				},
+				"url": {
+					"raw": "https://sales-prod.tryemanagecrm.com/api/shoppingcart/c431b582-1551-4c89-b837-bae359422804/new",
+					"protocol": "https",
+					"host": [
+						"sales-prod",
+						"tryemanagecrm",
+						"com"
+					],
+					"path": [
+						"api",
+						"shoppingcart",
+						"c431b582-1551-4c89-b837-bae359422804",
+						"new"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

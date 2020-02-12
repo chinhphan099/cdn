@@ -1,0 +1,223 @@
+{
+	"info": {
+		"_postman_id": "9883929c-f6e2-4303-bd4d-c6eb1db53cfd",
+		"name": "Campaign Informations",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Prices",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X_CID",
+						"value": "90ED5A72-0485-4B6C-9973-FA9E585AA95C",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "X_CID",
+						"value": "584EA331-0CD2-4C48-85D9-737F9DDDFA0B",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "X_CID",
+						"value": "19822FEF-80C0-4E76-AC06-1C9140D937D2",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "X_CID",
+						"value": "21682994-4932-40A1-82AA-0607659FD974",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://websales-api.tryemanagecrm.com/api/campaigns/4cb3565a-a27c-4620-95f1-8a46fb4597d3/products/prices",
+					"protocol": "https",
+					"host": [
+						"websales-api",
+						"tryemanagecrm",
+						"com"
+					],
+					"path": [
+						"api",
+						"campaigns",
+						"4cb3565a-a27c-4620-95f1-8a46fb4597d3",
+						"products",
+						"prices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Settings",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X_CID",
+						"value": "90ED5A72-0485-4B6C-9973-FA9E585AA95C",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "X_CID",
+						"value": "584EA331-0CD2-4C48-85D9-737F9DDDFA0B",
+						"type": "text"
+					},
+					{
+						"key": "X_CID",
+						"value": "8d78bc7e-35fa-48a4-9733-a1933c1dc548",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "X_CID",
+						"value": "E2F51A0F-D9F5-4A9D-8FF0-FD010F88FABD",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "X_CID",
+						"value": "21682994-4932-40A1-82AA-0607659FD974",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://websales-api.tryemanagecrm.com/api/campaigns/95932e22-989b-46ba-8ca1-f3ce2f4fdaa4/settings",
+					"protocol": "https",
+					"host": [
+						"websales-api",
+						"tryemanagecrm",
+						"com"
+					],
+					"path": [
+						"api",
+						"campaigns",
+						"95932e22-989b-46ba-8ca1-f3ce2f4fdaa4",
+						"settings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Upsells",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X_CID",
+						"value": "90ED5A72-0485-4B6C-9973-FA9E585AA95C",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "X_CID",
+						"value": "584EA331-0CD2-4C48-85D9-737F9DDDFA0B",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "X_CID",
+						"value": "E2F51A0F-D9F5-4A9D-8FF0-FD010F88FABD",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "X_CID",
+						"value": "8d78bc7e-35fa-48a4-9733-a1933c1dc548",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "X_CID",
+						"value": "19822FEF-80C0-4E76-AC06-1C9140D937D2",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "X_CID",
+						"value": "FF473CF2-E74E-4CAD-A92D-5395E6C6961F",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "X_CID",
+						"value": "2832216E-87E2-4F70-86CD-DE50A5A6155E",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "X_CID",
+						"value": "52708BE9-8D6D-4A8F-8A1D-86AB8AC71476",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "X_CID",
+						"value": "21682994-4932-40A1-82AA-0607659FD974",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://websales-api.tryemanagecrm.com/api/campaigns/4cb3565a-a27c-4620-95f1-8a46fb4597d3/upsells",
+					"protocol": "https",
+					"host": [
+						"websales-api",
+						"tryemanagecrm",
+						"com"
+					],
+					"path": [
+						"api",
+						"campaigns",
+						"4cb3565a-a27c-4620-95f1-8a46fb4597d3",
+						"upsells"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Coupon",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X_CID",
+						"value": "584EA331-0CD2-4C48-85D9-737F9DDDFA0B",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://websales-api.tryemanagecrm.com/api/campaigns/99b1a8df-defa-4018-8ba0-4ffb4a7f0595/coupons/TGRG201910?currencyCode=USD",
+					"protocol": "https",
+					"host": [
+						"websales-api",
+						"tryemanagecrm",
+						"com"
+					],
+					"path": [
+						"api",
+						"campaigns",
+						"99b1a8df-defa-4018-8ba0-4ffb4a7f0595",
+						"coupons",
+						"TGRG201910"
+					],
+					"query": [
+						{
+							"key": "currencyCode",
+							"value": "USD"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
