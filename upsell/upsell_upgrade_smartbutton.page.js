@@ -283,7 +283,7 @@
 
         if (upsell.orderInfo.paymentProcessorId == "5" || upsell.orderInfo.paymentProcessorId == "31") {
             pay = {
-                paymentProcessorId: Number(upsell.orderInfo.paymentProcessorId)
+                paymentProcessorId: 5
             };
         }
         let replacedParam = location.search.replace(/\?|\&*paymentId=[^&]*/g, '').replace(/\?|\&*token=[^&]*/g, '').replace(/\?|\&*PayerID=[^&]*/g, '');
@@ -391,7 +391,7 @@
 
         if (upsell.orderInfo.paymentProcessorId == "5" || upsell.orderInfo.paymentProcessorId == "31") {
             pay = {
-                paymentProcessorId: Number(upsell.orderInfo.paymentProcessorId)
+                paymentProcessorId: 5
             };
         }else{
 			//add installment

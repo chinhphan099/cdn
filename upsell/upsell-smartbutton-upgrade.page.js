@@ -358,7 +358,7 @@
 
         if (upsell.orderInfo.paymentProcessorId == "5" || upsell.orderInfo.paymentProcessorId == "31") {
             pay = {
-                paymentProcessorId: Number(upsell.orderInfo.paymentProcessorId)
+                paymentProcessorId: 5
             };
         }else{
 			//add installment
