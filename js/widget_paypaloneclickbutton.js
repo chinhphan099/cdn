@@ -106,7 +106,8 @@
                 "lastName": null
             },
             "payment": {
-                paymentProcessorId: !!window.paymentProcessorId ? window.paymentProcessorId : 5
+                "paymentProcessorId": !!window.paymentProcessorId ? window.paymentProcessorId : 5,
+                "callBackParam": document.location.search
             },
             "shippingAddress": null,
             "billingAddress": null,
