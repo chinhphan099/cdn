@@ -108,6 +108,7 @@
                                         <span>${shipping}</span>
                                         <span>{shippingPrice}</span>
                                     </div>
+                                    {tax}
                                     <div class="inner">
                                         <span>${total}</span>
                                         <span>{productTotal}</span>
@@ -127,6 +128,7 @@
                                         <span>${shipping}</span>
                                         <span>{shippingPrice}</span>
                                     </div>
+                                    {tax}
                                     <div class="inner">
                                         <span>${total}</span>
                                         <span>{productTotal}</span>
@@ -146,8 +148,23 @@
         let mainProductNames = (typeof mainProducts !== 'undefined') ? mainProducts : false;
         let upsellProductNames = (typeof upsellProducts !== 'undefined') ? upsellProducts : false;
 
+        let taxLine = '';
+        let mainProductTax = localStorage.getItem('mainProductTax');
+        if(mainProductTax) {
+            mainProductTax = JSON.parse(mainProductTax);
+            if(mainProductTax.tax != 0) {
+                taxLine = `
+                        <div class="inner">
+                            <span>Tax</span>
+                            <span>${'$' + mainProductTax.tax}</span>
+                        </div>
+                `;
+            }
+        }
+
         let listProduct = productItemMainTmp.replace('{productName}', data.productName)
                                 .replace(/\{productPrice\}/g, data.orderProductPriceFormatted)
+                                .replace(/\{tax\}/g, taxLine)
                                 .replace(/\{productTotal\}/g, `${data.orderPriceFormatted}<em>${installmentText}</em>`)
                                 .replace('{shippingPrice}', data.shippingPriceFormatted)
                                 .replace('{midDescriptor}', data.receipts[0].midDescriptor ? data.receipts[0].midDescriptor : 'Paypal')
@@ -174,6 +191,7 @@
 
             let itemTmp = productItemTmp.replace('{productName}', data.relatedOrders[i].productName)
                                 .replace(/\{productPrice\}/g, data.relatedOrders[i].orderProductPriceFormatted)
+                                .replace(/\{tax\}/g, '')
                                 .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}<em>${installmentText}</em>`)
                                 .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
                                 .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
