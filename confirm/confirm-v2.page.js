@@ -208,10 +208,10 @@
 
     /*--------start : run common confirm------------*/
     const CommonConfirm = utils.CommonConfirm;
-    class Confirm extends CommonConfirm {
+    class ConfirmV1 extends CommonConfirm {
     }
-    const isConfirm = new Confirm();
-    isConfirm.init();
+    const insConfirmV1 = new ConfirmV1();
+    insConfirmV1.init();
     /*--------/end : run common confirm------------*/
 
     window.addEventListener('DOMContentLoaded', () => {
