@@ -252,6 +252,9 @@
 
             //emit events
             try {
+                if(!!window.isPreOrder) {
+                    utils.localStorage().set('preOrder', true);
+                }
                 const productInfo = getDefaultSelectedProduct();
                 const currencyElms = _qAll('.jsCurrencyNumber');
                 Array.prototype.slice.call(currencyElms).forEach(currencyElm => {
@@ -290,7 +293,7 @@
             fullPriceValue: productInfo.productPrices.FullRetailPrice.Value
         });
 
-        //Enable Active Class for new  Checked Product
+        //Enable Active Class for new Checked Product
         let productListWidget = _qById('js-widget-products'),
             checkedProducts = _qAll('.productRadioListItem.checked-item');
 
