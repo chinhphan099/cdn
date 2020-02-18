@@ -20,7 +20,6 @@ Element.prototype.appendAfter = function (element) {
     let timedPopup;
     let timeinterval;
     let isPopupShowing = false;
-    window.shippingIndex = 0;
 
     // Count down
     function timeRemaining(endtime) {
@@ -162,53 +161,6 @@ Element.prototype.appendAfter = function (element) {
         return {wPrice, wFormatPrice};
     }
 
-    function implementDeliveryOptions(data) {
-        if(!_q('.delivery-options') || !_q('[name="deliveryOptions"]:checked')) {
-            return;
-        }
-
-        // Add index into shippings data then ascending short shipping array base on price form low to high
-        let shippings = data.shippings.map((obj, index) => {
-            obj.index = index;
-            return obj;
-        }).sort(function(a, b) {
-            return a.price - b.price;
-        });
-
-        // Set value for delivery options base on field index of Ascending array shipping
-        const deliveryRadios = _qAll('.delivery-options input[type="radio"]');
-        Array.prototype.slice.call(deliveryRadios).forEach((deliveryRadio, i) => {
-            if(!shippings[i]) {
-                return;
-            }
-            deliveryRadio.value = shippings[i].index;
-
-            const shippingFees = _getClosest(deliveryRadio, '.w_radio').querySelectorAll('.shipping-fee');
-            Array.prototype.slice.call(shippingFees).forEach((shippingFee) => {
-                shippingFee.querySelector('.js-img-loading').classList.add('hidden');
-                let shippingFormated = shippings[i].formattedPrice;
-                if(shippings[i].price === 0) {
-                    shippingFormated = `<b>${js_translate.freeCap || 'FREE'}</b>`;
-                }
-                shippingFee.querySelector('.sf').innerHTML = shippingFormated;
-            });
-        });
-
-        window.shippingIndex = Number(_q('[name="deliveryOptions"]:checked').value);
-    }
-
-    function onChangeDeliveryOptions() {
-        const deliveryRadios = _qAll('.delivery-options input[type="radio"]');
-        if(deliveryRadios.length === 0) {
-            return;
-        }
-        Array.prototype.slice.call(deliveryRadios).forEach((deliveryRadio, i) => {
-            deliveryRadio.addEventListener('click', () => {
-                loadStatistical();
-            });
-        });
-    }
-
     const productNameText = _q('.statistical .td-name').innerText;
     function loadStatistical(dataResponse) {
         if(!!dataResponse) {
@@ -221,27 +173,17 @@ Element.prototype.appendAfter = function (element) {
             productItem = _getClosest(checkedItem, '.productRadioListItem'),
             data = JSON.parse(checkedItem.dataset.product),
             taxes = data.productPrices.Surcharge.FormattedValue;
-
-        implementDeliveryOptions(data);
-        let shippingFee = data.shippings[window.shippingIndex].formattedPrice;
+        let shippingFee = data.shippings[0].formattedPrice;
 
         const warranty = getWarrantyPrice(fCurrency, taxes),
-            grandTotal = (data.shippings[window.shippingIndex].price + data.productPrices.DiscountedPrice.Value + warranty.wPrice).toFixed(2);
+            grandTotal = (data.shippings[0].price + data.productPrices.DiscountedPrice.Value + warranty.wPrice).toFixed(2);
 
-        if(data.shippings[window.shippingIndex].price === 0 && !!js_translate.freeCap) {
+        if(data.shippings[0].price === 0 && !!js_translate.freeCap) {
             shippingFee = `<b>${js_translate.freeCap}</b>`;
         }
 
         _q('.statistical .td-name').innerHTML = productNameText + ' ' + productItem.querySelector('.product-name p').innerHTML;
-        if(!!window.additionTextSumary && _q('.statistical').classList.contains('coupon-actived')) {
-            if(!!_q('.statistical .td-name .text-coupon')) {
-                _q('.statistical .td-name .text-coupon').parentNode.removeChild(_q('.statistical .td-name .text-coupon'));
-            }
-            _q('.statistical .td-name').insertAdjacentHTML('beforeend', ' ' + window.additionTextSumary.replace('{priceCoupOn}', fCurrency.replace('######', window.couponValue)));
-        }
-        Array.prototype.slice.call(_qAll('.statistical .td-price')).forEach((tdPriceElm) => {
-            tdPriceElm.innerText = utils.formatPrice(data.productPrices.DiscountedPrice.Value.toFixed(2), fCurrency, taxes);
-        });
+        _q('.statistical .td-price').innerText = utils.formatPrice(data.productPrices.DiscountedPrice.Value.toFixed(2), fCurrency, taxes);
         _q('.statistical .td-shipping').innerHTML = shippingFee;
 
         if(!!_q('.tr-warranty')) {
@@ -287,7 +229,7 @@ Element.prototype.appendAfter = function (element) {
         let checkQT = false;
         for (let input of inputs) {
             input.addEventListener('click', function () {
-                // checkIsSpecialItem(); // Existing on order.page.js
+                checkIsSpecialItem();
             });
 
             input.addEventListener('change', (e) => {
@@ -340,7 +282,7 @@ Element.prototype.appendAfter = function (element) {
             monthDdl = _q('#monthddl');
 
         if(_qById('yearddl').value === curYear.toString() && Number(monthDdl.value) < curMonth) {
-            monthDdl.value = (curMonth < 10 ? ('0' + curMonth.toString()) : curMonth);
+            monthDdl.value = (curMonth < 10 ? ("0" + curMonth.toString()) : curMonth);
         }
     }
     function setExpirationValue() {
@@ -402,8 +344,6 @@ Element.prototype.appendAfter = function (element) {
                     dataProduct.productPrices.DiscountedPrice.Value = Number((currentPrice * (100 - discount) / 100).toFixed(2));
                     dataProduct.productPrices.DiscountedPrice.FormattedValue = utils.formatPrice((currentPrice * (100 - discount) / 100).toFixed(2), fCurrency, dataProduct.shippings[0].formattedPrice);
                 }
-                dataProduct.productPrices.UnitDiscountRate.Value = (dataProduct.productPrices.DiscountedPrice.Value / dataProduct.quantity).toFixed(2);
-                dataProduct.productPrices.UnitDiscountRate.FormattedValue = utils.formatPrice(dataProduct.productPrices.UnitDiscountRate.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
 
                 let priceElms = _getClosest(items[i], '.productRadioListItem').querySelectorAll('.discountedPrice');
                 if(!!priceElms) {
@@ -412,10 +352,14 @@ Element.prototype.appendAfter = function (element) {
                     }
                 }
 
-                let unitPriceElms = _getClosest(items[i], '.productRadioListItem').querySelectorAll('.spanUnitDiscountRate');
-                if(!!unitPriceElms) {
-                    for(let unitPriceElm of unitPriceElms) {
-                        unitPriceElm.innerHTML = dataProduct.productPrices.UnitDiscountRate.FormattedValue;
+                if(!!dataProduct.productPrices.UnitDiscountRate){
+                    dataProduct.productPrices.UnitDiscountRate.Value = (dataProduct.productPrices.DiscountedPrice.Value / dataProduct.quantity).toFixed(2);
+                    dataProduct.productPrices.UnitDiscountRate.FormattedValue = utils.formatPrice(dataProduct.productPrices.UnitDiscountRate.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
+                    let unitPriceElms = _getClosest(items[i], '.productRadioListItem').querySelectorAll('.spanUnitDiscountRate');
+                    if(!!unitPriceElms) {
+                        for(let unitPriceElm of unitPriceElms) {
+                            unitPriceElm.innerHTML = dataProduct.productPrices.UnitDiscountRate.FormattedValue;
+                        }
                     }
                 }
 
@@ -428,7 +372,7 @@ Element.prototype.appendAfter = function (element) {
                 }
 
                 let nameElm = _getClosest(items[i], '.productRadioListItem').querySelector('.product-name p');
-                nameElm.innerHTML = `${nameElm.innerHTML} <span class="text-coupon">${window.additionText}</span>`;
+                nameElm.innerHTML = `${nameElm.innerHTML} ${window.additionText}`;
 
                 items[i].setAttribute('data-product', JSON.stringify(dataProduct));
             }
@@ -448,23 +392,15 @@ Element.prototype.appendAfter = function (element) {
         if(_q('.coupon-apply')) {
             _q('.coupon-apply').style.display = 'block';
         }
-        if(!!_q('.statistical')) {
-            _q('.statistical').classList.add('coupon-actived');
+        if(!_qById('couponCode')) {
+            let couponCodeElm = document.createElement('input');
+            couponCodeElm.id = 'couponCode';
+            couponCodeElm.type = 'hidden';
+            _q('body').appendChild(couponCodeElm);
         }
-        if(!_q('.coupon-popup').classList.contains('coupon-popup-future')) {
-            if(!_qById('couponCode')) {
-                let couponCodeElm = document.createElement('input');
-                couponCodeElm.id = 'couponCode';
-                couponCodeElm.type = 'hidden';
-                _q('body').appendChild(couponCodeElm);
-            }
-            _qById('couponCode').value = window.couponCodeId;
+        _qById('couponCode').value = window.couponCodeId;
 
-            reImplementProductList(couponDiscount);
-        }
-        else {
-            utils.localStorage().set('additionTextConfirmName', window.additionTextSumary);
-        }
+        reImplementProductList(couponDiscount);
         loadStatistical();
 
         // Installment
@@ -528,9 +464,8 @@ Element.prototype.appendAfter = function (element) {
         if(utils.getQueryParameter('pid') == 2 && _qAll('.js-list-group li').length > 2) {
             _qAll('.js-list-group li')[2].click();
         }
-        else {
-            _qAll('.js-list-group li')[1].click();
-        }
+        else _qAll('.js-list-group li')[1].click();
+
         if(_q('.free-gift-apply')) {
             _q('.free-gift-apply').style.display = 'block';
         }
@@ -541,7 +476,9 @@ Element.prototype.appendAfter = function (element) {
         _qById('couponBtn').classList.remove('disabled');
         _qById('couponBtn').addEventListener('click', (e) => {
             e.target.disabled = true;
-            if(!!_q('.w_exit_popup').classList.contains('gift-popup')) {
+            let paramPidOne = utils.getQueryParameter('pid') == 1 && !!_q('.holiday');
+            let paramPidTwo = utils.getQueryParameter('pid') == 2 && !!_q('.gift');
+            if(!!_q('.w_exit_popup').classList.contains('gift-popup') && (paramPidOne || paramPidTwo)) {
                 activePackageGift();
             }
             else if(!window.couponCodeId && !!_q('.w_exit_popup').classList.contains('coupon-popup-no-time')) {
@@ -559,9 +496,6 @@ Element.prototype.appendAfter = function (element) {
             }
             else if(!!window.couponCodeId) {
                 afterActiveCoupon();
-                if(!!_qById('couponCode') && !!_qById('couponCode').value && !!window.couponValue) {
-                    utils.localStorage().set('couponValue', window.couponValue);
-                }
             }
             loadStatistical();
             hidePopup(true);
@@ -608,9 +542,6 @@ Element.prototype.appendAfter = function (element) {
                 jsImageLoading.innerText = couponValFormat;
             }
             window.additionText = window.additionText.replace(/{couponPrice}/g, couponValFormat);
-            if(!!window.additionTextSumary) {
-                window.additionTextSumary = window.additionTextSumary.replace(/{couponPrice}/g, couponValFormat);
-            }
 
             if(!!_qById('couponBtn')) {
                 onActiveCoupon();
@@ -622,24 +553,45 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function handleExitPopupEvents() {
-        if(utils.getQueryParameter('iep') !== 'true' || !_q('.coupon-popup') || utils.getQueryParameter('et') === '1') {
+        if((utils.getQueryParameter('iep') !== 'true' && !utils.getQueryParameter('pid')) || !_q('.coupon-popup') || utils.getQueryParameter('et') === '1' ) {
             return;
         }
-
+        let isWrapSlide = _q('.gift-popup .gift');
+        let isRudyRing = _q('.gift-popup .holiday');
         //Check if have param of product gift or product holiday
-        if(utils.getQueryParameter('pid') == 2 && !!_q('.gift-popup .holiday')) {
-           _q('.gift-popup .holiday').classList.add('hidden');
+        if(utils.getQueryParameter('pid') == 2 && !!isWrapSlide) {//check if have param and content of WrapSlide
+            if(!!isRudyRing)
+               isRudyRing.classList.add('hidden');
+           _q('.gift-popup .only-coupon').classList.add('hidden');
+           hiddeenDefaultPupup();
         }
-        else if(_q('.gift-popup .gift')) {
-            _q('.gift-popup .gift').classList.add('hidden');
+        else if(utils.getQueryParameter('pid') == 1 && !!isRudyRing) {//check if have param and content of Rudy Ring
+            if(!!isWrapSlide)
+                isWrapSlide.classList.add('hidden');
+            _q('.gift-popup .only-coupon').classList.add('hidden');
+            hiddeenDefaultPupup();
         }
-
+        else {
+            if(!!isRudyRing)
+                isRudyRing.classList.add('hidden');
+            if(!!isWrapSlide)
+                isWrapSlide.classList.add('hidden');
+            let lbBtnGift = _q('.label-gift');
+            if(!!lbBtnGift)
+                lbBtnGift.classList.add('hidden');
+        }
         if (utils.isDevice()) {
             window.addEventListener('touchmove', handleTouchMove);
         }
         else {
             document.addEventListener('mouseout', handleMouseOut);
         }
+    }
+
+    function hiddeenDefaultPupup(){
+        _q('.w_modal_header').classList.add('hidden');
+        _q('.coupon-popup').classList.add('show-gift');
+        _q('.label-coupon').classList.add('hidden');
     }
 
     function adjustLayout() {
@@ -712,7 +664,6 @@ Element.prototype.appendAfter = function (element) {
         onChangeMonth();
         onChangeYear();
         onClickInputSelect();
-        onChangeDeliveryOptions();
         if(utils.getQueryParameter('loader') === '1') {
             utils.events.on('bindDoneLoader', handleExitPopupEvents);
         }
@@ -740,7 +691,7 @@ Element.prototype.appendAfter = function (element) {
         implementYearDropdown();
         implementMonthDropdown();
         setExpirationValue();
-        // checkIsSpecialItem();
+        checkIsSpecialItem();
         listener();
         hiddenElementByParamUrl();
     }
