@@ -265,6 +265,9 @@ Element.prototype.appendAfter = function (element) {
         _q('.statistical .grand-total').innerText = utils.formatPrice(grandTotal, fCurrency, taxes);
 
         let savePrice = (data.productPrices.FullRetailPrice.Value - data.productPrices.DiscountedPrice.Value).toFixed(2);
+        if(!!window.isPreOrder) {
+            savePrice = parseFloat(!!checkedItem.parentElement.querySelector('.discountValue') ? checkedItem.parentElement.querySelector('.discountValue').innerText : 0);
+        }
         if(!!_q('.discount-total')) {
             _q('.discount-total').innerHTML = '-' + fCurrency.replace('######', savePrice);
         }
@@ -402,8 +405,10 @@ Element.prototype.appendAfter = function (element) {
                     dataProduct.productPrices.DiscountedPrice.Value = Number((currentPrice * (100 - discount) / 100).toFixed(2));
                     dataProduct.productPrices.DiscountedPrice.FormattedValue = utils.formatPrice((currentPrice * (100 - discount) / 100).toFixed(2), fCurrency, dataProduct.shippings[0].formattedPrice);
                 }
-                dataProduct.productPrices.UnitDiscountRate.Value = (dataProduct.productPrices.DiscountedPrice.Value / dataProduct.quantity).toFixed(2);
-                dataProduct.productPrices.UnitDiscountRate.FormattedValue = utils.formatPrice(dataProduct.productPrices.UnitDiscountRate.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
+                if(!!dataProduct.productPrices.UnitDiscountRate) {
+                    dataProduct.productPrices.UnitDiscountRate.Value = (dataProduct.productPrices.DiscountedPrice.Value / dataProduct.quantity).toFixed(2);
+                    dataProduct.productPrices.UnitDiscountRate.FormattedValue = utils.formatPrice(dataProduct.productPrices.UnitDiscountRate.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
+                }
 
                 let priceElms = _getClosest(items[i], '.productRadioListItem').querySelectorAll('.discountedPrice');
                 if(!!priceElms) {
@@ -541,7 +546,9 @@ Element.prototype.appendAfter = function (element) {
         _qById('couponBtn').classList.remove('disabled');
         _qById('couponBtn').addEventListener('click', (e) => {
             e.target.disabled = true;
-            if(!!_q('.w_exit_popup').classList.contains('gift-popup')) {
+            let paramPidOne = utils.getQueryParameter('pid') == 1 && !!_q('.holiday');
+            let paramPidTwo = utils.getQueryParameter('pid') == 2 && !!_q('.gift');
+            if(!!_q('.w_exit_popup').classList.contains('gift-popup') && (paramPidOne || paramPidTwo)) {
                 activePackageGift();
             }
             else if(!window.couponCodeId && !!_q('.w_exit_popup').classList.contains('coupon-popup-no-time')) {
@@ -622,16 +629,37 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function handleExitPopupEvents() {
-        if(utils.getQueryParameter('iep') !== 'true' || !_q('.coupon-popup') || utils.getQueryParameter('et') === '1') {
+        if(utils.getQueryParameter('iep') !== 'true' || (utils.getQueryParameter('iep') !== 'true' && !utils.getQueryParameter('pid')) || !_q('.coupon-popup') || utils.getQueryParameter('et') === '1' ) {
             return;
         }
-
+        let giftElm = _q('.gift-popup .gift');
+        let holidayElm = _q('.gift-popup .holiday');
         //Check if have param of product gift or product holiday
-        if(utils.getQueryParameter('pid') == 2 && !!_q('.gift-popup .holiday')) {
-           _q('.gift-popup .holiday').classList.add('hidden');
+        if(utils.getQueryParameter('pid') == 2 && !!giftElm) {//check if have param and content of Gift
+            if(!!holidayElm) {
+               holidayElm.classList.add('hidden');
+            }
+            _q('.gift-popup .only-coupon').classList.add('hidden');
+            hiddenDefaultPopup();
         }
-        else if(_q('.gift-popup .gift')) {
-            _q('.gift-popup .gift').classList.add('hidden');
+        else if(utils.getQueryParameter('pid') == 1 && !!holidayElm) {//check if have param and content of Holiday
+            if(!!giftElm) {
+                giftElm.classList.add('hidden');
+            }
+            _q('.gift-popup .only-coupon').classList.add('hidden');
+            hiddenDefaultPopup();
+        }
+        else {
+            if(!!holidayElm) {
+                holidayElm.classList.add('hidden');
+            }
+            if(!!giftElm) {
+                giftElm.classList.add('hidden');
+            }
+            let lbBtnGift = _q('.label-gift');
+            if(!!lbBtnGift) {
+                lbBtnGift.classList.add('hidden');
+            }
         }
 
         if (utils.isDevice()) {
@@ -639,6 +667,18 @@ Element.prototype.appendAfter = function (element) {
         }
         else {
             document.addEventListener('mouseout', handleMouseOut);
+        }
+    }
+
+    function hiddenDefaultPopup() {
+        if(!!_q('.w_modal_header')) {
+            _q('.w_modal_header').classList.add('hidden');
+        }
+        if(!!_q('.coupon-popup')) {
+            _q('.coupon-popup').classList.add('show-gift');
+        }
+        if(!!_q('.label-coupon')) {
+            _q('.label-coupon').classList.add('hidden');
         }
     }
 
