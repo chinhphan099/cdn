@@ -34,7 +34,7 @@
     }
 
     function bindData(data) {
-        console.log(data);
+        //console.log(data);
 
         const fvalue = data.receipts[0].formattedAmount.replace(/[,|.]/g, '');
         const pValue = data.receipts[0].amount.toFixed(2).toString().replace(/\./, '');
@@ -197,7 +197,7 @@
         }
     }
 
-    utils.checkAffAndFireEvents()
+    utils.checkAffAndFireEvents();
 
     /*
     //Fire Cake Pixel
@@ -208,10 +208,10 @@
 
     /*--------start : run common confirm------------*/
     const CommonConfirm = utils.CommonConfirm;
-    class ConfirmV2 extends CommonConfirm {
+    class Confirm extends CommonConfirm {
     }
-    const isConfirmV2 = new ConfirmV2();
-    isConfirmV2.init();
+    const isConfirm = new Confirm();
+    isConfirm.init();
     /*--------/end : run common confirm------------*/
 
     window.addEventListener('DOMContentLoaded', () => {
