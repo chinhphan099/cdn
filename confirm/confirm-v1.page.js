@@ -115,6 +115,7 @@
                                     <div class="inner"><span>${charges_statement}</span></div>
                                 </li>`,
             productItemMainTmp = productItemTmp;
+
         if(utils.localStorage().get('preOrder') === 'true') {
             let pre_order_product_charges_statement_confirm_page = js_translate.pre_order_product_charges_statement_confirm_page || 'Your deposit will be processed for {productTotal} ({orderNumber}) and will appear as {midDescriptor}. You will be charged the price of the products when they ship.';
             productItemMainTmp = `<li class="item">
