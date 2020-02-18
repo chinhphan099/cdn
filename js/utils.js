@@ -95,7 +95,7 @@
         let res = await fetch(url, setting);
 
         if (res.ok) {
-            return await res.json();
+            return res.json();
         } else {
             return Promise.reject(new Error(res.statusText));
         }
@@ -645,6 +645,100 @@
         }
     }
 
+    function _updateThrottled(throttled) {
+        try {
+            const affParam = utils.getQueryParameter('Affid');
+            const siteDomain = location.host.replace('www.', '').replace('test.', '');
+            if (siteDomain !== '') {
+                utils.callAjax('https://yz3or1urua.execute-api.us-east-1.amazonaws.com/prod/updateThrottled', {
+                    method: 'POST',
+                    data: {
+                        affId: affParam,
+                        siteDomain: siteDomain,
+                        throttled: parseInt(throttled) + 1
+                    }
+                }).then(result => {
+                    console.log('updated sc successfully!');
+                }).catch(err => {
+                    //Fire Cake Pixel
+                    //utils.fireCakePixel();
+                    utils.fireEverFlow();
+                    utils.firePicksell();
+                    utils.fireMainOrderToGTMConversion();
+                });
+            }
+        } catch (err) {
+            //Fire Cake Pixel
+            //utils.fireCakePixel();
+            utils.fireEverFlow();
+            utils.firePicksell();
+            utils.fireMainOrderToGTMConversion();
+        }
+    }
+
+    function checkAffAndFireEvents() {
+        // try {
+        //     console.log('checkAffAndFireEvents');
+        //     const affParam = utils.getQueryParameter('Affid');
+        //     const orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
+        //     const checkedAff = utils.localStorage().get('checkedAff');
+        //     const siteDomain = location.host.replace('www.', '').replace('test.', '');
+        //     if (affParam && orderInfo && !checkedAff && siteDomain !== '') {
+        //         utils.callAjax('https://yz3or1urua.execute-api.us-east-1.amazonaws.com/prod/so', {
+        //             method: 'POST',
+        //             data: {
+        //                 affId: affParam,
+        //                 siteDomain: siteDomain
+        //             }
+        //         }).then(result => {
+        //             if (result && result.status) {
+        //                 utils.localStorage().set('checkedAff', 'true');
+
+        //                 const aff = result.data;
+        //                 const shouldThrottled = (aff.percent / 100) * (aff.totalOrders);
+        //                 if ((shouldThrottled - aff.throttled) >= 1) {
+        //                     //no fire and update throttled
+        //                     _updateThrottled(aff.throttled);
+        //                 } else {
+        //                     //Fire Cake Pixel
+        //                     //utils.fireCakePixel();
+        //                     utils.fireEverFlow();
+        //                     utils.firePicksell();
+        //                     utils.fireMainOrderToGTMConversion();
+        //                 }
+        //             } else {
+        //                 //Fire Cake Pixel
+        //                 //utils.fireCakePixel();
+        //                 utils.fireEverFlow();
+        //                 utils.firePicksell();
+        //                 utils.fireMainOrderToGTMConversion();
+        //             }
+        //         }).catch(err => {
+        //             //Fire Cake Pixel
+        //             //utils.fireCakePixel();
+        //             console.log(err);
+        //             utils.fireEverFlow();
+        //             utils.firePicksell();
+        //             utils.fireMainOrderToGTMConversion();
+        //         });
+        //     } else {
+        //         //Fire Cake Pixel
+        //         //utils.fireCakePixel();
+        //         utils.fireEverFlow();
+        //         utils.firePicksell();
+        //         utils.fireMainOrderToGTMConversion();
+        //     }
+        // } catch (err) {
+        //     console.log(err);
+        //     utils.fireEverFlow();
+        //     utils.firePicksell();
+        //     utils.fireMainOrderToGTMConversion();
+        // }
+
+        utils.fireEverFlow();
+        utils.firePicksell();
+    }
+
     //check and fire gtm convertion event for order pages
     function fireMainOrderToGTMConversion() {
         try {
@@ -658,7 +752,7 @@
                 window.dataLayer = window.dataLayer || [];
                 let counter = 1;
                 const timer = setInterval(() => {
-                    if(counter > 10) {
+                    if (counter > 10) {
                         window.dataLayer.push({
                             'event': 'Conversion',
                             'orderId': orderInfo.orderNumber,
@@ -667,7 +761,7 @@
                         clearInterval(timer);
                     }
 
-                    if(window._EA_ID) {
+                    if (window._EA_ID) {
                         window.dataLayer.push({
                             'event': 'Conversion',
                             'fpid': window._EA_ID,
@@ -696,7 +790,7 @@
                 window.dataLayer = window.dataLayer || [];
                 let counter = 1;
                 const timer = setInterval(() => {
-                    if(counter > 10) {
+                    if (counter > 10) {
                         window.dataLayer.push({
                             'event': 'Conversion',
                             'orderId': orderInfo.orderNumber,
@@ -705,7 +799,7 @@
                         clearInterval(timer);
                     }
 
-                    if(window._EA_ID) {
+                    if (window._EA_ID) {
                         window.dataLayer.push({
                             'event': 'Conversion',
                             'fpid': window._EA_ID,
@@ -733,12 +827,12 @@
                 window.dataLayer = window.dataLayer || [];
                 let counter = 1;
                 const timer = setInterval(() => {
-                    if(counter > 10) {
+                    if (counter > 10) {
                         window.dataLayer.push({ 'event': `Upsell "${fireUpsellForGTMPurchase}"` });
                         clearInterval(timer);
                     }
 
-                    if(window._EA_ID) {
+                    if (window._EA_ID) {
                         window.dataLayer.push({ 'event': `Upsell "${fireUpsellForGTMPurchase}"`, 'fpid': window._EA_ID });
                         clearInterval(timer);
                     }
@@ -873,33 +967,33 @@
     }
 
     //Filter first of Error field to excute event scrollIntoView - Animation will not work on IE browser
-    function focusErrorInputField(){
+    function focusErrorInputField() {
         try {
             //get first error input
             let input = _qAll('.input-error')[0];
 
-            if(!!input) {
-                input.scrollIntoView({behavior: "smooth", block: "center"});
+            if (!!input) {
+                input.scrollIntoView({ behavior: "smooth", block: "center" });
 
                 //set timer to detect Element in center view of screen then excute focus event for input
-                let timerFocus = setInterval(function(){
-                    if(input.getBoundingClientRect().bottom > 0 && (window.innerHeight/2 + input.getBoundingClientRect().height/2)  < input.getBoundingClientRect().bottom){
+                let timerFocus = setInterval(function () {
+                    if (input.getBoundingClientRect().bottom > 0 && (window.innerHeight / 2 + input.getBoundingClientRect().height / 2) < input.getBoundingClientRect().bottom) {
                         clearInterval(timerFocus);
                         input.focus();
                     }
-                },100);
+                }, 100);
             }
-        } catch(err){
+        } catch (err) {
             console.log(err);
         }
     }
 
     function saveUserInfoWithFingerprint() {
         try {
-            let firstName = _qById('customer_firstname') ? _qById('customer_firstname').value : _qById('shipping_firstname')? _qById('shipping_firstname').value : '';
+            let firstName = _qById('customer_firstname') ? _qById('customer_firstname').value : _qById('shipping_firstname') ? _qById('shipping_firstname').value : '';
             let lastName = _qById('customer_lastname') ? _qById('customer_lastname').value : _qById('shipping_lastname') ? _qById('shipping_lastname').value : '';
             let emailElem = _qById('customer_email');
-            if(window._EA_ID && firstName !== '' && lastName !== '' && emailElem && !emailElem.classList.contains('input-error')) {
+            if (window._EA_ID && firstName !== '' && lastName !== '' && emailElem && !emailElem.classList.contains('input-error')) {
                 //const url = `https://ctrwow-dev-fingerprint-microservice.azurewebsites.net/api/userinfo/${window._EA_ID}?code=5twg5EUTiWQLF2LzvHYonk6PsRREMi7qjRlRGCQSNJqHCaxsYVlgsA==`; test env
                 const url = `https://ctrwow-prod-fingerprint-microservice.azurewebsites.net/api/userinfo/${window._EA_ID}?code=hjQxSRcBk48Gii/2xmzwb2d08D1sazWO3qzOLwiRwndnSQ3w9zNITw==`; //prod env
                 const options = {
@@ -916,9 +1010,9 @@
                 utils.callAjax(url, options).then((result) => {
                     console.log(result);
                 })
-                .catch(error => console.log(error));
+                    .catch(error => console.log(error));
             }
-        } catch(err) {
+        } catch (err) {
             console.log('saveUserInfoWithFingerprint error: ', err);
         }
     }
@@ -993,6 +1087,7 @@
         fireCakePixel: fireCakePixel,
         fireEverFlow: fireEverFlow,
         firePicksell: firePicksell,
+        checkAffAndFireEvents: checkAffAndFireEvents,
         fireMainOrderToGTMConversion: fireMainOrderToGTMConversion,
         fireMainOrderToGTMConversionV2: fireMainOrderToGTMConversionV2,
         fireGtmPurchaseEvent: fireGtmPurchaseEvent,

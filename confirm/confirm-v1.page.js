@@ -24,12 +24,14 @@
         bindData(result);
     });
 
-    //update upsells status in CRM from NEW status to PAID
-    eCRM.Order.updateUpsellsStatus(confirm.orderInfo.orderNumber, function (result) {
-        if(result) {
-            console.log('upsells status is updated');
-        }
-    });
+    if(confirm.orderInfo.paymentProcessorId !== 31) {
+        //update upsells status in CRM from NEW status to PAID
+        eCRM.Order.updateUpsellsStatus(confirm.orderInfo.orderNumber, function (result) {
+            if(result) {
+                console.log('upsells status is updated');
+            }
+        });
+    }
 
     function bindData(data) {
         console.log(data);
@@ -176,10 +178,14 @@
         }
     }
 
+    utils.checkAffAndFireEvents();
+
+    /*
     //Fire Cake Pixel
     utils.fireCakePixel();
     utils.fireEverFlow();
     utils.firePicksell();
+    */
 
     /*--------start : run common confirm------------*/
     const CommonConfirm = utils.CommonConfirm;

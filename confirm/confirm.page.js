@@ -24,15 +24,17 @@
         bindData(result);
     });
 
-    //update upsells status in CRM from NEW status to PAID
-    eCRM.Order.updateUpsellsStatus(confirm.orderInfo.orderNumber, function (result) {
-        if(result) {
-            console.log('upsells status is updated');
-        }
-    });
+    if(confirm.orderInfo.paymentProcessorId !== 31) {
+        //update upsells status in CRM from NEW status to PAID
+        eCRM.Order.updateUpsellsStatus(confirm.orderInfo.orderNumber, function (result) {
+            if(result) {
+                console.log('upsells status is updated');
+            }
+        });
+    }
 
     function bindData(data) {
-        console.log(data);
+        //console.log(data);
 
         const fvalue = data.receipts[0].formattedAmount.replace(/[,|.]/g, '');
         const pValue = data.receipts[0].amount.toFixed(2).toString().replace(/\./, '');
@@ -176,10 +178,14 @@
         }
     }
 
+    utils.checkAffAndFireEvents();
+
+    /*
     //Fire Cake Pixel
     utils.fireCakePixel();
     utils.fireEverFlow();
     utils.firePicksell();
+    */
 
     /*--------start : run common confirm------------*/
     const CommonConfirm = utils.CommonConfirm;

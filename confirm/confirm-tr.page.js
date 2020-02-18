@@ -22,12 +22,14 @@
         bindData(result);
     });
 
-    //update upsells status in CRM from NEW status to PAID
-    eCRM.Order.updateUpsellsStatus(confirm.orderInfo.orderNumber, function (result) {
-        if(result) {
-            console.log('upsells status is updated');
-        }
-    });
+    if(confirm.orderInfo.paymentProcessorId !== 31) {
+        //update upsells status in CRM from NEW status to PAID
+        eCRM.Order.updateUpsellsStatus(confirm.orderInfo.orderNumber, function (result) {
+            if(result) {
+                console.log('upsells status is updated');
+            }
+        });
+    }
 
     function bindData(data) {
         console.log(data);
@@ -79,6 +81,12 @@
                             </div>`;
         shippingElem.innerHTML += shippingTmp;
         billingElem.innerHTML += billingTmp;
+
+        /*--------add address2 to form------------*/
+        if(!!data.shippingAddress.address2) {
+           shippingElem.querySelectorAll('span')[2].insertAdjacentHTML('beforebegin',`<span>${data.billingAddress.address2}</span>`);
+           billingElem.querySelectorAll('span')[2].insertAdjacentHTML('beforebegin',`<span>${data.billingAddress.address2}</span>`);
+        }
 
         //bind product list
         let shipping = "Shipping",
@@ -160,10 +168,14 @@
         }
     }
 
+    utils.checkAffAndFireEvents();
+
+    /*
     //Fire Cake Pixel
     utils.fireCakePixel();
     utils.fireEverFlow();
     utils.firePicksell();
+    */
 
   /*--------start : run common confirm------------*/
     const CommonConfirm = utils.CommonConfirm;

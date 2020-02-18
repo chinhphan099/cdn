@@ -81,7 +81,7 @@
                     utils.localStorage().set('user_firstname', result.address.firstName);
                     utils.localStorage().set('user_lastname', result.address.lastName);
 
-                    if(!!result.address.email) {
+                    if(!!result.address.email && successPage.orderInfo.paymentProcessorId == '31') {
                         let orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
                         if(!orderInfo.cusEmail) {
                             orderInfo.cusEmail = result.address.email;
