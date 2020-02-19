@@ -73,7 +73,7 @@ Element.prototype.appendAfter = function (element) {
                 <div class="second-text">${js_translate.seconds}</div>
             </div>
         `;
-        _q('.w_promo_text').insertBefore(countdownElm, document.getElementById('couponBtn'));
+        countdownElm.appendBefore(_qById('couponBtn'));
 
         // Begin Coutdown
         let currentTime = Date.parse(new Date()),
