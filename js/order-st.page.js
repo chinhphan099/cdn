@@ -583,6 +583,15 @@ Element.prototype.appendAfter = function (element) {
                 isClicked = true;
             }
         }, false);
+
+        Array.prototype.slice.call(_qAll('.w_exit_popup .close-popup-btn')).forEach((closePopupElm) => {
+            closePopupElm.addEventListener('click', () => {
+                hidePopup(isClicked);
+                if(!isClicked) {
+                    isClicked = true;
+                }
+            }, false);
+        });
     }
 
     function implementCoupon(data) {
