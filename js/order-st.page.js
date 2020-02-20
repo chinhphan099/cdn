@@ -48,8 +48,18 @@ Element.prototype.appendAfter = function (element) {
 
             const minuteElm = _q('.coupon-popup').querySelector('.ex-minute'),
                 secondElm = _q('.coupon-popup').querySelector('.ex-second');
-            minuteElm.innerHTML = t.minutes < 10 ? '0' + t.minutes : t.minutes;
-            secondElm.innerHTML = t.seconds < 10 ? '0' + t.seconds : t.seconds;
+            t.minutes = t.minutes < 10 ? '0' + t.minutes : t.minutes.toString();
+            t.seconds = t.seconds < 10 ? '0' + t.seconds : t.seconds.toString();
+
+            t.minutes = t.minutes.split('').map((num) => {
+                return `<span>${num}</span>`;
+            }).join('');
+            t.seconds = t.seconds.split('').map((num) => {
+                return `<span>${num}</span>`;
+            }).join('');
+
+            minuteElm.innerHTML = t.minutes;
+            secondElm.innerHTML = t.seconds;
         }
         updateClock(); // Run on first time
         timeinterval = setInterval(updateClock, 1000);
