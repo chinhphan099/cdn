@@ -272,6 +272,7 @@
                     utils.localStorage().set('countryCode', countryCodeIndex);
                 }
                 utils.localStorage().set('currencyCode', productInfo.currencyCode);
+                utils.localStorage().set('jsCurrency', productInfo.fCurrency);
                 utils.events.emit('triggerProductBannerSidebar', productInfo);
                 utils.events.emit('triggerWarranty', getSelectedProduct());
                 utils.events.emit('bindOrderPage', productInfo);
