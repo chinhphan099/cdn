@@ -99,6 +99,9 @@
             total = js_translate.total;
             charges_statement = js_translate.product_charges_statement_confirm_page;
         }
+        if(utils.localStorage().get('preOrderUpsell') === 'true') {
+            charges_statement = js_translate.pre_order_product_charges_statement_confirm_page || 'Your deposit will be processed for {productTotal} ({orderNumber}) and will appear as {midDescriptor}. You will be charged the price of the products when they ship.';
+        }
         let productItemTmp = `<li class="item">
                                     <div class="inner">
                                         <span>{productName}</span>
