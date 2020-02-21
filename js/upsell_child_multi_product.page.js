@@ -40,6 +40,21 @@
             spanUnitFullPriceElem.innerHTML = data.unitFullPrice;
         }
 
+        const upsellNameElms = _qAll('.pro-name');
+        for(let upsellNameElm of upsellNameElms) {
+            upsellNameElm.innerHTML = data.productName;
+        }
+
+        const quantityElms = _qAll('.jsquantity');
+        for(let quantityElm of quantityElms) {
+            quantityElm.innerHTML = data.quantity;
+        }
+
+        const quantityDdlElms = _qAll('.quantityDdl');
+        for(let quantityDdlElm of quantityDdlElms) {
+            quantityDdlElm.value = data.quantity - 1;
+        }
+
         // Update statistical informations
         if(!!_q('.statistical')) {
             _q('.statistical .td-name').innerHTML = productNameText + ' ' + data.productName;
@@ -79,6 +94,7 @@
 
         result = {
             productId: product.productId,
+            quantity: product.quantity,
             productName: _getClosest(checkedItem, '.productRadioListItem').querySelector('.product-name p').innerHTML,
             priceShipping: priceShipping,
             shippingValue: shippingValue,
@@ -109,22 +125,32 @@
 
     function onChangeProduct() {
         const inputs = _qAll('.productRadioListItem input');
-        for (let input of inputs) {
+        Array.prototype.slice.call(inputs).forEach((input) => {
             input.addEventListener('change', () => {
                 getSelectedProduct();
             }, false);
-        }
+        });
+    }
+
+    function onChangeDropdown() {
+        const quantityDdls = _qAll('.quantityDdl');
+        Array.prototype.slice.call(quantityDdls).forEach((quantityDdl) => {
+            quantityDdl.addEventListener('change', function() {
+                _qAll('input[name="product"]')[this.value].click();
+            });
+        });
     }
 
     function listener() {
         onChangeProduct();
+        onChangeDropdown();
     }
 
     function initial() {
         listener();
     }
 
-    window.addEventListener('load', () => {
+    window.addEventListener('DOMContentLoaded', () => {
         initial();
     });
 })(window.utils);
