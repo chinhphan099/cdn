@@ -155,11 +155,11 @@
                 paymentProcessorId: Number(upsell.orderInfo.paymentProcessorId)
             };
         }else{
-			//add installment
-			if (!!upsell.orderInfo.installmentValue && upsell.orderInfo.installmentValue !== ""){
-				pay.Instalments = upsell.orderInfo.installmentValue;
-			}
-		}
+            //add installment
+            if (!!upsell.orderInfo.installmentValue && upsell.orderInfo.installmentValue !== ""){
+                pay.Instalments = upsell.orderInfo.installmentValue;
+            }
+        }
 
         //add callback param to server to keep track
         let replacedParam = location.search.replace(/\?|\&*paymentId=[^&]*/g, '').replace(/\?|\&*token=[^&]*/g, '').replace(/\?|\&*PayerID=[^&]*/g, '');

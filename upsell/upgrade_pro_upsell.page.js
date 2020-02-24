@@ -161,11 +161,11 @@
                 paymentProcessorId: Number(upsell.orderInfo.paymentProcessorId)
             };
         }else{
-			//add installment
-			if (!!upsell.orderInfo.installmentValue && upsell.orderInfo.installmentValue !== ""){
-				pay.Instalments = upsell.orderInfo.installmentValue;
-			}
-		}
+            //add installment
+            if (!!upsell.orderInfo.installmentValue && upsell.orderInfo.installmentValue !== ""){
+                pay.Instalments = upsell.orderInfo.installmentValue;
+            }
+        }
 
         let replacedParam = location.search.replace(/\?|\&*paymentId=[^&]*/g, '').replace(/\?|\&*token=[^&]*/g, '').replace(/\?|\&*PayerID=[^&]*/g, '');
         pay.callBackParam = replacedParam !== '' ? '?' + replacedParam + '&' + getUpParam() : '?' + getUpParam();
