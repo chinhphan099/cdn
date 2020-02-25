@@ -24,9 +24,11 @@
         bindData(result);
     });
 
-    if(confirm.orderInfo.paymentProcessorId !== 31) {
+    const isUpdatedUpsells = utils.localStorage().get('isUpdatedUpsells');
+    if(!isUpdatedUpsells && confirm.orderInfo.paymentProcessorId !== 31) {
         //update upsells status in CRM from NEW status to PAID
         eCRM.Order.updateUpsellsStatus(confirm.orderInfo.orderNumber, function (result) {
+            utils.localStorage().set('isUpdatedUpsells', 'true');
             if(result) {
                 console.log('upsells status is updated');
             }
