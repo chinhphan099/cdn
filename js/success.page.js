@@ -46,19 +46,7 @@
         getToken: () => {
             return utils.getQueryParameter('token');
         },
-        includingParams: () => {
-            const params = successPage.orderInfo.orderParams;
-            if(successPage.orderInfo.paymentProcessorId == '31' && window.location.href.indexOf(params) === -1) {
-                if(window.location.href.indexOf('?') > -1) {
-                    window.location.href = document.location.href + '&' + params;
-                }
-                else {
-                    window.location.href = document.location.href + '?' + params;
-                }
-            }
-        },
         checkPaypalApprove: () => {
-            paypal.includingParams();// Testing
             const postData = {
                 trackingCountryCode: '',
                 trackingLanguageCountryCode: '',
