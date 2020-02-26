@@ -258,6 +258,38 @@
               #if($item.proId != '')
                 #set($prod = $dotcontent.pull("+contentType:EcommProductitem1 +(conhost:${host.identifier} conhost:SYSTEM_HOST) +EcommProductitem1.productId:($item.proId) +EcommProductitem1.language:*${languageFolder}*",1,"modDate desc"))
                 #if($UtilMethods.isSet($prod[0]))
+                  <input type="hidden" class="productId" value="$!{prod[0].productId}">
+                  <input type="hidden" class="productName" value="${prod[0].productName}">
+                  <input type="hidden" class="productSubTitle" value="${prod[0].productSubTitle}">
+                  <input type="hidden" class="productUrl" value="/${prod[0].language}/$!{prod[0].selectCategory}/$!{prod[0].productNameUrlSlug}">
+                  <input type="hidden" class="productImageUrl" value="$!{prod[0].mainImage.uri}">
+                  <input type="hidden" class="discountedPrice">
+                  <input type="hidden" class="formattedDiscountedPrice">
+                  <input type="hidden" class="shippingMethodId">
+                  <div class="thumb">
+                      <a href="/$!{prod[0].language}/$!{prod[0].selectCategory}/$!{prod[0].productNameUrlSlug}?deals=1" class="tmb-img" title="${prod[0].productName}" tabindex="0">
+                        #set($thumb = $!{prod[0].mainImage.uri})
+                            #if($UtilMethods.isSet($prod[0].thumbImage))
+                                #set($thumb = $!{prod[0].thumbImage.uri})
+                            #end
+                            <img src="${placeholderimage}" data-src="$!{thumb}" alt="$!{prod[0].productName}" class="img-view img-cate" role="">
+                            #if($UtilMethods.isSet($prod[0].productName))
+                            <img src="${placeholderimage}" data-src="$!{prod[0].thumbHover.uri}" alt="$!{prod[0].productName}" class="img-cate img-cate-hover">
+                            #end
+                      </a>
+                  </div>
+                  <h3 class="product-name">
+                    <a href="/$!{prod[0].language}/${prod[0].selectCategory}/${prod[0].productNameUrlSlug}" title="$!{prod[0].productName}">
+                      $!{prod[0].productName}
+                    </a>
+                  </h3>
+                  <div class="content">
+                    $!{prod[0].productSubTitle}
+                  </div>
+                  <div class="product-price">
+                    <del class="js-full-price old-price"></del>
+                    <ins class="js-discounted-price new-price"></ins>
+                  </div>
                   #if($prod[0].selectCategory == 'deals')
                     <div class="pro-link-wrap">
                       <a href="/$!{prod[0].language}/$!{prod[0].selectCategory}/$!{prod[0].productNameUrlSlug}?deals=1" class="shop-link">
