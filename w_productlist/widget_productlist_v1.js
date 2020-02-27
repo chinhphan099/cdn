@@ -255,6 +255,9 @@
                 if(!!window.isPreOrder) {
                     utils.localStorage().set('preOrder', true);
                 }
+                if(data.prices[data.prices.length - 1].quantity > 5) {
+                    window.isDoubleQuantity = true;
+                }
                 const productInfo = getDefaultSelectedProduct();
                 const currencyElms = _qAll('.jsCurrencyNumber');
                 Array.prototype.slice.call(currencyElms).forEach(currencyElm => {

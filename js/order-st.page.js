@@ -254,6 +254,17 @@ Element.prototype.appendAfter = function (element) {
         });
         _q('.statistical .td-shipping').innerHTML = shippingFee;
 
+        Array.prototype.slice.call(_qAll('.total-full-price')).forEach((totalFullPriceElm) => {
+            totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.FullRetailPrice.Value + data.shippings[window.shippingIndex].price).toFixed(2), fCurrency, taxes);
+        });
+        Array.prototype.slice.call(_qAll('.quantity-item')).forEach((quantityElm) => {
+            let quantity = data.quantity;
+            if(!!window.isDoubleQuantity) {
+                quantity /= 2;
+            }
+            quantityElm.innerText = quantity;
+        });
+
         if(!!_q('.tr-warranty')) {
             let trWarranty = _q('.tr-warranty');
             trWarranty.parentNode.removeChild(trWarranty);
