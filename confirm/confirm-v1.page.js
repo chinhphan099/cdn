@@ -141,6 +141,7 @@
 
         if(utils.localStorage().get('preOrder') === 'true') {
             let pre_order_product_charges_statement_confirm_page = js_translate.pre_order_product_charges_statement_confirm_page || 'Your deposit will be processed for {productTotal} ({orderNumber}) and will appear as {midDescriptor}. You will be charged the price of the products when they ship.';
+            pre_order_product_charges_statement_confirm_page = pre_order_product_charges_statement_confirm_page.replace(/\{productTotal\}/gi, '{productTotalPreOrder}');
             productItemMainTmp = `<li class="item">
                                     <div class="inner">
                                         <span>{productName}</span>
@@ -159,7 +160,7 @@
                                 </li>`;
         }
         if(utils.localStorage().get('preOrderUpsell') === 'true') {
-            productItemTmp = productItemTmp.replace(/\{productTotal\}/g, '{productTotalPreOrder}');
+            productItemTmp = productItemTmp.replace(/\{productTotal\}/gi, '{productTotalPreOrder}');
         }
         //Installment Payment : only for Brazil
         let installmentText = '';
