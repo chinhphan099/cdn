@@ -178,6 +178,17 @@
                             imgLoading.classList.add('hidden');
                         }
 
+                        //-----Start - Remove Currency Symbol and Decimals
+                        if(!!window.removeCurrencySymbol) {
+                            try {
+                                product.productPrices.DiscountedPrice.FormattedValue = product.productPrices.DiscountedPrice.Value.toFixed(0);
+                            }
+                            catch(err) {
+                                console.log('product.productPrices.DiscountedPrice' + err);
+                            }
+                        }
+                        //-----End - Remove Currency Symbol and Decimals
+
                         if(elemShippingFees) {
                             for(let elemShippingFee of elemShippingFees) {
                                 let shippingFeeText = '';
@@ -253,7 +264,9 @@
             //emit events
             try {
                 if(!!window.isPreOrder) {
-                    utils.localStorage().set('preOrder', true);
+                    setTimeout(() => {
+                        utils.localStorage().set('preOrder', true);
+                    }, 1000);
                 }
                 if(data.prices[data.prices.length - 1].quantity > 5) {
                     window.isDoubleQuantity = true;
