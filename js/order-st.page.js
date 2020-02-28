@@ -250,7 +250,14 @@ Element.prototype.appendAfter = function (element) {
             _q('.statistical .td-name').insertAdjacentHTML('beforeend', ' ' + window.additionTextSumary.replace('{priceCoupOn}', fCurrency.replace('######', window.couponValue)));
         }
         Array.prototype.slice.call(_qAll('.statistical .td-price')).forEach((tdPriceElm) => {
-            tdPriceElm.innerText = utils.formatPrice(data.productPrices.DiscountedPrice.Value.toFixed(2), fCurrency, taxes);
+            //tdPriceElm.innerText = utils.formatPrice(data.productPrices.DiscountedPrice.Value.toFixed(2), fCurrency, taxes);
+            //-----Start - Remove Currency Symbol and Decimals
+            if(!!window.removeCurrencySymbol){
+                tdPriceElm.innerText = data.productPrices.DiscountedPrice.Value.toFixed(0);
+            }else {
+                tdPriceElm.innerText = utils.formatPrice(data.productPrices.DiscountedPrice.Value.toFixed(2), fCurrency, taxes);
+            }
+            //-----End - Remove Currency Symbol and Decimals
         });
         _q('.statistical .td-shipping').innerHTML = shippingFee;
 
