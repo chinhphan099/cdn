@@ -273,9 +273,15 @@
                 }
                 const productInfo = getDefaultSelectedProduct();
                 const currencyElms = _qAll('.jsCurrencyNumber');
-                Array.prototype.slice.call(currencyElms).forEach(currencyElm => {
-                    currencyElm.innerText = productInfo.fCurrency.replace('######', currencyElm.innerText);
-                });
+
+                //-----Start - Remove Currency Symbol and Decimals
+                if(!window.removeCurrencySymbol) {
+                    Array.prototype.slice.call(currencyElms).forEach(currencyElm => {
+                        currencyElm.innerText = productInfo.fCurrency.replace('######', currencyElm.innerText);
+                    });
+                }
+                //-----End - Remove Currency Symbol and Decimals
+
                 if(!!productInfo && productInfo.currencyCode === '') {
                     productInfo.currencyCode = data.location.currencyCode;
                 }
