@@ -84,6 +84,7 @@ Element.prototype.appendAfter = function (element) {
             </div>
         `;
         countdownElm.appendBefore(_qById('couponBtn'));
+        utils.events.emit('beforeCountdown');
 
         // Begin Coutdown
         let currentTime = Date.parse(new Date()),
@@ -254,7 +255,7 @@ Element.prototype.appendAfter = function (element) {
             //-----Start - Remove Currency Symbol and Decimals
             if(!!window.removeCurrencySymbol){
                 tdPriceElm.innerText = data.productPrices.DiscountedPrice.Value.toFixed(0);
-            }else {
+            } else {
                 tdPriceElm.innerText = utils.formatPrice(data.productPrices.DiscountedPrice.Value.toFixed(2), fCurrency, taxes);
             }
             //-----End - Remove Currency Symbol and Decimals
@@ -263,6 +264,9 @@ Element.prototype.appendAfter = function (element) {
 
         Array.prototype.slice.call(_qAll('.total-full-price')).forEach((totalFullPriceElm) => {
             totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.FullRetailPrice.Value + data.shippings[window.shippingIndex].price).toFixed(2), fCurrency, taxes);
+        });
+        Array.prototype.slice.call(_qAll('.total-full-price-no-currency')).forEach((totalFullPriceElm) => {
+            totalFullPriceElm.innerText = (data.productPrices.FullRetailPrice.Value + data.shippings[window.shippingIndex].price).toFixed(0);
         });
         Array.prototype.slice.call(_qAll('.quantity-item')).forEach((quantityElm) => {
             let quantity = data.quantity;
