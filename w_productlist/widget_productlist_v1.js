@@ -442,10 +442,14 @@
         };
         const checkProduct = () => {
             // indexItem
+            if(currentPackage.length - 1 < indexItem) {
+                indexItem = currentPackage.length - 1;
+            }
             for(let [index, proId] of currentPackage.entries()) {
                 if(index === indexItem) {
                     let input = _q('input[name="product"][value="' + proId + '"]');
                     _getClosest(input, '.productRadioListItem').querySelector('.js-unitDiscountRate').click();
+                    break;
                 }
             }
         };
