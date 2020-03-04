@@ -296,6 +296,14 @@ Element.prototype.appendAfter = function (element) {
         _q('.statistical .td-taxes-fees').innerText = taxes;
         _q('.statistical .grand-total').innerText = utils.formatPrice(grandTotal, fCurrency, taxes);
 
+        Array.prototype.slice.call(_qAll('.jsFullPrice')).forEach((fullPriceElm) => {
+            fullPriceElm.innerText = data.productPrices.FullRetailPrice.FormattedValue;
+        });
+
+        Array.prototype.slice.call(_qAll('.jsUnitDiscountedPrice')).forEach((unitPriceElm) => {
+            unitPriceElm.innerText = data.productPrices.UnitDiscountRate.FormattedValue;
+        });
+
         let savePrice = (data.productPrices.FullRetailPrice.Value - data.productPrices.DiscountedPrice.Value).toFixed(2);
         if(!!window.isPreOrder) {
             savePrice = parseFloat(!!checkedItem.parentElement.querySelector('.discountValue') ? checkedItem.parentElement.querySelector('.discountValue').innerText : 0);
