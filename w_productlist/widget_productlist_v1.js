@@ -277,7 +277,7 @@
                 //-----Start - Remove Currency Symbol and Decimals
                 if(!window.removeCurrencySymbol) {
                     Array.prototype.slice.call(currencyElms).forEach(currencyElm => {
-                        currencyElm.innerText = productInfo.fCurrency.replace('######', currencyElm.innerText);
+                        currencyElm.innerText = productInfo.fCurrency.replace('######', currencyElm.textContent);
                     });
                 }
                 //-----End - Remove Currency Symbol and Decimals

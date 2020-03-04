@@ -220,7 +220,7 @@ Element.prototype.appendAfter = function (element) {
         });
     }
 
-    const productNameText = _q('.statistical .td-name').innerText;
+    const productNameText = _q('.statistical .td-name').innerText || '';
     function loadStatistical(dataResponse) {
         if(!!dataResponse) {
             fCurrency = dataResponse.fCurrency;
@@ -250,7 +250,7 @@ Element.prototype.appendAfter = function (element) {
             }
             _q('.statistical .td-name').insertAdjacentHTML('beforeend', ' ' + window.additionTextSumary.replace('{priceCoupOn}', fCurrency.replace('######', window.couponValue)));
         }
-        Array.prototype.slice.call(_qAll('.statistical .td-price')).forEach((tdPriceElm) => {
+        Array.prototype.slice.call(_qAll('.td-price')).forEach((tdPriceElm) => {
             //tdPriceElm.innerText = utils.formatPrice(data.productPrices.DiscountedPrice.Value.toFixed(2), fCurrency, taxes);
             //-----Start - Remove Currency Symbol and Decimals
             if(!!window.removeCurrencySymbol){
@@ -294,7 +294,9 @@ Element.prototype.appendAfter = function (element) {
         }
 
         _q('.statistical .td-taxes-fees').innerText = taxes;
-        _q('.statistical .grand-total').innerText = utils.formatPrice(grandTotal, fCurrency, taxes);
+        Array.prototype.slice.call(_qAll('.grand-total')).forEach((grandTotalElm) => {
+            grandTotalElm.innerText = utils.formatPrice(grandTotal, fCurrency, taxes);
+        });
 
         Array.prototype.slice.call(_qAll('.jsFullPrice')).forEach((fullPriceElm) => {
             fullPriceElm.innerText = data.productPrices.FullRetailPrice.FormattedValue;
