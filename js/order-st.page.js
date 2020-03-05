@@ -588,6 +588,7 @@ Element.prototype.appendAfter = function (element) {
         _qById('couponBtn').classList.remove('disabled');
         _qById('couponBtn').addEventListener('click', (e) => {
             e.target.disabled = true;
+            utils.events.emit('onActivePopup');
             let paramPidOne = utils.getQueryParameter('pid') == 1 && !!_q('.holiday');
             let paramPidTwo = utils.getQueryParameter('pid') == 2 && !!_q('.gift');
             if(!!_q('.w_exit_popup').classList.contains('gift-popup') && (paramPidOne || paramPidTwo)) {
