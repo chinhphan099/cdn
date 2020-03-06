@@ -1,4 +1,4 @@
-(() => {
+((utils) => {
     const key = 'campproducts';
     if(!window.siteSetting || !siteSetting.webKey || !siteSetting.CID) {
         return;
@@ -8,6 +8,13 @@
         let fValue = data.prices[0].productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
         let pValue = data.prices[0].productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
         data.fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
+
+        if(!!utils) {
+            const currencyElms = _qAll('.jsCurrencyNumber');
+            Array.prototype.slice.call(currencyElms).forEach(currencyElm => {
+                currencyElm.innerText = data.fCurrency.replace('######', currencyElm.textContent);
+            });
+        }
         return data;
     }
 
@@ -18,7 +25,7 @@
         });
         if(camps[0][webKey].prices.length > 0) {
             const emitData = addCurrencyIntoData(camps[0][webKey]);
-            if(utils) {
+            if(!!utils) {
                 utils.events.emit('bindData', emitData);
             }
         }
@@ -78,7 +85,7 @@
             .then(data => {
                 try {
                     console.log('loading prices');
-                    if(utils) {
+                    if(!!utils) {
                         const emitData = addCurrencyIntoData(data);
                         utils.events.emit('bindData', emitData);
                     }
@@ -124,4 +131,4 @@
     window.addEventListener('load', () => {
         init();
     });
-})();
+})(window.utils);
