@@ -313,6 +313,9 @@ Element.prototype.appendAfter = function (element) {
         if(!!_q('.discount-total')) {
             _q('.discount-total').innerHTML = '-' + fCurrency.replace('######', savePrice);
         }
+        if(!!_q('.discount-total-1')) {
+            _q('.discount-total-1').innerHTML = fCurrency.replace('######', savePrice);
+        }
         let percent = parseInt(data.productPrices.DiscountedPrice.Value * 100 / data.productPrices.FullRetailPrice.Value);
         if(!!_q('.discount-percent')) {
             _q('.discount-percent').innerHTML = percent + '%';
