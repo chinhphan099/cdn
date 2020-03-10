@@ -21,6 +21,7 @@
 
     eCRM.Order.getRelatedOrders(confirm.orderInfo.orderNumber, function (result) {
         console.log(result);
+        utils.events.emit('bindGtmEvents', result);
         bindData(result);
     });
 
@@ -175,17 +176,14 @@
         let upsellProductNames = (typeof upsellProducts !== 'undefined') ? upsellProducts : false;
 
         let taxLine = '';
-        let mainProductTax = localStorage.getItem('mainProductTax');
-        if(mainProductTax) {
-            mainProductTax = JSON.parse(mainProductTax);
-            if(mainProductTax.tax != 0) {
-                taxLine = `
+        const taxMainValue = parseFloat(data.orderPrice) - parseFloat(data.orderProductPrice) - parseFloat(data.shippingPrice);
+        if(taxMainValue > 0) {
+            taxLine = `
                         <div class="inner">
                             <span>Tax</span>
-                            <span>${'$' + mainProductTax.tax}</span>
+                            <span>${'$' + taxMainValue.toFixed(2)}</span>
                         </div>
                 `;
-            }
         }
 
         let listProduct = productItemMainTmp.replace('{productName}', data.productName)
@@ -216,11 +214,22 @@
                                     .replace(/\$price/, utils.formatPrice(mainPrice, fCurrency, shippingPriceFormatted)) + ')';
             }
 
+            let taxUpsellLine = '';
+            const taxUpsellValue = parseFloat(data.relatedOrders[i].orderPrice) - parseFloat(data.relatedOrders[i].orderProductPrice) - parseFloat(data.relatedOrders[i].shippingPrice);
+            if(taxUpsellValue > 0) {
+                taxUpsellLine = `
+                        <div class="inner">
+                            <span>Tax</span>
+                            <span>${'$' + taxUpsellValue.toFixed(2)}</span>
+                        </div>
+                `;
+            }
+
             let itemTmp = '';
             if(data.relatedOrders[i].productName.toLowerCase().indexOf('warranty')>-1){
                 itemTmp = productItemTmpWarranty.replace('{productName}', data.relatedOrders[i].productName)
                                 .replace(/\{productPrice\}/g, data.relatedOrders[i].orderProductPriceFormatted)
-                                .replace(/\{tax\}/g, '')
+                                .replace(/\{tax\}/g, taxUpsellLine)
                                 .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}<em>${installmentText}</em>`)
                                 .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
                                 .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
@@ -229,7 +238,7 @@
             else {
                 itemTmp = productItemTmp.replace('{productName}', data.relatedOrders[i].productName)
                                 .replace(/\{productPrice\}/g, data.relatedOrders[i].orderProductPriceFormatted)
-                                .replace(/\{tax\}/g, '')
+                                .replace(/\{tax\}/g, taxUpsellLine)
                                 .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}<em>${installmentText}</em>`)
                                 .replace(/\{productTotalPreOrder\}/g, `${data.relatedOrders[i].orderProductPriceFormatted}<em>${installmentText}</em>`)
                                 .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)

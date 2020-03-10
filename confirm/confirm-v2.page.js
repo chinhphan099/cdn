@@ -21,6 +21,7 @@
 
     eCRM.Order.getRelatedOrders(confirm.orderInfo.orderNumber, function (result) {
         console.log(result);
+        utils.events.emit('bindGtmEvents', result);
         bindData(result);
     });
 
@@ -122,9 +123,7 @@
                                 </li>`,
             productItemMainTmp = productItemTmp;
 
-        if(utils.localStorage().get('preOrder') === 'true') {
-            let pre_order_product_charges_statement_confirm_page = js_translate.pre_order_product_charges_statement_confirm_page || 'Your deposit will be processed for {productTotal} ({orderNumber}) and will appear as {midDescriptor}. You will be charged the price of the products when they ship.';
-            productItemMainTmp = `<li class="item">
+        let productItemTmpWarranty = `<li class="item">
                                     <div class="inner">
                                         <span>{productName}</span>
                                         <span>{productPrice}</span>
@@ -138,8 +137,31 @@
                                         <span>${total}</span>
                                         <span>{productTotal}</span>
                                     </div>
+                                    <div class="inner"><span>${js_translate.product_charges_statement_confirm_page}</span></div>
+                                </li>`;
+
+        if(utils.localStorage().get('preOrder') === 'true') {
+            let pre_order_product_charges_statement_confirm_page = js_translate.pre_order_product_charges_statement_confirm_page || 'Your deposit will be processed for {productTotal} ({orderNumber}) and will appear as {midDescriptor}. You will be charged the price of the products when they ship.';
+            pre_order_product_charges_statement_confirm_page = pre_order_product_charges_statement_confirm_page.replace(/\{productTotal\}/gi, '{productTotalPreOrder}');
+            productItemMainTmp = `<li class="item">
+                                    <div class="inner">
+                                        <span>{productName}</span>
+                                        <span>{productPrice}</span>
+                                    </div>
+                                    <div class="inner">
+                                        <span>${shipping}</span>
+                                        <span>{shippingPrice}</span>
+                                    </div>
+                                    {tax}
+                                    <div class="inner">
+                                        <span>${total}</span>
+                                        <span>{productTotalPreOrder}</span>
+                                    </div>
                                     <div class="inner"><span>${pre_order_product_charges_statement_confirm_page}</span></div>
                                 </li>`;
+        }
+        if(utils.localStorage().get('preOrderUpsell') === 'true') {
+            productItemTmp = productItemTmp.replace(/\{productTotal\}/gi, '{productTotalPreOrder}');
         }
         //Installment Payment : only for Brazil
         let installmentText = '';
@@ -154,23 +176,21 @@
         let upsellProductNames = (typeof upsellProducts !== 'undefined') ? upsellProducts : false;
 
         let taxLine = '';
-        let mainProductTax = localStorage.getItem('mainProductTax');
-        if(mainProductTax) {
-            mainProductTax = JSON.parse(mainProductTax);
-            if(mainProductTax.tax != 0) {
-                taxLine = `
+        const taxMainValue = parseFloat(data.orderPrice) - parseFloat(data.orderProductPrice) - parseFloat(data.shippingPrice);
+        if(taxMainValue > 0) {
+            taxLine = `
                         <div class="inner">
                             <span>Tax</span>
-                            <span>${'$' + mainProductTax.tax}</span>
+                            <span>${'$' + taxMainValue.toFixed(2)}</span>
                         </div>
                 `;
-            }
         }
 
         let listProduct = productItemMainTmp.replace('{productName}', data.productName)
                                 .replace(/\{productPrice\}/g, data.orderProductPriceFormatted)
                                 .replace(/\{tax\}/g, taxLine)
                                 .replace(/\{productTotal\}/g, `${data.orderPriceFormatted}<em>${installmentText}</em>`)
+                                .replace(/\{productTotalPreOrder\}/g, `${data.orderProductPriceFormatted}<em>${installmentText}</em>`)
                                 .replace('{shippingPrice}', data.shippingPriceFormatted)
                                 .replace('{midDescriptor}', data.receipts[0].midDescriptor ? data.receipts[0].midDescriptor : 'Paypal')
                                 .replace(/\{orderNumber\}/g, data.orderNumber);
@@ -194,13 +214,37 @@
                                     .replace(/\$price/, utils.formatPrice(mainPrice, fCurrency, shippingPriceFormatted)) + ')';
             }
 
-            let itemTmp = productItemTmp.replace('{productName}', data.relatedOrders[i].productName)
+            let taxUpsellLine = '';
+            const taxUpsellValue = parseFloat(data.relatedOrders[i].orderPrice) - parseFloat(data.relatedOrders[i].orderProductPrice) - parseFloat(data.relatedOrders[i].shippingPrice);
+            if(taxUpsellValue > 0) {
+                taxUpsellLine = `
+                        <div class="inner">
+                            <span>Tax</span>
+                            <span>${'$' + taxUpsellValue.toFixed(2)}</span>
+                        </div>
+                `;
+            }
+
+            let itemTmp = '';
+            if(data.relatedOrders[i].productName.toLowerCase().indexOf('warranty')>-1){
+                itemTmp = productItemTmpWarranty.replace('{productName}', data.relatedOrders[i].productName)
                                 .replace(/\{productPrice\}/g, data.relatedOrders[i].orderProductPriceFormatted)
-                                .replace(/\{tax\}/g, '')
+                                .replace(/\{tax\}/g, taxUpsellLine)
                                 .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}<em>${installmentText}</em>`)
                                 .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
                                 .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
                                 .replace(/\{orderNumber\}/g, data.relatedOrders[i].orderNumber);
+            }
+            else {
+                itemTmp = productItemTmp.replace('{productName}', data.relatedOrders[i].productName)
+                                .replace(/\{productPrice\}/g, data.relatedOrders[i].orderProductPriceFormatted)
+                                .replace(/\{tax\}/g, taxUpsellLine)
+                                .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}<em>${installmentText}</em>`)
+                                .replace(/\{productTotalPreOrder\}/g, `${data.relatedOrders[i].orderProductPriceFormatted}<em>${installmentText}</em>`)
+                                .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
+                                .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
+                                .replace(/\{orderNumber\}/g, data.relatedOrders[i].orderNumber);
+            }
 
             if(!!upsellProductNames) {
                 for(let j = 0; j < upsellProductNames.length; j++) {
