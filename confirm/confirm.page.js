@@ -177,7 +177,7 @@
 
         let taxLine = '';
         const taxMainValue = parseFloat(data.orderPrice) - parseFloat(data.orderProductPrice) - parseFloat(data.shippingPrice);
-        if(taxMainValue > 0) {
+        if(taxMainValue > 0 && utils.localStorage().get('preOrder') !== 'true') {
             taxLine = `
                         <div class="inner">
                             <span>Tax</span>
@@ -216,7 +216,7 @@
 
             let taxUpsellLine = '';
             const taxUpsellValue = parseFloat(data.relatedOrders[i].orderPrice) - parseFloat(data.relatedOrders[i].orderProductPrice) - parseFloat(data.relatedOrders[i].shippingPrice);
-            if(taxUpsellValue > 0) {
+            if(taxUpsellValue > 0 && utils.localStorage().get('preOrderUpsell') !== 'true') {
                 taxUpsellLine = `
                         <div class="inner">
                             <span>Tax</span>
@@ -226,7 +226,7 @@
             }
 
             let itemTmp = '';
-            if(data.relatedOrders[i].productName.toLowerCase().indexOf('warranty')>-1){
+            if(data.relatedOrders[i].productName.toLowerCase().indexOf('warranty') > -1){
                 itemTmp = productItemTmpWarranty.replace('{productName}', data.relatedOrders[i].productName)
                                 .replace(/\{productPrice\}/g, data.relatedOrders[i].orderProductPriceFormatted)
                                 .replace(/\{tax\}/g, taxUpsellLine)
