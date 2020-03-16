@@ -205,7 +205,7 @@
             }
         }
 
-        totalPreOrder = utils.formatPrice(data.orderPrice - data.orderProductPrice, fCurrency, shippingPriceFormatted);
+        totalPreOrder = utils.formatPrice((data.orderPrice - data.orderProductPrice).toFixed(2), fCurrency, shippingPriceFormatted);
         //grandTotal += (data.orderPrice - data.orderProductPrice);
         totalBalance += data.orderProductPrice;
         totalProductsWhenReady += (data.orderPrice - data.orderProductPrice);
