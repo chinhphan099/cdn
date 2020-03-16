@@ -133,9 +133,13 @@
             lifetimeRate = 0,
             productWarranty = 0;
 
+        const fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
+        const pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
+
         if(product.shippings != null && product.shippings.length > 0) {
             shippingFee = product.shippings[0].price;
         }
+
         if(_qById('txtProductWarranty') != null) {
             if(_qById('txtProductWarranty').checked === true) {
                 let lifeTimeInfo = getLifetimePrice(product);
@@ -145,9 +149,13 @@
         }
         if(_q('#txtMiniUpsellPID') != null) {
             if(_q('#txtMiniUpsellPID').checked === true) {
-                productWarranty = parseFloat(_q('.warrantyDiscountPrice').dataset.warrantydiscountprice);
+                if(!!_q('.warrantyDiscountPrice')) {
+                    productWarranty = parseFloat(_q('.warrantyDiscountPrice').dataset.warrantydiscountprice);
+                }
             }
         }
+
+        const fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
         var orderInfo = {
             'upsells': orderResponse.upsells,
             'upsellIndex': 0,
@@ -163,6 +171,8 @@
             'orderTotalFull': product.productPrices.DiscountedPrice.Value + shippingFee + lifetimePrice + productWarranty,
             'savedTotal': product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value,
             'quantity': product.quantity,
+            'feeShipping': shippingFee,
+            'fCurrency': fCurrency,
             'orderedProducts': [
                 {
                     type: 'main',
@@ -172,20 +182,22 @@
                 }
             ],
             installmentValue: _qById('ddl_installpayment') ? _qById('ddl_installpayment').value : '',
-            installmentText: (window.widget && window.widget.installmentpayment) ? window.widget.installmentpayment.optionText : ''
+            installmentText: (window.widget && window.widget.installmentpayment) ? window.widget.installmentpayment.optionText : '',
+            url: location.pathname
         };
 
         utils.localStorage().set('orderInfo', JSON.stringify(orderInfo));
     }
 
-    function placeMainOrder(paymenttype) {
+    function isValidInfos() {
         const checkCustomerForm = utils.customerForm.isValid();
         // const payment = _q('input[name="paymentmethod"]:checked');
         const payment = true;
         if (!payment) {
             console.log('please select a payment method');
-            return;
-        } else {
+            return false;
+        }
+        else {
             const checkCreditCardForm = utils.creditcardForm.isValid();
             const checkShippingForm = window.widget.shipping.isValid();
             const checkProductListValue = window.widget.productlist !== undefined ? window.widget.productlist.isValidProductList() : true;
@@ -203,13 +215,41 @@
 
                 //Exute functiona focusErrorInputField
                 utils.focusErrorInputField();
-                return;
+                return false;
             }
         }
+        return true;
+    }
 
-        utils.showAjaxLoading();
+    function recalculateCTAPosition() {
+        let ctaButton = _qById('js-basic-cta-button'),
+            wrapLoadingIcon = _q('.custom-loading .wrap-loading');
+
+            wrapLoadingIcon.style.left = ctaButton.getBoundingClientRect().left + 'px';
+            wrapLoadingIcon.style.top = ctaButton.getBoundingClientRect().top + 'px';
+    }
+
+    function placeMainOrder(paymenttype) {
+        //Show Ajax Custom Loading
+        //utils.showAjaxLoading();
+        let customAjaxLoading = _q('.custom-loading'),
+            time = 0;
+
+        if(!!customAjaxLoading) {
+            time = 100;
+            customAjaxLoading.classList.remove('hidden');
+            _q('body').classList.add('overflow');
+
+            if(customAjaxLoading.classList.contains('black-screen')) {
+                recalculateCTAPosition();
+            }
+        }
+        else {
+            utils.showAjaxLoading();
+        }
 
         const orderData = getOrderData(paymenttype);
+        eCRM.Order.webkey = siteSetting.webKey;
 
         eCRM.Order.placeOrder(orderData, paymenttype, function (result) {
             //make a flag is that has a order successfully, will be used in decline page
@@ -219,20 +259,49 @@
                 utils.localStorage().set('user_firstname', orderData.customer.firstName);
                 utils.localStorage().set('user_lastname', orderData.customer.lastName);
                 saveInforForUpsellPage(result);
-
+                //Display Message successed
+                if(!!customAjaxLoading) {
+                    customAjaxLoading.classList.add('successed');
+                }
                 //utils.fireMainOrderToGTMConversionV2();
 
-                if (result.callBackUrl) {
-                    document.location = result.callBackUrl;
-                } else if (result.paymentContinueResult && result.paymentContinueResult.actionUrl !== '') {
-                    document.location = result.paymentContinueResult.actionUrl;
-                } else if (result.upsells.length > 0 && result.upsells[0].upsellUrl !== '') {
-                    const redirectUrl = result.upsells[0].upsellUrl.substr(result.upsells[0].upsellUrl.lastIndexOf('/') + 1);
-                    location.href = redirectUrl;
-                } else {
-                    utils.redirectPage(siteSetting.successUrl);
-                }
-            } else {
+                //Making delay time to showing successful message when checkout
+                setTimeout(function() {
+                    if (result.callBackUrl) {
+                        document.location = result.callBackUrl;
+                    }
+                    else if (result.paymentContinueResult && result.paymentContinueResult.actionUrl !== '') {
+                        document.location = result.paymentContinueResult.actionUrl;
+                    }
+                    else if (result.upsells.length > 0 && result.upsells[0].upsellUrl !== '') {
+                        const redirectUrl = result.upsells[0].upsellUrl.substr(result.upsells[0].upsellUrl.lastIndexOf('/') + 1);
+                        if(!customAjaxLoading) {
+                            window.location.href = redirectUrl;
+                        }
+                        else {
+                            let page = _q('body');
+                            let position = 0;
+                            let op = 1;
+                            let slpage = setInterval(function() {
+                                if (position === 350) {
+                                    clearInterval(slpage);
+                                    window.location.href = redirectUrl;
+                                }
+                                else {
+                                    position += 10;
+                                    page.style.right = position + 'px';
+                                    page.style.opacity = op;
+                                    op = op - 0.05;
+                                }
+                            }, 10);
+                        }
+                    }
+                    else {
+                        utils.redirectPage(siteSetting.successUrl);
+                    }
+                }, time);
+            }
+            else {
                 utils.localStorage().set('userPaymentType', 'creditcard');
                 utils.redirectPage(siteSetting.declineUrl);
             }
@@ -242,11 +311,25 @@
     function handleButtonClick() {
         _qById('js-basic-cta-button').addEventListener('click', function (e) {
             e.preventDefault();
-            placeMainOrder('creditcard');
+            window.ccFlag = true;
+            window.paypalFlag = false;
+            if(!isValidInfos()) {
+                return;
+            }
+            if(!!_q('.widget_modal_upsell')) {
+                _q('.widget_modal_upsell').style.display = 'block';
+            }
+            else {
+                placeMainOrder('creditcard');
+            }
         });
     }
 
     document.addEventListener('DOMContentLoaded', function () {
         handleButtonClick();
     });
+
+    window.cc = {
+        placeMainOrder: placeMainOrder,
+    };
 })(window.utils);

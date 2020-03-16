@@ -29,12 +29,20 @@
     function handleButtonClick() {
         _q('#js-paypal-oneclick-button .w_radio').addEventListener('click', function (e) {
             e.preventDefault();
-            placeMainOrder();
+            window.paypalFlag = true;
+            window.ccFlag = false;
+            _q('body').classList.add('paypal-in-progress');
+            if(!!_q('.widget_modal_upsell')) {
+                _q('.widget_modal_upsell').style.display = 'block';
+            }
+            else {
+                placeMainOrder();
+            }
         });
     }
 
     function placeMainOrder() {
-        let paymenttype = 'paypal';
+        const paymenttype = 'paypal';
         const paypalLoading = _q('.paypal-loading-overlay');
         const checkProductListValue = window.widget.productlist !== undefined ? window.widget.productlist.isValidProductList() : true;
 
@@ -109,7 +117,7 @@
             "shippingAddress": null,
             "billingAddress": null,
             "funnelBoxId": !!_qById('txtProductWarranty') ? (_qById('txtProductWarranty').checked ? _qById('txtProductWarranty').value : 0) : 0
-        }
+        };
 
         //Addtional Miniupsell Data
         // if(_qById('txtMiniUpsellPID') && _qById('txtMiniUpsellPID').checked) {
@@ -195,7 +203,8 @@
                     sku: product.sku,
                     pid: product.productId
                 }
-            ]
+            ],
+            url: location.pathname
         }
 
         utils.localStorage().set('orderInfo', JSON.stringify(orderInfo));
@@ -213,4 +222,8 @@
     document.addEventListener('DOMContentLoaded', function () {
         handleButtonClick();
     });
+
+    window.paypal = {
+        placeMainOrder: placeMainOrder,
+    };
 })(window.utils);
