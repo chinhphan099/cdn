@@ -36,7 +36,7 @@ class Checkout {
             monthDdl = document.getElementById('monthddl');
 
         if(document.getElementById('yearddl').value === curYear.toString() && Number(monthDdl.value) < curMonth) {
-            monthDdl.value = curMonth;
+            monthDdl.value = curMonth > 9 ? curMonth : '0' + curMonth;
         }
     }
     setExpirationValue() {
@@ -347,6 +347,32 @@ class Checkout {
     }
     // End Place Order
 
+    appendParamIntoUrl(id) {
+        let currentUrl = window.location.href,
+            param = '';
+
+        if(currentUrl.indexOf(id) > -1) {
+            return;
+        }
+        if(currentUrl.indexOf('?') > -1) {
+            param = '&clickid=' + id;
+        }
+        else {
+            param = '?clickid=' + id;
+        }
+        const newurl = currentUrl + param;
+        window.history.pushState({path: newurl}, '', newurl);
+    }
+
+    finishOrder() {
+        if(!!window.ccFlag) {
+            this.submitFirstProduct('cc');
+        }
+        if(!!window.paypalFlag) {
+            this.submitFirstProduct('pp');
+        }
+    }
+
     // Bind Events
     bindEvents() {
         this.openCvvPopup();
@@ -358,7 +384,14 @@ class Checkout {
         document.getElementById('btn-submit-cc').addEventListener('click', e => {
             e.preventDefault();
             if(this.checkValidSelectedProducts() && this.checkoutValidation.isValid()) {
-                this.submitFirstProduct('cc');
+                window.ccFlag = true;
+                window.paypalFlag = false;
+                if(!!document.querySelector('.widget_modal_upsell')) {
+                    document.querySelector('.widget_modal_upsell').style.display = 'block';
+                }
+                else {
+                    this.submitFirstProduct('cc');
+                }
             }
         });
 
@@ -366,9 +399,30 @@ class Checkout {
         document.getElementById('btn-submit-paypal').addEventListener('click', e => {
             e.preventDefault();
             if(this.checkValidSelectedProducts()) {
-                this.submitFirstProduct('pp');
+                window.paypalFlag = true;
+                window.ccFlag = false;
+                document.querySelector('body').classList.add('paypal-in-progress');
+                if(!!document.querySelector('.widget_modal_upsell')) {
+                    document.querySelector('.widget_modal_upsell').style.display = 'block';
+                }
+                else {
+                    this.submitFirstProduct('pp');
+                }
             }
         });
+
+        if(!!document.getElementById('btnX')) {
+            document.getElementById('btnX').addEventListener('click', e => {
+                this.appendParamIntoUrl(e.currentTarget.id);
+                this.finishOrder();
+            });
+        }
+        if(!!document.getElementById('btnFinishOrder')) {
+            document.getElementById('btnFinishOrder').addEventListener('click', e => {
+                this.appendParamIntoUrl(e.currentTarget.id);
+                this.finishOrder();
+            });
+        }
 
         //show or hide billing
         const chkSameAsShipping = document.getElementById('same-as-shipping');

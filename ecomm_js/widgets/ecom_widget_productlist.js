@@ -229,6 +229,7 @@ export default class ProductList {
             //emit events
             try {
                 this.events.emit('bindOrderPage', data);
+                this.saveToLocalCart();
             } catch (err) {
                 console.log(err);
             }
@@ -472,24 +473,31 @@ export default class ProductList {
 
         let productRows = '',
             productRow = `
-            <tr class="pro-row">
-                <td class="td-name">{name}</td>
-                <td class="td-price">{price}</td>
-            </tr>
-        `;
+                <tr class="pro-row">
+                    <td class="td-name">{name}</td>
+                    <td class="td-price">{price}</td>
+                </tr>
+            `;
 
         if(this.cart.totalQuantity === 0 || (this.cart.totalQuantity === 1 && !!document.getElementById('product_' + this.cart.items[0].productId).closest('.productItem').classList.contains('gift-item'))) {
             document.querySelector('.statistical').classList.add('hidden');
         }
         else if(this.cart.totalQuantity > 0) {
             document.querySelector('.statistical').classList.remove('hidden');
+            let savedPrice = 0;
             for(let item of this.cart.items) {
                 let price = item.discountedPrice * item.quantity;
                 let formatPrice = this.formatPrice(price.toFixed(2), item.formattedPrice);
-                let tmp = productRow.replace('{name}', item.productName + ' x ' + item.quantity).replace('{price}', formatPrice);
+                let tmp = productRow.replace('{name}', item.productName + '<span class="unit"> x ' + item.quantity + '</span>').replace('{price}', formatPrice);
                 productRows += tmp;
+                savedPrice += item.savedPrice;
             }
-            document.querySelector('.grand-total').innerText = this.cart.formatTotalPrice;
+            if(!!document.querySelector('.discount-total')) {
+                document.querySelector('.discount-total').innerText = this.formatPrice(savedPrice.toFixed(2), this.cart.formatTotalPrice);
+            }
+            if(!!document.querySelector('.grand-total')) {
+                document.querySelector('.grand-total').innerText = this.cart.formatTotalPrice;
+            }
         }
 
         if(this.cart.shippingFee.price === 0) {
@@ -540,9 +548,9 @@ export default class ProductList {
         const checkedProducts = document.querySelectorAll('input[name="product"]:checked');
         let totalQuantity = 0,
             shippingFee = {},
-            formatTotalPrice,
             totalPrice = 0,
-            tmpFormatPrice = '';
+            tmpFormatPrice = '',
+            totalShippingFee = 0;
 
         this.sliceArray(checkedProducts).forEach(checkedProduct => {
             const dataProduct = JSON.parse(checkedProduct.dataset.product),
@@ -553,20 +561,25 @@ export default class ProductList {
             tmpFormatPrice = dataProduct.productPrices.DiscountedPrice.FormattedValue;
             shippingFee = this.getShippingFee(dataProduct.shippings, true); // true: Assumed FREE shipping
 
+            totalShippingFee += shippingFee.shippingPrice;
+
             this.products.push({
                 productName: checkedProduct.dataset.productname,
                 productId: dataProduct.productId,
                 discountedPrice: dataProduct.productPrices.RootDiscountedPrice.Value,
+                savedPrice: (dataProduct.productPrices.FullRetailPrice.Value - dataProduct.productPrices.RootDiscountedPrice.Value) * quantity,
                 formattedPrice: dataProduct.productPrices.RootDiscountedPrice.FormattedValue,
                 quantity: quantity,
                 shippingMethodId: shippingFee.shippingMethodId,
                 shippingPrice: shippingFee.shippingPrice,
-                formatShippingPrice: shippingFee.formatShippingPrice
+                formatShippingPrice: shippingFee.formatShippingPrice,
+                isRadio: checkedProduct.type === 'radio' ? true : false
             });
         });
 
         if(totalQuantity === 1 || (totalQuantity === 2 && !!this.checkHasGiftItem())) {
             shippingFee = this.getShippingFee(JSON.parse(checkedProducts[checkedProducts.length - 1].dataset.product).shippings, false);
+            totalShippingFee = shippingFee.shippingPrice;
             this.products[checkedProducts.length - 1].shippingMethodId = shippingFee.shippingMethodId;
             // Save for Confirm page
             this.products[checkedProducts.length - 1].shippingPrice = shippingFee.shippingPrice;
@@ -579,8 +592,8 @@ export default class ProductList {
             items: this.products,
             totalQuantity: totalQuantity,
             shippingFee: {
-                price: shippingFee.shippingPrice,
-                formatPrice: shippingFee.formatShippingPrice
+                price: totalShippingFee,
+                formatPrice: this.formatPrice(totalShippingFee.toFixed(2), tmpFormatPrice)
             },
             totalPrice: Number(totalPrice.toFixed(2)),
             formatTotalPrice: this.formatPrice(totalPrice.toFixed(2), tmpFormatPrice)
@@ -642,16 +655,24 @@ export default class ProductList {
         const productItems = document.querySelectorAll('input[name="product"]');
         this.sliceArray(productItems).forEach(productItem => {
             productItem.addEventListener('change', (e) => {
-                if(!!productItem.checked) {
+
+                if(e.currentTarget.type === 'radio') {
+                    document.querySelector('.checked-item').classList.remove('checked-item');
                     productItem.closest('.productItem').classList.add('checked-item');
-                    if(!!e.currentTarget.closest('.productItem').querySelector('.js-quantity') &&
-                        e.currentTarget.closest('.productItem').querySelector('.js-quantity').value === '0') {
-                        this.updateQuantity(e.currentTarget.closest('.productItem'), 1, Number(e.currentTarget.closest('.productItem').querySelector('.qty-plus').dataset.max));
-                    }
                 }
                 else {
-                    productItem.closest('.productItem').classList.remove('checked-item');
+                    if(!!productItem.checked) {
+                        productItem.closest('.productItem').classList.add('checked-item');
+                        if(!!e.currentTarget.closest('.productItem').querySelector('.js-quantity') &&
+                            e.currentTarget.closest('.productItem').querySelector('.js-quantity').value === '0') {
+                            this.updateQuantity(e.currentTarget.closest('.productItem'), 1, Number(e.currentTarget.closest('.productItem').querySelector('.qty-plus').dataset.max));
+                        }
+                    }
+                    else {
+                        productItem.closest('.productItem').classList.remove('checked-item');
+                    }
                 }
+
                 if(!!document.querySelector('.prl-error')) {
                     document.querySelector('.prl-error').classList.add('hidden');
                 }
