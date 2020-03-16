@@ -239,7 +239,7 @@
             }
 
             let itemTmp = '';
-            if(data.relatedOrders[i].productName.toLowerCase().indexOf('warranty')>-1){
+            if(data.relatedOrders[i].productName.toLowerCase().indexOf('warranty')>-1 && utils.localStorage().get('preOrderUpsell') !== 'true'){
                 itemTmp = productItemTmpWarranty.replace('{productName}', data.relatedOrders[i].productName)
                     .replace(/\{productPrice\}/g, data.relatedOrders[i].orderProductPriceFormatted)
                     .replace(/\{productPrice\}/g, data.relatedOrders[i].orderProductPriceFormatted)
@@ -295,7 +295,12 @@
         _q('.totalBalance').innerHTML =  utils.formatPrice(totalBalance.toFixed(2), fCurrency, shippingPriceFormatted);
         _q('.totalProductsWhenReady').innerHTML = utils.formatPrice((totalProductsWhenReady - shippingFromOrder).toFixed(2), fCurrency, shippingPriceFormatted)
         _q('.grandTotal').innerHTML = utils.formatPrice((totalBalance + totalProductsWhenReady).toFixed(2), fCurrency, shippingPriceFormatted);
-        _q('.shippingOrder').innerHTML = utils.formatPrice(shippingOrder.toFixed(2), fCurrency, shippingPriceFormatted)
+        if(isNaN(shippingOrder)){
+            _q('.shippingOrder').innerHTML = js_translate.shipping;
+        }else{
+            _q('.shippingOrder').innerHTML = utils.formatPrice(shippingOrder.toFixed(2), fCurrency, shippingPriceFormatted);
+        }
+
         //Payment summary
 
         if(!!utils.localStorage().get('additionTextConfirmName')) {
