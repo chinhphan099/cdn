@@ -21,7 +21,7 @@ import Utils from '../common/utils.js';
         let perfData = window.performance.timing, // The PerformanceTiming interface
             //estimatedTime = -(perfData.loadEventEnd - perfData.navigationStart), // Calculated Estimated Time of Page Load which returns negative value.
             estimatedTime = perfData.responseEnd - perfData.navigationStart, // Calculated Estimated Time of Page Load which returns negative value.
-            time = parseInt((estimatedTime / 1000) % 60) * 100,//Converting EstimatedTime from miliseconds to seconds.                    
+            time = parseInt((estimatedTime / 1000) % 60) * 100,//Converting EstimatedTime from miliseconds to seconds.
             start = 0,
             end = 100,
             durataion = time;
@@ -31,7 +31,7 @@ import Utils from '../common/utils.js';
                 increment = end > start ? 1 : -1,
                 stepTime = Math.abs(Math.floor(duration / range));
             //console.log('step time: ', stepTime);
-            stepTime = 15; //stepTime < 10 ? 10 : stepTime;                     
+            stepTime = 15; //stepTime < 10 ? 10 : stepTime;
             var timer = setInterval(function () {
                 current += increment;
                 if (current == end) {
