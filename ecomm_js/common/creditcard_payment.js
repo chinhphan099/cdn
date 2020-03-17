@@ -27,7 +27,12 @@ export default class CreditCardPayment {
                 if (result && result.success) {
                     localStorage.removeItem(constants.CART);
                     this.saveLocalStorage(result, 'creditcart');
-                    Utils.redirectPage(constants.CONFIRM_URL);
+                    if(!!siteSetting.confirmUrl) {
+                        Utils.redirectPage(siteSetting.confirmUrl);
+                    }
+                    else {
+                        Utils.redirectPage(constants.CONFIRM_URL);
+                    }
                 }else{
                     Utils.redirectPage(constants.DECLINE_URL);
                 }

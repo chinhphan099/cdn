@@ -18,6 +18,9 @@ class Success {
 
             if(result && result.success) {
                 let confirmUrl = constants.CONFIRM_URL;
+                if(!!siteSetting.confirmUrl) {
+                    confirmUrl = siteSetting.confirmUrl;
+                }
                 const paramsForConfirmPage = localStorage.getItem('paramsForConfirmPage');
                 if(paramsForConfirmPage) {
                     confirmUrl += confirmUrl.indexOf('?') > 0 ? '&' + paramsForConfirmPage : '?' + paramsForConfirmPage;
