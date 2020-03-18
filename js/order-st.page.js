@@ -314,7 +314,12 @@ Element.prototype.appendAfter = function (element) {
 
         let savePrice = (data.productPrices.FullRetailPrice.Value - data.productPrices.DiscountedPrice.Value).toFixed(2);
         if(!!window.isPreOrder) {
-            // savePrice = parseFloat(!!checkedItem.parentElement.querySelector('.discountValue') ? checkedItem.parentElement.querySelector('.discountValue').innerText : 0);
+            // if(!!checkedItem.parentElement.querySelector('.discountValue')) {
+            //     savePrice = checkedItem.parentElement.querySelector('.discountValue').textContent;
+            // }
+            // else {
+            //     savePrice = getSavePrice(checkedItem);
+            // }
             savePrice = getSavePrice(checkedItem);
         }
         if(!!_q('.discount-total')) {

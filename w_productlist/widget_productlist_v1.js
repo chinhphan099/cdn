@@ -10,20 +10,20 @@
     }
 
     window.isNotCallApiUpsell = true;
+    let retailPriceDepositOneUnit = 1;
 
     function replaceUserString() {
         //Product List Widget
         if(_qById('js-widget-products')) {
-            const iconPriceLoading = '';
             const unitDiscountRateLables = _qAll('.js-unitDiscountRate');
             if(unitDiscountRateLables) {
                 for(let elem of unitDiscountRateLables) {
-                    elem.innerHTML = elem.innerHTML.replace(/{UnitDiscountRate}/gi, `<span class="spanUnitDiscountRate">${iconPriceLoading}</span>`)
+                    elem.innerHTML = elem.innerHTML.replace(/{UnitDiscountRate}/gi, `<span class="spanUnitDiscountRate"></span>`)
                                             .replace(/{UnitFullRate}/gi, '<span class="spanUnitFullRate"></span>')
-                                            .replace(/{DiscountedPrice}/gi, `<span class="discountedPrice">${iconPriceLoading}</span>`)
-                                            .replace(/{SavePrice}/gi, `<span class="savePrice">${iconPriceLoading}</span>`)
+                                            .replace(/{DiscountedPrice}/gi, `<span class="discountedPrice"></span>`)
+                                            .replace(/{SavePrice}/gi, `<span class="savePrice"></span>`)
                                             .replace(/{ShippingFee}/gi, '<span class="jsShippingFee"></span>')
-                                            .replace(/{FullPrice}/gi, `<del class="fullPrice">${iconPriceLoading}</del>`);
+                                            .replace(/{FullPrice}/gi, `<del class="fullPrice"></del>`);
                 }
             }
         }
@@ -110,13 +110,10 @@
         if(typeof activeCouponFrom === 'number' && activeCouponFrom > product.productPrices.DiscountedPrice.Value) {
             return product;
         }
-        let discountedPrice, unitDiscountRate;
-        const fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
-        const pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
-        const fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
+        let discountedPrice;
         const shippingFee = product.shippings[0].formattedPrice;
         const couponValue = Number(utils.getQueryParameter('couponValue').replace('percent', ''));
-        let couponValFormat = utils.formatPrice(couponValue, fCurrency, shippingFee);
+        let couponValFormat = utils.formatPrice(couponValue, window.fCurrency, shippingFee);
         if(utils.getQueryParameter('couponValue').indexOf('percent') > -1) {
             couponValFormat = utils.getQueryParameter('couponValue').replace('percent', '%');
             discountedPrice = (product.productPrices.DiscountedPrice.Value * (100 - couponValue) / 100).toFixed(2);
@@ -125,9 +122,9 @@
             discountedPrice = (product.productPrices.DiscountedPrice.Value - couponValue).toFixed(2);
         }
         product.productPrices.DiscountedPrice.Value = Number(discountedPrice);
-        product.productPrices.DiscountedPrice.FormattedValue = utils.formatPrice(discountedPrice, fCurrency, shippingFee);
+        product.productPrices.DiscountedPrice.FormattedValue = utils.formatPrice(discountedPrice, window.fCurrency, shippingFee);
         product.productPrices.UnitDiscountRate.Value = Number((discountedPrice / product.quantity).toFixed(2));
-        product.productPrices.UnitDiscountRate.FormattedValue = utils.formatPrice(product.productPrices.UnitDiscountRate.Value, fCurrency, shippingFee);
+        product.productPrices.UnitDiscountRate.FormattedValue = utils.formatPrice(product.productPrices.UnitDiscountRate.Value, window.fCurrency, shippingFee);
 
         afterActiveCoupon(_qById('product_' + product.productId), couponValFormat);
 
@@ -140,14 +137,73 @@
         return product;
     }
 
+    function implementPriceHTML(product, quantity) {
+        // const fullPrice = _qAll(`.price-full-unit-${quantity}`);
+        const price1stCharge = _qAll(`.depositFirstChargePrice_${quantity}`);
+        const savePrice = _qAll(`.depositSavePrice_${quantity}`);
+        const shortSavePrice = _qAll(`.depositShortSavePrice_${quantity}`);
+        const eachPrice = _qAll(`.depositEachPrice_${quantity}`);
+        const shortEachPrice = _qAll(`.depositShortEachPrice_${quantity}`);
+
+        // Array.prototype.slice.call(fullPrice).forEach(elm => {
+        //     elm.textContent = utils.formatPrice((product.productPrices.UnitDiscountRate.Value + product.productPrices.FullRetailPrice.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+        // });
+        Array.prototype.slice.call(price1stCharge).forEach(elm => {
+            elm.textContent = utils.formatPrice(product.productPrices.DiscountedPrice.Value, window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+        });
+        Array.prototype.slice.call(savePrice).forEach(elm => {
+            elm.textContent = product.productPrices.SavePriceDeposit.FormattedValue;
+        });
+        Array.prototype.slice.call(shortSavePrice).forEach(elm => {
+            elm.textContent = utils.formatPrice(Math.round(product.productPrices.SavePriceDeposit.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+        });
+        Array.prototype.slice.call(eachPrice).forEach(elm => {
+            elm.textContent = product.productPrices.UnitDiscountRate.FormattedValue;
+        });
+        Array.prototype.slice.call(shortEachPrice).forEach(elm => {
+            elm.textContent = utils.formatPrice(Math.round(product.productPrices.UnitDiscountRate.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+        });
+    }
+
+    function generatePriceForDeposit(product) {
+        let quantity = product.quantity;
+        if(window.isDoubleQuantity) {
+            quantity /= 2;
+        }
+        if(quantity === 1) {
+            retailPriceDepositOneUnit = product.productPrices.FullRetailPrice.Value / 0.65; // 100% - 35%
+        }
+
+        let retailPriceDeposit = retailPriceDepositOneUnit * quantity;
+        let totalPriceDeposit = product.productPrices.DiscountedPrice.Value + product.productPrices.FullRetailPrice.Value;
+
+        product.productPrices.SavePriceDeposit = {};
+        product.productPrices.SavePriceDeposit.Value = Number((retailPriceDeposit - totalPriceDeposit).toFixed(2));
+        product.productPrices.SavePriceDeposit.FormattedValue = utils.formatPrice(product.productPrices.SavePriceDeposit.Value, window.fCurrency, product.shippings[0].formattedPrice);
+
+        implementPriceHTML(product, quantity);
+        return product;
+    }
+
     function bindProducts(data) {
         console.log(data);
         const countryCodeIndex = utils.localStorage().get('countryCodeIndex');
+        for(let i = 0; i < data.prices.length; i++){
+            if(data.prices[i].quantity > 5){
+                window.isDoubleQuantity = true;
+                utils.localStorage().set('doubleQuantity', 'true');
+                break;
+            }
+        }
         if(!(data instanceof Error) && data.prices.length > 0) {
             Array.prototype.slice.call(data.prices).forEach(product => {
                 try {
                     const radio = _qById('product_' + product.productId);
                     if(radio) {
+                        const fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
+                        const pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
+                        window.fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
+
                         let options = JSON.parse(_qById('js-widget-products').dataset.options);
                         if(options.hasOwnProperty('isUseFullPrice')) {
                             product = syncDiscountVsFullPrice(product);
@@ -155,6 +211,9 @@
                         if(!!utils.getQueryParameter('couponCode') && !!utils.getQueryParameter('couponValue')) {
                             // Apply coupon Code
                             product = applyCouponCode(product);
+                        }
+                        if(!!window.isPreOrder) {
+                            product = generatePriceForDeposit(product);
                         }
                         radio.setAttribute('data-product', JSON.stringify(product));
                         radio.onchange = handleProductChange;
@@ -166,9 +225,7 @@
                         const elemTotalDiscountPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .spanTotalDiscountPriceElm');
                         const elemFullPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .fullPrice');
                         const elemSavePrice = _qAll('label[for="' + 'product_' + product.productId + '"] .savePrice');
-                        const fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
-                        const pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
-                        const fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
+                        const elemSavePriceDeposit = _qAll('label[for="' + 'product_' + product.productId + '"] .savePriceDeposit');
 
                         // Hidden all image loading
                         // productRadioListItem
@@ -234,7 +291,7 @@
                         if(elemTotalDiscountPrice) {
                             for(let totalDiscountPrice of elemTotalDiscountPrice) {
                                 let totalDiscountPriceValue = (product.productPrices.DiscountedPrice.Value + product.shippings[0].price).toFixed(2);
-                                let totalDiscountPriceText = fCurrency.replace('######', totalDiscountPriceValue);
+                                let totalDiscountPriceText = window.fCurrency.replace('######', totalDiscountPriceValue);
                                 let totalDiscountPriceTextNode = document.createTextNode(totalDiscountPriceText);
                                 totalDiscountPrice.appendChild(totalDiscountPriceTextNode);
                             }
@@ -248,9 +305,19 @@
                         if(elemSavePrice) {
                             for(let savePrice of elemSavePrice) {
                                 let savePriceValue = (product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value).toFixed(2);
-                                let savePriceText = fCurrency.replace('######', savePriceValue);
+                                let savePriceText = window.fCurrency.replace('######', savePriceValue);
                                 let savePriceTextNode = document.createTextNode(savePriceText);
                                 savePrice.appendChild(savePriceTextNode);
+                            }
+                        }
+
+                        if(window.isPreOrder) {
+                            if(elemSavePriceDeposit) {
+                                for(let savePriceDeposit of elemSavePriceDeposit) {
+                                    let savePriceDepositFormat = utils.formatPrice(Math.round(product.productPrices.SavePriceDeposit.Value), window.fCurrency, product.productPrices.SavePriceDeposit.FormattedValue);
+                                    let savePriceTextDepositNode = document.createTextNode(savePriceDepositFormat);
+                                    savePriceDeposit.appendChild(savePriceTextDepositNode);
+                                }
                             }
                         }
                     }
@@ -267,9 +334,6 @@
                     setTimeout(() => {
                         utils.localStorage().set('preOrder', true);
                     }, 1000);
-                }
-                if(data.prices[data.prices.length - 1].quantity > 5) {
-                    window.isDoubleQuantity = true;
                 }
                 const productInfo = getDefaultSelectedProduct();
                 const currencyElms = _qAll('.jsCurrencyNumber');
@@ -372,10 +436,6 @@
                 }
             }
 
-            const fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
-            const pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
-            const fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
-
             result = {
                 priceShipping: priceShipping,
                 shippingValue: shippingValue,
@@ -384,7 +444,7 @@
                 fullPrice: product.productPrices.FullRetailPrice.FormattedValue,
                 fullPriceValue: product.productPrices.FullRetailPrice.Value,
                 currencyCode: product.productPrices.FullRetailPrice.GlobalCurrencyCode != null ? product.productPrices.FullRetailPrice.GlobalCurrencyCode : '',
-                fCurrency: fCurrency
+                fCurrency: window.fCurrency
             }
         } catch (err) {
             console.log('getDefaultSelectedProduct : ', err);
