@@ -149,19 +149,44 @@
         //     elm.textContent = utils.formatPrice((product.productPrices.UnitDiscountRate.Value + product.productPrices.FullRetailPrice.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
         // });
         Array.prototype.slice.call(price1stCharge).forEach(elm => {
-            elm.textContent = utils.formatPrice(product.productPrices.DiscountedPrice.Value, window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+            if(!!window.removeCurrencySymbol) {
+                elm.textContent = product.productPrices.DiscountedPrice.Value;
+            }
+            else {
+                elm.textContent = utils.formatPrice(product.productPrices.DiscountedPrice.Value, window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+            }
         });
         Array.prototype.slice.call(savePrice).forEach(elm => {
-            elm.textContent = product.productPrices.SavePriceDeposit.FormattedValue;
+            if(!!window.removeCurrencySymbol) {
+                elm.textContent = product.productPrices.SavePriceDeposit.Value;
+            }
+            else {
+                elm.textContent = product.productPrices.SavePriceDeposit.FormattedValue;
+            }
         });
         Array.prototype.slice.call(shortSavePrice).forEach(elm => {
-            elm.textContent = utils.formatPrice(Math.round(product.productPrices.SavePriceDeposit.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+            if(!!window.removeCurrencySymbol) {
+                elm.textContent = Math.round(product.productPrices.SavePriceDeposit.Value);
+            }
+            else {
+                elm.textContent = utils.formatPrice(Math.round(product.productPrices.SavePriceDeposit.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+            }
         });
         Array.prototype.slice.call(eachPrice).forEach(elm => {
-            elm.textContent = product.productPrices.UnitDiscountRate.FormattedValue;
+            if(!!window.removeCurrencySymbol) {
+                elm.textContent = product.productPrices.UnitDiscountRate.Value;
+            }
+            else {
+                elm.textContent = product.productPrices.UnitDiscountRate.FormattedValue;
+            }
         });
         Array.prototype.slice.call(shortEachPrice).forEach(elm => {
-            elm.textContent = utils.formatPrice(Math.round(product.productPrices.UnitDiscountRate.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+            if(!!window.removeCurrencySymbol) {
+                elm.textContent = Math.round(product.productPrices.UnitDiscountRate.Value);
+            }
+            else {
+                elm.textContent = utils.formatPrice(Math.round(product.productPrices.UnitDiscountRate.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+            }
         });
     }
 
@@ -315,6 +340,9 @@
                             if(elemSavePriceDeposit) {
                                 for(let savePriceDeposit of elemSavePriceDeposit) {
                                     let savePriceDepositFormat = utils.formatPrice(Math.round(product.productPrices.SavePriceDeposit.Value), window.fCurrency, product.productPrices.SavePriceDeposit.FormattedValue);
+                                    if(!!window.removeCurrencySymbol) {
+                                        savePriceDepositFormat = Math.round(product.productPrices.SavePriceDeposit.Value);
+                                    }
                                     let savePriceTextDepositNode = document.createTextNode(savePriceDepositFormat);
                                     savePriceDeposit.appendChild(savePriceTextDepositNode);
                                 }
