@@ -220,6 +220,12 @@ Element.prototype.appendAfter = function (element) {
         });
     }
 
+    function getSavePrice(checkedItem) {
+        const product = JSON.parse(checkedItem.dataset.product);
+        let savePrice = Math.round(product.productPrices.SavePriceDeposit.Value);
+        return savePrice;
+    }
+
     const productNameText = _q('.statistical .td-name').innerText || '';
     function loadStatistical(dataResponse) {
         if(!!dataResponse) {
@@ -308,7 +314,8 @@ Element.prototype.appendAfter = function (element) {
 
         let savePrice = (data.productPrices.FullRetailPrice.Value - data.productPrices.DiscountedPrice.Value).toFixed(2);
         if(!!window.isPreOrder) {
-            savePrice = parseFloat(!!checkedItem.parentElement.querySelector('.discountValue') ? checkedItem.parentElement.querySelector('.discountValue').innerText : 0);
+            // savePrice = parseFloat(!!checkedItem.parentElement.querySelector('.discountValue') ? checkedItem.parentElement.querySelector('.discountValue').innerText : 0);
+            savePrice = getSavePrice(checkedItem);
         }
         if(!!_q('.discount-total')) {
             _q('.discount-total').innerHTML = '-' + fCurrency.replace('######', savePrice);
