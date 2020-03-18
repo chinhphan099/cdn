@@ -8,7 +8,9 @@ import Utils from '../common/utils.js';
     }
 
     function init() {
-        document.getElementById('page-loading').style.display = 'block';
+        if(!!document.getElementById('page-loading')) {
+            document.getElementById('page-loading').style.display = 'block';
+        }
         document.querySelector('body').classList.remove('hidden');
 
         if (typeof window.performance === 'undefined' || typeof window.performance.timing === 'undefined') {
