@@ -147,10 +147,20 @@
         const shortEachPrice = _qAll(`.depositShortEachPrice_${quantity}`);
 
         Array.prototype.slice.call(shortRestPrice).forEach(elm => {
-            elm.textContent = utils.formatPrice(Math.round(product.productPrices.FullRetailPrice.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+            if(!!window.removeCurrencySymbol) {
+                elm.textContent = Math.round(product.productPrices.FullRetailPrice.Value);
+            }
+            else {
+                elm.textContent = utils.formatPrice(Math.round(product.productPrices.FullRetailPrice.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+            }
         });
         Array.prototype.slice.call(restPrice).forEach(elm => {
-            elm.textContent = product.productPrices.FullRetailPrice.FormattedValue;
+            if(!!window.removeCurrencySymbol) {
+                elm.textContent = product.productPrices.FullRetailPrice.Value;
+            }
+            else {
+                elm.textContent = product.productPrices.FullRetailPrice.FormattedValue;
+            }
         });
         Array.prototype.slice.call(price1stCharge).forEach(elm => {
             if(!!window.removeCurrencySymbol) {
