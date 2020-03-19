@@ -188,18 +188,18 @@
         });
         Array.prototype.slice.call(eachPrice).forEach(elm => {
             if(!!window.removeCurrencySymbol) {
-                elm.textContent = (product.productPrices.FullRetailPrice.Value / quantity).toFixed(2);
+                elm.textContent = ((product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value) / quantity).toFixed(2);
             }
             else {
-                elm.textContent = utils.formatPrice((product.productPrices.FullRetailPrice.Value / quantity).toFixed(2), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+                elm.textContent = utils.formatPrice(((product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value) / quantity).toFixed(2), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
             }
         });
         Array.prototype.slice.call(shortEachPrice).forEach(elm => {
             if(!!window.removeCurrencySymbol) {
-                elm.textContent = Math.round(product.productPrices.FullRetailPrice.Value / quantity);
+                elm.textContent = Math.round((product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value) / quantity);
             }
             else {
-                elm.textContent = utils.formatPrice(Math.round(product.productPrices.FullRetailPrice.Value / quantity), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+                elm.textContent = utils.formatPrice(Math.round((product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value) / quantity), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
             }
         });
     }
