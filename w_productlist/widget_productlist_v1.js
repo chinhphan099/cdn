@@ -138,16 +138,30 @@
     }
 
     function implementPriceHTML(product, quantity) {
-        // const fullPrice = _qAll(`.price-full-unit-${quantity}`);
+        const shortRestPrice = _qAll(`.depositShortRestPrice_${quantity}`);
+        const restPrice = _qAll(`.depositRestPrice_${quantity}`);
         const price1stCharge = _qAll(`.depositFirstChargePrice_${quantity}`);
         const savePrice = _qAll(`.depositSavePrice_${quantity}`);
         const shortSavePrice = _qAll(`.depositShortSavePrice_${quantity}`);
         const eachPrice = _qAll(`.depositEachPrice_${quantity}`);
         const shortEachPrice = _qAll(`.depositShortEachPrice_${quantity}`);
 
-        // Array.prototype.slice.call(fullPrice).forEach(elm => {
-        //     elm.textContent = utils.formatPrice((product.productPrices.UnitDiscountRate.Value + product.productPrices.FullRetailPrice.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
-        // });
+        Array.prototype.slice.call(shortRestPrice).forEach(elm => {
+            if(!!window.removeCurrencySymbol) {
+                elm.textContent = Math.round(product.productPrices.FullRetailPrice.Value);
+            }
+            else {
+                elm.textContent = utils.formatPrice(Math.round(product.productPrices.FullRetailPrice.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+            }
+        });
+        Array.prototype.slice.call(restPrice).forEach(elm => {
+            if(!!window.removeCurrencySymbol) {
+                elm.textContent = product.productPrices.FullRetailPrice.Value;
+            }
+            else {
+                elm.textContent = product.productPrices.FullRetailPrice.FormattedValue;
+            }
+        });
         Array.prototype.slice.call(price1stCharge).forEach(elm => {
             if(!!window.removeCurrencySymbol) {
                 elm.textContent = product.productPrices.DiscountedPrice.Value;
@@ -174,18 +188,18 @@
         });
         Array.prototype.slice.call(eachPrice).forEach(elm => {
             if(!!window.removeCurrencySymbol) {
-                elm.textContent = product.productPrices.UnitDiscountRate.Value;
+                elm.textContent = (product.productPrices.FullRetailPrice.Value / quantity).toFixed(2);
             }
             else {
-                elm.textContent = product.productPrices.UnitDiscountRate.FormattedValue;
+                elm.textContent = utils.formatPrice((product.productPrices.FullRetailPrice.Value / quantity).toFixed(2), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
             }
         });
         Array.prototype.slice.call(shortEachPrice).forEach(elm => {
             if(!!window.removeCurrencySymbol) {
-                elm.textContent = Math.round(product.productPrices.UnitDiscountRate.Value);
+                elm.textContent = Math.round(product.productPrices.FullRetailPrice.Value / quantity);
             }
             else {
-                elm.textContent = utils.formatPrice(Math.round(product.productPrices.UnitDiscountRate.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+                elm.textContent = utils.formatPrice(Math.round(product.productPrices.FullRetailPrice.Value / quantity), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
             }
         });
     }
@@ -203,7 +217,7 @@
         let totalPriceDeposit = product.productPrices.DiscountedPrice.Value + product.productPrices.FullRetailPrice.Value;
 
         product.productPrices.SavePriceDeposit = {};
-        product.productPrices.SavePriceDeposit.Value = Number((retailPriceDeposit - totalPriceDeposit).toFixed(2));
+        product.productPrices.SavePriceDeposit.Value = Math.abs(Number((retailPriceDeposit - totalPriceDeposit).toFixed(2)));
         product.productPrices.SavePriceDeposit.FormattedValue = utils.formatPrice(product.productPrices.SavePriceDeposit.Value, window.fCurrency, product.shippings[0].formattedPrice);
 
         implementPriceHTML(product, quantity);
