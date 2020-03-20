@@ -143,6 +143,8 @@
         const price1stCharge = _qAll(`.depositFirstChargePrice_${quantity}`);
         const savePrice = _qAll(`.depositSavePrice_${quantity}`);
         const shortSavePrice = _qAll(`.depositShortSavePrice_${quantity}`);
+        const fullPrice = _qAll(`.depositFullPrice_${quantity}`);
+        const shortFullPrice = _qAll(`.depositShortFullPrice_${quantity}`);
         const eachPrice = _qAll(`.depositEachPrice_${quantity}`);
         const shortEachPrice = _qAll(`.depositShortEachPrice_${quantity}`);
 
@@ -186,6 +188,22 @@
                 elm.textContent = utils.formatPrice(Math.round(product.productPrices.SavePriceDeposit.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
             }
         });
+        Array.prototype.slice.call(fullPrice).forEach(elm => {
+            if(!!window.removeCurrencySymbol) {
+                elm.textContent = (product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value).toFixed(2);
+            }
+            else {
+                elm.textContent = utils.formatPrice((product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value).toFixed(2), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+            }
+        });
+        Array.prototype.slice.call(shortFullPrice).forEach(elm => {
+            if(!!window.removeCurrencySymbol) {
+                elm.textContent = Math.round(product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value);
+            }
+            else {
+                elm.textContent = utils.formatPrice(Math.round(product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+            }
+        });
         Array.prototype.slice.call(eachPrice).forEach(elm => {
             if(!!window.removeCurrencySymbol) {
                 elm.textContent = ((product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value) / quantity).toFixed(2);
@@ -210,7 +228,7 @@
             quantity /= 2;
         }
         if(quantity === 1) {
-            retailPriceDepositOneUnit = product.productPrices.FullRetailPrice.Value / 0.65; // 100% - 35%
+            retailPriceDepositOneUnit = (product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value) / 0.65; // 100% - 35%
         }
 
         let retailPriceDeposit = retailPriceDepositOneUnit * quantity;
