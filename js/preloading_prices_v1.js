@@ -4,18 +4,68 @@
         return;
     }
 
+    function implementLoadingIcon() {
+        for(let quantity = 1; quantity < 6; quantity++) {
+            const discountPriceElms = document.querySelectorAll(`.discountPrice_${quantity}`);
+            Array.prototype.slice.call(discountPriceElms).forEach(elm => {
+                elm.innerHTML = '<img width="20" height="10" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" data-src="//d16hdrba6dusey.cloudfront.net/sitecommon/images/loading-price-v1.gif" />';
+            });
+            const depositDiscountPriceElms = document.querySelectorAll(`.depositDiscountPrice_${quantity}`);
+            Array.prototype.slice.call(depositDiscountPriceElms).forEach(elm => {
+                elm.innerHTML = '<img width="20" height="10" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" data-src="//d16hdrba6dusey.cloudfront.net/sitecommon/images/loading-price-v1.gif" />';
+            });
+        }
+    }
+
     function addCurrencyIntoData(data) {
         let fValue = data.prices[0].productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
         let pValue = data.prices[0].productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
         data.fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
 
-        if(!!utils) {
-            const currencyElms = _qAll('.jsCurrencyNumber');
-            Array.prototype.slice.call(currencyElms).forEach(currencyElm => {
-                currencyElm.innerText = data.fCurrency.replace('######', currencyElm.textContent);
+        const currencyElms = document.querySelectorAll('.jsCurrencyNumber');
+        Array.prototype.slice.call(currencyElms).forEach(currencyElm => {
+            currencyElm.innerText = data.fCurrency.replace('######', currencyElm.textContent);
+        });
+        return data;
+    }
+
+    function implementPrice(product, fCurrency, quantity) {
+        try {
+            const discountPriceElms = document.querySelectorAll(`.discountPrice_${quantity}`);
+            Array.prototype.slice.call(discountPriceElms).forEach(elm => {
+                elm.textContent = product.productPrices.DiscountedPrice.FormattedValue;
+            });
+            const depositDiscountPriceElms = document.querySelectorAll(`.depositDiscountPrice_${quantity}`);
+            Array.prototype.slice.call(depositDiscountPriceElms).forEach(elm => {
+                elm.textContent = utils.formatPrice(Math.round(product.productPrices.DiscountedPrice.Value), fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
             });
         }
-        return data;
+        catch (err) {
+            console.log(err);
+        }
+    }
+
+    function loopData(data) {
+        if(!(data instanceof Error) && data.prices.length > 0) {
+            for(let i = 0; i < data.prices.length; i++){
+                if(data.prices[i].quantity > 5){
+                    window.isDoubleQuantity = true;
+                    break;
+                }
+            }
+            Array.prototype.slice.call(data.prices).forEach(product => {
+                try {
+                    let quantity = product.quantity;
+                    if(!!window.isDoubleQuantity) {
+                        quantity /= 2;
+                    }
+                    implementPrice(product, data.fCurrency, quantity);
+                }
+                catch (err) {
+                    console.log(err);
+                }
+            });
+        }
     }
 
     function getDataFromLSAndEmit(webKey) {
@@ -25,6 +75,7 @@
         });
         if(camps[0][webKey].prices.length > 0) {
             const emitData = addCurrencyIntoData(camps[0][webKey]);
+            loopData(emitData);
             if(!!utils) {
                 utils.events.emit('bindData', emitData);
             }
@@ -85,8 +136,9 @@
             .then(data => {
                 try {
                     console.log('loading prices');
+                    const emitData = addCurrencyIntoData(data);
+                    loopData(emitData);
                     if(!!utils) {
-                        const emitData = addCurrencyIntoData(data);
                         utils.events.emit('bindData', emitData);
                     }
                     //store in localStorage
@@ -128,6 +180,9 @@
             });
     }
 
+    document.addEventListener('DOMContentLoaded', () => {
+        implementLoadingIcon();
+    });
     window.addEventListener('load', () => {
         init();
     });

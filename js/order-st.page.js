@@ -271,6 +271,13 @@ Element.prototype.appendAfter = function (element) {
         Array.prototype.slice.call(_qAll('.total-full-price')).forEach((totalFullPriceElm) => {
             totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.FullRetailPrice.Value + data.shippings[window.shippingIndex].price).toFixed(2), fCurrency, taxes);
         });
+        Array.prototype.slice.call(_qAll('.depositEachPrice')).forEach((totalFullPriceElm) => {
+            let quantity = data.quantity;
+            if(!!window.isDoubleQuantity) {
+                quantity /= 2;
+            }
+            totalFullPriceElm.innerText = utils.formatPrice(((data.productPrices.FullRetailPrice.Value + data.productPrices.DiscountedPrice.Value) / quantity).toFixed(2), fCurrency, taxes);
+        });
         Array.prototype.slice.call(_qAll('.depositFullPrice')).forEach((totalFullPriceElm) => {
             totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.FullRetailPrice.Value + data.productPrices.DiscountedPrice.Value).toFixed(2), fCurrency, taxes);
         });
