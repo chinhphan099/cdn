@@ -238,6 +238,10 @@
         product.productPrices.SavePriceDeposit.Value = Math.abs(Number((retailPriceDeposit - totalPriceDeposit).toFixed(2)));
         product.productPrices.SavePriceDeposit.FormattedValue = utils.formatPrice(product.productPrices.SavePriceDeposit.Value, window.fCurrency, product.shippings[0].formattedPrice);
 
+        product.productPrices.FullRetailPriceDeposit = {};
+        product.productPrices.FullRetailPriceDeposit.Value = Number((totalPriceDeposit + product.productPrices.SavePriceDeposit.Value).toFixed(2));
+        product.productPrices.FullRetailPriceDeposit.FormattedValue = utils.formatPrice(product.productPrices.FullRetailPriceDeposit.Value, window.fCurrency, product.shippings[0].formattedPrice);
+
         implementPriceHTML(product, quantity);
         return product;
     }
@@ -283,6 +287,7 @@
                         const elemFullPrice = _qAll('label[for="' + 'product_' + product.productId + '"] .fullPrice');
                         const elemSavePrice = _qAll('label[for="' + 'product_' + product.productId + '"] .savePrice');
                         const elemSavePriceDeposit = _qAll('label[for="' + 'product_' + product.productId + '"] .savePriceDeposit');
+                        const elemFullRetailPriceDeposit = _qAll('label[for="' + 'product_' + product.productId + '"] .fullRetailPriceDeposit');
 
                         // Hidden all image loading
                         // productRadioListItem
@@ -377,6 +382,16 @@
                                     }
                                     let savePriceTextDepositNode = document.createTextNode(savePriceDepositFormat);
                                     savePriceDeposit.appendChild(savePriceTextDepositNode);
+                                }
+                            }
+                            if(elemFullRetailPriceDeposit) {
+                                for(let fullRetailPriceDeposit of elemFullRetailPriceDeposit) {
+                                    let fullRetailPriceDepositFormat = product.productPrices.FullRetailPriceDeposit.FormattedValue;
+                                    if(!!window.removeCurrencySymbol) {
+                                        fullRetailPriceDepositFormat = product.productPrices.FullRetailPriceDeposit.Value;
+                                    }
+                                    let fullRetailPriceTextDepositNode = document.createTextNode(fullRetailPriceDepositFormat);
+                                    fullRetailPriceDeposit.appendChild(fullRetailPriceTextDepositNode);
                                 }
                             }
                         }
