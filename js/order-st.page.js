@@ -226,7 +226,7 @@ Element.prototype.appendAfter = function (element) {
         return savePrice;
     }
 
-    const productNameText = _q('.statistical .td-name').innerText || '';
+    const productNameText = !!_q('.statistical .td-name') ? _q('.statistical .td-name').textContent : '';
     function loadStatistical(dataResponse) {
         if(!!dataResponse) {
             fCurrency = dataResponse.fCurrency;
@@ -249,24 +249,26 @@ Element.prototype.appendAfter = function (element) {
             shippingFee = `<b>${js_translate.freeCap}</b>`;
         }
 
-        _q('.statistical .td-name').innerHTML = productNameText + ' ' + productItem.querySelector('.product-name p').innerHTML;
-        if(!!window.additionTextSumary && _q('.statistical').classList.contains('coupon-actived')) {
+        if(!!_q('.statistical .td-name')) {
+            _q('.statistical .td-name').innerHTML = productNameText + ' ' + productItem.querySelector('.product-name p').innerHTML;
+        }
+        if(!!window.additionTextSumary && !!_q('.statistical') && _q('.statistical').classList.contains('coupon-actived')) {
             if(!!_q('.statistical .td-name .text-coupon')) {
                 _q('.statistical .td-name .text-coupon').parentNode.removeChild(_q('.statistical .td-name .text-coupon'));
             }
             _q('.statistical .td-name').insertAdjacentHTML('beforeend', ' ' + window.additionTextSumary.replace('{priceCoupOn}', fCurrency.replace('######', window.couponValue)));
         }
         Array.prototype.slice.call(_qAll('.td-price')).forEach((tdPriceElm) => {
-            //tdPriceElm.innerText = utils.formatPrice(data.productPrices.DiscountedPrice.Value.toFixed(2), fCurrency, taxes);
-            //-----Start - Remove Currency Symbol and Decimals
             if(!!window.removeCurrencySymbol){
                 tdPriceElm.innerText = data.productPrices.DiscountedPrice.Value.toFixed(0);
-            } else {
+            }
+            else {
                 tdPriceElm.innerText = utils.formatPrice(data.productPrices.DiscountedPrice.Value.toFixed(2), fCurrency, taxes);
             }
-            //-----End - Remove Currency Symbol and Decimals
         });
-        _q('.statistical .td-shipping').innerHTML = shippingFee;
+        if(!!_q('.statistical .td-shipping')) {
+            _q('.statistical .td-shipping').innerHTML = shippingFee;
+        }
 
         Array.prototype.slice.call(_qAll('.total-full-price')).forEach((totalFullPriceElm) => {
             totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.FullRetailPrice.Value + data.shippings[window.shippingIndex].price).toFixed(2), fCurrency, taxes);
@@ -312,7 +314,9 @@ Element.prototype.appendAfter = function (element) {
             warrantyElm.appendAfter(trShipping);
         }
 
-        _q('.statistical .td-taxes-fees').innerText = taxes;
+        if(!!_q('.statistical .td-taxes-fees')) {
+            _q('.statistical .td-taxes-fees').innerText = taxes;
+        }
         Array.prototype.slice.call(_qAll('.grand-total')).forEach((grandTotalElm) => {
             grandTotalElm.innerText = utils.formatPrice(grandTotal, fCurrency, taxes);
         });
