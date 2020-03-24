@@ -713,7 +713,7 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function handleExitPopupEvents() {
-        if(utils.getQueryParameter('iep') !== 'true' || (utils.getQueryParameter('iep') !== 'true' && !utils.getQueryParameter('pid')) || !_q('.coupon-popup') || utils.getQueryParameter('et') === '1' ) {
+        if(utils.getQueryParameter('iep') !== 'true' || !_q('.coupon-popup') || utils.getQueryParameter('et') === '1') {
             return;
         }
         let giftElm = _q('.gift-popup .gift');

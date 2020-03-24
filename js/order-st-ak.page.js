@@ -20,6 +20,7 @@ Element.prototype.appendAfter = function (element) {
     let timedPopup;
     let timeinterval;
     let isPopupShowing = false;
+    window.shippingIndex = 0;
 
     // Count down
     function timeRemaining(endtime) {
@@ -47,8 +48,18 @@ Element.prototype.appendAfter = function (element) {
 
             const minuteElm = _q('.coupon-popup').querySelector('.ex-minute'),
                 secondElm = _q('.coupon-popup').querySelector('.ex-second');
-            minuteElm.innerHTML = t.minutes < 10 ? '0' + t.minutes : t.minutes;
-            secondElm.innerHTML = t.seconds < 10 ? '0' + t.seconds : t.seconds;
+            t.minutes = t.minutes < 10 ? '0' + t.minutes : t.minutes.toString();
+            t.seconds = t.seconds < 10 ? '0' + t.seconds : t.seconds.toString();
+
+            t.minutes = t.minutes.split('').map((num) => {
+                return `<span>${num}</span>`;
+            }).join('');
+            t.seconds = t.seconds.split('').map((num) => {
+                return `<span>${num}</span>`;
+            }).join('');
+
+            minuteElm.innerHTML = t.minutes;
+            secondElm.innerHTML = t.seconds;
         }
         updateClock(); // Run on first time
         timeinterval = setInterval(updateClock, 1000);
@@ -72,7 +83,8 @@ Element.prototype.appendAfter = function (element) {
                 <div class="second-text">${js_translate.seconds}</div>
             </div>
         `;
-        _q('.w_promo_text').insertBefore(countdownElm, document.getElementById('couponBtn'));
+        countdownElm.appendBefore(_qById('couponBtn'));
+        utils.events.emit('beforeCountdown');
 
         // Begin Coutdown
         let currentTime = Date.parse(new Date()),
@@ -161,7 +173,60 @@ Element.prototype.appendAfter = function (element) {
         return {wPrice, wFormatPrice};
     }
 
-    const productNameText = _q('.statistical .td-name').innerText;
+    function implementDeliveryOptions(data) {
+        if(!_q('.delivery-options') || !_q('[name="deliveryOptions"]:checked')) {
+            return;
+        }
+
+        // Add index into shippings data then ascending short shipping array base on price form low to high
+        let shippings = data.shippings.map((obj, index) => {
+            obj.index = index;
+            return obj;
+        }).sort(function(a, b) {
+            return a.price - b.price;
+        });
+
+        // Set value for delivery options base on field index of Ascending array shipping
+        const deliveryRadios = _qAll('.delivery-options input[type="radio"]');
+        Array.prototype.slice.call(deliveryRadios).forEach((deliveryRadio, i) => {
+            if(!shippings[i]) {
+                return;
+            }
+            deliveryRadio.value = shippings[i].index;
+
+            const shippingFees = _getClosest(deliveryRadio, '.w_radio').querySelectorAll('.shipping-fee');
+            Array.prototype.slice.call(shippingFees).forEach((shippingFee) => {
+                shippingFee.querySelector('.js-img-loading').classList.add('hidden');
+                let shippingFormated = shippings[i].formattedPrice;
+                if(shippings[i].price === 0) {
+                    shippingFormated = `<b>${js_translate.freeCap || 'FREE'}</b>`;
+                }
+                shippingFee.querySelector('.sf').innerHTML = shippingFormated;
+            });
+        });
+
+        window.shippingIndex = Number(_q('[name="deliveryOptions"]:checked').value);
+    }
+
+    function onChangeDeliveryOptions() {
+        const deliveryRadios = _qAll('.delivery-options input[type="radio"]');
+        if(deliveryRadios.length === 0) {
+            return;
+        }
+        Array.prototype.slice.call(deliveryRadios).forEach((deliveryRadio, i) => {
+            deliveryRadio.addEventListener('click', () => {
+                loadStatistical();
+            });
+        });
+    }
+
+    function getSavePrice(checkedItem) {
+        const product = JSON.parse(checkedItem.dataset.product);
+        let savePrice = Math.round(product.productPrices.SavePriceDeposit.Value);
+        return savePrice;
+    }
+
+    const productNameText = !!_q('.statistical .td-name') ? _q('.statistical .td-name').textContent : '';
     function loadStatistical(dataResponse) {
         if(!!dataResponse) {
             fCurrency = dataResponse.fCurrency;
@@ -173,18 +238,64 @@ Element.prototype.appendAfter = function (element) {
             productItem = _getClosest(checkedItem, '.productRadioListItem'),
             data = JSON.parse(checkedItem.dataset.product),
             taxes = data.productPrices.Surcharge.FormattedValue;
-        let shippingFee = data.shippings[0].formattedPrice;
+
+        implementDeliveryOptions(data);
+        let shippingFee = data.shippings[window.shippingIndex].formattedPrice;
 
         const warranty = getWarrantyPrice(fCurrency, taxes),
-            grandTotal = (data.shippings[0].price + data.productPrices.DiscountedPrice.Value + warranty.wPrice).toFixed(2);
+            grandTotal = (data.shippings[window.shippingIndex].price + data.productPrices.DiscountedPrice.Value + warranty.wPrice).toFixed(2);
 
-        if(data.shippings[0].price === 0 && !!js_translate.freeCap) {
+        if(data.shippings[window.shippingIndex].price === 0 && !!js_translate.freeCap) {
             shippingFee = `<b>${js_translate.freeCap}</b>`;
         }
 
-        _q('.statistical .td-name').innerHTML = productNameText + ' ' + productItem.querySelector('.product-name p').innerHTML;
-        _q('.statistical .td-price').innerText = utils.formatPrice(data.productPrices.DiscountedPrice.Value.toFixed(2), fCurrency, taxes);
-        _q('.statistical .td-shipping').innerHTML = shippingFee;
+        if(!!_q('.statistical .td-name')) {
+            _q('.statistical .td-name').innerHTML = productNameText + ' ' + productItem.querySelector('.product-name p').innerHTML;
+        }
+        if(!!window.additionTextSumary && !!_q('.statistical') && _q('.statistical').classList.contains('coupon-actived')) {
+            if(!!_q('.statistical .td-name .text-coupon')) {
+                _q('.statistical .td-name .text-coupon').parentNode.removeChild(_q('.statistical .td-name .text-coupon'));
+            }
+            _q('.statistical .td-name').insertAdjacentHTML('beforeend', ' ' + window.additionTextSumary.replace('{priceCoupOn}', fCurrency.replace('######', window.couponValue)));
+        }
+        Array.prototype.slice.call(_qAll('.td-price')).forEach((tdPriceElm) => {
+            if(!!window.removeCurrencySymbol){
+                tdPriceElm.innerText = data.productPrices.DiscountedPrice.Value.toFixed(0);
+            }
+            else {
+                tdPriceElm.innerText = utils.formatPrice(data.productPrices.DiscountedPrice.Value.toFixed(2), fCurrency, taxes);
+            }
+        });
+        if(!!_q('.statistical .td-shipping')) {
+            _q('.statistical .td-shipping').innerHTML = shippingFee;
+        }
+
+        Array.prototype.slice.call(_qAll('.total-full-price')).forEach((totalFullPriceElm) => {
+            totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.FullRetailPrice.Value + data.shippings[window.shippingIndex].price).toFixed(2), fCurrency, taxes);
+        });
+        Array.prototype.slice.call(_qAll('.depositEachPrice')).forEach((totalFullPriceElm) => {
+            let quantity = data.quantity;
+            if(!!window.isDoubleQuantity) {
+                quantity /= 2;
+            }
+            totalFullPriceElm.innerText = utils.formatPrice(((data.productPrices.FullRetailPrice.Value + data.productPrices.DiscountedPrice.Value) / quantity).toFixed(2), fCurrency, taxes);
+        });
+        Array.prototype.slice.call(_qAll('.depositFullPrice')).forEach((totalFullPriceElm) => {
+            totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.FullRetailPrice.Value + data.productPrices.DiscountedPrice.Value).toFixed(2), fCurrency, taxes);
+        });
+        Array.prototype.slice.call(_qAll('.depositFullPriceShip')).forEach((totalFullPriceElm) => {
+            totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.FullRetailPrice.Value + data.productPrices.DiscountedPrice.Value + data.shippings[window.shippingIndex].price).toFixed(2), fCurrency, taxes);
+        });
+        Array.prototype.slice.call(_qAll('.total-full-price-no-currency')).forEach((totalFullPriceElm) => {
+            totalFullPriceElm.innerText = (data.productPrices.FullRetailPrice.Value + data.shippings[window.shippingIndex].price).toFixed(0);
+        });
+        Array.prototype.slice.call(_qAll('.quantity-item')).forEach((quantityElm) => {
+            let quantity = data.quantity;
+            if(!!window.isDoubleQuantity) {
+                quantity /= 2;
+            }
+            quantityElm.innerText = quantity;
+        });
 
         if(!!_q('.tr-warranty')) {
             let trWarranty = _q('.tr-warranty');
@@ -203,8 +314,41 @@ Element.prototype.appendAfter = function (element) {
             warrantyElm.appendAfter(trShipping);
         }
 
-        _q('.statistical .td-taxes-fees').innerText = taxes;
-        _q('.statistical .grand-total').innerText = utils.formatPrice(grandTotal, fCurrency, taxes);
+        if(!!_q('.statistical .td-taxes-fees')) {
+            _q('.statistical .td-taxes-fees').innerText = taxes;
+        }
+        Array.prototype.slice.call(_qAll('.grand-total')).forEach((grandTotalElm) => {
+            grandTotalElm.innerText = utils.formatPrice(grandTotal, fCurrency, taxes);
+        });
+
+        Array.prototype.slice.call(_qAll('.jsFullPrice')).forEach((fullPriceElm) => {
+            fullPriceElm.innerText = data.productPrices.FullRetailPrice.FormattedValue;
+        });
+
+        Array.prototype.slice.call(_qAll('.jsUnitDiscountedPrice')).forEach((unitPriceElm) => {
+            unitPriceElm.innerText = data.productPrices.UnitDiscountRate.FormattedValue;
+        });
+
+        let savePrice = (data.productPrices.FullRetailPrice.Value - data.productPrices.DiscountedPrice.Value).toFixed(2);
+        if(!!window.isPreOrder) {
+            // if(!!checkedItem.parentElement.querySelector('.discountValue')) {
+            //     savePrice = checkedItem.parentElement.querySelector('.discountValue').textContent;
+            // }
+            // else {
+            //     savePrice = getSavePrice(checkedItem);
+            // }
+            savePrice = getSavePrice(checkedItem);
+        }
+        if(!!_q('.discount-total')) {
+            _q('.discount-total').innerHTML = '-' + fCurrency.replace('######', savePrice);
+        }
+        if(!!_q('.discount-total-1')) {
+            _q('.discount-total-1').innerHTML = fCurrency.replace('######', savePrice);
+        }
+        let percent = parseInt(data.productPrices.DiscountedPrice.Value * 100 / data.productPrices.FullRetailPrice.Value);
+        if(!!_q('.discount-percent')) {
+            _q('.discount-percent').innerHTML = percent + '%';
+        }
 
         if (data.productTypeName.toLocaleLowerCase() === 'coupon') {
             utils.localStorage().set('isActivationCode', 'true');
@@ -220,7 +364,7 @@ Element.prototype.appendAfter = function (element) {
         let checkQT = false;
         for (let input of inputs) {
             input.addEventListener('click', function () {
-                checkIsSpecialItem();
+                // checkIsSpecialItem(); // Existing on order.page.js
             });
 
             input.addEventListener('change', (e) => {
@@ -273,7 +417,7 @@ Element.prototype.appendAfter = function (element) {
             monthDdl = _q('#monthddl');
 
         if(_qById('yearddl').value === curYear.toString() && Number(monthDdl.value) < curMonth) {
-            monthDdl.value = curMonth;
+            monthDdl.value = (curMonth < 10 ? ('0' + curMonth.toString()) : curMonth);
         }
     }
     function setExpirationValue() {
@@ -335,8 +479,10 @@ Element.prototype.appendAfter = function (element) {
                     dataProduct.productPrices.DiscountedPrice.Value = Number((currentPrice * (100 - discount) / 100).toFixed(2));
                     dataProduct.productPrices.DiscountedPrice.FormattedValue = utils.formatPrice((currentPrice * (100 - discount) / 100).toFixed(2), fCurrency, dataProduct.shippings[0].formattedPrice);
                 }
-                dataProduct.productPrices.UnitDiscountRate.Value = (dataProduct.productPrices.DiscountedPrice.Value / dataProduct.quantity).toFixed(2);
-                dataProduct.productPrices.UnitDiscountRate.FormattedValue = utils.formatPrice(dataProduct.productPrices.UnitDiscountRate.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
+                if(!!dataProduct.productPrices.UnitDiscountRate) {
+                    dataProduct.productPrices.UnitDiscountRate.Value = (dataProduct.productPrices.DiscountedPrice.Value / dataProduct.quantity).toFixed(2);
+                    dataProduct.productPrices.UnitDiscountRate.FormattedValue = utils.formatPrice(dataProduct.productPrices.UnitDiscountRate.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
+                }
 
                 let priceElms = _getClosest(items[i], '.productRadioListItem').querySelectorAll('.discountedPrice');
                 if(!!priceElms) {
@@ -361,7 +507,7 @@ Element.prototype.appendAfter = function (element) {
                 }
 
                 let nameElm = _getClosest(items[i], '.productRadioListItem').querySelector('.product-name p');
-                nameElm.innerHTML = `${nameElm.innerHTML} ${window.additionText}`;
+                nameElm.innerHTML = `${nameElm.innerHTML} <span class="text-coupon">${window.additionText}</span>`;
 
                 items[i].setAttribute('data-product', JSON.stringify(dataProduct));
             }
@@ -381,15 +527,23 @@ Element.prototype.appendAfter = function (element) {
         if(_q('.coupon-apply')) {
             _q('.coupon-apply').style.display = 'block';
         }
-        if(!_qById('couponCode')) {
-            let couponCodeElm = document.createElement('input');
-            couponCodeElm.id = 'couponCode';
-            couponCodeElm.type = 'hidden';
-            _q('body').appendChild(couponCodeElm);
+        if(!!_q('.statistical')) {
+            _q('.statistical').classList.add('coupon-actived');
         }
-        _qById('couponCode').value = window.couponCodeId;
+        if(!_q('.coupon-popup').classList.contains('coupon-popup-future')) {
+            if(!_qById('couponCode')) {
+                let couponCodeElm = document.createElement('input');
+                couponCodeElm.id = 'couponCode';
+                couponCodeElm.type = 'hidden';
+                _q('body').appendChild(couponCodeElm);
+            }
+            _qById('couponCode').value = window.couponCodeId;
 
-        reImplementProductList(couponDiscount);
+            reImplementProductList(couponDiscount);
+        }
+        else {
+            utils.localStorage().set('additionTextConfirmName', window.additionTextSumary);
+        }
         loadStatistical();
 
         // Installment
@@ -449,7 +603,11 @@ Element.prototype.appendAfter = function (element) {
     }
 
     function activePackageGift() {
-        if(_qAll('.js-list-group li').length > 1) {
+        //Check if have product for gift and holiday
+        if(utils.getQueryParameter('pid') == 2 && _qAll('.js-list-group li').length > 2) {
+            _qAll('.js-list-group li')[2].click();
+        }
+        else {
             _qAll('.js-list-group li')[1].click();
         }
         if(_q('.free-gift-apply')) {
@@ -462,7 +620,10 @@ Element.prototype.appendAfter = function (element) {
         _qById('couponBtn').classList.remove('disabled');
         _qById('couponBtn').addEventListener('click', (e) => {
             e.target.disabled = true;
-            if(!!_q('.w_exit_popup').classList.contains('gift-popup')) {
+            utils.events.emit('onActivePopup');
+            let paramPidOne = utils.getQueryParameter('pid') == 1 && !!_q('.holiday');
+            let paramPidTwo = utils.getQueryParameter('pid') == 2 && !!_q('.gift');
+            if(!!_q('.w_exit_popup').classList.contains('gift-popup') && (paramPidOne || paramPidTwo)) {
                 activePackageGift();
             }
             else if(!window.couponCodeId && !!_q('.w_exit_popup').classList.contains('coupon-popup-no-time')) {
@@ -480,6 +641,9 @@ Element.prototype.appendAfter = function (element) {
             }
             else if(!!window.couponCodeId) {
                 afterActiveCoupon();
+                if(!!_qById('couponCode') && !!_qById('couponCode').value && !!window.couponValue) {
+                    utils.localStorage().set('couponValue', window.couponValue);
+                }
             }
             loadStatistical();
             hidePopup(true);
@@ -494,6 +658,15 @@ Element.prototype.appendAfter = function (element) {
                 isClicked = true;
             }
         }, false);
+
+        Array.prototype.slice.call(_qAll('.w_exit_popup .close-popup-btn')).forEach((closePopupElm) => {
+            closePopupElm.addEventListener('click', () => {
+                hidePopup(isClicked);
+                if(!isClicked) {
+                    isClicked = true;
+                }
+            }, false);
+        });
     }
 
     function implementCoupon(data) {
@@ -526,6 +699,9 @@ Element.prototype.appendAfter = function (element) {
                 jsImageLoading.innerText = couponValFormat;
             }
             window.additionText = window.additionText.replace(/{couponPrice}/g, couponValFormat);
+            if(!!window.additionTextSumary) {
+                window.additionTextSumary = window.additionTextSumary.replace(/{couponPrice}/g, couponValFormat);
+            }
 
             if(!!_qById('couponBtn')) {
                 onActiveCoupon();
@@ -540,12 +716,53 @@ Element.prototype.appendAfter = function (element) {
         if(utils.getQueryParameter('iep') === '0' || !_q('.coupon-popup') || utils.getQueryParameter('et') === '1') {
             return;
         }
+        let giftElm = _q('.gift-popup .gift');
+        let holidayElm = _q('.gift-popup .holiday');
+        //Check if have param of product gift or product holiday
+        if(utils.getQueryParameter('pid') == 2 && !!giftElm) {//check if have param and content of Gift
+            if(!!holidayElm) {
+               holidayElm.classList.add('hidden');
+            }
+            _q('.gift-popup .only-coupon').classList.add('hidden');
+            hiddenDefaultPopup();
+        }
+        else if(utils.getQueryParameter('pid') == 1 && !!holidayElm) {//check if have param and content of Holiday
+            if(!!giftElm) {
+                giftElm.classList.add('hidden');
+            }
+            _q('.gift-popup .only-coupon').classList.add('hidden');
+            hiddenDefaultPopup();
+        }
+        else {
+            if(!!holidayElm) {
+                holidayElm.classList.add('hidden');
+            }
+            if(!!giftElm) {
+                giftElm.classList.add('hidden');
+            }
+            let lbBtnGift = _q('.label-gift');
+            if(!!lbBtnGift) {
+                lbBtnGift.classList.add('hidden');
+            }
+        }
 
         if (utils.isDevice()) {
             window.addEventListener('touchmove', handleTouchMove);
         }
         else {
             document.addEventListener('mouseout', handleMouseOut);
+        }
+    }
+
+    function hiddenDefaultPopup() {
+        if(!!_q('.w_modal_header')) {
+            _q('.w_modal_header').classList.add('hidden');
+        }
+        if(!!_q('.coupon-popup')) {
+            _q('.coupon-popup').classList.add('show-gift');
+        }
+        if(!!_q('.label-coupon')) {
+            _q('.label-coupon').classList.add('hidden');
         }
     }
 
@@ -619,6 +836,7 @@ Element.prototype.appendAfter = function (element) {
         onChangeMonth();
         onChangeYear();
         onClickInputSelect();
+        onChangeDeliveryOptions();
         if(utils.getQueryParameter('loader') === '1') {
             utils.events.on('bindDoneLoader', handleExitPopupEvents);
         }
@@ -646,7 +864,7 @@ Element.prototype.appendAfter = function (element) {
         implementYearDropdown();
         implementMonthDropdown();
         setExpirationValue();
-        checkIsSpecialItem();
+        // checkIsSpecialItem();
         listener();
         hiddenElementByParamUrl();
     }
