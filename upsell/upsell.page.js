@@ -26,8 +26,8 @@
 
     function replaceBracketsStrings() {
         const allElements = _qAll('body *');
-        for(let elem of allElements) {
-            if(elem.children.length === 0 || elem.tagName.toLowerCase() === 'span') {
+        for (let elem of allElements) {
+            if (elem.children.length === 0 || elem.tagName.toLowerCase() === 'span') {
                 elem.innerHTML = elem.innerHTML.replace(/{price}/g, '<span class="spanUpsellPrice"></span>');
                 elem.innerHTML = elem.innerHTML.replace(/{fullprice}/g, '<span class="spanFullPrice"></span>');
             }
@@ -49,23 +49,23 @@
             console.log(products);
 
             const spanUpsellPriceElems = _qAll('.spanUpsellPrice');
-            for(let spanUpsellPrice of spanUpsellPriceElems) {
+            for (let spanUpsellPrice of spanUpsellPriceElems) {
                 spanUpsellPrice.innerHTML = products.prices[0].productPrices.DiscountedPrice.FormattedValue;
             }
 
             const spanFullPriceElems = _qAll('.spanFullPrice');
-            for(let spanFullPrice of spanFullPriceElems) {
+            for (let spanFullPrice of spanFullPriceElems) {
                 spanFullPrice.innerHTML = products.prices[0].productPrices.FullRetailPrice.FormattedValue;
             }
         });
     }
     // if(!window.isNotCallApiUpsell) {
-        getProduct();
+    getProduct();
     // }
 
     function handleBasicUpsellCTAButton() {
         const ctaButtons = _qAll('.js-btn-place-upsell-order');
-        if(ctaButtons) {
+        if (ctaButtons) {
             Array.prototype.slice.call(ctaButtons).forEach(ele => {
                 ele.addEventListener('click', function (e) {
                     e.preventDefault();
@@ -75,7 +75,7 @@
         }
 
         const noThankBtns = _qAll('.js-btn-no-thanks');
-        for(let noThankBtn of noThankBtns) {
+        for (let noThankBtn of noThankBtns) {
             noThankBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 cancelUpsellOrder();
@@ -160,9 +160,9 @@
             pay = {
                 paymentProcessorId: Number(upsell.orderInfo.paymentProcessorId)
             };
-        }else{
+        } else {
             //add installment
-            if (!!upsell.orderInfo.installmentValue && upsell.orderInfo.installmentValue !== ""){
+            if (!!upsell.orderInfo.installmentValue && upsell.orderInfo.installmentValue !== "") {
                 pay.Instalments = upsell.orderInfo.installmentValue;
             }
         }
@@ -186,7 +186,7 @@
                 webKey: upsell.mainWebKey,
                 relatedOrderNumber: upsell.orderInfo.orderNumber
             },
-            shippingMethodId: upsell.products[window.upsell_productindex].shippings.length > 0 ? upsell.products[window.upsell_productindex].shippings[0].shippingMethodId: null,
+            shippingMethodId: upsell.products[window.upsell_productindex].shippings.length > 0 ? upsell.products[window.upsell_productindex].shippings[0].shippingMethodId : null,
             comment: '',
             useShippingAddressForBilling: true,
             productId: upsell.products[window.upsell_productindex].productId,
@@ -212,7 +212,7 @@
         }
 
         upsell.orderInfo.upsellIndex += 1;
-        if(!!window.clickNoSkipStep && Number(window.clickNoSkipStep) > 0) {
+        if (!!window.clickNoSkipStep && Number(window.clickNoSkipStep) > 0) {
             upsell.orderInfo.upsellIndex += Number(window.clickNoSkipStep);
         }
         utils.localStorage().set('orderInfo', JSON.stringify(upsell.orderInfo));
