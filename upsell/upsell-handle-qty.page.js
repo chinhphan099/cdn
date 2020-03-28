@@ -15,7 +15,7 @@
     function impletementNumberXOrderQuantity() {
         Array.prototype.slice.call(_qAll('[class^="orderunitx"]')).forEach((cls) => {
             let num = Number(cls.className.replace(/[^0-9]/g,'')),
-                qty = JSON.parse(utils.localStorage().get('orderInfo')).quantity;
+                qty = !!utils.localStorage().get('orderInfo') ? JSON.parse(utils.localStorage().get('orderInfo')).quantity : 1;
 
             if(!!utils.localStorage().get('doubleQuantity')) {
                 qty /= 2;
