@@ -9,7 +9,15 @@
             cls.textContent = index * num;
         });
         --index;
-        _qAll('.productRadioListItem input')[index].click();
+        if(!!_q('.js-list-group')) {
+            let activePackage = _q('.js-list-group .active').dataset.package.split(','),
+                pid = activePackage[index];
+
+            _q('.productRadioListItem input[id="product_' + pid + '"]').click();
+        }
+        else {
+            _qAll('.productRadioListItem input')[index].click();
+        }
     }
 
     function impletementNumberXOrderQuantity() {
@@ -57,6 +65,9 @@
                 let numberVal = Number(_q('.numberTxt').value),
                     max = _qAll('.productRadioListItem').length || 4;
 
+                if(!!_q('.js-list-group')) {
+                    max = _q('.js-list-group ul').dataset.packagedisplay.split(',').length;
+                }
                 if(numberVal >= max) {
                     return;
                 }
