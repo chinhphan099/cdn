@@ -31,12 +31,13 @@
 #set($specialOnly = '')
 #if($justShowSpecial == 'true')
     #set($specialOnly = '&quot;specialOnly&quot;: true')
-    #if($hideInstallmentText == 'true')
+    #if($hideInstallmentText == 'true' || $updateBestSellerPriceOnHeading == 'true')
         #set($specialOnly = $specialOnly + ', ')
     #end
 #end
 *#
 
+## 2
 #set($isHideInstallmentText = '')
 #if($hideInstallmentText == 'true')
     #set($isHideInstallmentText = '&quot;isHideInstallmentText&quot;: true')
@@ -45,6 +46,7 @@
     #end
 #end
 
+## 1
 #set($isUpdateHeadingPrice = '')
 #if($updateBestSellerPriceOnHeading == 'true')
     #set($isUpdateHeadingPrice = '&quot;isUpdateHeadingPrice&quot;: true')
@@ -61,7 +63,7 @@
     #end
     </script>
 
-    <div id="js-widget-products" class="product-list $!{className}" data-options="{$isHideInstallmentText $isUpdateHeadingPrice}">
+    <div id="js-widget-products" class="product-list $!{className}" data-options="{$isHideInstallmentText $isUpdateHeadingPrice}" #if($!{activeClass} == true)data-activeclass=""#end>
         <input type="hidden" id="hdfSelectedProduct" value="$!{productIdForHeading}" />
         <div class="product-heading">
             <div>$!{itemsLabel}</div>
@@ -92,13 +94,16 @@
                         #set($fullPriceElm = '<del class="fullPrice">' + $loadingImg + '</del>')
                         #set($shippingFeeElm = '<span class="jsShippingFee">' + $loadingImg + '</span>')
                         #set($savePriceElm = '<span class="savePrice">' + $loadingImg + '</span>')
+                        #set($savePriceDepositElm = '<span class="savePriceDeposit">' + $loadingImg + '</span>')
+                        #set($firstCharge = '<span class="spanFirstCharge">' + $loadingImg + '</span>')
                         #set($discountedPriceElm = '<span class="discountedPrice">' + $loadingImg + '</span>')
                         #set($unitFullRateElm = '<span class="spanUnitFullRate">' + $loadingImg + '</span>')
                         #set($unitDiscountRateElm = '<span class="spanUnitDiscountRate">' + $loadingImg + '</span>')
+                        #set($unitDiscountRateWithQty = '<span class="spanUnitDiscountRateWithQty">' + $loadingImg + '</span>')
                         #set($totalDiscountPriceElm = '<span class="spanTotalDiscountPriceElm">' + $loadingImg + '</span>')
                         #set($installmentPriceElm = '<span class="spanInstallmentPriceElm">' + $loadingImg + '</span>')
                         <div class="product-name">
-                            $prod.productName.replaceAll('xaaax', '"').replaceAll('src="/pub-assets/', $replaceSrc).replaceAll('\{FullPrice\}', $fullPriceElm).replaceAll('\{fullPrice\}', $fullPriceElm).replaceAll('\{ShippingFee\}', $shippingFeeElm).replaceAll('\{SavePrice\}', $savePriceElm).replaceAll('\{DiscountedPrice\}', $discountedPriceElm).replaceAll('\{discountedPrice\}', $discountedPriceElm).replaceAll('\{UnitFullRate\}', $unitFullRateElm).replaceAll('\{UnitDiscountRate\}', $unitDiscountRateElm).replaceAll('\{totalDiscountPrice\}', $totalDiscountPriceElm).replaceAll('\{installmentprice\}', $installmentPriceElm)
+                            $prod.productName.replaceAll('xaaax', '"').replaceAll('src="/pub-assets/', $replaceSrc).replaceAll('\{FullPrice\}', $fullPriceElm).replaceAll('\{fullPrice\}', $fullPriceElm).replaceAll('\{ShippingFee\}', $shippingFeeElm).replaceAll('\{SavePrice\}', $savePriceElm).replaceAll('\{SavePriceDeposit\}', $savePriceDepositElm).replaceAll('\{FirstCharge\}', $firstCharge).replaceAll('\{DiscountedPrice\}', $discountedPriceElm).replaceAll('\{discountedPrice\}', $discountedPriceElm).replaceAll('\{UnitFullRate\}', $unitFullRateElm).replaceAll('\{UnitDiscountRate\}', $unitDiscountRateElm).replaceAll('\{UnitDiscountRateWithQty\}', $unitDiscountRateWithQty).replaceAll('\{totalDiscountPrice\}', $totalDiscountPriceElm).replaceAll('\{installmentprice\}', $installmentPriceElm)
                         </div>
                     </label>
                     <label class="productPrice" for="product_$!{prod.productId}">
@@ -124,12 +129,23 @@
 #else
     <div id="js-widget-products" class="product-list $!{className}">No product found!</div>
 #end
-
+#if($isPreOrder == 'true')
+    <script>
+        window.isPreOrder = true;
+        window.paymentProcessorId = 31; /* For Paypal*/
+    </script>
+#end
+#if($removeCurrencySymbol == 'true')
+    <script>window.removeCurrencySymbol = true;</script>
+#end
 #if($UtilMethods.isSet($secondWebkey) && $secondWebkey != "")
     <script>window.secondWebkey = '$!{secondWebkey}'</script>
 #end
 #if($UtilMethods.isSet($thirdWebkey) && $thirdWebkey != "")
     <script>window.thirdWebkey = '$!{thirdWebkey}'</script>
+#end
+#if($UtilMethods.isSet($fourthWebkey) && $fourthWebkey != "")
+    <script>window.fourthWebkey = '$!{fourthWebkey}'</script>
 #end
 <link linkType="component" rel="stylesheet/less" type="text/css" href="//d16hdrba6dusey.cloudfront.net/sitecommon/less/widgets/widget_productlist_v1.less">
 #if($UtilMethods.isSet($con.localJsFile))
