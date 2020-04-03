@@ -250,7 +250,7 @@
         console.log(data);
         const countryCodeIndex = utils.localStorage().get('countryCodeIndex');
         for(let i = 0; i < data.prices.length; i++) {
-            if(data.prices[i].quantity > 5) {
+            if(data.prices[i].quantity > 6) {
                 window.isDoubleQuantity = true;
                 setTimeout(() => {
                     utils.localStorage().set('doubleQuantity', 'true');
