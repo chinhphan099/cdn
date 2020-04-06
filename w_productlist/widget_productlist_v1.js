@@ -340,7 +340,9 @@
             if(doubleFlag) {
                 window.isDoubleQuantity = true;
                 if(window.location.pathname.indexOf('special-offer-') === -1) {
-                    utils.localStorage().set('doubleQuantity', 'true');
+                    setTimeout(() => {
+                        utils.localStorage().set('doubleQuantity', 'true');
+                    }, 600);
                 }
             }
             else {
