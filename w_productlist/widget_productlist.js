@@ -88,6 +88,14 @@
     }
     initWidgetProducts();
 
+    function generateSavePrices(product) {
+        product.productPrices.SavePrice = {};
+        product.productPrices.SavePrice.Value = Number((product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value).toFixed(2));
+        product.productPrices.SavePrice.FormattedValue = utils.formatPrice(product.productPrices.SavePrice.Value.toFixed(2), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+
+        return product;
+    }
+
     function bindProducts(data) {
         if (!(data instanceof Error) && data.prices.length > 0) {
             //console.log(data);
@@ -95,6 +103,11 @@
                 try {
                     const radio = _qById('product_' + product.productId);
                     if (radio) {
+                        let fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, ''),
+                            pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
+                        window.fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
+                        product = generateSavePrices(product);
+
                         radio.setAttribute('data-product', JSON.stringify(product));
                         radio.onchange = handleProductChange;
 

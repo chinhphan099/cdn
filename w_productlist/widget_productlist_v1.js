@@ -378,6 +378,8 @@
                         if(!!window.isPreOrder && !product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                             product = generatePriceForDeposit(product);
                         }
+
+                        product.productPrices.UnitDiscountRate = product.productPrices.UnitDiscountRate || {};
                         if(!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                             product.productPrices.UnitDiscountRate.Value = Number((product.productPrices.DiscountedPrice.Value / quantity).toFixed(2));
                         }
