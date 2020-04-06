@@ -195,12 +195,6 @@
         });
     }
 
-    function getSavePrice(checkedItem) {
-        const product = JSON.parse(checkedItem.dataset.product);
-        let savePrice = product.productPrices.SavePrice.FormattedValue;
-        return savePrice;
-    }
-
     const productNameText = !!_q('.statistical .td-name') ? _q('.statistical .td-name').textContent : '';
     function loadStatistical(dataResponse) {
         if(!!dataResponse) {fCurrency = dataResponse.fCurrency;}
