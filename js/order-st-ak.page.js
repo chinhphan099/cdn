@@ -1,11 +1,3 @@
-Element.prototype.appendBefore = function (element) {
-    element.parentNode.insertBefore(this, element);
-}, false;
-
-Element.prototype.appendAfter = function (element) {
-    element.parentNode.insertBefore(this, element.nextSibling);
-}, false;
-
 ((utils) => {
     if (!utils) {
         console.log('utils module is not found');
@@ -51,39 +43,39 @@ Element.prototype.appendAfter = function (element) {
             t.minutes = t.minutes < 10 ? '0' + t.minutes : t.minutes.toString();
             t.seconds = t.seconds < 10 ? '0' + t.seconds : t.seconds.toString();
 
-            t.minutes = t.minutes.split('').map((num) => {
+            t.minutes = t.minutes.split('').map(num => {
                 return `<span>${num}</span>`;
             }).join('');
-            t.seconds = t.seconds.split('').map((num) => {
+            t.seconds = t.seconds.split('').map(num => {
                 return `<span>${num}</span>`;
             }).join('');
 
             minuteElm.innerHTML = t.minutes;
             secondElm.innerHTML = t.seconds;
         }
-        updateClock(); // Run on first time
+        updateClock();
         timeinterval = setInterval(updateClock, 1000);
     }
     function generateCountDown() {
         if (!_q('.coupon-popup') || !!isPopupShowing) {
             return;
         }
-        const countdownElm = document.createElement('div');
-        countdownElm.id = 'timeCount';
-        countdownElm.innerHTML = `
-            <div class="w_item">
-                <div class="ex-minute"></div>
-                <div class="minute-text">${js_translate.minutes}</div>
-            </div>
-            <div class="w_item">
-                <div class="semicolon">:</div>
-            </div>
-            <div class="w_item">
-                <div class="ex-second"></div>
-                <div class="second-text">${js_translate.seconds}</div>
+        const countdownHTML = `
+            <div id="timeCount">
+                <div class="w_item">
+                    <div class="ex-minute"></div>
+                    <div class="minute-text">${js_translate.minutes}</div>
+                </div>
+                <div class="w_item">
+                    <div class="semicolon">:</div>
+                </div>
+                <div class="w_item">
+                    <div class="ex-second"></div>
+                    <div class="second-text">${js_translate.seconds}</div>
+                </div>
             </div>
         `;
-        countdownElm.appendBefore(_qById('couponBtn'));
+        _qById('couponBtn').insertAdjacentHTML('beforebegin', countdownHTML);
         utils.events.emit('beforeCountdown');
 
         // Begin Coutdown
@@ -101,11 +93,8 @@ Element.prototype.appendAfter = function (element) {
             return;
         }
         if ((e.pageY - window.pageYOffset) <= 0) {
-            // const product = _q('input[name="product"]:checked').dataset.product;
-            // if (!!product) {
-                document.removeEventListener('mouseout', handleMouseOut);
-                generateCountDown();
-            // }
+            document.removeEventListener('mouseout', handleMouseOut);
+            generateCountDown();
         }
     }
 
@@ -116,10 +105,7 @@ Element.prototype.appendAfter = function (element) {
         const mbTimer = !!window.pendingTimeOnMobile ? Number(window.pendingTimeOnMobile) * 1000 : 5000;
         window.removeEventListener('touchmove', handleTouchMove);
         mobileTimer = setTimeout(() => {
-            // const product = _q('input[name="product"]:checked').dataset.product;
-            // if (!!product) {
-                generateCountDown();
-            // }
+            generateCountDown();
         }, mbTimer);
     }
 
@@ -143,18 +129,7 @@ Element.prototype.appendAfter = function (element) {
         }
     }
 
-    function checkIsSpecialItem() {
-        const checkedItem = _q('input[name="product"]:checked');
-        const proItem = _getClosest(checkedItem, '.productRadioListItem');
-        if (proItem.classList.contains('special_offer')) {
-            utils.localStorage().set('isSpecialOffer', 'true');
-        }
-        else {
-            utils.localStorage().set('isSpecialOffer', 'false');
-        }
-    }
-
-    function getWarrantyPrice(fCurrency, taxes) {
+    function getWarrantyPrice(taxes) {
         let wPrice = 0, wFormatPrice = false;
 
         if(!!_qById('txtProductWarranty') && _qById('txtProductWarranty').checked) {
@@ -195,7 +170,7 @@ Element.prototype.appendAfter = function (element) {
             deliveryRadio.value = shippings[i].index;
 
             const shippingFees = _getClosest(deliveryRadio, '.w_radio').querySelectorAll('.shipping-fee');
-            Array.prototype.slice.call(shippingFees).forEach((shippingFee) => {
+            Array.prototype.slice.call(shippingFees).forEach(shippingFee => {
                 shippingFee.querySelector('.js-img-loading').classList.add('hidden');
                 let shippingFormated = shippings[i].formattedPrice;
                 if(shippings[i].price === 0) {
@@ -222,129 +197,143 @@ Element.prototype.appendAfter = function (element) {
 
     function getSavePrice(checkedItem) {
         const product = JSON.parse(checkedItem.dataset.product);
-        let savePrice = Math.round(product.productPrices.SavePriceDeposit.Value);
+        let savePrice = product.productPrices.SavePrice.FormattedValue;
         return savePrice;
     }
 
     const productNameText = !!_q('.statistical .td-name') ? _q('.statistical .td-name').textContent : '';
     function loadStatistical(dataResponse) {
-        if(!!dataResponse) {
-            fCurrency = dataResponse.fCurrency;
-        }
-        if(!fCurrency) {
-            return;
-        }
+        if(!!dataResponse) {fCurrency = dataResponse.fCurrency;}
+        if(!fCurrency) {return;}
+
         const checkedItem = _q('.productRadioListItem input:checked'),
             productItem = _getClosest(checkedItem, '.productRadioListItem'),
             data = JSON.parse(checkedItem.dataset.product),
             taxes = data.productPrices.Surcharge.FormattedValue;
 
         implementDeliveryOptions(data);
+        let quantity = data.quantity;
+        if(!!window.isDoubleQuantity) {
+            quantity /= 2;
+        }
+
         let shippingFee = data.shippings[window.shippingIndex].formattedPrice;
-
-        const warranty = getWarrantyPrice(fCurrency, taxes),
-            grandTotal = (data.shippings[window.shippingIndex].price + data.productPrices.DiscountedPrice.Value + warranty.wPrice).toFixed(2);
-
         if(data.shippings[window.shippingIndex].price === 0 && !!js_translate.freeCap) {
             shippingFee = `<b>${js_translate.freeCap}</b>`;
         }
 
-        if(!!_q('.statistical .td-name')) {
-            _q('.statistical .td-name').innerHTML = productNameText + ' ' + productItem.querySelector('.product-name p').innerHTML;
-        }
-        if(!!window.additionTextSumary && !!_q('.statistical') && _q('.statistical').classList.contains('coupon-actived')) {
-            if(!!_q('.statistical .td-name .text-coupon')) {
-                _q('.statistical .td-name .text-coupon').parentNode.removeChild(_q('.statistical .td-name .text-coupon'));
+        Array.prototype.slice.call(_qAll('.td-name')).forEach(tdNameElm => {
+            tdNameElm.innerHTML = productNameText + ' ' + productItem.querySelector('.product-name p').innerHTML;
+            if(!!window.additionTextSumary && _q('.statistical').classList.contains('coupon-actived')) {
+                if(!!tdNameElm.querySelector('.text-coupon')) {
+                    tdNameElm.querySelector('.text-coupon').parentNode.removeChild(tdNameElm.querySelector('.text-coupon'));
+                }
+                tdNameElm.insertAdjacentHTML('beforeend', ' ' + window.additionTextSumary.replace('{priceCoupon}', fCurrency.replace('######', window.couponValue)));
             }
-            _q('.statistical .td-name').insertAdjacentHTML('beforeend', ' ' + window.additionTextSumary.replace('{priceCoupOn}', fCurrency.replace('######', window.couponValue)));
-        }
-        Array.prototype.slice.call(_qAll('.td-price')).forEach((tdPriceElm) => {
-            if(!!window.removeCurrencySymbol){
-                tdPriceElm.innerText = data.productPrices.DiscountedPrice.Value.toFixed(0);
+        });
+
+        Array.prototype.slice.call(_qAll('.td-price')).forEach(tdPriceElm => {
+            if(!!window.isPreOrder && !!data.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                if(!!window.removeCurrencySymbol) {
+                    tdPriceElm.innerText = data.productPrices.PreSaleAmount1.Value;
+                }
+                else {
+                    tdPriceElm.innerText = data.productPrices.PreSaleAmount1.FormattedValue;
+                }
             }
             else {
-                tdPriceElm.innerText = utils.formatPrice(data.productPrices.DiscountedPrice.Value.toFixed(2), fCurrency, taxes);
+                if(!!window.removeCurrencySymbol) {
+                    tdPriceElm.innerText = data.productPrices.DiscountedPrice.Value;
+                }
+                else {
+                    tdPriceElm.innerText = data.productPrices.DiscountedPrice.FormattedValue;
+                }
             }
         });
-        if(!!_q('.statistical .td-shipping')) {
-            _q('.statistical .td-shipping').innerHTML = shippingFee;
-        }
 
-        Array.prototype.slice.call(_qAll('.total-full-price')).forEach((totalFullPriceElm) => {
-            totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.FullRetailPrice.Value + data.shippings[window.shippingIndex].price).toFixed(2), fCurrency, taxes);
+        Array.prototype.slice.call(_qAll('.td-shipping')).forEach(shippingElm => {
+            shippingElm.innerHTML = shippingFee;
         });
-        Array.prototype.slice.call(_qAll('.depositEachPrice')).forEach((totalFullPriceElm) => {
-            let quantity = data.quantity;
-            if(!!window.isDoubleQuantity) {
-                quantity /= 2;
+
+        Array.prototype.slice.call(_qAll('.total-full-price')).forEach(totalFullPriceElm => {
+            if(!!window.isPreOrder) {
+                if(!!data.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                    totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.DiscountedPrice.Value + data.shippings[window.shippingIndex].price - data.productPrices.PreSaleAmount1.Value).toFixed(2), fCurrency, taxes);
+                }
+                else {
+                    totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.FullRetailPrice.Value + data.shippings[window.shippingIndex].price).toFixed(2), fCurrency, taxes);
+                }
             }
-            totalFullPriceElm.innerText = utils.formatPrice(((data.productPrices.FullRetailPrice.Value + data.productPrices.DiscountedPrice.Value) / quantity).toFixed(2), fCurrency, taxes);
+            else {
+                totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.DiscountedPrice.Value + data.shippings[window.shippingIndex].price).toFixed(2), fCurrency, taxes);
+            }
         });
-        Array.prototype.slice.call(_qAll('.depositFullPrice')).forEach((totalFullPriceElm) => {
-            totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.FullRetailPrice.Value + data.productPrices.DiscountedPrice.Value).toFixed(2), fCurrency, taxes);
-        });
-        Array.prototype.slice.call(_qAll('.depositFullPriceShip')).forEach((totalFullPriceElm) => {
-            totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.FullRetailPrice.Value + data.productPrices.DiscountedPrice.Value + data.shippings[window.shippingIndex].price).toFixed(2), fCurrency, taxes);
-        });
-        Array.prototype.slice.call(_qAll('.total-full-price-no-currency')).forEach((totalFullPriceElm) => {
+
+        Array.prototype.slice.call(_qAll('.total-full-price-no-currency')).forEach(totalFullPriceElm => {
             totalFullPriceElm.innerText = (data.productPrices.FullRetailPrice.Value + data.shippings[window.shippingIndex].price).toFixed(0);
         });
-        Array.prototype.slice.call(_qAll('.quantity-item')).forEach((quantityElm) => {
-            let quantity = data.quantity;
-            if(!!window.isDoubleQuantity) {
-                quantity /= 2;
-            }
+
+        Array.prototype.slice.call(_qAll('.quantity-item')).forEach(quantityElm => {
             quantityElm.innerText = quantity;
         });
+
+        Array.prototype.slice.call(_qAll('.statistical .td-taxes-fees')).forEach(taxElm => {
+            taxElm.innerText = taxes;
+        });
+
+        let warranty = getWarrantyPrice(taxes),
+            grandTotal = data.shippings[window.shippingIndex].price + data.productPrices.DiscountedPrice.Value + warranty.wPrice;
+
+        if(!!window.isPreOrder && !data.productPrices.hasOwnProperty('PreSaleAmount1')) {
+            grandTotal += data.productPrices.FullRetailPrice.Value;
+        }
 
         if(!!_q('.tr-warranty')) {
             let trWarranty = _q('.tr-warranty');
             trWarranty.parentNode.removeChild(trWarranty);
         }
+
         if(!!warranty.wFormatPrice) {
             let trShipping = _getClosest(_q('.statistical .td-shipping'), 'tr'),
-                warrantyElm = document.createElement('tr');
+                warrantyHTML = `
+                <tr class="tr-warranty">
+                    <td>${js_translate.warranty || 'Warranty:'}</td>
+                    <td>${warranty.wFormatPrice}</td>
+                </tr>
+                `;
 
-            warrantyElm.classList.add('tr-warranty');
-            warrantyElm.innerHTML = `
-                <td>${js_translate.warranty || 'Warranty:'}</td>
-                <td>${warranty.wFormatPrice}</td>
-            `;
-
-            warrantyElm.appendAfter(trShipping);
+            trShipping.insertAdjacentHTML('afterend', warrantyHTML);
         }
 
-        if(!!_q('.statistical .td-taxes-fees')) {
-            _q('.statistical .td-taxes-fees').innerText = taxes;
-        }
-        Array.prototype.slice.call(_qAll('.grand-total')).forEach((grandTotalElm) => {
-            grandTotalElm.innerText = utils.formatPrice(grandTotal, fCurrency, taxes);
+        Array.prototype.slice.call(_qAll('.grand-total')).forEach(grandTotalElm => {
+            grandTotalElm.innerText = utils.formatPrice(grandTotal.toFixed(2), fCurrency, taxes);
         });
 
-        Array.prototype.slice.call(_qAll('.jsFullPrice')).forEach((fullPriceElm) => {
-            fullPriceElm.innerText = data.productPrices.FullRetailPrice.FormattedValue;
+        Array.prototype.slice.call(_qAll('.jsFullPrice, .depositFullPrice')).forEach(jsFullPrice => {
+            if(!window.isPreOrder || !!data.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                jsFullPrice.innerText = data.productPrices.FullRetailPrice.FormattedValue;
+            }
+            else {
+                jsFullPrice.innerText = utils.formatPrice((data.productPrices.FullRetailPrice.Value + data.productPrices.DiscountedPrice.Value).toFixed(2), fCurrency, taxes);
+            }
         });
 
-        Array.prototype.slice.call(_qAll('.jsUnitDiscountedPrice')).forEach((unitPriceElm) => {
-            unitPriceElm.innerText = data.productPrices.UnitDiscountRate.FormattedValue;
+        Array.prototype.slice.call(_qAll('.depositEachPrice, .jsUnitDiscountedPrice')).forEach(eachPrice => {
+            if(!window.isPreOrder || !!data.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                eachPrice.innerText = utils.formatPrice((data.productPrices.DiscountedPrice.Value / quantity).toFixed(2), fCurrency, taxes);
+            }
+            else {
+                eachPrice.innerText = utils.formatPrice(((data.productPrices.FullRetailPrice.Value + data.productPrices.DiscountedPrice.Value) / quantity).toFixed(2), fCurrency, taxes);
+            }
         });
 
-        let savePrice = (data.productPrices.FullRetailPrice.Value - data.productPrices.DiscountedPrice.Value).toFixed(2);
-        if(!!window.isPreOrder) {
-            // if(!!checkedItem.parentElement.querySelector('.discountValue')) {
-            //     savePrice = checkedItem.parentElement.querySelector('.discountValue').textContent;
-            // }
-            // else {
-            //     savePrice = getSavePrice(checkedItem);
-            // }
-            savePrice = getSavePrice(checkedItem);
-        }
-        if(!!_q('.discount-total')) {
-            _q('.discount-total').innerHTML = '-' + fCurrency.replace('######', savePrice);
-        }
-        if(!!_q('.discount-total-1')) {
-            _q('.discount-total-1').innerHTML = fCurrency.replace('######', savePrice);
-        }
+        Array.prototype.slice.call(_qAll('.discount-total')).forEach(discountTotal => {
+            discountTotal.innerHTML = '-' + data.productPrices.SavePrice.FormattedValue;
+        });
+        Array.prototype.slice.call(_qAll('.discount-total-1')).forEach(discountTotal => {
+            discountTotal.innerHTML = data.productPrices.SavePrice.FormattedValue;
+        });
+
         let percent = parseInt(data.productPrices.DiscountedPrice.Value * 100 / data.productPrices.FullRetailPrice.Value);
         if(!!_q('.discount-percent')) {
             _q('.discount-percent').innerHTML = percent + '%';
@@ -360,13 +349,8 @@ Element.prototype.appendAfter = function (element) {
 
     let isClickedInput = false;
     function onClickInputSelect() {
-        const inputs = _qAll('input');
         let checkQT = false;
-        for (let input of inputs) {
-            input.addEventListener('click', function () {
-                // checkIsSpecialItem(); // Existing on order.page.js
-            });
-
+        Array.prototype.slice.call(_qAll('input')).forEach(input => {
             input.addEventListener('change', (e) => {
                 if(!!utils.getQueryParameter('qt') && !checkQT) {
                     checkQT = true;
@@ -378,15 +362,14 @@ Element.prototype.appendAfter = function (element) {
                     loadStatistical();
                 }
             }, false);
-        }
+        });
 
-        const selects = _qAll('select');
-        for (let select of selects) {
-            select.addEventListener('click', function () {
+        Array.prototype.slice.call(_qAll('select')).forEach(select => {
+            select.addEventListener('click', function() {
                 isClickedInput = true;
                 hidePopup(true);
             });
-        }
+        });
     }
 
     function onChangeWarranty() {
@@ -463,52 +446,91 @@ Element.prototype.appendAfter = function (element) {
     }
     // End Month and Year Dropdown
 
-    function reImplementProductList(discount) {
+    function reImplementProductList(tmpDiscount) {
         const items = _qAll('.productRadioListItem input');
         for(let i = 0, n = items.length; i < n; i ++) {
+            let discount = tmpDiscount;
             if(!!items[i].dataset.product) {
                 let dataProduct = JSON.parse(items[i].dataset.product),
+                    productRadioItem = _getClosest(items[i], '.productRadioListItem'),
                     currentPrice = dataProduct.productPrices.DiscountedPrice.Value,
-                    currentPriceFormat = dataProduct.productPrices.DiscountedPrice.FormattedValue;
+                    currentPriceFormat = dataProduct.productPrices.DiscountedPrice.FormattedValue,
+                    quantity = dataProduct.quantity;
 
-                if(typeCoupon === 'Money Amount') {
-                    dataProduct.productPrices.DiscountedPrice.Value = Number((currentPrice - discount).toFixed(2));
-                    dataProduct.productPrices.DiscountedPrice.FormattedValue = utils.formatPrice((currentPrice - discount).toFixed(2), fCurrency, dataProduct.shippings[0].formattedPrice);
+                if(window.isDoubleQuantity) {
+                    quantity /= 2;
+                }
+
+                if(!!window.isPreOrder && !dataProduct.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                    currentPrice = dataProduct.productPrices.FullRetailPrice.Value;
+                    if(typeCoupon !== 'Money Amount') {
+                        discount = (currentPrice + dataProduct.productPrices.DiscountedPrice.Value) * discount  / 100;
+                    }
+                    dataProduct.productPrices.FullRetailPrice.Value = Number((currentPrice - discount).toFixed(2));
+                    dataProduct.productPrices.FullRetailPrice.FormattedValue = utils.formatPrice(dataProduct.productPrices.FullRetailPrice.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
                 }
                 else {
-                    dataProduct.productPrices.DiscountedPrice.Value = Number((currentPrice * (100 - discount) / 100).toFixed(2));
-                    dataProduct.productPrices.DiscountedPrice.FormattedValue = utils.formatPrice((currentPrice * (100 - discount) / 100).toFixed(2), fCurrency, dataProduct.shippings[0].formattedPrice);
+                    if(typeCoupon !== 'Money Amount') {
+                        discount = currentPrice * discount  / 100;
+                    }
+                    dataProduct.productPrices.DiscountedPrice.Value = Number((currentPrice - discount).toFixed(2));
+                    dataProduct.productPrices.DiscountedPrice.FormattedValue = utils.formatPrice(dataProduct.productPrices.DiscountedPrice.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
                 }
-                if(!!dataProduct.productPrices.UnitDiscountRate) {
-                    dataProduct.productPrices.UnitDiscountRate.Value = (dataProduct.productPrices.DiscountedPrice.Value / dataProduct.quantity).toFixed(2);
+
+                if(!window.isPreOrder || !!dataProduct.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                    if(!!dataProduct.productPrices.UnitDiscountRate) {
+                        dataProduct.productPrices.UnitDiscountRate.Value = Number((dataProduct.productPrices.DiscountedPrice.Value / quantity).toFixed(2));
+                        dataProduct.productPrices.UnitDiscountRate.FormattedValue = utils.formatPrice(dataProduct.productPrices.UnitDiscountRate.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
+                    }
+                }
+                else {
+                    dataProduct.productPrices.UnitDiscountRate.Value = Number(((dataProduct.productPrices.FullRetailPrice.Value + dataProduct.productPrices.DiscountedPrice.Value) / quantity).toFixed(2));
                     dataProduct.productPrices.UnitDiscountRate.FormattedValue = utils.formatPrice(dataProduct.productPrices.UnitDiscountRate.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
                 }
 
-                let priceElms = _getClosest(items[i], '.productRadioListItem').querySelectorAll('.discountedPrice');
-                if(!!priceElms) {
-                    for(let priceElm of priceElms) {
-                        priceElm.innerHTML = `${dataProduct.productPrices.DiscountedPrice.FormattedValue} <del style="color: grey; font-size: 0.9em; font-weight: normal;">${currentPriceFormat}</del>`;
-                    }
-                }
+                dataProduct.productPrices.SavePrice = dataProduct.productPrices.SavePrice || {};
+                // if(!window.isPreOrder || !!dataProduct.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                //     dataProduct.productPrices.SavePrice.Value = Number((dataProduct.productPrices.FullRetailPrice.Value - dataProduct.productPrices.DiscountedPrice.Value).toFixed(2));
+                //     dataProduct.productPrices.SavePrice.FormattedValue = utils.formatPrice(dataProduct.productPrices.SavePrice.Value.toFixed(2), fCurrency, dataProduct.shippings[0].formattedPrice);
+                // }
+                // else {
+                //     dataProduct.productPrices.SavePrice.Value = Number((dataProduct.productPrices.SavePrice.Value + discount).toFixed(2));
+                //     dataProduct.productPrices.SavePrice.FormattedValue = utils.formatPrice(dataProduct.productPrices.SavePrice.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
+                // }
+                dataProduct.productPrices.SavePrice.Value = Number((dataProduct.productPrices.SavePrice.Value + discount).toFixed(2));
+                dataProduct.productPrices.SavePrice.FormattedValue = utils.formatPrice(dataProduct.productPrices.SavePrice.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
 
-                let unitPriceElms = _getClosest(items[i], '.productRadioListItem').querySelectorAll('.spanUnitDiscountRate');
-                if(!!unitPriceElms) {
-                    for(let unitPriceElm of unitPriceElms) {
-                        unitPriceElm.innerHTML = dataProduct.productPrices.UnitDiscountRate.FormattedValue;
+                Array.prototype.slice.call(productRadioItem.querySelectorAll('.discountedPrice')).forEach(priceElm => {
+                    let discountedPriceValue = dataProduct.productPrices.DiscountedPrice.Value;
+                    if(!!window.isPreOrder && !dataProduct.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                        // discountedPriceValue = discountedPriceValue + dataProduct.productPrices.FullRetailPrice.Value;
                     }
-                }
+                    priceElm.innerHTML = `${utils.formatPrice(discountedPriceValue.toFixed(2), fCurrency, dataProduct.productPrices.FullRetailPrice.FormattedValue)} <del style="color: grey; font-size: 0.9em; font-weight: normal;">${currentPriceFormat}</del>`;
+                });
 
-                let savePriceElms = _getClosest(items[i], '.productRadioListItem').querySelectorAll('.savePrice');
-                if(!!savePriceElms) {
-                    for(let savePriceElm of savePriceElms) {
-                        let savePrice = (dataProduct.productPrices.FullRetailPrice.Value - dataProduct.productPrices.DiscountedPrice.Value).toFixed(2);
-                        savePriceElm.innerHTML = fCurrency.replace('######', savePrice);
+                Array.prototype.slice.call(productRadioItem.querySelectorAll('.spanUnitDiscountRate')).forEach(unitPriceElm => {
+                    unitPriceElm.innerHTML = dataProduct.productPrices.UnitDiscountRate.FormattedValue;
+                });
+
+                Array.prototype.slice.call(productRadioItem.querySelectorAll('.savePrice, .savePriceDeposit')).forEach(savePrice => {
+                    let savePriceFormat = utils.formatPrice(dataProduct.productPrices.SavePrice.Value, fCurrency, dataProduct.productPrices.SavePrice.FormattedValue);
+
+                    if(!!window.removeCurrencySymbol) {
+                        savePriceFormat = dataProduct.productPrices.SavePrice.Value;
                     }
-                }
+                    savePrice.innerHTML = savePriceFormat;
+                });
 
-                let nameElm = _getClosest(items[i], '.productRadioListItem').querySelector('.product-name p');
+                Array.prototype.slice.call(productRadioItem.querySelectorAll('.spanTotalDiscountPriceElm')).forEach(totalDiscountPrice => {
+                    let totalDiscountPriceValue = dataProduct.productPrices.DiscountedPrice.Value + dataProduct.shippings[0].price;
+                    if(!!window.isPreOrder && !dataProduct.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                        totalDiscountPriceValue = totalDiscountPriceValue + dataProduct.productPrices.FullRetailPrice.Value;
+                    }
+                    totalDiscountPrice.innerHTML = utils.formatPrice(totalDiscountPriceValue.toFixed(2), fCurrency, dataProduct.productPrices.FullRetailPrice.FormattedValue);
+                });
+
+                let nameElm = productRadioItem.querySelector('.product-name p');
                 nameElm.innerHTML = `${nameElm.innerHTML} <span class="text-coupon">${window.additionText}</span>`;
-
                 items[i].setAttribute('data-product', JSON.stringify(dataProduct));
             }
         }
@@ -518,7 +540,8 @@ Element.prototype.appendAfter = function (element) {
         const product = _q('input[name="product"]:checked').dataset.product;
         if (product) {
             return JSON.parse(product);
-        } else {
+        }
+        else {
             return null;
         }
     }
@@ -659,7 +682,7 @@ Element.prototype.appendAfter = function (element) {
             }
         }, false);
 
-        Array.prototype.slice.call(_qAll('.w_exit_popup .close-popup-btn')).forEach((closePopupElm) => {
+        Array.prototype.slice.call(_qAll('.w_exit_popup .close-popup-btn')).forEach(closePopupElm => {
             closePopupElm.addEventListener('click', () => {
                 hidePopup(isClicked);
                 if(!isClicked) {
@@ -718,15 +741,14 @@ Element.prototype.appendAfter = function (element) {
         }
         let giftElm = _q('.gift-popup .gift');
         let holidayElm = _q('.gift-popup .holiday');
-        //Check if have param of product gift or product holiday
-        if(utils.getQueryParameter('pid') == 2 && !!giftElm) {//check if have param and content of Gift
+        if(utils.getQueryParameter('pid') == 2 && !!giftElm) {
             if(!!holidayElm) {
                holidayElm.classList.add('hidden');
             }
             _q('.gift-popup .only-coupon').classList.add('hidden');
             hiddenDefaultPopup();
         }
-        else if(utils.getQueryParameter('pid') == 1 && !!holidayElm) {//check if have param and content of Holiday
+        else if(utils.getQueryParameter('pid') == 1 && !!holidayElm) {
             if(!!giftElm) {
                 giftElm.classList.add('hidden');
             }
@@ -806,21 +828,18 @@ Element.prototype.appendAfter = function (element) {
         const timer = !!utils.getQueryParameter('timed') ? Number(utils.getQueryParameter('timed')) * 1000 : null;
         if(!!timer && !!_q('.coupon-popup')) {
             timedPopup = setTimeout(function() {
-                // const product = _q('input[name="product"]:checked').dataset.product;
-                // if (!!product) {
-                    generateCountDown();
-                // }
+                generateCountDown();
             }, timer);
         }
     }
 
     function updateCurrencyPrice(data) {
         if(!!_q('.discount-text .price')) {
-            _q('.discount-text .price').innerText = data.fCurrency.replace('######', _q('.discount-text .price').innerText);
+            _q('.discount-text .price').innerText = data.fCurrency.replace('######', _q('.discount-text .price').textContent);
         }
         const currencyItems = _qAll('.w_exit_popup .currency');
         for(const currencyItem of currencyItems) {
-            currencyItem.innerText = utils.formatPrice(currencyItem.innerText, data.fCurrency, data.discountPrice);
+            currencyItem.innerText = utils.formatPrice(currencyItem.textContent, data.fCurrency, data.discountPrice);
         }
     }
 
@@ -864,7 +883,6 @@ Element.prototype.appendAfter = function (element) {
         implementYearDropdown();
         implementMonthDropdown();
         setExpirationValue();
-        // checkIsSpecialItem();
         listener();
         hiddenElementByParamUrl();
     }
