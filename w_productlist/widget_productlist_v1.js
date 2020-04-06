@@ -300,49 +300,58 @@
     }
 
     function checkDoubleQuantity() {
-        let ids = [];
-        Array.prototype.slice.call(_qAll('input[name="product"]')).forEach(item => {
-            ids = [...ids, Number(item.value)]
-        });
-        if(!!_q('.js-list-group li')) {
-            if(!!_q('.js-list-group li.active')) {
-                ids = _q('.js-list-group li.active').dataset.package.split(',').map(num => {
-                    return parseInt(num);
-                });
+        try {
+            let ids = [];
+            Array.prototype.slice.call(_qAll('input[name="product"]')).forEach(item => {
+                ids = [...ids, Number(item.value)]
+            });
+            if(!!_q('.js-list-group li')) {
+                if(!!_q('.js-list-group li.active')) {
+                    ids = _q('.js-list-group li.active').dataset.package.split(',').map(num => {
+                        return parseInt(num);
+                    });
+                }
+                else {
+                    ids = _q('.js-list-group ul').dataset.packagedisplay.split(',').map(num => {
+                        return parseInt(num);
+                    });
+                }
+            }
+
+            if(!window.PRICES) {
+                return;
+            }
+
+            const packagePrices = window.PRICES.filter(price => {
+                return ids.includes(price.productId);
+            });
+            const ascShortPrices = [...packagePrices].sort((a, b) => {
+                return a.quantity - b.quantity;
+            });
+
+            let doubleFlag = true;
+            for(let i = 0, n = ascShortPrices.length; i < n; i++) {
+                if(ascShortPrices[i].quantity % 2 !== 0) {
+                    doubleFlag = false;
+                    break;
+                }
+            }
+
+            if(doubleFlag) {
+                window.isDoubleQuantity = true;
+                if(window.location.pathname.indexOf('special-offer-') === -1) {
+                    utils.localStorage().set('doubleQuantity', 'true');
+                }
             }
             else {
-                ids = _q('.js-list-group ul').dataset.packagedisplay.split(',').map(num => {
-                    return parseInt(num);
-                });
+                window.isDoubleQuantity = false;
+                if(window.location.pathname.indexOf('special-offer-') === -1) { // Check for upsell page
+                    utils.localStorage().remove('doubleQuantity');
+                }
             }
         }
-
-        const packagePrices = window.PRICES.filter(price => {
-            return ids.includes(price.productId);
-        });
-        const ascShortPrices = [...packagePrices].sort((a, b) => {
-            return a.quantity - b.quantity;
-        });
-
-        let doubleFlag = true;
-        for(let i = 0, n = ascShortPrices.length; i < n; i++) {
-            if(ascShortPrices[i].quantity % 2 !== 0) {
-                doubleFlag = false;
-                break;
-            }
-        }
-
-        if(doubleFlag) {
-            window.isDoubleQuantity = true;
-            if(window.location.pathname.indexOf('special-offer-') === -1) {
-                utils.localStorage().set('doubleQuantity', 'true');
-            }
-        }
-        else {
-            window.isDoubleQuantity = false;
-            if(window.location.pathname.indexOf('special-offer-') === -1) { // Check for upsell page
-                utils.localStorage().remove('doubleQuantity');
-            }
+        catch(e) {
+            console.log(e);
         }
     }
 
@@ -648,6 +657,7 @@
                 }
             }
 
+            checkDoubleQuantity();
             checkProduct();
         };
         const setupTab = () => {
@@ -753,7 +763,6 @@
                     }
 
                     activeTab(tabItem);
-                    checkDoubleQuantity();
                     saveActiveTabIndex();
 
                     let options = JSON.parse(_qById('js-widget-products').dataset.options);

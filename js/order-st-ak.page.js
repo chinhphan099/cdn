@@ -328,10 +328,21 @@
         });
 
         Array.prototype.slice.call(_qAll('.discount-total')).forEach(discountTotal => {
-            discountTotal.innerHTML = '-' + data.productPrices.SavePrice.FormattedValue;
+            if(!!window.isPreOrder && !data.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                discountTotal.innerHTML = '-' + utils.formatPrice(Math.round(data.productPrices.SavePrice.Value), fCurrency, taxes);
+            }
+            else {
+                discountTotal.innerHTML = '-' + data.productPrices.SavePrice.FormattedValue;
+            }
         });
+
         Array.prototype.slice.call(_qAll('.discount-total-1')).forEach(discountTotal => {
-            discountTotal.innerHTML = data.productPrices.SavePrice.FormattedValue;
+            if(!!window.isPreOrder && !data.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                discountTotal.innerHTML = utils.formatPrice(Math.round(data.productPrices.SavePrice.Value), fCurrency, taxes);
+            }
+            else {
+                discountTotal.innerHTML = data.productPrices.SavePrice.FormattedValue;
+            }
         });
 
         let percent = parseInt(data.productPrices.DiscountedPrice.Value * 100 / data.productPrices.FullRetailPrice.Value);
