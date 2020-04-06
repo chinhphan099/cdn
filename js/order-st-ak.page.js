@@ -505,7 +505,7 @@
                 });
 
                 Array.prototype.slice.call(productRadioItem.querySelectorAll('.savePrice')).forEach(savePrice => {
-                    let savePriceFormat = utils.formatPrice(dataProduct.productPrices.SavePrice.Value, fCurrency, dataProduct.productPrices.SavePrice.FormattedValue);
+                    let savePriceFormat = utils.formatPrice(dataProduct.productPrices.SavePrice.Value.toFixed(2), fCurrency, dataProduct.productPrices.SavePrice.FormattedValue);
 
                     if(!!window.removeCurrencySymbol) {
                         savePriceFormat = dataProduct.productPrices.SavePrice.Value;

@@ -433,7 +433,7 @@
                         });
 
                         Array.prototype.slice.call(wrapElm.querySelectorAll('.savePrice')).forEach(savePrice => {
-                            let savePriceFormat = utils.formatPrice(product.productPrices.SavePrice.Value, window.fCurrency, product.productPrices.SavePrice.FormattedValue);
+                            let savePriceFormat = utils.formatPrice(product.productPrices.SavePrice.Value.toFixed(2), window.fCurrency, product.productPrices.SavePrice.FormattedValue);
 
                             if(!!window.removeCurrencySymbol) {
                                 savePriceFormat = product.productPrices.SavePrice.Value;
