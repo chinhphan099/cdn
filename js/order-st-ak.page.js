@@ -464,14 +464,14 @@
                 if(!!window.isPreOrder && !dataProduct.productPrices.hasOwnProperty('PreSaleAmount1')) {
                     currentPrice = dataProduct.productPrices.FullRetailPrice.Value;
                     if(typeCoupon !== 'Money Amount') {
-                        discount = (currentPrice + dataProduct.productPrices.DiscountedPrice.Value) * discount  / 100;
+                        discount = (currentPrice + dataProduct.productPrices.DiscountedPrice.Value) * discount / 100;
                     }
                     dataProduct.productPrices.FullRetailPrice.Value = Number((currentPrice - discount).toFixed(2));
                     dataProduct.productPrices.FullRetailPrice.FormattedValue = utils.formatPrice(dataProduct.productPrices.FullRetailPrice.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
                 }
                 else {
                     if(typeCoupon !== 'Money Amount') {
-                        discount = currentPrice * discount  / 100;
+                        discount = currentPrice * discount / 100;
                     }
                     dataProduct.productPrices.DiscountedPrice.Value = Number((currentPrice - discount).toFixed(2));
                     dataProduct.productPrices.DiscountedPrice.FormattedValue = utils.formatPrice(dataProduct.productPrices.DiscountedPrice.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
@@ -489,14 +489,6 @@
                 }
 
                 dataProduct.productPrices.SavePrice = dataProduct.productPrices.SavePrice || {};
-                // if(!window.isPreOrder || !!dataProduct.productPrices.hasOwnProperty('PreSaleAmount1')) {
-                //     dataProduct.productPrices.SavePrice.Value = Number((dataProduct.productPrices.FullRetailPrice.Value - dataProduct.productPrices.DiscountedPrice.Value).toFixed(2));
-                //     dataProduct.productPrices.SavePrice.FormattedValue = utils.formatPrice(dataProduct.productPrices.SavePrice.Value.toFixed(2), fCurrency, dataProduct.shippings[0].formattedPrice);
-                // }
-                // else {
-                //     dataProduct.productPrices.SavePrice.Value = Number((dataProduct.productPrices.SavePrice.Value + discount).toFixed(2));
-                //     dataProduct.productPrices.SavePrice.FormattedValue = utils.formatPrice(dataProduct.productPrices.SavePrice.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
-                // }
                 dataProduct.productPrices.SavePrice.Value = Number((dataProduct.productPrices.SavePrice.Value + discount).toFixed(2));
                 dataProduct.productPrices.SavePrice.FormattedValue = utils.formatPrice(dataProduct.productPrices.SavePrice.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
 
@@ -512,11 +504,20 @@
                     unitPriceElm.innerHTML = dataProduct.productPrices.UnitDiscountRate.FormattedValue;
                 });
 
-                Array.prototype.slice.call(productRadioItem.querySelectorAll('.savePrice, .savePriceDeposit')).forEach(savePrice => {
+                Array.prototype.slice.call(productRadioItem.querySelectorAll('.savePrice')).forEach(savePrice => {
                     let savePriceFormat = utils.formatPrice(dataProduct.productPrices.SavePrice.Value, fCurrency, dataProduct.productPrices.SavePrice.FormattedValue);
 
                     if(!!window.removeCurrencySymbol) {
                         savePriceFormat = dataProduct.productPrices.SavePrice.Value;
+                    }
+                    savePrice.innerHTML = savePriceFormat;
+                });
+
+                Array.prototype.slice.call(productRadioItem.querySelectorAll('.savePriceDeposit')).forEach(savePrice => {
+                    let savePriceFormat = utils.formatPrice(Math.round(dataProduct.productPrices.SavePrice.Value), fCurrency, dataProduct.productPrices.SavePrice.FormattedValue);
+
+                    if(!!window.removeCurrencySymbol) {
+                        savePriceFormat = Math.round(dataProduct.productPrices.SavePrice.Value);
                     }
                     savePrice.innerHTML = savePriceFormat;
                 });
