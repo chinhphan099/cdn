@@ -500,7 +500,8 @@
                 Array.prototype.slice.call(productRadioItem.querySelectorAll('.discountedPrice')).forEach(priceElm => {
                     let discountedPriceValue = dataProduct.productPrices.DiscountedPrice.Value;
                     if(!!window.isPreOrder && !dataProduct.productPrices.hasOwnProperty('PreSaleAmount1')) {
-                        discountedPriceValue = discountedPriceValue + dataProduct.productPrices.FullRetailPrice.Value;
+                        // Sẽ bị lỗi ở pre-order cũ vì discount là charge lần 1
+                        // discountedPriceValue = discountedPriceValue + dataProduct.productPrices.FullRetailPrice.Value;
                     }
                     priceElm.innerHTML = `${utils.formatPrice(discountedPriceValue.toFixed(2), fCurrency, dataProduct.productPrices.FullRetailPrice.FormattedValue)} <del style="color: grey; font-size: 0.9em; font-weight: normal;">${currentPriceFormat}</del>`;
                 });
@@ -528,7 +529,7 @@
                 });
 
                 Array.prototype.slice.call(productRadioItem.querySelectorAll('.spanTotalDiscountPriceElm')).forEach(totalDiscountPrice => {
-                    let totalDiscountPriceValue = dataProduct.productPrices.DiscountedPrice.Value + dataProduct.shippings[0].price;
+                    let totalDiscountPriceValue = dataProduct.productPrices.DiscountedPrice.Value; // + dataProduct.shippings[0].price;
                     if(!!window.isPreOrder && !dataProduct.productPrices.hasOwnProperty('PreSaleAmount1')) {
                         totalDiscountPriceValue = totalDiscountPriceValue + dataProduct.productPrices.FullRetailPrice.Value;
                     }

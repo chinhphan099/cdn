@@ -432,13 +432,13 @@
                         Array.prototype.slice.call(wrapElm.querySelectorAll('.discountedPrice')).forEach(discountedPrice => {
                             let discountedPriceValue = product.productPrices.DiscountedPrice.Value;
                             if(!!window.isPreOrder && !product.productPrices.hasOwnProperty('PreSaleAmount1')) {
-                                discountedPriceValue = discountedPriceValue + product.productPrices.FullRetailPrice.Value;
+                                // discountedPriceValue = discountedPriceValue + product.productPrices.FullRetailPrice.Value;
                             }
                             discountedPrice.insertAdjacentText('beforeend', utils.formatPrice(discountedPriceValue.toFixed(2), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue));
                         });
 
                         Array.prototype.slice.call(wrapElm.querySelectorAll('.spanTotalDiscountPriceElm')).forEach(totalDiscountPrice => {
-                            let totalDiscountPriceValue = product.productPrices.DiscountedPrice.Value + product.shippings[0].price;
+                            let totalDiscountPriceValue = product.productPrices.DiscountedPrice.Value; // + product.shippings[0].price;
                             if(!!window.isPreOrder && !product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                                 totalDiscountPriceValue = totalDiscountPriceValue + product.productPrices.FullRetailPrice.Value;
                             }
