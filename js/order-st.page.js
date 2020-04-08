@@ -500,7 +500,7 @@
                 Array.prototype.slice.call(productRadioItem.querySelectorAll('.discountedPrice')).forEach(priceElm => {
                     let discountedPriceValue = dataProduct.productPrices.DiscountedPrice.Value;
                     if(!!window.isPreOrder && !dataProduct.productPrices.hasOwnProperty('PreSaleAmount1')) {
-                        // discountedPriceValue = discountedPriceValue + dataProduct.productPrices.FullRetailPrice.Value;
+                        discountedPriceValue = discountedPriceValue + dataProduct.productPrices.FullRetailPrice.Value;
                     }
                     priceElm.innerHTML = `${utils.formatPrice(discountedPriceValue.toFixed(2), fCurrency, dataProduct.productPrices.FullRetailPrice.FormattedValue)} <del style="color: grey; font-size: 0.9em; font-weight: normal;">${currentPriceFormat}</del>`;
                 });
