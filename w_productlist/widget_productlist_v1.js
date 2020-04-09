@@ -1,4 +1,7 @@
 (function (utils) {
+    window.widget = window.widget ? window.widget : {};
+    window.widget.productlist = {};
+
     if(!utils || !window.siteSetting) {
         console.log('utils or window.siteSetting not found');
         return;
@@ -147,7 +150,8 @@
     }
 
     function implementPriceHTML(product, quantity) {
-        Array.prototype.slice.call(_qAll(`.depositFirstChargePrice_${quantity}`)).forEach(elm => {
+        // This function will be recalled from order-st.page.js - After active Coupon
+        Array.prototype.slice.call(_qAll(`.discountedPrice_${quantity}, .depositFirstChargePrice_${quantity}`)).forEach(elm => {
             if(!!window.isPreOrder && !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                 if(!!window.removeCurrencySymbol) {
                     elm.textContent = product.productPrices.PreSaleAmount1.Value;
@@ -166,7 +170,7 @@
             }
         });
 
-        Array.prototype.slice.call(_qAll(`.depositSavePrice_${quantity}`)).forEach(elm => {
+        Array.prototype.slice.call(_qAll(`.savePrice_${quantity}, .depositSavePrice_${quantity}`)).forEach(elm => {
             if(!!window.removeCurrencySymbol) {
                 elm.textContent = product.productPrices.SavePrice.Value;
             }
@@ -175,7 +179,7 @@
             }
         });
 
-        Array.prototype.slice.call(_qAll(`.depositShortSavePrice_${quantity}`)).forEach(elm => {
+        Array.prototype.slice.call(_qAll(`.shortSavePrice_${quantity}, .depositShortSavePrice_${quantity}`)).forEach(elm => {
             if(!!window.removeCurrencySymbol) {
                 elm.textContent = Math.round(product.productPrices.SavePrice.Value);
             }
@@ -184,7 +188,7 @@
             }
         });
 
-        Array.prototype.slice.call(_qAll(`.depositEachPrice_${quantity}`)).forEach(elm => {
+        Array.prototype.slice.call(_qAll(`.eachPrice_${quantity}, .depositEachPrice_${quantity}`)).forEach(elm => {
             if(!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                 if(!!window.removeCurrencySymbol) {
                     elm.textContent = (product.productPrices.DiscountedPrice.Value / quantity).toFixed(2);
@@ -203,7 +207,7 @@
             }
         });
 
-        Array.prototype.slice.call(_qAll(`.depositShortEachPrice_${quantity}`)).forEach(elm => {
+        Array.prototype.slice.call(_qAll(`.shortEachPrice_${quantity}, .depositShortEachPrice_${quantity}`)).forEach(elm => {
             if(!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                 if(!!window.removeCurrencySymbol) {
                     elm.textContent = Math.round(product.productPrices.DiscountedPrice.Value / quantity);
@@ -221,44 +225,6 @@
                 }
             }
         });
-
-        /*
-        Array.prototype.slice.call(_qAll(`.depositShortRestPrice_${quantity}`)).forEach(elm => {
-            if(!!window.removeCurrencySymbol) {
-                elm.textContent = Math.round(product.productPrices.FullRetailPrice.Value);
-            }
-            else {
-                elm.textContent = utils.formatPrice(Math.round(product.productPrices.FullRetailPrice.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
-            }
-        });
-
-        Array.prototype.slice.call(_qAll(`.depositRestPrice_${quantity}`)).forEach(elm => {
-            if(!!window.removeCurrencySymbol) {
-                elm.textContent = product.productPrices.FullRetailPrice.Value;
-            }
-            else {
-                elm.textContent = product.productPrices.FullRetailPrice.FormattedValue;
-            }
-        });
-
-        Array.prototype.slice.call(_qAll(`.depositFullPrice_${quantity}`)).forEach(elm => {
-            if(!!window.removeCurrencySymbol) {
-                elm.textContent = (product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value).toFixed(2);
-            }
-            else {
-                elm.textContent = utils.formatPrice((product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value).toFixed(2), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
-            }
-        });
-
-        Array.prototype.slice.call(_qAll(`.depositShortFullPrice_${quantity}`)).forEach(elm => {
-            if(!!window.removeCurrencySymbol) {
-                elm.textContent = Math.round(product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value);
-            }
-            else {
-                elm.textContent = utils.formatPrice(Math.round(product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
-            }
-        });
-        */
     }
 
     function generatePriceForDeposit(product) {
@@ -281,7 +247,6 @@
         product.productPrices.FullRetailPriceDeposit.Value = Number((totalPriceDeposit + product.productPrices.SavePrice.Value).toFixed(2));
         product.productPrices.FullRetailPriceDeposit.FormattedValue = utils.formatPrice(product.productPrices.FullRetailPriceDeposit.Value, window.fCurrency, product.shippings[0].formattedPrice);
 
-        implementPriceHTML(product, quantity);
         return product;
     }
 
@@ -294,8 +259,6 @@
         product.productPrices.SavePrice = {};
         product.productPrices.SavePrice.Value = Number((product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value).toFixed(2));
         product.productPrices.SavePrice.FormattedValue = utils.formatPrice(product.productPrices.SavePrice.Value.toFixed(2), window.fCurrency, product.shippings[0].formattedPrice);
-
-        implementPriceHTML(product, quantity);
         return product;
     }
 
@@ -331,6 +294,11 @@
 
             let doubleFlag = true;
             for(let i = 0, n = ascShortPrices.length; i < n; i++) {
+                if(n < 2) {
+                    // Check for case each product belong a tab
+                    doubleFlag = false;
+                    break;
+                }
                 if(ascShortPrices[i].quantity % 2 !== 0) {
                     doubleFlag = false;
                     break;
@@ -380,6 +348,7 @@
                         if(!!window.isPreOrder && !product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                             product = generatePriceForDeposit(product);
                         }
+                        implementPriceHTML(product, quantity);
 
                         product.productPrices.UnitDiscountRate = product.productPrices.UnitDiscountRate || {};
                         if(!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
@@ -811,9 +780,8 @@
             }
             return isValid;
         };
-        window.widget = window.widget ? window.widget : {};
-        window.widget.productlist = {
-            isValidProductList: isValidProductList,
-        };
+        window.widget.productlist.isValidProductList = isValidProductList;
     }
+
+    window.widget.productlist.implementPriceHTML = implementPriceHTML;
 })(window.utils);

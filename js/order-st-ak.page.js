@@ -378,15 +378,17 @@
     }
 
     function onChangeWarranty() {
-        if(!!_qById('txtProductWarranty')) {
-            _qById('txtProductWarranty').addEventListener('change', function() {
-                loadStatistical();
-            });
-        }
+        if(!_qById('txtProductWarranty')) return;
+
+        _qById('txtProductWarranty').addEventListener('change', function() {
+            loadStatistical();
+        });
     }
 
     // Month and Year Dropdown
     function implementYearDropdown() {
+        if(!_qById('yearddl')) return;
+
         const d = new Date(),
             curYear = d.getFullYear(),
             endYear = curYear + 20;
@@ -399,53 +401,42 @@
         }
     }
     function implementMonthDropdown() {
+        if(!_qById('monthddl') || !_qById('yearddl')) return;
+
         const d = new Date(),
             curYear = d.getFullYear(),
             curMonth = d.getMonth() + 1,
-            monthDdl = _q('#monthddl');
+            monthDdl = _qById('monthddl');
 
         if(_qById('yearddl').value === curYear.toString() && Number(monthDdl.value) < curMonth) {
             monthDdl.value = (curMonth < 10 ? ('0' + curMonth.toString()) : curMonth);
         }
     }
     function setExpirationValue() {
+        if(!_qById('monthddl') || !_qById('yearddl') || !_qById('creditcard_expirydate')) return;
+
         _qById('creditcard_expirydate').value = _qById('monthddl').value + '/' + _qById('yearddl').value.toString().substr(2);
     }
-    // let tmpYear = 0, tmpMonth = 0;
     function onChangeMonth() {
+        if(!_qById('monthddl')) return;
+
         _qById('monthddl').addEventListener('change', function() {
-            // tmpMonth = 0;
             const currentMonth = new Date().getMonth() + 1,
                 currentYear = new Date().getFullYear(),
                 monthSelected = Number(_qById('monthddl').value),
                 yearSelected = Number(_qById('yearddl').value);
 
             if(monthSelected < currentMonth && currentYear === yearSelected) {
-                // tmpYear = yearSelected;
                 _qById('yearddl').value = yearSelected + 1;
             }
-            /*if(monthSelected >= currentMonth && !!tmpYear) {
-                _qById('yearddl').value = tmpYear;
-            }*/
             setExpirationValue();
         }, false);
     }
     function onChangeYear() {
-        _qById('yearddl').addEventListener('change', function() {
-            // tmpYear = 0;
-            /*const currentMonth = new Date().getMonth() + 1,
-                currentYear = new Date().getFullYear(),
-                monthSelected = _qById('monthddl').value,
-                yearSelected = Number(_qById('yearddl').value);
+        if(!_qById('yearddl')) return;
 
-            if(yearSelected === currentYear && Number(monthSelected) < currentMonth) {
-                tmpMonth = monthSelected;
-                _qById('monthddl').value = currentMonth;
-            }
-            if(yearSelected > currentYear && !!tmpMonth) {
-                _qById('monthddl').value = tmpMonth;
-            }*/
-            implementMonthDropdown(); // Comment this row if open above comment
+        _qById('yearddl').addEventListener('change', function() {
+            implementMonthDropdown();
             setExpirationValue();
         }, false);
     }
@@ -529,12 +520,16 @@
                 });
 
                 Array.prototype.slice.call(productRadioItem.querySelectorAll('.spanTotalDiscountPriceElm')).forEach(totalDiscountPrice => {
-                    let totalDiscountPriceValue = dataProduct.productPrices.DiscountedPrice.Value; // + dataProduct.shippings[0].price;
+                    let totalDiscountPriceValue = dataProduct.productPrices.DiscountedPrice.Value;
                     if(!!window.isPreOrder && !dataProduct.productPrices.hasOwnProperty('PreSaleAmount1')) {
                         totalDiscountPriceValue = totalDiscountPriceValue + dataProduct.productPrices.FullRetailPrice.Value;
                     }
                     totalDiscountPrice.innerHTML = utils.formatPrice(totalDiscountPriceValue.toFixed(2), fCurrency, dataProduct.productPrices.FullRetailPrice.FormattedValue);
                 });
+
+                if(typeof window.widget.productlist.implementPriceHTML === 'function') {
+                    window.widget.productlist.implementPriceHTML(dataProduct, quantity);
+                }
 
                 let nameElm = productRadioItem.querySelector('.product-name p');
                 nameElm.innerHTML = `${nameElm.innerHTML} <span class="text-coupon">${window.additionText}</span>`;
