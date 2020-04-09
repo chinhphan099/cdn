@@ -527,8 +527,8 @@
                     totalDiscountPrice.innerHTML = utils.formatPrice(totalDiscountPriceValue.toFixed(2), fCurrency, dataProduct.productPrices.FullRetailPrice.FormattedValue);
                 });
 
-                if(typeof window.widget.productlist.implementPriceHTML === 'function') {
-                    window.widget.productlist.implementPriceHTML(dataProduct, quantity);
+                if(typeof window.implementPriceHTML === 'function') {
+                    window.implementPriceHTML(dataProduct, quantity);
                 }
 
                 let nameElm = productRadioItem.querySelector('.product-name p');

@@ -1,7 +1,4 @@
 (function (utils) {
-    window.widget = window.widget ? window.widget : {};
-    window.widget.productlist = {};
-
     if(!utils || !window.siteSetting) {
         console.log('utils or window.siteSetting not found');
         return;
@@ -780,8 +777,11 @@
             }
             return isValid;
         };
-        window.widget.productlist.isValidProductList = isValidProductList;
+        window.widget = window.widget ? window.widget : {};
+        window.widget.productlist = {
+            isValidProductList: isValidProductList
+        };
     }
 
-    window.widget.productlist.implementPriceHTML = implementPriceHTML;
+    window.implementPriceHTML = implementPriceHTML;
 })(window.utils);
