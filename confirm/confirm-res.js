@@ -102,6 +102,7 @@
             totalBalance = 0,
             grandTotal = 0,
             totalProductsWhenReady = 0,
+            remainingPrice = 0,
             charges_statement = "Charges on your statement will be processed for {productPrice} and will appear as {midDescriptor}";
         if(window.js_translate) {
             shipping = js_translate.shipping;
@@ -116,9 +117,9 @@
             lwPreOrder = js_translate.lwPreOrder;
             totalLwPreOrder = js_translate.totalLwPreOrder;
         }
-        // if(utils.localStorage().get('preOrderUpsell') === 'true') {
-        //     charges_statement = js_translate.pre_order_product_charges_statement_confirm_page || 'Your deposit will be processed for {productTotal} ({orderNumber}) and will appear as {midDescriptor}. You will be charged the price of the products when they ship.';
-        // }
+        if(utils.localStorage().get('preOrderUpsell') === 'true') {
+             charges_statement = js_translate.pre_order_product_charges_statement_confirm_page || 'Your deposit will be processed for {productTotal} ({orderNumber}) and will appear as {midDescriptor}. You will be charged the price of the products when they ship.';
+        }
         let productItemTmp = `<li class="item">
                                     <div class="inner">
                                         <span>{productName}</span>
@@ -141,6 +142,24 @@
             productItemMainTmp = productItemTmp;
 
         let productItemTmpWarranty = `<li class="item">
+                                        <div class="inner">
+                                            <span>{productName}</span>
+                                            <span>{productPrice}</span>
+                                        </div>
+                                        <div class="inner">
+                                            <span>${shipping}</span>
+                                            <span>{shippingPrice}</span>
+                                        </div>
+                                        <div class="inner" style="display:none;">
+                                        </div>
+                                        {tax}
+                                        <div class="inner">
+                                            <span>${total}</span>
+                                            <span>{productTotal}</span>
+                                        </div>
+                                        <div class="inner"><span>${js_translate.product_charges_statement_confirm_page}</span></div>
+                                    </li>`;
+        let productItemTmpWarrantyMonthLyCharge = `<li class="item">
                                     <div class="inner">
                                         <span>${lwPreOrder}</span>
                                     </div>
@@ -154,7 +173,7 @@
 
         if(utils.localStorage().get('preOrder') === 'true') {
             let pre_order_product_charges_statement_confirm_page = js_translate.pre_order_product_charges_statement_confirm_page || 'Your deposit will be processed for {productTotal} ({orderNumber}) and will appear as {midDescriptor}. You will be charged the price of the products when they ship.';
-            pre_order_product_charges_statement_confirm_page = pre_order_product_charges_statement_confirm_page.replace(/\{productTotal\}/gi, '{productTotalPreOrder}');
+            pre_order_product_charges_statement_confirm_page = pre_order_product_charges_statement_confirm_page.replace(/\{productTotal\}/gi, '{productPricePreOrder}');
             productItemMainTmp = `<li class="item">
                                     <div class="inner">
                                         <span>{productName}</span>
@@ -166,19 +185,19 @@
                                     </div>
                                     <div class="inner">
                                         <span>${remainingBalance}</span>
-                                        <span>{productTotalPreOrder}</span>
+                                        <span>{remainingBalancePrice}</span>
                                     </div>
                                     {tax}
                                     <div class="inner">
                                         <span>${total}</span>
-                                        <span>{remainingBalancePrice}</span>
+                                        <span>{productTotalPreOrder}</span>
                                     </div>
                                     <div class="inner"><span>${pre_order_product_charges_statement_confirm_page}</span></div>
                                 </li>`;
         }
-        if(utils.localStorage().get('preOrderUpsell') === 'true') {
-            productItemTmp = productItemTmp.replace(/\{productTotal\}/gi, '{productTotalPreOrder}');
-        }
+        //if(utils.localStorage().get('preOrderUpsell') === 'true') {
+        //    productItemTmp = productItemTmp.replace(/\{productTotal\}/gi, '{productTotalPreOrder}');
+        //}
         //Installment Payment : only for Brazil
         let installmentText = '';
         if(confirm.orderInfo.installmentValue && confirm.orderInfo.installmentValue !== '') {
@@ -205,15 +224,16 @@
             }
         }
 
-        totalPreOrder = utils.formatPrice((data.orderPrice - data.orderProductPrice).toFixed(2), fCurrency, shippingPriceFormatted);
+        totalPreOrder = utils.formatPrice((data.orderPrice).toFixed(2), fCurrency, shippingPriceFormatted);
+        remainingPrice = utils.formatPrice((data.orderPrice - data.orderProductPrice).toFixed(2), fCurrency, shippingPriceFormatted);
         //grandTotal += (data.orderPrice - data.orderProductPrice);
         totalBalance += data.orderProductPrice;
-        totalProductsWhenReady += (data.orderPrice - data.orderProductPrice);
+        totalProductsWhenReady += data.orderPrice - data.orderProductPrice; //(data.orderPrice - data.orderProductPrice);
         let listProduct = productItemMainTmp.replace('{productName}', data.productName)
             .replace(/\{productPrice\}/g, data.orderProductPriceFormatted)
-            .replace(/\{remainingBalancePrice\}/g, data.orderPriceFormatted)
+            .replace(/\{remainingBalancePrice\}/g, remainingPrice)
             .replace(/\{tax\}/g, taxLine)
-            .replace(/\{productTotal\}/g, `${data.orderPriceFormatted}<em>${installmentText}</em>`)
+            .replace(/\{productPricePreOrder\}/g, `${data.orderProductPriceFormatted}`)
             .replace(/\{productTotalPreOrder\}/g, `${totalPreOrder}<em>${installmentText}</em>`)
             .replace('{shippingPrice}', data.shippingPriceFormatted)
             .replace('{midDescriptor}', data.receipts[0].midDescriptor ? data.receipts[0].midDescriptor : 'Paypal')
@@ -239,11 +259,25 @@
             }
 
             let itemTmp = '';
-            if(data.relatedOrders[i].productName.toLowerCase().indexOf('warranty')>-1 && utils.localStorage().get('preOrderUpsell') !== 'true'){
+            if(data.relatedOrders[i].productName.toLowerCase().indexOf('warranty')>-1 && utils.localStorage().get('preOrderWarranty') !== 'true' && utils.localStorage().get('warrantyMonthlyCharge') !== 'true'){
                 itemTmp = productItemTmpWarranty.replace('{productName}', data.relatedOrders[i].productName)
                     .replace(/\{productPrice\}/g, data.relatedOrders[i].orderProductPriceFormatted)
-                    .replace(/\{productPrice\}/g, data.relatedOrders[i].orderProductPriceFormatted)
+                    .replace(/\{remainingBalancePrice\}/g, data.relatedOrders[i].orderPriceFormatted)
                     .replace(/\{tax\}/g, '')
+                    .replace(/\{productTotalPreOrder\}/g, `${totalPreOrder}<em>${installmentText}</em>`)
+                    .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}<em>${installmentText}</em>`)
+                    .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
+                    .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
+                    .replace(/\{orderNumber\}/g, data.relatedOrders[i].orderNumber);
+
+                totalBalance = totalBalance + data.relatedOrders[i].orderPrice;
+                grandTotal += data.relatedOrders[i].orderPrice;
+            }else if(data.relatedOrders[i].productName.toLowerCase().indexOf('warranty')>-1 && utils.localStorage().get('preOrderWarranty') !== 'true' && utils.localStorage().get('warrantyMonthlyCharge') === 'true'){
+                itemTmp = productItemTmpWarrantyMonthLyCharge.replace('{productName}', data.relatedOrders[i].productName)
+                    .replace(/\{productPrice\}/g, data.relatedOrders[i].orderProductPriceFormatted)
+                    .replace(/\{remainingBalancePrice\}/g, data.relatedOrders[i].orderPriceFormatted)
+                    .replace(/\{tax\}/g, '')
+                    .replace(/\{productTotalPreOrder\}/g, `${totalPreOrder}<em>${installmentText}</em>`)
                     .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}<em>${installmentText}</em>`)
                     .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
                     .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
@@ -264,7 +298,7 @@
                     .replace(/\{remainingBalancePrice\}/g, data.relatedOrders[i].orderPriceFormatted)
                     .replace(/\{tax\}/g, '')
                     .replace(/\{productTotalPreOrder\}/g, `${totalPreOrder}<em>${installmentText}</em>`)
-                    .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}<em>${installmentText}</em>`)
+                    .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderProductPriceFormatted}<em>${installmentText}</em>`)
                     .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
                     .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
                     .replace(/\{orderNumber\}/g, data.relatedOrders[i].orderNumber);
@@ -289,14 +323,14 @@
             orderInfo = JSON.parse(utils.localStorage().get('orderInfo')),
             shippingFromOrder = orderInfo.feeShipping,
             shippingOrder = orderInfo.feeShipping;
-        shippingOrder = shippingOrder > 0 ? shippingOrder : js_translate.shipping;
+        shippingOrder = shippingOrder > 0 ? shippingOrder : js_translate.FREESHIP;
         formatCurrency(fCurrency,shippingPriceFormatted);
 
         _q('.totalBalance').innerHTML =  utils.formatPrice(totalBalance.toFixed(2), fCurrency, shippingPriceFormatted);
-        _q('.totalProductsWhenReady').innerHTML = utils.formatPrice((totalProductsWhenReady - shippingFromOrder).toFixed(2), fCurrency, shippingPriceFormatted)
+        _q('.totalProductsWhenReady').innerHTML = utils.formatPrice((totalProductsWhenReady).toFixed(2), fCurrency, shippingPriceFormatted)
         _q('.grandTotal').innerHTML = utils.formatPrice((totalBalance + totalProductsWhenReady).toFixed(2), fCurrency, shippingPriceFormatted);
         if(isNaN(shippingOrder)){
-            _q('.shippingOrder').innerHTML = js_translate.shipping;
+            _q('.shippingOrder').innerHTML = shippingOrder;
         }else{
             _q('.shippingOrder').innerHTML = utils.formatPrice(shippingOrder.toFixed(2), fCurrency, shippingPriceFormatted);
         }
@@ -349,10 +383,81 @@
 
     /*--------/end : run common confirm------------*/
 
+    //------------------START--CREATE BUTTON CLAIM MORE DEAL - TU NGUYEN
+        let createButtonClaimDeals = function(){
+            let urlBtnClaimParam = utils.getQueryParameter('lead');
+
+            //STOP the functional when url Button Claim Deals  Param  =  lead
+            if(!urlBtnClaimParam){
+                //console.log('invalid listicle param');
+                return;
+            }
+
+            //Create HTML
+            let divWrap = document.createElement('div'),
+                span = document.createElement('span'),
+                button = document.createElement('a'),
+                btnTextDefault = js_translate.btnUrlDefault ? js_translate.btnUrlDefault : "Claim more deals",
+                btnUrlDefault = urlBtnClaimParam === "us" ? "https://www.acptaofficial.com/" : "https://global.acptaofficial.com/",
+                timer;
+
+            let param = location.href.split("?").length > 1 ? location.href.split("?")[1] : "";
+            if(param !== "") btnUrlDefault = btnUrlDefault + "?" + param;
+
+            //Append Child to DOM
+            divWrap.id = "btn-claimdeals";
+            button.href = btnUrlDefault;
+            button.innerHTML = btnTextDefault;
+            divWrap.appendChild(span)
+            divWrap.appendChild(button);
+
+            _q('main').appendChild(divWrap);
+            //Style Button Back
+                //Wrap Style
+                divWrap.style.position = "fixed";
+                divWrap.style.right = "0px";
+                divWrap.style.top = "50%";
+                divWrap.style.backgroundColor = "rgba(0, 139, 204,0.9)";
+                divWrap.style.zIndex = "10";
+                divWrap.style.transform = "rotate(-90deg) translateY(-50%) translateX(100%)";
+                divWrap.style.transformOrigin = "right center";
+                divWrap.style.borderRadius = "5px 5px 0px 0px";
+                //Arrow style
+                span.style.position = "absolute";
+                span.style.top = "50%";
+                span.style.marginTop = "-6px";
+                span.style.left = "10px";
+                span.style.borderLeft = "8px solid transparent";
+                span.style.borderRight = "8px solid transparent";
+                span.style.borderBottom = "10px solid #fff";
+                span.style.borderRadius = "3px";
+                span.style.zIndex = "-1";
+                //Button Style style
+                button.style.display = "inline-block";
+                button.style.padding = "10px 15px 10px 35px";
+                button.style.color = "#fff";
+                button.style.lineHeight = "1.15em";
+                button.style.textDecoration = "none";
+                button.style.fontWeight = "normal";
+                button.style.fontFamily = "Roboto";
+                button.style.fontSize = "16px";
+                button.classList.add('no-tracking');
+
+            //Create timming point to trigger click button on new tab
+            timer = setTimeout(function(){
+                if(utils.localStorage().get('leadClick') === "true") return;
+                utils.localStorage().set('leadClick','true');
+                button.click();
+            },8000);
+        }
+    //-------------------END--CREATE BUTTON CLAIM MORE DEAL
     window.addEventListener('DOMContentLoaded', () => {
 
         //replace replaceTokenSummary
         replaceTokenSummary();
+
+        //Create Button Claim deals
+        createButtonClaimDeals();
 
     if(utils.localStorage().get('preOrder') === 'true') {
         _q('.receipt-list .title').innerHTML = js_translate.pre_order_title || 'ITEMS PRE-ORDERED';

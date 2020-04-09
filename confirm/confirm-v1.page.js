@@ -177,7 +177,7 @@
 
         let taxLine = '';
         const taxMainValue = parseFloat(data.orderPrice) - parseFloat(data.orderProductPrice) - parseFloat(data.shippingPrice);
-        if(taxMainValue > 0 && utils.localStorage().get('preOrder') !== 'true') {
+        if(taxMainValue > 0.1 && utils.localStorage().get('preOrder') !== 'true') {
             taxLine = `
                         <div class="inner">
                             <span>Tax</span>
