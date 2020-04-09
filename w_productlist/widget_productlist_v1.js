@@ -438,7 +438,7 @@
                         });
 
                         Array.prototype.slice.call(wrapElm.querySelectorAll('.spanTotalDiscountPriceElm')).forEach(totalDiscountPrice => {
-                            let totalDiscountPriceValue = product.productPrices.DiscountedPrice.Value + product.shippings[0].price;
+                            let totalDiscountPriceValue = product.productPrices.DiscountedPrice.Value; // + product.shippings[0].price;
                             if(!!window.isPreOrder && !product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                                 totalDiscountPriceValue = totalDiscountPriceValue + product.productPrices.FullRetailPrice.Value;
                             }
