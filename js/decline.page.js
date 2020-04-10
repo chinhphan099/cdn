@@ -15,6 +15,11 @@
             //remove gtm upsell purchas event
             utils.localStorage().remove('fireUpsellForGTMPurchase');
 
+            const twoLastCharUrl = location.href.substring(location.href.length - 2);
+            if(location.href.indexOf('?') > -1 && location.href.indexOf('=') > -1 && twoLastCharUrl === '=1') {
+                location.href = siteSetting.successUrl + location.search.slice(0, -1) + '0';
+                return;
+            }
             location.href = siteSetting.successUrl + location.search;
         } else { //remove paypal params
             //check if is redirected from Paypal
