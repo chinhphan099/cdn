@@ -55,6 +55,22 @@
             quantityDdlElm.value = data.quantity - 1;
         }
 
+        Array.prototype.slice.call(_qAll('.spanFirstCharge')).forEach((spanFirstCharge) => {
+            if(data.hasOwnProperty('preSaleAmount1')) {
+                spanFirstCharge.innerHTML = data.preSaleAmount1;
+            }
+            else {
+                spanFirstCharge.innerHTML = data.discountPrice;
+            }
+        });
+
+        Array.prototype.slice.call(_qAll('.spanRemainAmount')).forEach((spanRemainAmount) => {
+            if(!data.hasOwnProperty('remainAmount')) {
+                return;
+            }
+            spanRemainAmount.innerHTML = data.remainAmount;
+        });
+
         // Update statistical informations
         if(!!_q('.statistical')) {
             _q('.statistical .td-name').innerHTML = productNameText + ' ' + data.productName;
@@ -110,6 +126,13 @@
             fCurrency: fCurrency
         };
 
+        if(product.productPrices.hasOwnProperty('PreSaleAmount1')) {
+            let remainAmountNumber = product.productPrices.DiscountedPrice.Value - product.productPrices.PreSaleAmount1.Value;
+
+            result.remainAmount = utils.formatPrice(remainAmountNumber.toFixed(2), fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+            result.preSaleAmount1 = product.productPrices.PreSaleAmount1.FormattedValue;
+        }
+
         implementSelectedProduct(result);
     }
     function createArrayProducts(data) {
@@ -117,6 +140,7 @@
             prodArr.push(item.productId);
         }
         getSelectedProduct();
+        utils.events.emit('implementProductDone', data); // a.Hoa added
     }
     function listenEvents() {
         utils.events.on('triggerQuantity', createArrayProducts);
