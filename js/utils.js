@@ -101,8 +101,8 @@
         }
     }
 
-    function formatPrice(price, fCurrency, shippingPriceFormatted) {
-        if (shippingPriceFormatted.indexOf(',') > -1) {
+    function formatPrice(price, fCurrency, shortestPriceFormatted) {
+        if (shortestPriceFormatted.indexOf(',') > -1) {
             return fCurrency.replace('######', price.toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')); // x.xxx.xxx,xx
         }
         return fCurrency.replace('######', price.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')); // x,xxx,xxx.xx
@@ -482,7 +482,7 @@
                 hrefParams = href.split('?')[1];
             }
             if (!!window.siteSetting && !!window.siteSetting.redirectURL && window.siteSetting.redirectURL.trim() !== '') {
-                if (href && href.indexOf('contact-us') < 0 && href.indexOf('terms') < 0 && href.indexOf('policy') < 0 && href.indexOf('affiliate') < 0 && href.indexOf('usermanual') < 0 && href.indexOf('javascript') < 0 && href.indexOf('www') < 0 && href.indexOf('//') < 0 && link.className.indexOf('no-redirect') < 0) {
+                if (href && href.indexOf('contact-us') < 0 && href.indexOf('terms') < 0 && href.indexOf('policy') < 0 && href.indexOf('affiliate') < 0 && href.indexOf('usermanual') < 0 && href.indexOf('impressum.html') < 0 && href.indexOf('javascript') < 0 && href.indexOf('www') < 0 && href.indexOf('//') < 0 && link.className.indexOf('no-redirect') < 0) {
                     href = window.siteSetting.redirectURL;
                 }
             }
@@ -645,98 +645,83 @@
         }
     }
 
-    function _updateThrottled(throttled) {
+    function _updateThrottled(throttled, siteDomain) {
         try {
             const affParam = utils.getQueryParameter('Affid');
-            const siteDomain = location.host.replace('www.', '').replace('test.', '');
-            if (siteDomain !== '') {
-                utils.callAjax('https://yz3or1urua.execute-api.us-east-1.amazonaws.com/prod/updateThrottled', {
-                    method: 'POST',
-                    data: {
-                        affId: affParam,
-                        siteDomain: siteDomain,
-                        throttled: parseInt(throttled) + 1
-                    }
-                }).then(result => {
-                    console.log('updated sc successfully!');
-                }).catch(err => {
-                    //Fire Cake Pixel
-                    //utils.fireCakePixel();
-                    utils.fireEverFlow();
-                    utils.firePicksell();
-                    utils.fireMainOrderToGTMConversion();
-                });
-            }
+            utils.callAjax('https://yz3or1urua.execute-api.us-east-1.amazonaws.com/prod/updateThrottled', {
+                method: 'POST',
+                data: {
+                    affId: affParam,
+                    siteDomain: siteDomain,
+                    throttled: parseInt(throttled) + 1
+                }
+            }).then(result => {
+                console.log('updated sc successfully!');
+            }).catch(err => {
+                _fireTracking();
+            });
         } catch (err) {
-            //Fire Cake Pixel
-            //utils.fireCakePixel();
-            utils.fireEverFlow();
-            utils.firePicksell();
-            utils.fireMainOrderToGTMConversion();
+            _fireTracking();
         }
     }
 
     function checkAffAndFireEvents() {
-        // try {
-        //     console.log('checkAffAndFireEvents');
-        //     const affParam = utils.getQueryParameter('Affid');
-        //     const orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
-        //     const checkedAff = utils.localStorage().get('checkedAff');
-        //     const siteDomain = location.host.replace('www.', '').replace('test.', '');
-        //     if (affParam && orderInfo && !checkedAff && siteDomain !== '') {
-        //         utils.callAjax('https://yz3or1urua.execute-api.us-east-1.amazonaws.com/prod/so', {
-        //             method: 'POST',
-        //             data: {
-        //                 affId: affParam,
-        //                 siteDomain: siteDomain
-        //             }
-        //         }).then(result => {
-        //             if (result && result.status) {
-        //                 utils.localStorage().set('checkedAff', 'true');
+        try {
+            console.log('checkAffAndFireEventsV2');
+            const affParam = utils.getQueryParameter('Affid');
+            const orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
+            const checkedAff = utils.localStorage().get('checkedAff');
+            const mainOrderLink = utils.localStorage().get('mainOrderLink');
+            if (affParam && orderInfo && !checkedAff && mainOrderLink && mainOrderLink !== '') {
+                const siteDomain = location.host.replace(/(www|test)\./, '') + mainOrderLink;
+                utils.callAjax('https://yz3or1urua.execute-api.us-east-1.amazonaws.com/prod/so', {
+                    method: 'POST',
+                    data: {
+                        affId: affParam,
+                        siteDomain: siteDomain
+                    }
+                }).then(result => {
+                    if (result && result.status) {
+                        utils.localStorage().set('checkedAff', 'true');
 
-        //                 const aff = result.data;
-        //                 const shouldThrottled = (aff.percent / 100) * (aff.totalOrders);
-        //                 if ((shouldThrottled - aff.throttled) >= 1) {
-        //                     //no fire and update throttled
-        //                     _updateThrottled(aff.throttled);
-        //                 } else {
-        //                     //Fire Cake Pixel
-        //                     //utils.fireCakePixel();
-        //                     utils.fireEverFlow();
-        //                     utils.firePicksell();
-        //                     utils.fireMainOrderToGTMConversion();
-        //                 }
-        //             } else {
-        //                 //Fire Cake Pixel
-        //                 //utils.fireCakePixel();
-        //                 utils.fireEverFlow();
-        //                 utils.firePicksell();
-        //                 utils.fireMainOrderToGTMConversion();
-        //             }
-        //         }).catch(err => {
-        //             //Fire Cake Pixel
-        //             //utils.fireCakePixel();
-        //             console.log(err);
-        //             utils.fireEverFlow();
-        //             utils.firePicksell();
-        //             utils.fireMainOrderToGTMConversion();
-        //         });
-        //     } else {
-        //         //Fire Cake Pixel
-        //         //utils.fireCakePixel();
-        //         utils.fireEverFlow();
-        //         utils.firePicksell();
-        //         utils.fireMainOrderToGTMConversion();
-        //     }
-        // } catch (err) {
-        //     console.log(err);
-        //     utils.fireEverFlow();
-        //     utils.firePicksell();
-        //     utils.fireMainOrderToGTMConversion();
-        // }
+                        const aff = result.data;
+                        const shouldThrottled = (aff.percent / 100) * (aff.totalOrders);
+                        if ((shouldThrottled - aff.throttled) >= 1) {
+                            //no fire and update throttled
+                            _updateThrottled(aff.throttled, siteDomain);
+                        } else {
+                            _fireTracking();
+                        }
+                    } else {
+                        _fireTracking();
+                    }
+                }).catch(err => {
+                    console.log(err);
+                    _fireTracking();
+                });
+            } else {
+                _fireTracking();
+            }
+        } catch (err) {
+            console.log(err);
+            _fireTracking();
+        }
 
-        utils.fireEverFlow();
+        // utils.fireEverFlow();
+        // utils.firePicksell();
+    }
+
+    function _fireTracking() {
+        //Fire Pixels
+        //utils.fireCakePixel();
+        const ersParam = utils.getQueryParameter('ERS');
+        if(!ersParam || ersParam.toLowerCase() !== 'y') {
+            utils.fireEverFlow();
+        } else {
+            console.log('not fire EF');
+        }
         utils.firePicksell();
+        utils.fireMainOrderToGTMConversion();
     }
 
     //check and fire gtm convertion event for order pages
@@ -946,6 +931,12 @@
             upsell.orderInfo.upsellPriceToUpgrade = upsell.products[window.upsell_productindex].productPrices.DiscountedPrice.Value;
             upsell.orderInfo.savedTotal += savedOfUpsell;
             upsell.orderInfo.isUpsellOrdered = 1;
+            const { upsellUrls = [] } = upsell.orderInfo;
+            upsellUrls.push({
+                orderNumber: responseData.orderNumber,
+                url: location.pathname
+            });
+            upsell.orderInfo.upsellUrls = upsellUrls;
             utils.localStorage().set('orderInfo', JSON.stringify(upsell.orderInfo));
 
             utils.localStorage().set('webkey_to_check_paypal', upsell.upsellWebKey);
@@ -1017,6 +1008,49 @@
         }
     }
 
+    function bindTaxForUpsell(upsellInfo) {
+        try {
+            if (typeof window.applyTax === 'undefined') return;
+
+            const countryCode = window.localStorage.getItem('countryCode');
+            const stateCode = window.localStorage.getItem('stateCode');
+            if (!countryCode || !stateCode) {
+                const spanUpsellPriceElems = _qAll('.spanUpsellPrice');
+                for (let spanUpsellPrice of spanUpsellPriceElems) {
+                    spanUpsellPrice.innerHTML = upsellInfo.products[0].productPrices.DiscountedPrice.FormattedValue;
+                }
+                return;
+            }
+
+            const url = `https://websales-api.tryemanagecrm.com/api/campaigns/${upsellInfo.upsellWebKey}/taxes/${countryCode}/${stateCode}`;
+            const options = {
+                headers: {
+                    X_CID: siteSetting.CID
+                }
+            }
+
+            utils.callAjax(url, options).then(result => {
+                window.productsTaxes = result.productsTaxes;
+
+                const upsellIndex = window.upsell_productindex ? window.upsell_productindex : 0;
+                const productId = upsellInfo.products[upsellIndex].productId;
+                const taxProduct = result.productsTaxes.filter(p => p.productId == productId)[0];
+                if (taxProduct) {
+                    const priceWithTax = parseFloat(upsellInfo.products[upsellIndex].productPrices.DiscountedPrice.Value) + parseFloat(taxProduct.tax.taxValue);
+                    const spanUpsellPriceElems = _qAll('.spanUpsellPrice');
+                    for (let spanUpsellPrice of spanUpsellPriceElems) {
+                        spanUpsellPrice.innerHTML = '$' + priceWithTax.toFixed(2);
+                    }
+                }
+                console.log(result);
+            }).catch(error => {
+                console.log('call tax error : ', error);
+            });
+        } catch (err) {
+            console.log('bind tax error : ', err);
+        }
+    }
+
     //Common Upsell classs is used in all sites
     class CommonUpsell {
         fireMainOrderToGTMConversion() {
@@ -1028,7 +1062,7 @@
         }
 
         init() {
-            this.fireMainOrderToGTMConversion();
+            //this.fireMainOrderToGTMConversion();
             this.fireGtmPurchaseEvent();
         }
     }
@@ -1051,7 +1085,7 @@
         }
 
         init() {
-            this.fireMainOrderToGTMConversion();
+            //this.fireMainOrderToGTMConversion();
             this.fireGtmPurchaseEvent();
         }
     }
@@ -1097,6 +1131,7 @@
         checkCamp: checkCamp,
         saveInfoToLocalForUpsells: saveInfoToLocalForUpsells,
         focusErrorInputField: focusErrorInputField,
-        saveUserInfoWithFingerprint: saveUserInfoWithFingerprint
+        saveUserInfoWithFingerprint: saveUserInfoWithFingerprint,
+        bindTaxForUpsell: bindTaxForUpsell
     }
 })(window, document);
