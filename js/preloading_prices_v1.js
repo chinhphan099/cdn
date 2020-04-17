@@ -79,13 +79,21 @@
 
     function loopData(data) {
         if(!(data instanceof Error) && data.prices.length > 0) {
-            for(let i = 0; i < data.prices.length; i++){
-                if(data.prices[i].quantity > 5){
-                    window.isDoubleQuantity = true;
+            const ascShortPrices = [...data.prices].sort((a, b) => a.quantity - b.quantity);
+            let doubleFlag = true;
+
+            for(let i = 0, n = ascShortPrices.length; i < n; i++) {
+                if(ascShortPrices[i].quantity % 2 !== 0) {
+                    doubleFlag = false;
                     break;
                 }
             }
-            Array.prototype.slice.call(data.prices).forEach(product => {
+
+            if(doubleFlag) {
+                window.isDoubleQuantity = true;
+            }
+
+            Array.prototype.slice.call(ascShortPrices).forEach(product => {
                 try {
                     let quantity = product.quantity;
                     if(!!window.isDoubleQuantity) {
