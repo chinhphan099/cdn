@@ -180,8 +180,8 @@
         if(taxMainValue > 0.1 && utils.localStorage().get('preOrder') !== 'true') {
             taxLine = `
                         <div class="inner">
-                            <span>Tax</span>
-                            <span>${'$' + taxMainValue.toFixed(2)}</span>
+                            <span>${js_translate.tax || 'Tax'}</span>
+                            <span>${utils.formatPrice(taxMainValue.toFixed(2), fCurrency, shippingPriceFormatted)}</span>
                         </div>
                 `;
         }
@@ -216,11 +216,11 @@
 
             let taxUpsellLine = '';
             const taxUpsellValue = parseFloat(data.relatedOrders[i].orderPrice) - parseFloat(data.relatedOrders[i].orderProductPrice) - parseFloat(data.relatedOrders[i].shippingPrice);
-            if(taxUpsellValue > 0 && utils.localStorage().get('preOrderUpsell') !== 'true') {
+            if(taxUpsellValue > 0.1 && utils.localStorage().get('preOrderUpsell') !== 'true') {
                 taxUpsellLine = `
                         <div class="inner">
-                            <span>Tax</span>
-                            <span>${'$' + taxUpsellValue.toFixed(2)}</span>
+                            <span>${js_translate.tax || 'Tax'}</span>
+                            <span>${utils.formatPrice(taxUpsellValue.toFixed(2), fCurrency, shippingPriceFormatted)}</span>
                         </div>
                 `;
             }
