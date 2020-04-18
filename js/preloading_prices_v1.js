@@ -7,6 +7,11 @@
 
     function implementLoadingIcon() {
         for(let quantity = 1; quantity < 6; quantity++) {
+            const firstChargeElms = document.querySelectorAll(`.firstCharge_${quantity}`);
+            Array.prototype.slice.call(firstChargeElms).forEach(elm => {
+                elm.innerHTML = '<img width="20" height="10" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" data-src="//d16hdrba6dusey.cloudfront.net/sitecommon/images/loading-price-v1.gif" />';
+            });
+
             const discountPriceElms = document.querySelectorAll(`.discountPrice_${quantity}`);
             Array.prototype.slice.call(discountPriceElms).forEach(elm => {
                 elm.innerHTML = '<img width="20" height="10" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" data-src="//d16hdrba6dusey.cloudfront.net/sitecommon/images/loading-price-v1.gif" />';
@@ -49,7 +54,12 @@
         let totalPriceDeposit = product.productPrices.DiscountedPrice.Value + product.productPrices.FullRetailPrice.Value;
 
         product.productPrices.SavePriceDeposit = {};
-        product.productPrices.SavePriceDeposit.Value = Math.abs(Number((retailPriceDeposit - totalPriceDeposit).toFixed(2)));
+        if(!!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
+            product.productPrices.SavePriceDeposit.Value = product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value;
+        }
+        else {
+            product.productPrices.SavePriceDeposit.Value = Math.abs(Number((retailPriceDeposit - totalPriceDeposit).toFixed(2)));
+        }
         product.productPrices.SavePriceDeposit.FormattedValue = utils.formatPrice(product.productPrices.SavePriceDeposit.Value, fCurrency, product.shippings[0].formattedPrice);
 
         return product;
@@ -57,6 +67,16 @@
 
     function implementPrice(product, fCurrency, quantity) {
         try {
+            const firstChargeElms = document.querySelectorAll(`.firstCharge_${quantity}`);
+            Array.prototype.slice.call(firstChargeElms).forEach(elm => {
+                if(!!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                    elm.textContent = utils.formatPrice(Math.round(product.productPrices.PreSaleAmount1.Value), fCurrency, product.productPrices.PreSaleAmount1.FormattedValue);
+                }
+                else {
+                    elm.textContent = product.productPrices.DiscountedPrice.FormattedValue;
+                }
+            });
+
             const discountPriceElms = document.querySelectorAll(`.discountPrice_${quantity}`);
             Array.prototype.slice.call(discountPriceElms).forEach(elm => {
                 elm.textContent = product.productPrices.DiscountedPrice.FormattedValue;
