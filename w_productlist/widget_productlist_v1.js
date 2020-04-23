@@ -146,9 +146,14 @@
         return product;
     }
 
-    function implementPriceHTML(product, quantity) {
+    function implementPriceHTML(product, quantity, isRefiredPrice = false) {
         // This function will be recalled from order-st.page.js - After active Coupon
         Array.prototype.slice.call(_qAll(`.discountedPrice_${quantity}, .depositFirstChargePrice_${quantity}`)).forEach(elm => {
+            if(!!elm.classList.contains('fired-price') && !isRefiredPrice) {
+                return;
+            }
+            elm.classList.add('fired-price');
+
             if(!!window.isPreOrder && !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                 if(!!window.removeCurrencySymbol) {
                     elm.textContent = product.productPrices.PreSaleAmount1.Value;
@@ -168,6 +173,11 @@
         });
 
         Array.prototype.slice.call(_qAll(`.savePrice_${quantity}, .depositSavePrice_${quantity}`)).forEach(elm => {
+            if(!!elm.classList.contains('fired-price') && !isRefiredPrice) {
+                return;
+            }
+            elm.classList.add('fired-price');
+
             if(!!window.removeCurrencySymbol) {
                 elm.textContent = product.productPrices.SavePrice.Value;
             }
@@ -177,6 +187,11 @@
         });
 
         Array.prototype.slice.call(_qAll(`.shortSavePrice_${quantity}, .depositShortSavePrice_${quantity}`)).forEach(elm => {
+            if(!!elm.classList.contains('fired-price') && !isRefiredPrice) {
+                return;
+            }
+            elm.classList.add('fired-price');
+
             if(!!window.removeCurrencySymbol) {
                 elm.textContent = Math.round(product.productPrices.SavePrice.Value);
             }
@@ -186,6 +201,11 @@
         });
 
         Array.prototype.slice.call(_qAll(`.eachPrice_${quantity}, .depositEachPrice_${quantity}`)).forEach(elm => {
+            if(!!elm.classList.contains('fired-price') && !isRefiredPrice) {
+                return;
+            }
+            elm.classList.add('fired-price');
+
             if(!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                 if(!!window.removeCurrencySymbol) {
                     elm.textContent = (product.productPrices.DiscountedPrice.Value / quantity).toFixed(2);
@@ -205,6 +225,11 @@
         });
 
         Array.prototype.slice.call(_qAll(`.shortEachPrice_${quantity}, .depositShortEachPrice_${quantity}`)).forEach(elm => {
+            if(!!elm.classList.contains('fired-price') && !isRefiredPrice) {
+                return;
+            }
+            elm.classList.add('fired-price');
+
             if(!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                 if(!!window.removeCurrencySymbol) {
                     elm.textContent = Math.round(product.productPrices.DiscountedPrice.Value / quantity);
