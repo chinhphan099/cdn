@@ -528,7 +528,7 @@
                 });
 
                 if(typeof window.implementPriceHTML === 'function') {
-                    window.implementPriceHTML(dataProduct, quantity);
+                    window.implementPriceHTML(dataProduct, quantity, true);
                 }
 
                 let nameElm = productRadioItem.querySelector('.product-name p');
