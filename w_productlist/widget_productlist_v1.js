@@ -1,4 +1,4 @@
-(function (utils) {
+(function(utils) {
     if(!utils || !window.siteSetting) {
         console.log('utils or window.siteSetting not found');
         return;
@@ -11,17 +11,17 @@
         var qSelector = _qAll(selector);
 
         return {
-            addClass: function (className) {
+            addClass: function(className) {
                 for(let elm of qSelector) {
                     elm.classList.add(className);
                 }
             },
-            removeClass: function (className) {
+            removeClass: function(className) {
                 for(let elm of qSelector) {
                     elm.classList.remove(className);
                 }
             }
-        }
+        };
     }
 
     function replaceUserString() {
@@ -41,64 +41,6 @@
         }
     }
     replaceUserString();
-
-    function initWidgetProducts() {
-        const eCRM = new EmanageCRMJS({
-            webkey: siteSetting.webKey,
-            cid: siteSetting.CID,
-            lang: '',
-            isTest: utils.getQueryParameter('isCardTest') ? true : false
-        });
-
-        if(utils.checkCamp(siteSetting.webKey)) {
-            let campProducts = localStorage.getItem('campproducts');
-            if(campProducts) {
-                campProducts = JSON.parse(campProducts);
-                const camps = campProducts.camps.filter(item => {
-                    return item[siteSetting.webKey];
-                });
-
-                if(camps.length > 0) {
-                    console.log('get prices from LS');
-                    bindProducts(camps[0][siteSetting.webKey]);
-                }
-            }
-        }
-        else {
-            eCRM.Campaign.getProducts(function(data) {
-                let campProducts = localStorage.getItem('campproducts');
-                if(campProducts) {
-                    campProducts = JSON.parse(campProducts);
-                }
-                else {
-                    campProducts = {
-                        camps: []
-                    }
-                }
-
-                if(typeof data.prices !== 'undefined') {
-                    data.timestamp = new Date().toISOString();
-                    const camps = campProducts.camps.filter(item => {
-                        return item[siteSetting.webKey];
-                    });
-
-                    let camp = {};
-                    if(camps.length > 0) {
-                        camp = camps[0];
-                        camp[siteSetting.webKey] = data;
-                    }
-                    else {
-                        camp[siteSetting.webKey] = data;
-                        campProducts.camps.push(camp);
-                    }
-
-                    localStorage.setItem('campproducts', JSON.stringify(campProducts));
-                }
-                bindProducts(data);
-            });
-        }
-    }
-    initWidgetProducts();
 
     function afterActiveCoupon(input, couponValFormat) {
         const couponApplyText = _q('.coupon-apply');
@@ -313,7 +255,7 @@
         try {
             let ids = [];
             Array.prototype.slice.call(_qAll('input[name="product"]')).forEach(item => {
-                ids = [...ids, Number(item.value)]
+                ids = [...ids, Number(item.value)];
             });
             if(!!_q('.js-list-group li')) {
                 if(!!_q('.js-list-group li.active')) {
@@ -372,6 +314,61 @@
         }
     }
 
+    function getSelectedProduct() {
+        const product = _q('input[name="product"]:checked').dataset.product;
+        if(product) {
+            return JSON.parse(product);
+        }
+        else {
+            return null;
+        }
+    }
+
+    function handleProductChange() {
+        const productInfo = getSelectedProduct();
+        utils.events.emit('triggerWarranty', productInfo);
+        utils.events.emit('triggerInstallmentPayment', {
+            discountPrice: productInfo.productPrices.DiscountedPrice.FormattedValue,
+            discountPriceValue: productInfo.productPrices.DiscountedPrice.Value,
+            fullPrice: productInfo.productPrices.FullRetailPrice.FormattedValue,
+            fullPriceValue: productInfo.productPrices.FullRetailPrice.Value
+        });
+
+        if(_qById('js-widget-products').dataset.activeclass !== undefined) {
+            q('.productRadioListItem.checked-item').removeClass('checked-item');
+            _getClosest(this,'.productRadioListItem').classList.add('checked-item');
+        }
+    }
+
+    function getDefaultSelectedProduct() {
+        let result = null;
+        try {
+            let product = JSON.parse(_qById('product_' + _qById('hdfSelectedProduct').value).dataset.product),
+                shippingValue = 0,
+                priceShipping = window.js_translate ? window.js_translate.free || 'free' : 'free';
+
+            if(product.shippings.length > 0 && product.shippings[0] !== 0) {
+                shippingValue = product.shippings[0].price;
+                priceShipping = product.shippings[0].formattedPrice;
+            }
+
+            result = {
+                shippingValue: shippingValue,
+                priceShipping: priceShipping,
+                discountPrice: product.productPrices.DiscountedPrice.FormattedValue,
+                discountPriceValue: product.productPrices.DiscountedPrice.Value,
+                fullPrice: product.productPrices.FullRetailPrice.FormattedValue,
+                fullPriceValue: product.productPrices.FullRetailPrice.Value,
+                currencyCode: product.productPrices.FullRetailPrice.GlobalCurrencyCode != null ? product.productPrices.FullRetailPrice.GlobalCurrencyCode : '',
+                fCurrency: window.fCurrency
+            };
+        }
+        catch (err) {
+            console.log('getDefaultSelectedProduct : ', err);
+        }
+        return result;
+    }
+
     function bindProducts(data) {
         console.log(data);
         const countryCodeIndex = utils.localStorage().get('countryCodeIndex');
@@ -387,7 +384,6 @@
                             pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
                         window.fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
 
-                        let options = JSON.parse(_qById('js-widget-products').dataset.options);
                         if(!!utils.getQueryParameter('couponCode') && !!utils.getQueryParameter('couponValue')) {
                             product = applyCouponCode(product);
                         }
@@ -557,60 +553,63 @@
         }
     }
 
-    function handleProductChange() {
-        const productInfo = getSelectedProduct();
-        utils.events.emit('triggerWarranty', productInfo);
-        utils.events.emit('triggerInstallmentPayment', {
-            discountPrice: productInfo.productPrices.DiscountedPrice.FormattedValue,
-            discountPriceValue: productInfo.productPrices.DiscountedPrice.Value,
-            fullPrice: productInfo.productPrices.FullRetailPrice.FormattedValue,
-            fullPriceValue: productInfo.productPrices.FullRetailPrice.Value
+    function initWidgetProducts() {
+        const eCRM = new EmanageCRMJS({
+            webkey: siteSetting.webKey,
+            cid: siteSetting.CID,
+            lang: '',
+            isTest: utils.getQueryParameter('isCardTest') ? true : false
         });
 
-        if(_qById('js-widget-products').dataset.activeclass !== undefined) {
-            q('.productRadioListItem.checked-item').removeClass('checked-item');
-            _getClosest(this,'.productRadioListItem').classList.add('checked-item');
-        }
-    }
+        if(utils.checkCamp(siteSetting.webKey)) {
+            let campProducts = localStorage.getItem('campproducts');
+            if(campProducts) {
+                campProducts = JSON.parse(campProducts);
+                const camps = campProducts.camps.filter(item => {
+                    return item[siteSetting.webKey];
+                });
 
-    function getSelectedProduct() {
-        const product = _q('input[name="product"]:checked').dataset.product;
-        if(product) {
-            return JSON.parse(product);
+                if(camps.length > 0) {
+                    console.log('get prices from LS');
+                    bindProducts(camps[0][siteSetting.webKey]);
+                }
+            }
         }
         else {
-            return null;
+            eCRM.Campaign.getProducts(function(data) {
+                let campProducts = localStorage.getItem('campproducts');
+                if(campProducts) {
+                    campProducts = JSON.parse(campProducts);
+                }
+                else {
+                    campProducts = {
+                        camps: []
+                    };
+                }
+
+                if(typeof data.prices !== 'undefined') {
+                    data.timestamp = new Date().toISOString();
+                    const camps = campProducts.camps.filter(item => {
+                        return item[siteSetting.webKey];
+                    });
+
+                    let camp = {};
+                    if(camps.length > 0) {
+                        camp = camps[0];
+                        camp[siteSetting.webKey] = data;
+                    }
+                    else {
+                        camp[siteSetting.webKey] = data;
+                        campProducts.camps.push(camp);
+                    }
+
+                    localStorage.setItem('campproducts', JSON.stringify(campProducts));
+                }
+                bindProducts(data);
+            });
         }
     }
-
-    function getDefaultSelectedProduct() {
-        let result = null;
-        try {
-            let product = JSON.parse(_qById('product_' + _qById('hdfSelectedProduct').value).dataset.product),
-                shippingValue = 0,
-                priceShipping = window.js_translate ? window.js_translate.free || 'free' : 'free';
-
-            if(product.shippings.length > 0 && product.shippings[0] !== 0) {
-                shippingValue = product.shippings[0].price;
-                priceShipping = product.shippings[0].formattedPrice;
-            }
-
-            result = {
-                shippingValue: shippingValue,
-                priceShipping: priceShipping,
-                discountPrice: product.productPrices.DiscountedPrice.FormattedValue,
-                discountPriceValue: product.productPrices.DiscountedPrice.Value,
-                fullPrice: product.productPrices.FullRetailPrice.FormattedValue,
-                fullPriceValue: product.productPrices.FullRetailPrice.Value,
-                currencyCode: product.productPrices.FullRetailPrice.GlobalCurrencyCode != null ? product.productPrices.FullRetailPrice.GlobalCurrencyCode : '',
-                fCurrency: window.fCurrency
-            }
-        }
-        catch (err) {
-            console.log('getDefaultSelectedProduct : ', err);
-        }
-        return result;
-    }
+    initWidgetProducts();
 
     // Tab click
     if(!!_q('.js-list-group li')) {
@@ -697,7 +696,7 @@
             if(!!waitTime) {
                 clearTimeout(waitTime);
             }
-            waitTime = setTimeout(function () {
+            waitTime = setTimeout(function() {
                 saveActiveTabIndex();
             }, 3000);
         };
@@ -766,16 +765,16 @@
         const listener = () => {
             for(let tabItem of tabItems) {
                 if(!!titleElm) {
-                    tabItem.addEventListener('mouseenter', function () {
+                    tabItem.addEventListener('mouseenter', function() {
                         titleElm.innerHTML = tabItem.dataset.replacetext;
                     }, false);
 
-                    tabItem.addEventListener('mouseleave', function () {
+                    tabItem.addEventListener('mouseleave', function() {
                         titleElm.innerHTML = activeText;
                     }, false);
                 }
 
-                tabItem.addEventListener('click', function () {
+                tabItem.addEventListener('click', function() {
                     // Update Text
                     if(!!titleElm) {
                         activeText = tabItem.dataset.replacetext;
@@ -797,7 +796,7 @@
             }
 
             if(!!_qById('btn-yes-exit-popup')) {
-                _qById('btn-yes-exit-popup').addEventListener('click', function () {
+                _qById('btn-yes-exit-popup').addEventListener('click', function() {
                     indexItem = 0;
                     init(true);
                 }, false);
