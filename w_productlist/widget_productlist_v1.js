@@ -265,37 +265,47 @@
     }
 
     function generatePriceForDeposit(product) {
-        let quantity = product.quantity;
-        if(window.isDoubleQuantity) {
-            quantity /= 2;
+        try {
+            let quantity = product.quantity;
+            if(window.isDoubleQuantity) {
+                quantity /= 2;
+            }
+            if(quantity === 1) {
+                retailPriceDepositOneUnit = (product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value) / 0.65; // 100% - 35%
+            }
+
+            let retailPriceDeposit = retailPriceDepositOneUnit * quantity;
+            let totalPriceDeposit = product.productPrices.DiscountedPrice.Value + product.productPrices.FullRetailPrice.Value;
+
+            product.productPrices.SavePrice = {};
+            product.productPrices.SavePrice.Value = Math.abs(Number((retailPriceDeposit - totalPriceDeposit).toFixed(2)));
+            product.productPrices.SavePrice.FormattedValue = utils.formatPrice(product.productPrices.SavePrice.Value, window.fCurrency, product.shippings[0].formattedPrice);
+
+            product.productPrices.FullRetailPriceDeposit = {};
+            product.productPrices.FullRetailPriceDeposit.Value = Number((totalPriceDeposit + product.productPrices.SavePrice.Value).toFixed(2));
+            product.productPrices.FullRetailPriceDeposit.FormattedValue = utils.formatPrice(product.productPrices.FullRetailPriceDeposit.Value, window.fCurrency, product.shippings[0].formattedPrice);
         }
-        if(quantity === 1) {
-            retailPriceDepositOneUnit = (product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value) / 0.65; // 100% - 35%
+        catch(e) {
+            console.log(e);
         }
-
-        let retailPriceDeposit = retailPriceDepositOneUnit * quantity;
-        let totalPriceDeposit = product.productPrices.DiscountedPrice.Value + product.productPrices.FullRetailPrice.Value;
-
-        product.productPrices.SavePrice = {};
-        product.productPrices.SavePrice.Value = Math.abs(Number((retailPriceDeposit - totalPriceDeposit).toFixed(2)));
-        product.productPrices.SavePrice.FormattedValue = utils.formatPrice(product.productPrices.SavePrice.Value, window.fCurrency, product.shippings[0].formattedPrice);
-
-        product.productPrices.FullRetailPriceDeposit = {};
-        product.productPrices.FullRetailPriceDeposit.Value = Number((totalPriceDeposit + product.productPrices.SavePrice.Value).toFixed(2));
-        product.productPrices.FullRetailPriceDeposit.FormattedValue = utils.formatPrice(product.productPrices.FullRetailPriceDeposit.Value, window.fCurrency, product.shippings[0].formattedPrice);
 
         return product;
     }
 
     function generateSavePrices(product) {
-        let quantity = product.quantity;
-        if(window.isDoubleQuantity) {
-            quantity /= 2;
-        }
+        try {
+            let quantity = product.quantity;
+            if(window.isDoubleQuantity) {
+                quantity /= 2;
+            }
 
-        product.productPrices.SavePrice = {};
-        product.productPrices.SavePrice.Value = Number((product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value).toFixed(2));
-        product.productPrices.SavePrice.FormattedValue = utils.formatPrice(product.productPrices.SavePrice.Value.toFixed(2), window.fCurrency, product.shippings[0].formattedPrice);
+            product.productPrices.SavePrice = {};
+            product.productPrices.SavePrice.Value = Number((product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value).toFixed(2));
+            product.productPrices.SavePrice.FormattedValue = utils.formatPrice(product.productPrices.SavePrice.Value.toFixed(2), window.fCurrency, product.shippings[0].formattedPrice);
+        }
+        catch(e) {
+            console.log(e);
+        }
         return product;
     }
 
@@ -770,6 +780,10 @@
                     if(!!titleElm) {
                         activeText = tabItem.dataset.replacetext;
                         titleElm.innerHTML = activeText;
+                    }
+
+                    if(!!tabItem.dataset.webkey) {
+                        siteSetting.webKey = tabItem.dataset.webkey;
                     }
 
                     activeTab(tabItem);

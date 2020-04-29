@@ -55,6 +55,7 @@
         }
 
         const orderData = getOrderData(paymenttype);
+        eCRM.Order.webkey = siteSetting.webKey;
 
         eCRM.Order.placeOrder(orderData, paymenttype, function (result) {
             //make a flag is that has a order successfully, will be used in decline page
