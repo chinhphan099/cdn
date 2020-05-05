@@ -56,33 +56,56 @@
         updateClock();
         timeinterval = setInterval(updateClock, 1000);
     }
+    function removeTimeText() {
+        let timeTextElms = _qAll('.w_exit_popup .timetext');
+        for(let timeTextElm of timeTextElms) {
+            timeTextElm.parentNode.removeChild(timeTextElm);
+        }
+
+        let timeTextArray = [
+            'within the next 5 minutes',
+            'within the next 2 minutes'
+        ];
+        Array.prototype.slice.call(_qAll('.w_exit_popup p')).forEach(elm => {
+            for(let timeText of timeTextArray) {
+                if(elm.innerHTML.indexOf(timeText) > -1) {
+                    elm.innerHTML = elm.innerHTML.replace(timeText, '');
+                }
+            }
+        });
+    }
     function generateCountDown() {
         if (!_q('.coupon-popup') || !!isPopupShowing) {
             return;
         }
-        const countdownHTML = `
-            <div id="timeCount">
-                <div class="w_item">
-                    <div class="ex-minute"></div>
-                    <div class="minute-text">${js_translate.minutes}</div>
+        if(utils.getQueryParameter('timer') !== '0') {
+            const countdownHTML = `
+                <div id="timeCount">
+                    <div class="w_item">
+                        <div class="ex-minute"></div>
+                        <div class="minute-text">${js_translate.minutes}</div>
+                    </div>
+                    <div class="w_item">
+                        <div class="semicolon">:</div>
+                    </div>
+                    <div class="w_item">
+                        <div class="ex-second"></div>
+                        <div class="second-text">${js_translate.seconds}</div>
+                    </div>
                 </div>
-                <div class="w_item">
-                    <div class="semicolon">:</div>
-                </div>
-                <div class="w_item">
-                    <div class="ex-second"></div>
-                    <div class="second-text">${js_translate.seconds}</div>
-                </div>
-            </div>
-        `;
-        _qById('couponBtn').insertAdjacentHTML('beforebegin', countdownHTML);
-        utils.events.emit('beforeCountdown');
+            `;
+            _qById('couponBtn').insertAdjacentHTML('beforebegin', countdownHTML);
+            utils.events.emit('beforeCountdown');
 
-        // Begin Coutdown
-        let currentTime = Date.parse(new Date()),
-            deadline = new Date(currentTime + time_in_minutes * 60 * 1000);
+            // Begin Coutdown
+            let currentTime = Date.parse(new Date()),
+                deadline = new Date(currentTime + time_in_minutes * 60 * 1000);
 
-        handleCountDown(deadline);
+            handleCountDown(deadline);
+        }
+        else {
+            removeTimeText();
+        }
         _q('.coupon-popup').style.display = 'block';
         isPopupShowing = true;
     }
