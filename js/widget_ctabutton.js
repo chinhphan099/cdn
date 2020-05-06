@@ -275,6 +275,26 @@
                     }
                     else if (result.upsells.length > 0 && result.upsells[0].upsellUrl !== '') {
                         const redirectUrl = result.upsells[0].upsellUrl.substr(result.upsells[0].upsellUrl.lastIndexOf('/') + 1);
+
+                        //Check flag: fireAfterSuccess - to emit event fireAfterSuccess
+                        if(!!window.emitAfterSuccessCredit){
+                            utils.events.emit('fireAfterSuccessCC', {
+                                result: result,
+                                redirectUrl: redirectUrl,
+                                orderData: orderData
+                            });
+
+                            //Prevent Redirect next Url
+                            if(window.stopRedirect) return;
+                        }
+                        else if(!!window.emitAfterSuccess){
+                            utils.events.emit('fireAfterSuccess', {
+                                result: result,
+                                redirectUrl: redirectUrl,
+                                orderData: orderData
+                            });
+                        }
+
                         if(!customAjaxLoading) {
                             window.location.href = redirectUrl;
                         }
@@ -318,6 +338,9 @@
             }
             if(!!_q('.widget_modal_upsell')) {
                 _q('.widget_modal_upsell').style.display = 'block';
+            }
+            else if(!!window.preventCheckoutCredit || !!window.preventCheckout){
+                return;
             }
             else {
                 placeMainOrder('creditcard');

@@ -35,6 +35,9 @@
             if(!!_q('.widget_modal_upsell')) {
                 _q('.widget_modal_upsell').style.display = 'block';
             }
+            else if(!!window.preventCheckoutPaypal || !!window.preventCheckout){
+                return;
+            }
             else {
                 placeMainOrder();
             }
@@ -68,6 +71,20 @@
                 saveInforForUpsellPage(result);
 
                 utils.localStorage().set('webkey_to_check_paypal', siteSetting.webKey);
+
+                //Check flag: emitAfterSuccessPaypal - to emit event fireAfterSuccess
+                if(!!window.emitAfterSuccessPaypal ){
+                    utils.events.emit('fireAfterSuccessPP', {
+                        result: result,
+                        orderData: orderData
+                    });
+                }
+                else if(!!window.emitAfterSuccess){
+                    utils.events.emit('fireAfterSuccess', {
+                        result: result,
+                        orderData: orderData
+                    });
+                }
 
                 if (result.callBackUrl) {
                     document.location = result.callBackUrl;
