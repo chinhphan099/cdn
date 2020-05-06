@@ -537,10 +537,11 @@
                 else {
                     utils.localStorage().set('countryCode', countryCodeIndex);
                 }
-                utils.localStorage().set('currencyCode', productInfo.currencyCode);
                 setTimeout(() => {
                     utils.localStorage().set('jsCurrency', window.fCurrency);
+                    utils.localStorage().set('currencyCode', productInfo.currencyCode);
                 }, 1000);
+                utils.localStorage().set('currencyCode', productInfo.currencyCode);
                 utils.events.emit('triggerProductBannerSidebar', productInfo);
                 utils.events.emit('triggerWarranty', getSelectedProduct());
                 utils.events.emit('bindOrderPage', productInfo);
