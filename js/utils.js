@@ -1090,6 +1090,73 @@
         }
     }
 
+    //Custom Events inject to CTA Button - Tu Nguyen
+    class injectCustomEventsToCTABtn {
+        preventCheckout(paypentType = true, cbFnc){
+            //Paypemt Type
+                //-- 'paypal' : prevent checkout only with paypal
+                //-- 'cc' : prevent checkout only with creditcard
+                //-- true : prevent checkout with both of paypal and creditcard
+            //cbFnc
+                //-- Excute callback function
+            switch(paypentType){
+                case 'paypal':
+                    window.preventCheckoutPaypal = true;
+                    break;
+                case 'cc':
+                    window.preventCheckoutCredit = true;
+                    break;
+                default:
+                    window.preventCheckout = true;
+            }
+            if(typeof cbFnc === 'function'){
+                cbFnc();
+            }
+        }
+
+        emitEventAfterCheckout(paypentType = true, registerFnc, stopRedirect = false){
+            //@paypentType
+                //-- 'paypal' : emit events only with paypal successfully
+                //-- 'cc' : emit events only with credit card successfully
+                //-- true : emit events with both of paypal  and creditcard successfully
+            //@stopRedirect
+                //-- if @true, enable variable window.stopRedirect & prevent page are moving on next Url
+            //@registerFnc
+                //-- register Event to emitted after checkout success page.
+
+            switch(paypentType){
+                case 'paypal':
+                    window.emitAfterSuccessPaypal = true;
+                    //Register Events
+                    if(typeof registerFnc === 'function') {
+                        utils.events.on('fireAfterSuccessPP', function(data){
+                            registerFnc(data);
+                        });
+                    }
+                    break;
+                case 'cc':
+                    window.emitAfterSuccessCredit = true;
+
+                    if(!!stopRedirect) window.stopRedirect = true;
+
+                    if(typeof registerFnc === 'function') {
+                        utils.events.on('fireAfterSuccessCC', function(data){
+                            registerFnc(data);
+                        });
+                    }
+                    break;
+                default:
+                    window.emitAfterSuccess = true;
+
+                if(typeof registerFnc === 'function') {
+                    utils.events.on('fireAfterSuccess', function(data){
+                        registerFnc(data);
+                    });
+                }
+            }
+        }
+    }
+
     global.utils = {
         CommonUpsell: CommonUpsell,
         CommonOrder: CommonOrder,
@@ -1132,6 +1199,7 @@
         saveInfoToLocalForUpsells: saveInfoToLocalForUpsells,
         focusErrorInputField: focusErrorInputField,
         saveUserInfoWithFingerprint: saveUserInfoWithFingerprint,
-        bindTaxForUpsell: bindTaxForUpsell
+        bindTaxForUpsell: bindTaxForUpsell,
+        injectCustomEventsToCTABtn: injectCustomEventsToCTABtn
     }
 })(window, document);
