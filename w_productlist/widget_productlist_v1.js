@@ -510,8 +510,6 @@
                 }
             });
 
-            siteSetting.countryCode = data.location.countryCode;
-
             try {
                 if(!!window.isPreOrder) {
                     setTimeout(() => {
@@ -530,6 +528,7 @@
                     productInfo.currencyCode = data.location.currencyCode;
                 }
                 utils.events.emit('bindProductDiscountInfo', productInfo);
+                siteSetting.countryCode = countryCodeIndex || data.location.countryCode;
                 if(!countryCodeIndex) {
                     utils.localStorage().set('countryCode', data.location.countryCode);
                     utils.events.emit('triggerAddressForm', data.location.countryCode);
@@ -539,6 +538,7 @@
                 }
                 setTimeout(() => {
                     utils.localStorage().set('jsCurrency', window.fCurrency);
+                    utils.localStorage().set('countryCode', siteSetting.countryCode);
                     utils.localStorage().set('currencyCode', productInfo.currencyCode);
                 }, 1000);
                 utils.localStorage().set('currencyCode', productInfo.currencyCode);
