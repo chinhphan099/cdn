@@ -168,7 +168,7 @@
             'orderTotal': product.productPrices.DiscountedPrice.Value,
             'lifetimePrice': lifetimePrice,
             'lifetimeRate': lifetimeRate,
-            'orderTotalFull': product.productPrices.DiscountedPrice.Value + shippingFee + lifetimePrice + productWarranty,
+            'orderTotalFull': Number((product.productPrices.DiscountedPrice.Value + shippingFee + lifetimePrice + productWarranty).toFixed(2)),
             'savedTotal': product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value,
             'quantity': product.quantity,
             'feeShipping': shippingFee,
