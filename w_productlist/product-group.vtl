@@ -1,0 +1,241 @@
+## Chinh
+<style>
+    .listGroup {
+        margin: 20px 0px;
+    }
+
+    .listGroup li {
+        max-width: 700px;
+        padding: 15px 0px;
+        position: relative;
+    }
+
+    .listGroup li:nth-child(even) {
+        background-color: #e0ecf5;
+    }
+
+    .listGroup li:nth-child(odd) {
+        background-color: #f0fbed;
+    }
+
+    .listGroup li label {
+        width: 120px;
+        display: inline-block;
+    }
+
+    .listGroup li div {
+        padding: 7px 0px;
+    }
+
+    .listGroup input {
+        width: 500px;
+        height: 35px;
+    }
+
+    .listGroup select {
+        width: 150px;
+        height: 25px;
+    }
+
+    .listGroup input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+    }
+
+    .removePackage {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        cursor: pointer;
+    }
+
+    #result {
+        margin-top: 15px;
+    }
+</style>
+
+#set($con = $dotcontent.find($request.getAttribute("com.dotmarketing.contentlet.edit").inode))
+<ul id="listGroup" class="listGroup"></ul>
+<script>
+    var count = 1;
+    var productGroup = {
+        data: []
+    };
+
+    function initPagePackage() {
+        #if($UtilMethods.isSet($con.productGroup))
+            var items = $con.productGroup;
+            productGroup.data = items.data;
+
+            var item;
+            if(items.data.length > 0) {
+                for(var i = 0; i < items.data.length; i++) {
+                    item = items.data[i];
+                    generatePackage(item);
+                }
+                updateValueToCustomFieldPackage();
+                var lastItemId = items.data[items.data.length-1].id;
+                count = parseInt(lastItemId.replace('adapter-', '')) + 1;
+            }
+        #end
+    }
+    initPagePackage();
+
+    function getItemByIdPackage(id) {
+        var obj = null;
+        for(var i = 0; i < productGroup.data.length; i++) {
+            if(productGroup.data[i].id === id) {
+                obj = productGroup.data[i];
+                break;
+            }
+        }
+
+        return obj;
+    }
+
+    function createRowPackage(label, input, id) {
+        var div = document.createElement('div');
+        div.appendChild(label);
+        div.appendChild(input);
+        return div;
+    }
+
+    function createLabelPackage(text) {
+        var label = document.createElement('label');
+        var textNode = document.createTextNode(text);
+        label.appendChild(textNode);
+        return label;
+    }
+
+    function createInputPackage(className, value, inputType) {
+        var input = document.createElement('INPUT');
+        if(value && value !== '') {
+            input.value = value;
+        }
+
+        if(inputType && inputType === 'checkbox') {
+            if(value == true) {
+                input.setAttribute('checked', value);
+            }
+        }
+
+        input.addEventListener('change', function(e) {
+            var li = this.parentNode.parentNode;
+            var obj = getItemByIdPackage(li.id);
+            if(obj) {
+                obj.tabName = li.querySelector('input.tabName').value;
+                obj.selectedText = li.querySelector('input.selectedText').value;
+                obj.pidPackages = li.querySelector('input.pidPackages').value;
+                obj.webkey = li.querySelector('input.webkey').value;
+                obj.pidUpgrade = li.querySelector('input.pidUpgrade').value;
+            } else {
+                obj = {
+                    id: li.id,
+                    tabName: li.querySelector('input.tabName').value,
+                    selectedText: li.querySelector('input.selectedText').value,
+                    pidPackages: li.querySelector('input.pidPackages').value,
+                    webkey: li.querySelector('input.webkey').value,
+                    pidUpgrade: li.querySelector('input.pidUpgrade').value
+                };
+                productGroup.data.push(obj);
+            }
+
+            updateValueToCustomFieldPackage();
+        });
+
+        input.setAttribute('type', inputType);
+        input.classList.add(className);
+        return input;
+    }
+
+    function addGroup() {
+        var item = {
+            id: 'adapter-' + count,
+            tabName: '',
+            selectedText: '',
+            pidPackages: '',
+            webkey: '',
+            pidUpgrade: ''
+        }
+
+        productGroup.data.push(item);
+        generatePackage(item);
+        updateValueToCustomFieldPackage();
+        count++;
+    }
+
+    function generatePackage(item) {
+        //create li
+        var li = document.createElement('li');
+        li.setAttribute('id', item.id);
+
+        //row 1 : Type Name
+        var label1 = createLabelPackage('Tab Name');
+        var input1 = createInputPackage('tabName', item.tabName, 'text');
+        var row1 = createRowPackage(label1, input1);
+        li.appendChild(row1);
+
+        //row 2 : Image Url
+        var label2 = createLabelPackage('Selected Text');
+        var input2 = createInputPackage('selectedText', item.selectedText, 'text');
+        var row2 = createRowPackage(label2, input2);
+        li.appendChild(row2);
+
+        //row 3 : PID's Package
+        var label3 = createLabelPackage('PID\'s Packages');
+        var input3 = createInputPackage('pidPackages', item.pidPackages, 'text');
+        var row3 = createRowPackage(label3, input3);
+        li.appendChild(row3);
+
+        //row 4 : pidUpgrade
+        var label4 = createLabelPackage('PID Upgrade');
+        var input4 = createInputPackage('pidUpgrade', item.pidUpgrade, 'text');
+        var row4 = createRowPackage(label4, input4);
+        li.appendChild(row4);
+
+        //row 5 : Webkey
+        var label5 = createLabelPackage('Webkey');
+        var input5 = createInputPackage('webkey', item.webkey, 'text');
+        var row5 = createRowPackage(label5, input5);
+        li.appendChild(row5);
+
+        //remove link
+        var a = document.createElement('a');
+        var textNode = document.createTextNode('Remove');
+        a.classList.add('removePackage');
+        a.appendChild(textNode);
+        bindEventRemovePackage(a);
+        li.appendChild(a);
+
+        document.getElementById('listGroup').appendChild(li);
+    }
+
+    function updateValueToCustomFieldPackage() {
+        //document.getElementById('result1').innerHTML = JSON.stringify(productGroup.data, null, 3);
+        console.log(productGroup.data.length);
+        if(productGroup.data.length > 0) {
+            dojo.byId("productGroup").value = JSON.stringify(productGroup);
+        }
+        else {
+            dojo.byId("productGroup").value = '';
+        }
+    }
+
+    function bindEventRemovePackage(elem) {
+        elem.addEventListener('click', function(e) {
+            e.preventDefault();
+            var li = elem.parentNode;
+            var item = getItemByIdPackage(li.id);
+            var index = productGroup.data.indexOf(item);
+            productGroup.data.splice(index, 1);
+            document.getElementById('listGroup').removeChild(li);
+
+            //count--;
+
+            updateValueToCustomFieldPackage();
+        });
+    }
+</script>
+
+<button dojoType="dijit.form.Button" onclick="addGroup">Add Group</button>
+<pre id="result1"></pre>
