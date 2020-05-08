@@ -9,6 +9,19 @@
     </center>
 #end
 
+#if($UtilMethods.isSet($products))
+    #set($jsonObj = $json.generate($!{products}))
+    <script>
+        window.productIds = [];
+        #foreach($product in $jsonObj.data)
+            window.productIds.push(btoa("gid://shopify/Product/$!{product.productId}"));
+        #end
+    </script>
+#end
+
+#if($wrapTabAndProductlist == 'true')
+<div class="productlists-wrapper">
+#end
 #if($UtilMethods.isSet($productGroup))
     <div class="js-list-group $!{className}-icon">
         #if($con.fullSelectedText)
@@ -17,7 +30,16 @@
         <ul data-packagedisplay="$!{packageDisplay}">
             #set($groupObj = $json.generate($!{productGroup}))
             #foreach($group in $groupObj.data)
-                <li data-package="$!{group.pidPackages}" data-replacetext="$!{group.selectedText}"><p>$group.tabName</p></li>
+                #set($webkey = $!{dotPageContent.campaignWebkey})
+                #if($group.has("webkey") && $group.webkey.trim() != '')
+                    #set($webkey = $group.webkey)
+                #end
+
+                #set($pidUpgrade = '')
+                #if($group.has("pidUpgrade") && $group.pidUpgrade.trim() != '')
+                    #set($pidUpgrade = $group.pidUpgrade)
+                #end
+                <li data-webkey="$webkey" data-pidupgrade="$pidUpgrade" data-package="$!{group.pidPackages}" data-replacetext="$!{group.selectedText}"><p>$group.tabName</p></li>
             #end
         </ul>
         #if($UtilMethods.isSet($con.productListErrorMsg))
@@ -55,14 +77,6 @@
 #set($loadingImg = '<span class="js-img-loading"><img src="' + $!{placeholderimage} + '" width="20" height="10" data-src="//d16hdrba6dusey.cloudfront.net/sitecommon/images/loading-price-v1.gif"></span>')
 
 #if($UtilMethods.isSet($products))
-    #set($jsonObj = $json.generate($!{products}))
-    <script>
-    window.productIds = [];
-    #foreach($product in $jsonObj.data)
-        window.productIds.push(btoa("gid://shopify/Product/$!{product.productId}"));
-    #end
-    </script>
-
     <div id="js-widget-products" class="product-list $!{className}" data-options="{$isHideInstallmentText $isUpdateHeadingPrice}" #if($!{activeClass} == true)data-activeclass=""#end>
         <input type="hidden" id="hdfSelectedProduct" value="$!{productIdForHeading}" />
         <div class="product-heading">
@@ -129,6 +143,10 @@
 #else
     <div id="js-widget-products" class="product-list $!{className}">No product found!</div>
 #end
+#if($wrapTabAndProductlist == 'true')
+</div>
+#end
+
 #if($isPreOrder == 'true')
     <script>
         window.isPreOrder = true;

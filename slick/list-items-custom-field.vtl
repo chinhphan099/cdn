@@ -127,7 +127,8 @@
         min-height: 60px !important;
         resize: vertical;
     }
-    #wrapAllTitleAndDescription_field {
+    #wrapAllTitleAndDescription_field,
+    #wrapThumbAndTitleAndSubImage_field {
         padding-left: 15px;
         padding-bottom: 20px;
         margin-bottom: 20px;
@@ -880,6 +881,14 @@
         typeContent.on('change', function () {
             checktypeContent(this.get('value'));
         });
+
+        if(dijit.byId('text40Checkbox').get('checked')) {
+            dijit.byId('text170Checkbox').set('disabled', true);
+        }
+
+        if(dijit.byId('text170Checkbox').get('checked')) {
+            dijit.byId('text40Checkbox').set('disabled', true);
+        }
     }
     function checkModeSlider() {
         var centerPadding = dijit.byId('centerPadding');
@@ -995,6 +1004,24 @@
         });
         dijit.byId('slidesToShowOnMobile').on('change', function () {
             checkfadeSlider();
+        });
+
+        dijit.byId('text40Checkbox').on('change', function () {
+            if(dijit.byId('text40Checkbox').get('checked')) {
+                dijit.byId('text170Checkbox').set('disabled', true);
+            }
+            else {
+                dijit.byId('text170Checkbox').set('disabled', false);
+            }
+        });
+
+        dijit.byId('text170Checkbox').on('change', function () {
+            if(dijit.byId('text170Checkbox').get('checked')) {
+                dijit.byId('text40Checkbox').set('disabled', true);
+            }
+            else {
+                dijit.byId('text40Checkbox').set('disabled', false);
+            }
         });
     }
     dojo.ready(function() {

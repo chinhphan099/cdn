@@ -137,6 +137,9 @@
           #if($UtilMethods.isSet($item.topText))
             <h3 class="w_toptext">$item.topText.replaceAll('xaaax', '"')</h3>
           #end
+          #if($wrapThumbAndTitleAndSubImage == 'true')
+            <div class="w_content_wrap">
+          #end
           #if($UtilMethods.isSet($item.videoID))
             #if($item.videoID.indexOf('vimeo') > -1)
               <div class="vimeo-video img-view" data-vimeo-id="$item.videoID.split('-')[1]" id="vimeo_$item.videoID.split('-')[1]"></div>
@@ -248,9 +251,16 @@
                 #end
               </span>
             #end
+            #if($wrapThumbAndTitleAndSubImage == 'true')
+              </div>
+            #end
             #if($UtilMethods.isSet($item.shortDesc))
-              #set($replaceSrc = "src=\"$!{placeholderimage}\" data-src=\"/pub-assets/")
-              <div class="w_desc">$!{item.shortDesc.replaceAll('xaaax', '"').replaceAll("/c/portal/", "").replaceAll('src="/pub-assets/', $replaceSrc)}</div>
+              #if($lazyloadImage == 'true')
+                #set($replaceSrc = "src=\"$!{placeholderimage}\" data-src=\"/pub-assets/")
+                <div class="w_desc">$!{item.shortDesc.replaceAll('xaaax', '"').replaceAll("/c/portal/", "").replaceAll('src="/pub-assets/', $replaceSrc)}</div>
+              #else
+                <div class="w_desc">$!{item.shortDesc.replaceAll('xaaax', '"').replaceAll("/c/portal/", "")}</div>
+              #end
             #end
 
             ## Generate Product Details Link Page
@@ -273,7 +283,7 @@
                                 #set($thumb = $!{prod[0].thumbImage.uri})
                             #end
                             <img src="${placeholderimage}" data-src="$!{thumb}" alt="$!{prod[0].productName}" class="img-view img-cate" role="">
-                            #if($UtilMethods.isSet($prod[0].productName))
+                            #if($UtilMethods.isSet($prod[0].thumbHover))
                             <img src="${placeholderimage}" data-src="$!{prod[0].thumbHover.uri}" alt="$!{prod[0].productName}" class="img-cate img-cate-hover">
                             #end
                       </a>
