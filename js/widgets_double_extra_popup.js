@@ -29,6 +29,11 @@
             doubleItem = window.PRICES.filter(elm => elm.productId === doublePid)[0],
             fCurrency = window.fCurrency;
 
+        if (!doubleItem) {
+            console.log('Error: Double item not exist');
+            return;
+        }
+        // console.log(`${productData.productId} : ${doubleItem.productId}`);
         savePriceValue = doubleItem.productPrices.DiscountedPrice.Value - productData.productPrices.DiscountedPrice.Value;
 
         // console.log(window.PRICES);
@@ -122,7 +127,7 @@
         let productUpgrade = JSON.parse(dummyInput.dataset.product);
 
         orderDataUprage.productId = productUpgrade.productId;
-        orderDataUprage.shippingMethodId = productUpgrade.shippings.length > 0 ? productUpgrade.shippings[0].shippingMethodId : null,
+        orderDataUprage.shippingMethodId = productUpgrade.shippings.length > 0 ? productUpgrade.shippings[0].shippingMethodId : null;
 
         eCRM.Order.placeOrderWithUrl(url, orderDataUprage, 'creditcard', function (data) {
             if (data.success) {
