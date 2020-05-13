@@ -665,6 +665,9 @@
             for (let proId of packageDisplay) {
                 let inputElm = _qById('product_' + proId);
                 let proItem = _getClosest(inputElm, '.productRadioListItem');
+                if (!proItem) {
+                    continue;
+                }
 
                 let options = JSON.parse(_qById('js-widget-products').dataset.options);
                 if (isPopup) {
