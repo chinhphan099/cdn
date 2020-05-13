@@ -1,5 +1,4 @@
 (function (utils) {
-
     if (!utils) {
         console.log('modules is not found');
         return;
@@ -13,13 +12,12 @@
         isTest: utils.getQueryParameter('isCardTest') ? true : false
     });
 
-    let doubleItemId, orderNumber, urlRedirect, orderData, defaultProduct,
+    let doubleItemId, orderNumber, urlRedirect, orderData, defaultProduct, savePriceValue,
         extraPopup = _q('.extra-popup'),
         dummyInput = _q('#product_00');
 
     //Render dynamic price for popup content while input changed
     let renderPrice = function () {
-
         let productData = JSON.parse(_q('input[name="product"]:checked').dataset.product),
             listPkgElm = _q('.js-list-group li.active'),
             listPidPkg = listPkgElm.dataset.package.split(','),
@@ -29,17 +27,18 @@
             doublePid = Number(listPidUpgrade[currentIndex]),
 
             doubleItem = window.PRICES.filter(elm => elm.productId === doublePid)[0],
-            fCurrency = window.fCurrency,
-            savePriceValue = doubleItem.productPrices.DiscountedPrice.Value - productData.productPrices.DiscountedPrice.Value;
+            fCurrency = window.fCurrency;
 
-        console.log(window.PRICES);
+        savePriceValue = doubleItem.productPrices.DiscountedPrice.Value - productData.productPrices.DiscountedPrice.Value;
+
+        // console.log(window.PRICES);
         //display triple__layout or double__layout base on quantity
         extraPopup.classList.remove('triple-display', 'double-display');
         if (productData.quantity > 1 && currentIndex > 0) {
             extraPopup.classList.add('double-display');
-        } else {
+        }
+        else {
             extraPopup.classList.add('triple-display');
-
         }
 
         //Dynamic content
@@ -53,7 +52,8 @@
                 //Detect using custom class
                 if (!!rootName) {
                     item.innerHTML = rootName.innerHTML;
-                } else {
+                }
+                else if (!!selectedInputParent && selectedInputParent.querySelectorAll('.product-name p').length > 0) {
                     item.innerHTML = selectedInputParent.querySelectorAll('.product-name p')[0].innerHTML;
                 }
             }
@@ -65,12 +65,12 @@
                 //Detect using custom class
                 if (!!rootDesc) {
                     item.innerHTML = rootDesc.innerHTML;
-                } else {
+                }
+                else if (!!selectedInputParent && selectedInputParent.querySelectorAll('.product-name p').length > 0) {
                     item.innerHTML = selectedInputParent.querySelectorAll('.product-name p')[0].innerHTML;
                 }
             }
         }
-
 
         //Drop dynamic data for {variable}
         let savingPrice = _qAll('.savePrice'),
@@ -113,10 +113,8 @@
         dummyInput.dataset.product = JSON.stringify(doubleItem);
     }
 
-
     //Call API to update new product Id - Upgrade API
     let submitDataUpgrade = function (orderNumber, redirectUrl) {
-
         let url = `${eCRM.Order.baseAPIEndpoint}/orders/${orderNumber}/${doubleItemId}`,
             orderDataUprage = orderData;
 
@@ -126,34 +124,42 @@
         orderDataUprage.productId = productUpgrade.productId;
         orderDataUprage.shippingMethodId = productUpgrade.shippings.length > 0 ? productUpgrade.shippings[0].shippingMethodId : null,
 
-            eCRM.Order.placeOrderWithUrl(url, orderDataUprage, 'creditcard', function (data) {
-                if (data.success) {
-                    let page = _q('body');
-                    let position = 0;
-                    let op = 1;
-                    let slpage = setInterval(function () {
-                        if (position === 350) {
-                            clearInterval(slpage);
-                            window.location.href = redirectUrl;
-                        }
-                        else {
-                            position += 10;
-                            page.style.right = position + 'px';
-                            page.style.opacity = op;
-                            op = op - 0.05;
-                        }
-                    }, 10);
-                } else {
-                    utils.redirectPage(siteSetting.declineUrl);
-                }
+        eCRM.Order.placeOrderWithUrl(url, orderDataUprage, 'creditcard', function (data) {
+            if (data.success) {
+                let page = _q('body');
+                let position = 0;
+                let op = 1;
 
-            })
+                let orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
+                orderInfo.orderTotal = Number((orderInfo.orderTotal + savePriceValue).toFixed(2));
+                orderInfo.orderTotalFull = Number((orderInfo.orderTotalFull + savePriceValue).toFixed(2));
+
+                utils.localStorage().set('orderInfo', JSON.stringify(orderInfo));
+
+                let slpage = setInterval(function () {
+                    if (position === 350) {
+                        clearInterval(slpage);
+                        window.location.href = redirectUrl;
+                    }
+                    else {
+                        position += 10;
+                        page.style.right = position + 'px';
+                        page.style.opacity = op;
+                        op = op - 0.05;
+                    }
+                }, 10);
+            }
+            else {
+                utils.redirectPage(siteSetting.declineUrl);
+            }
+        })
     }
 
     let activateCreditCardUpgrade = function (orderNumber, redirectUrl) {
         if (!!orderNumber) {
             submitDataUpgrade(orderNumber, redirectUrl);
-        } else {
+        }
+        else {
             location.href = redirectUrl;
         }
     }
@@ -222,7 +228,6 @@
 
         //Handle input change
         const inputs = _qAll('.productRadioListItem input');
-
         for (let item of inputs) {
             item.addEventListener('change', function (e) {
                 renderPrice();
@@ -288,4 +293,8 @@
     document.addEventListener('DOMContentLoaded', function () {
         initial();
     });
+
+    window.extrapop = {
+        renderPrice: renderPrice
+    };
 })(window.utils);
