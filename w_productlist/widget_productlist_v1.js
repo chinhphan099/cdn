@@ -1,5 +1,5 @@
-(function(utils) {
-    if(!utils || !window.siteSetting) {
+(function (utils) {
+    if (!utils || !window.siteSetting) {
         console.log('utils or window.siteSetting not found');
         return;
     }
@@ -11,13 +11,13 @@
         var qSelector = _qAll(selector);
 
         return {
-            addClass: function(className) {
-                for(let elm of qSelector) {
+            addClass: function (className) {
+                for (let elm of qSelector) {
                     elm.classList.add(className);
                 }
             },
-            removeClass: function(className) {
-                for(let elm of qSelector) {
+            removeClass: function (className) {
+                for (let elm of qSelector) {
                     elm.classList.remove(className);
                 }
             }
@@ -25,17 +25,17 @@
     }
 
     function replaceUserString() {
-        if(_qById('js-widget-products')) {
+        if (_qById('js-widget-products')) {
             const unitDiscountRateLables = _qAll('.js-unitDiscountRate');
-            if(unitDiscountRateLables) {
-                for(let elem of unitDiscountRateLables) {
+            if (unitDiscountRateLables) {
+                for (let elem of unitDiscountRateLables) {
                     elem.innerHTML = elem.innerHTML
-                                        .replace(/{UnitDiscountRate}/gi, `<span class="spanUnitDiscountRate"></span>`)
-                                        .replace(/{UnitFullRate}/gi, '<span class="spanUnitFullRate"></span>')
-                                        .replace(/{DiscountedPrice}/gi, `<span class="discountedPrice"></span>`)
-                                        .replace(/{SavePrice}/gi, `<span class="savePrice"></span>`)
-                                        .replace(/{ShippingFee}/gi, '<span class="jsShippingFee"></span>')
-                                        .replace(/{FullPrice}/gi, `<del class="fullPrice"></del>`);
+                        .replace(/{UnitDiscountRate}/gi, `<span class="spanUnitDiscountRate"></span>`)
+                        .replace(/{UnitFullRate}/gi, '<span class="spanUnitFullRate"></span>')
+                        .replace(/{DiscountedPrice}/gi, `<span class="discountedPrice"></span>`)
+                        .replace(/{SavePrice}/gi, `<span class="savePrice"></span>`)
+                        .replace(/{ShippingFee}/gi, '<span class="jsShippingFee"></span>')
+                        .replace(/{FullPrice}/gi, `<del class="fullPrice"></del>`);
                 }
             }
         }
@@ -45,12 +45,12 @@
     function afterActiveCoupon(input, couponValFormat) {
         const couponApplyText = _q('.coupon-apply');
         const parentItem = _getClosest(input, '.productRadioListItem');
-        if(!!couponApplyText) {
+        if (!!couponApplyText) {
             couponApplyText.innerHTML = couponApplyText.innerHTML.replace(/{couponPrice}/g, couponValFormat);
             _q('.coupon-apply').style.display = 'block';
         }
 
-        if(!!parentItem.querySelector('.product-name') && !!window.additionText) {
+        if (!!parentItem.querySelector('.product-name') && !!window.additionText) {
             window.additionText = window.additionText.replace(/{couponPrice}/g, couponValFormat);
             const nameElm = parentItem.querySelector('.product-name p');
             nameElm.innerHTML = `${nameElm.innerHTML} ${window.additionText}`;
@@ -60,10 +60,10 @@
     function applyCouponCode(product) {
         let activeCouponFrom = Number(utils.getQueryParameter('activeFrom') || window.activeFrom);
         let quantity = product.quantity;
-        if(!!window.isDoubleQuantity) {
+        if (!!window.isDoubleQuantity) {
             quantity /= 2;
         }
-        if(typeof activeCouponFrom === 'number' && activeCouponFrom > product.productPrices.DiscountedPrice.Value) {
+        if (typeof activeCouponFrom === 'number' && activeCouponFrom > product.productPrices.DiscountedPrice.Value) {
             return product;
         }
 
@@ -71,7 +71,7 @@
         const shippingFee = product.shippings[0].formattedPrice;
         const couponValue = Number(utils.getQueryParameter('couponValue').replace('percent', ''));
         let couponValFormat = utils.formatPrice(couponValue, window.fCurrency, shippingFee);
-        if(utils.getQueryParameter('couponValue').indexOf('percent') > -1) {
+        if (utils.getQueryParameter('couponValue').indexOf('percent') > -1) {
             couponValFormat = utils.getQueryParameter('couponValue').replace('percent', '%');
             discountedPrice = (product.productPrices.DiscountedPrice.Value * (100 - couponValue) / 100).toFixed(2);
         }
@@ -91,16 +91,16 @@
     function implementPriceHTML(product, quantity, isRefiredPrice = false) {
         // This function will be recalled from order-st.page.js - After active Coupon
         Array.prototype.slice.call(_qAll(`.discountedPrice_${quantity}, .depositFirstChargePrice_${quantity}`)).forEach(elm => {
-            if((!!elm.classList.contains('fired-price') && !isRefiredPrice) || !!elm.classList.contains('is-refired')) {
+            if ((!!elm.classList.contains('fired-price') && !isRefiredPrice) || !!elm.classList.contains('is-refired')) {
                 return;
             }
             elm.classList.add('fired-price');
-            if(!!isRefiredPrice) {
+            if (!!isRefiredPrice) {
                 elm.classList.add('is-refired');
             }
 
-            if(!!window.isPreOrder && !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
-                if(!!window.removeCurrencySymbol) {
+            if (!!window.isPreOrder && !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                if (!!window.removeCurrencySymbol) {
                     elm.textContent = product.productPrices.PreSaleAmount1.Value;
                 }
                 else {
@@ -108,7 +108,7 @@
                 }
             }
             else {
-                if(!!window.removeCurrencySymbol) {
+                if (!!window.removeCurrencySymbol) {
                     elm.textContent = product.productPrices.DiscountedPrice.Value;
                 }
                 else {
@@ -118,15 +118,15 @@
         });
 
         Array.prototype.slice.call(_qAll(`.savePrice_${quantity}, .depositSavePrice_${quantity}`)).forEach(elm => {
-            if((!!elm.classList.contains('fired-price') && !isRefiredPrice) || !!elm.classList.contains('is-refired')) {
+            if ((!!elm.classList.contains('fired-price') && !isRefiredPrice) || !!elm.classList.contains('is-refired')) {
                 return;
             }
             elm.classList.add('fired-price');
-            if(!!isRefiredPrice) {
+            if (!!isRefiredPrice) {
                 elm.classList.add('is-refired');
             }
 
-            if(!!window.removeCurrencySymbol) {
+            if (!!window.removeCurrencySymbol) {
                 elm.textContent = product.productPrices.SavePrice.Value;
             }
             else {
@@ -135,15 +135,15 @@
         });
 
         Array.prototype.slice.call(_qAll(`.shortSavePrice_${quantity}, .depositShortSavePrice_${quantity}`)).forEach(elm => {
-            if((!!elm.classList.contains('fired-price') && !isRefiredPrice) || !!elm.classList.contains('is-refired')) {
+            if ((!!elm.classList.contains('fired-price') && !isRefiredPrice) || !!elm.classList.contains('is-refired')) {
                 return;
             }
             elm.classList.add('fired-price');
-            if(!!isRefiredPrice) {
+            if (!!isRefiredPrice) {
                 elm.classList.add('is-refired');
             }
 
-            if(!!window.removeCurrencySymbol) {
+            if (!!window.removeCurrencySymbol) {
                 elm.textContent = Math.round(product.productPrices.SavePrice.Value);
             }
             else {
@@ -152,16 +152,16 @@
         });
 
         Array.prototype.slice.call(_qAll(`.eachPrice_${quantity}, .depositEachPrice_${quantity}`)).forEach(elm => {
-            if((!!elm.classList.contains('fired-price') && !isRefiredPrice) || !!elm.classList.contains('is-refired')) {
+            if ((!!elm.classList.contains('fired-price') && !isRefiredPrice) || !!elm.classList.contains('is-refired')) {
                 return;
             }
             elm.classList.add('fired-price');
-            if(!!isRefiredPrice) {
+            if (!!isRefiredPrice) {
                 elm.classList.add('is-refired');
             }
 
-            if(!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
-                if(!!window.removeCurrencySymbol) {
+            if (!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                if (!!window.removeCurrencySymbol) {
                     elm.textContent = (product.productPrices.DiscountedPrice.Value / quantity).toFixed(2);
                 }
                 else {
@@ -169,7 +169,7 @@
                 }
             }
             else {
-                if(!!window.removeCurrencySymbol) {
+                if (!!window.removeCurrencySymbol) {
                     elm.textContent = ((product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value) / quantity).toFixed(2);
                 }
                 else {
@@ -179,16 +179,16 @@
         });
 
         Array.prototype.slice.call(_qAll(`.shortEachPrice_${quantity}, .depositShortEachPrice_${quantity}`)).forEach(elm => {
-            if((!!elm.classList.contains('fired-price') && !isRefiredPrice) || !!elm.classList.contains('is-refired')) {
+            if ((!!elm.classList.contains('fired-price') && !isRefiredPrice) || !!elm.classList.contains('is-refired')) {
                 return;
             }
             elm.classList.add('fired-price');
-            if(!!isRefiredPrice) {
+            if (!!isRefiredPrice) {
                 elm.classList.add('is-refired');
             }
 
-            if(!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
-                if(!!window.removeCurrencySymbol) {
+            if (!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                if (!!window.removeCurrencySymbol) {
                     elm.textContent = Math.round(product.productPrices.DiscountedPrice.Value / quantity);
                 }
                 else {
@@ -196,7 +196,7 @@
                 }
             }
             else {
-                if(!!window.removeCurrencySymbol) {
+                if (!!window.removeCurrencySymbol) {
                     elm.textContent = Math.round((product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value) / quantity);
                 }
                 else {
@@ -209,10 +209,10 @@
     function generatePriceForDeposit(product) {
         try {
             let quantity = product.quantity;
-            if(window.isDoubleQuantity) {
+            if (window.isDoubleQuantity) {
                 quantity /= 2;
             }
-            if(quantity === 1) {
+            if (quantity === 1) {
                 retailPriceDepositOneUnit = (product.productPrices.FullRetailPrice.Value + product.productPrices.DiscountedPrice.Value) / 0.65; // 100% - 35%
             }
 
@@ -227,7 +227,7 @@
             product.productPrices.FullRetailPriceDeposit.Value = Number((totalPriceDeposit + product.productPrices.SavePrice.Value).toFixed(2));
             product.productPrices.FullRetailPriceDeposit.FormattedValue = utils.formatPrice(product.productPrices.FullRetailPriceDeposit.Value, window.fCurrency, product.shippings[0].formattedPrice);
         }
-        catch(e) {
+        catch (e) {
             console.log(e);
         }
 
@@ -237,7 +237,7 @@
     function generateSavePrices(product) {
         try {
             let quantity = product.quantity;
-            if(window.isDoubleQuantity) {
+            if (window.isDoubleQuantity) {
                 quantity /= 2;
             }
 
@@ -245,7 +245,7 @@
             product.productPrices.SavePrice.Value = Number((product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value).toFixed(2));
             product.productPrices.SavePrice.FormattedValue = utils.formatPrice(product.productPrices.SavePrice.Value.toFixed(2), window.fCurrency, product.shippings[0].formattedPrice);
         }
-        catch(e) {
+        catch (e) {
             console.log(e);
         }
         return product;
@@ -257,8 +257,8 @@
             Array.prototype.slice.call(_qAll('input[name="product"]')).forEach(item => {
                 ids = [...ids, Number(item.value)];
             });
-            if(!!_q('.js-list-group li')) {
-                if(!!_q('.js-list-group li.active')) {
+            if (!!_q('.js-list-group li')) {
+                if (!!_q('.js-list-group li.active')) {
                     ids = _q('.js-list-group li.active').dataset.package.split(',').map(num => {
                         return parseInt(num);
                     });
@@ -270,7 +270,7 @@
                 }
             }
 
-            if(!window.PRICES) {
+            if (!window.PRICES) {
                 return;
             }
 
@@ -282,21 +282,21 @@
             });
 
             let doubleFlag = true;
-            for(let i = 0, n = ascShortPrices.length; i < n; i++) {
-                if(n < 2) {
+            for (let i = 0, n = ascShortPrices.length; i < n; i++) {
+                if (n < 2) {
                     // Check for case each product belong a tab
                     doubleFlag = false;
                     break;
                 }
-                if(ascShortPrices[i].quantity % 2 !== 0) {
+                if (ascShortPrices[i].quantity % 2 !== 0) {
                     doubleFlag = false;
                     break;
                 }
             }
 
-            if(doubleFlag) {
+            if (doubleFlag) {
                 window.isDoubleQuantity = true;
-                if(window.location.pathname.indexOf('special-offer-') === -1) {
+                if (window.location.pathname.indexOf('special-offer-') === -1) {
                     setTimeout(() => {
                         utils.localStorage().set('doubleQuantity', 'true');
                     }, 600);
@@ -304,19 +304,19 @@
             }
             else {
                 window.isDoubleQuantity = false;
-                if(window.location.pathname.indexOf('special-offer-') === -1) { // Check for upsell page
+                if (window.location.pathname.indexOf('special-offer-') === -1) { // Check for upsell page
                     utils.localStorage().remove('doubleQuantity');
                 }
             }
         }
-        catch(e) {
+        catch (e) {
             console.log(e);
         }
     }
 
     function getSelectedProduct() {
         const product = _q('input[name="product"]:checked').dataset.product;
-        if(product) {
+        if (product) {
             return JSON.parse(product);
         }
         else {
@@ -334,9 +334,9 @@
             fullPriceValue: productInfo.productPrices.FullRetailPrice.Value
         });
 
-        if(_qById('js-widget-products').dataset.activeclass !== undefined) {
+        if (_qById('js-widget-products').dataset.activeclass !== undefined) {
             q('.productRadioListItem.checked-item').removeClass('checked-item');
-            _getClosest(this,'.productRadioListItem').classList.add('checked-item');
+            _getClosest(this, '.productRadioListItem').classList.add('checked-item');
         }
     }
 
@@ -347,7 +347,7 @@
                 shippingValue = 0,
                 priceShipping = window.js_translate ? window.js_translate.free || 'free' : 'free';
 
-            if(product.shippings.length > 0 && product.shippings[0] !== 0) {
+            if (product.shippings.length > 0 && product.shippings[0] !== 0) {
                 shippingValue = product.shippings[0].price;
                 priceShipping = product.shippings[0].formattedPrice;
             }
@@ -372,29 +372,29 @@
     function bindProducts(data) {
         console.log(data);
         const countryCodeIndex = utils.localStorage().get('countryCodeIndex');
-        if(!(data instanceof Error) && data.prices.length > 0) {
+        if (!(data instanceof Error) && data.prices.length > 0) {
             window.PRICES = data.prices;
             checkDoubleQuantity();
             Array.prototype.slice.call(data.prices).forEach(product => {
                 try {
                     const radio = _qById('product_' + product.productId);
-                    if(radio) {
+                    if (radio) {
                         let quantity = !!window.isDoubleQuantity ? product.quantity / 2 : product.quantity,
                             fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, ''),
                             pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
                         window.fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
 
-                        if(!!utils.getQueryParameter('couponCode') && !!utils.getQueryParameter('couponValue')) {
+                        if (!!utils.getQueryParameter('couponCode') && !!utils.getQueryParameter('couponValue')) {
                             product = applyCouponCode(product);
                         }
                         product = generateSavePrices(product);
-                        if(!!window.isPreOrder && !product.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                        if (!!window.isPreOrder && !product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                             product = generatePriceForDeposit(product);
                         }
                         implementPriceHTML(product, quantity);
 
                         product.productPrices.UnitDiscountRate = product.productPrices.UnitDiscountRate || {};
-                        if(!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                        if (!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                             product.productPrices.UnitDiscountRate.Value = Number((product.productPrices.DiscountedPrice.Value / quantity).toFixed(2));
                         }
                         else {
@@ -407,11 +407,11 @@
 
                         q('.productRadioListItem .js-img-loading').addClass('hidden');
 
-                        if(!!window.removeCurrencySymbol) {
+                        if (!!window.removeCurrencySymbol) {
                             try {
                                 product.productPrices.DiscountedPrice.FormattedValue = product.productPrices.DiscountedPrice.Value.toFixed(0);
                             }
-                            catch(err) {
+                            catch (err) {
                                 console.log('product.productPrices.DiscountedPrice' + err);
                             }
                         }
@@ -419,17 +419,17 @@
                         const wrapElm = _getClosest(_q('label[for="' + 'product_' + product.productId + '"]'), '.productRadioListItem');
                         Array.prototype.slice.call(wrapElm.querySelectorAll('.jsShippingFee')).forEach(elemShippingFee => {
                             let shippingFeeText = !!window.js_translate.FREESHIP ? window.js_translate.FREESHIP : 'FREE SHIPPING';
-                            if(!window.js_translate.shippingFee) {
+                            if (!window.js_translate.shippingFee) {
                                 window.js_translate.shippingFee = '{price} Shipping';
                             }
-                            if(product.shippings[0].price !== 0) {
+                            if (product.shippings[0].price !== 0) {
                                 shippingFeeText = window.js_translate.shippingFee.replace('{price}', product.shippings[0].formattedPrice);
                             }
                             elemShippingFee.insertAdjacentText('beforeend', shippingFeeText);
                         });
 
                         Array.prototype.slice.call(wrapElm.querySelectorAll('.spanFirstCharge')).forEach(elemFirstCharge => {
-                            if(!!window.isPreOrder && !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                            if (!!window.isPreOrder && !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                                 elemFirstCharge.insertAdjacentText('beforeend', product.productPrices.PreSaleAmount1.FormattedValue);
                             }
                             else {
@@ -443,7 +443,7 @@
 
                         Array.prototype.slice.call(wrapElm.querySelectorAll('.discountedPrice')).forEach(discountedPrice => {
                             let discountedPriceValue = product.productPrices.DiscountedPrice.Value;
-                            if(!!window.isPreOrder && !product.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                            if (!!window.isPreOrder && !product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                                 // discountedPriceValue = discountedPriceValue + product.productPrices.FullRetailPrice.Value;
                             }
                             discountedPrice.insertAdjacentText('beforeend', utils.formatPrice(discountedPriceValue.toFixed(2), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue));
@@ -451,7 +451,7 @@
 
                         Array.prototype.slice.call(wrapElm.querySelectorAll('.spanTotalDiscountPriceElm')).forEach(totalDiscountPrice => {
                             let totalDiscountPriceValue = product.productPrices.DiscountedPrice.Value; // + product.shippings[0].price;
-                            if(!!window.isPreOrder && !product.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                            if (!!window.isPreOrder && !product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                                 totalDiscountPriceValue = totalDiscountPriceValue + product.productPrices.FullRetailPrice.Value;
                             }
                             totalDiscountPrice.insertAdjacentText('beforeend', utils.formatPrice(totalDiscountPriceValue.toFixed(2), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue));
@@ -460,7 +460,7 @@
                         Array.prototype.slice.call(wrapElm.querySelectorAll('.savePrice')).forEach(savePrice => {
                             let savePriceFormat = utils.formatPrice(product.productPrices.SavePrice.Value.toFixed(2), window.fCurrency, product.productPrices.SavePrice.FormattedValue);
 
-                            if(!!window.removeCurrencySymbol) {
+                            if (!!window.removeCurrencySymbol) {
                                 savePriceFormat = product.productPrices.SavePrice.Value;
                             }
                             savePrice.innerHTML = savePriceFormat;
@@ -469,19 +469,19 @@
                         Array.prototype.slice.call(wrapElm.querySelectorAll('.savePriceDeposit')).forEach(savePrice => {
                             let savePriceFormat = utils.formatPrice(Math.round(product.productPrices.SavePrice.Value), window.fCurrency, product.productPrices.SavePrice.FormattedValue);
 
-                            if(!!window.removeCurrencySymbol) {
+                            if (!!window.removeCurrencySymbol) {
                                 savePriceFormat = Math.round(product.productPrices.SavePrice.Value);
                             }
                             savePrice.innerHTML = savePriceFormat;
                         });
 
                         Array.prototype.slice.call(wrapElm.querySelectorAll('.fullPrice, .fullRetailPriceDeposit')).forEach(fullPrice => {
-                            if(!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                            if (!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                                 fullPrice.insertAdjacentText('beforeend', product.productPrices.FullRetailPrice.FormattedValue);
                             }
-                            else if(product.productPrices.hasOwnProperty('FullRetailPriceDeposit')) {
+                            else if (product.productPrices.hasOwnProperty('FullRetailPriceDeposit')) {
                                 let fullRetailPriceDepositFormat = product.productPrices.FullRetailPriceDeposit.FormattedValue;
-                                if(!!window.removeCurrencySymbol) {
+                                if (!!window.removeCurrencySymbol) {
                                     fullRetailPriceDepositFormat = product.productPrices.FullRetailPriceDeposit.Value;
                                 }
                                 fullPrice.insertAdjacentText('beforeend', fullRetailPriceDepositFormat);
@@ -490,8 +490,8 @@
 
                         Array.prototype.slice.call(wrapElm.querySelectorAll('.spanUnitFullRate')).forEach(unitFullRate => {
                             let unitFullRateText = '';
-                            if(!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
-                                if(typeof product.productPrices.UnitFullRetailPrice !== 'undefined') {
+                            if (!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                                if (typeof product.productPrices.UnitFullRetailPrice !== 'undefined') {
                                     unitFullRateText = product.productPrices.UnitFullRetailPrice.FormattedValue;
                                 }
                                 else {
@@ -511,25 +511,25 @@
             });
 
             try {
-                if(!!window.isPreOrder) {
+                if (!!window.isPreOrder) {
                     setTimeout(() => {
                         utils.localStorage().set('preOrder', true);
                     }, 1000);
                 }
                 const productInfo = getDefaultSelectedProduct();
 
-                if(!window.removeCurrencySymbol) {
+                if (!window.removeCurrencySymbol) {
                     Array.prototype.slice.call(_qAll('.jsCurrencyNumber')).forEach(currencyElm => {
                         currencyElm.innerText = window.fCurrency.replace('######', currencyElm.textContent);
                     });
                 }
 
-                if(!!productInfo && productInfo.currencyCode === '') {
+                if (!!productInfo && productInfo.currencyCode === '') {
                     productInfo.currencyCode = data.location.currencyCode;
                 }
                 utils.events.emit('bindProductDiscountInfo', productInfo);
                 siteSetting.countryCode = countryCodeIndex || data.location.countryCode;
-                if(!countryCodeIndex) {
+                if (!countryCodeIndex) {
                     utils.localStorage().set('countryCode', data.location.countryCode);
                     utils.events.emit('triggerAddressForm', data.location.countryCode);
                 }
@@ -540,8 +540,11 @@
                     utils.localStorage().set('jsCurrency', window.fCurrency);
                     utils.localStorage().set('countryCode', siteSetting.countryCode);
                     utils.localStorage().set('currencyCode', productInfo.currencyCode);
+                    utils.localStorage().set('ip', data.location.ip);
+                    utils.localStorage().set('mainCampaignName', data.campaignName);
+                    utils.localStorage().set('mainWebKey', window.siteSetting.webKey);
                 }, 1000);
-                utils.localStorage().set('currencyCode', productInfo.currencyCode);
+                utils.events.emit('triggerAddressForm', data.location.countryCode);
                 utils.events.emit('triggerProductBannerSidebar', productInfo);
                 utils.events.emit('triggerWarranty', getSelectedProduct());
                 utils.events.emit('bindOrderPage', productInfo);
@@ -562,24 +565,24 @@
             isTest: utils.getQueryParameter('isCardTest') ? true : false
         });
 
-        if(utils.checkCamp(siteSetting.webKey)) {
+        if (utils.checkCamp(siteSetting.webKey)) {
             let campProducts = localStorage.getItem('campproducts');
-            if(campProducts) {
+            if (campProducts) {
                 campProducts = JSON.parse(campProducts);
                 const camps = campProducts.camps.filter(item => {
                     return item[siteSetting.webKey];
                 });
 
-                if(camps.length > 0) {
+                if (camps.length > 0) {
                     console.log('get prices from LS');
                     bindProducts(camps[0][siteSetting.webKey]);
                 }
             }
         }
         else {
-            eCRM.Campaign.getProducts(function(data) {
+            eCRM.Campaign.getProducts(function (data) {
                 let campProducts = localStorage.getItem('campproducts');
-                if(campProducts) {
+                if (campProducts) {
                     campProducts = JSON.parse(campProducts);
                 }
                 else {
@@ -588,14 +591,14 @@
                     };
                 }
 
-                if(typeof data.prices !== 'undefined') {
+                if (typeof data.prices !== 'undefined') {
                     data.timestamp = new Date().toISOString();
                     const camps = campProducts.camps.filter(item => {
                         return item[siteSetting.webKey];
                     });
 
                     let camp = {};
-                    if(camps.length > 0) {
+                    if (camps.length > 0) {
                         camp = camps[0];
                         camp[siteSetting.webKey] = data;
                     }
@@ -613,7 +616,7 @@
     initWidgetProducts();
 
     // Tab click
-    if(!!_q('.js-list-group li')) {
+    if (!!_q('.js-list-group li')) {
         const tabItems = _qAll('.js-list-group li'),
             titleElm = _q('.js-list-group h5'),
             packageDisplay = _q('.js-list-group ul').dataset.packagedisplay.split(',');
@@ -625,15 +628,15 @@
             waitTime,
             indexItem = currentPackage.indexOf(_q('input[name="product"]:checked').value);
 
-        if(!!titleElm) {
+        if (!!titleElm) {
             rootActiveText = titleElm.innerHTML;
             activeText = rootActiveText;
         }
 
         const saveActiveTabIndex = () => {
             utils.localStorage().set('indexTab', -1);
-            for(let [index, tabItem] of tabItems.entries()) {
-                if(tabItem.classList.contains('active')) {
+            for (let [index, tabItem] of tabItems.entries()) {
+                if (tabItem.classList.contains('active')) {
                     utils.localStorage().set('indexTab', index);
                     break;
                 }
@@ -643,11 +646,11 @@
             indexItem = currentPackage.indexOf(_q('input[name="product"]:checked').value);
         };
         const checkProduct = () => {
-            if(currentPackage.length - 1 < indexItem) {
+            if (currentPackage.length - 1 < indexItem) {
                 indexItem = currentPackage.length - 1;
             }
-            for(let [index, proId] of currentPackage.entries()) {
-                if(index === indexItem) {
+            for (let [index, proId] of currentPackage.entries()) {
+                if (index === indexItem) {
                     let input = _q('input[name="product"][value="' + proId + '"]');
                     _getClosest(input, '.productRadioListItem').querySelector('.js-unitDiscountRate').click();
                     break;
@@ -659,20 +662,20 @@
             // Hide all product items
             q('.productRadioListItem').addClass('hidden');
 
-            for(let proId of packageDisplay) {
+            for (let proId of packageDisplay) {
                 let inputElm = _qById('product_' + proId);
                 let proItem = _getClosest(inputElm, '.productRadioListItem');
 
                 let options = JSON.parse(_qById('js-widget-products').dataset.options);
-                if(isPopup) {
-                    if(proItem.classList.contains('special_offer')) {
+                if (isPopup) {
+                    if (proItem.classList.contains('special_offer')) {
                         proItem.classList.remove('hidden');
                     }
-                    if(!options.specialOnly) {
+                    if (!options.specialOnly) {
                         proItem.classList.remove('hidden');
                     }
                 }
-                else if(!proItem.classList.contains('special_offer')) {
+                else if (!proItem.classList.contains('special_offer')) {
                     proItem.classList.remove('hidden');
                 }
             }
@@ -681,23 +684,23 @@
             checkProduct();
         };
         const setupTab = () => {
-            if(!!titleElm) {
+            if (!!titleElm) {
                 activeText = rootActiveText;
                 titleElm.innerHTML = activeText;
             }
             q('.js-list-group li').removeClass('active');
-            for(let tabItem of tabItems) {
-                if(_q('.js-list-group ul').dataset.packagedisplay === tabItem.dataset.package) {
+            for (let tabItem of tabItems) {
+                if (_q('.js-list-group ul').dataset.packagedisplay === tabItem.dataset.package) {
                     tabItem.classList.add('active');
                     isMissingTab = false;
                     break;
                 }
             }
 
-            if(!!waitTime) {
+            if (!!waitTime) {
                 clearTimeout(waitTime);
             }
-            waitTime = setTimeout(function() {
+            waitTime = setTimeout(function () {
                 saveActiveTabIndex();
             }, 3000);
         };
@@ -707,18 +710,18 @@
 
             q('.js-list-group li').removeClass('clicked');
             tabItem.classList.add('clicked');
-            if(!!_q('.prl-error')) {
+            if (!!_q('.prl-error')) {
                 _q('.prl-error').classList.add('hidden');
             }
-            if(!tabItem.classList.contains('active')) {
+            if (!tabItem.classList.contains('active')) {
                 q('.js-list-group li').removeClass('active');
                 tabItem.classList.add('active');
                 showDefaultProduct(tabItem.dataset.package.split(','), isPopup);
             }
-            else if(isMissingTab && tabItem.classList.contains('active')) {
+            else if (isMissingTab && tabItem.classList.contains('active')) {
                 q('.js-list-group li').removeClass('active');
                 tabItem.classList.remove('clicked');
-                if(!!titleElm) {
+                if (!!titleElm) {
                     activeText = rootActiveText;
                     titleElm.innerHTML = activeText;
                 }
@@ -733,15 +736,15 @@
                 bestSellerFullPrice = bestSellerData.productPrices.FullRetailPrice.FormattedValue;
 
             const textDiscountPriceElms = _qAll('.js-sale-off-heading .textDiscountPrice');
-            if(!!textDiscountPriceElms) {
-                for(let textDiscountPriceElm of textDiscountPriceElms) {
+            if (!!textDiscountPriceElms) {
+                for (let textDiscountPriceElm of textDiscountPriceElms) {
                     textDiscountPriceElm.innerText = bestSellerDiscountPrice;
                 }
             }
 
             const textFullPriceElms = _qAll('.js-sale-off-heading .textFullPrice');
-            if(!!textFullPriceElms) {
-                for(let textFullPriceElm of textFullPriceElms) {
+            if (!!textFullPriceElms) {
+                for (let textFullPriceElm of textFullPriceElms) {
                     textFullPriceElm.innerText = bestSellerFullPrice;
                 }
             }
@@ -750,11 +753,11 @@
             setupTab();
             showDefaultProduct(packageDisplay, isPopup);
 
-            if(isPopup) {
+            if (isPopup) {
                 // Remove all Best seller
                 var selectedPro = _qAll('.productRadioListItem:not(.special_offer) .best-seller-text');
-                for(let elm of selectedPro) {
-                    if(elm) {
+                for (let elm of selectedPro) {
+                    if (elm) {
                         elm.parentNode.removeChild(elm);
                     }
                 }
@@ -764,25 +767,25 @@
             }
         };
         const listener = () => {
-            for(let tabItem of tabItems) {
-                if(!!titleElm) {
-                    tabItem.addEventListener('mouseenter', function() {
+            for (let tabItem of tabItems) {
+                if (!!titleElm) {
+                    tabItem.addEventListener('mouseenter', function () {
                         titleElm.innerHTML = tabItem.dataset.replacetext;
                     }, false);
 
-                    tabItem.addEventListener('mouseleave', function() {
+                    tabItem.addEventListener('mouseleave', function () {
                         titleElm.innerHTML = activeText;
                     }, false);
                 }
 
-                tabItem.addEventListener('click', function() {
+                tabItem.addEventListener('click', function () {
                     // Update Text
-                    if(!!titleElm) {
+                    if (!!titleElm) {
                         activeText = tabItem.dataset.replacetext;
                         titleElm.innerHTML = activeText;
                     }
 
-                    if(!!tabItem.dataset.webkey) {
+                    if (!!tabItem.dataset.webkey) {
                         siteSetting.webKey = tabItem.dataset.webkey;
                     }
 
@@ -790,14 +793,14 @@
                     saveActiveTabIndex();
 
                     let options = JSON.parse(_qById('js-widget-products').dataset.options);
-                    if(options.hasOwnProperty('isUpdateHeadingPrice')) {
+                    if (options.hasOwnProperty('isUpdateHeadingPrice')) {
                         updateHeadingPrice();
                     }
                 }, false);
             }
 
-            if(!!_qById('btn-yes-exit-popup')) {
-                _qById('btn-yes-exit-popup').addEventListener('click', function() {
+            if (!!_qById('btn-yes-exit-popup')) {
+                _qById('btn-yes-exit-popup').addEventListener('click', function () {
                     indexItem = 0;
                     init(true);
                 }, false);
@@ -810,16 +813,16 @@
         //export isValidProductList
         const isValidProductList = () => {
             let isValid = false;
-            const tabPackages= _qAll('.js-list-group li'),
+            const tabPackages = _qAll('.js-list-group li'),
                 errorPrlMsg = _q('.prl-error');
-            for(const tabPackage of tabPackages) {
-                if(tabPackage.classList.contains('active')) {
+            for (const tabPackage of tabPackages) {
+                if (tabPackage.classList.contains('active')) {
                     isValid = true;
                     break;
                 }
             }
-            if(!!errorPrlMsg) {
-                if(!isValid) {
+            if (!!errorPrlMsg) {
+                if (!isValid) {
                     errorPrlMsg.classList.remove('hidden');
                 }
                 else {
