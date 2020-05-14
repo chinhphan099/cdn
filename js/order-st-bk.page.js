@@ -80,20 +80,20 @@
         }
         if (utils.getQueryParameter('timer') !== '0') {
             const countdownHTML = `
-                <div id="timeCount">
-                    <div class="w_item">
-                        <div class="ex-minute"></div>
-                        <div class="minute-text">${js_translate.minutes}</div>
-                    </div>
-                    <div class="w_item">
-                        <div class="semicolon">:</div>
-                    </div>
-                    <div class="w_item">
-                        <div class="ex-second"></div>
-                        <div class="second-text">${js_translate.seconds}</div>
-                    </div>
-                </div>
-            `;
+                                <div id="timeCount">
+                                        <div class="w_item">
+                                                <div class="ex-minute"></div>
+                                                <div class="minute-text">${js_translate.minutes}</div>
+                                        </div>
+                                        <div class="w_item">
+                                                <div class="semicolon">:</div>
+                                        </div>
+                                        <div class="w_item">
+                                                <div class="ex-second"></div>
+                                                <div class="second-text">${js_translate.seconds}</div>
+                                        </div>
+                                </div>
+                        `;
             _qById('couponBtn').insertAdjacentHTML('beforebegin', countdownHTML);
             utils.events.emit('beforeCountdown');
 
@@ -313,11 +313,11 @@
         if (!!warranty.wFormatPrice) {
             let trShipping = _getClosest(_q('.statistical .td-shipping'), 'tr'),
                 warrantyHTML = `
-                <tr class="tr-warranty">
-                    <td>${js_translate.warranty || 'Warranty:'}</td>
-                    <td>${warranty.wFormatPrice}</td>
-                </tr>
-                `;
+                                <tr class="tr-warranty">
+                                        <td>${js_translate.warranty || 'Warranty:'}</td>
+                                        <td>${warranty.wFormatPrice}</td>
+                                </tr>
+                                `;
 
             trShipping.insertAdjacentHTML('afterend', warrantyHTML);
         }
@@ -465,52 +465,6 @@
     }
     // End Month and Year Dropdown
 
-    function reRenderAllPrice(tmpDiscount) {
-        try {
-            window.PRICES = window.PRICES.map(dataProduct => {
-                let discount = tmpDiscount;
-                let currentPrice = dataProduct.productPrices.DiscountedPrice.Value,
-                    quantity = dataProduct.quantity;
-
-                if (window.isDoubleQuantity) {
-                    quantity /= 2;
-                }
-
-                if (!!window.isPreOrder && !dataProduct.productPrices.hasOwnProperty('PreSaleAmount1')) {
-                    currentPrice = dataProduct.productPrices.FullRetailPrice.Value;
-                    if (typeCoupon !== 'Money Amount') {
-                        discount = (currentPrice + dataProduct.productPrices.DiscountedPrice.Value) * discount / 100;
-                    }
-                    dataProduct.productPrices.FullRetailPrice.Value = Number((currentPrice - discount).toFixed(2));
-                    dataProduct.productPrices.FullRetailPrice.FormattedValue = utils.formatPrice(dataProduct.productPrices.FullRetailPrice.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
-                }
-                else {
-                    if (typeCoupon !== 'Money Amount') {
-                        discount = currentPrice * discount / 100;
-                    }
-                    dataProduct.productPrices.DiscountedPrice.Value = Number((currentPrice - discount).toFixed(2));
-                    dataProduct.productPrices.DiscountedPrice.FormattedValue = utils.formatPrice(dataProduct.productPrices.DiscountedPrice.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
-                }
-
-                if (!window.isPreOrder || !!dataProduct.productPrices.hasOwnProperty('PreSaleAmount1')) {
-                    if (!!dataProduct.productPrices.UnitDiscountRate) {
-                        dataProduct.productPrices.UnitDiscountRate.Value = Number((dataProduct.productPrices.DiscountedPrice.Value / quantity).toFixed(2));
-                        dataProduct.productPrices.UnitDiscountRate.FormattedValue = utils.formatPrice(dataProduct.productPrices.UnitDiscountRate.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
-                    }
-                }
-                else {
-                    dataProduct.productPrices.UnitDiscountRate.Value = Number(((dataProduct.productPrices.FullRetailPrice.Value + dataProduct.productPrices.DiscountedPrice.Value) / quantity).toFixed(2));
-                    dataProduct.productPrices.UnitDiscountRate.FormattedValue = utils.formatPrice(dataProduct.productPrices.UnitDiscountRate.Value, fCurrency, dataProduct.shippings[0].formattedPrice);
-                }
-
-                return dataProduct;
-            });
-        }
-        catch (e) {
-            console.log(e);
-        }
-    }
-
     function reImplementProductList(tmpDiscount) {
         const items = _qAll('.productRadioListItem input');
         for (let i = 0, n = items.length; i < n; i++) {
@@ -604,11 +558,6 @@
                 nameElm.innerHTML = `${nameElm.innerHTML} <span class="text-coupon">${window.additionText}</span>`;
                 items[i].setAttribute('data-product', JSON.stringify(dataProduct));
             }
-        }
-
-        reRenderAllPrice(tmpDiscount);
-        if (typeof window.extrapop !== 'undefined' && typeof window.extrapop.renderPrice === 'function') {
-            window.extrapop.renderPrice();
         }
     }
 
