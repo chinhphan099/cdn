@@ -529,22 +529,23 @@
                 }
                 utils.events.emit('bindProductDiscountInfo', productInfo);
                 siteSetting.countryCode = countryCodeIndex || data.location.countryCode;
-                if (!countryCodeIndex) {
-                    utils.localStorage().set('countryCode', data.location.countryCode);
-                    utils.events.emit('triggerAddressForm', data.location.countryCode);
-                }
-                else {
-                    utils.localStorage().set('countryCode', countryCodeIndex);
-                }
+                // if (!countryCodeIndex) {
+                //     utils.localStorage().set('countryCode', data.location.countryCode);
+                //     utils.events.emit('triggerAddressForm', data.location.countryCode);
+                // }
+                // else {
+                //     utils.localStorage().set('countryCode', countryCodeIndex);
+                // }
+                utils.localStorage().set('countryCode', siteSetting.countryCode);
                 setTimeout(() => {
                     utils.localStorage().set('jsCurrency', window.fCurrency);
-                    utils.localStorage().set('countryCode', siteSetting.countryCode);
+                    // utils.localStorage().set('countryCode', siteSetting.countryCode);
                     utils.localStorage().set('currencyCode', productInfo.currencyCode);
                     utils.localStorage().set('ip', data.location.ip);
                     utils.localStorage().set('mainCampaignName', data.campaignName);
                     utils.localStorage().set('mainWebKey', window.siteSetting.webKey);
-                }, 1000);
-                utils.events.emit('triggerAddressForm', data.location.countryCode);
+                }, 600);
+                utils.events.emit('triggerAddressForm', siteSetting.countryCode);
                 utils.events.emit('triggerProductBannerSidebar', productInfo);
                 utils.events.emit('triggerWarranty', getSelectedProduct());
                 utils.events.emit('bindOrderPage', productInfo);
