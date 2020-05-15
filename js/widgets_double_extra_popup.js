@@ -231,7 +231,7 @@
                 e.preventDefault();
 
                 //append parameter
-                appendParamIntoUrl(sectionBtn.dataset.btnaddid);
+                appendParamIntoUrl(sectionBtn.dataset.btnaddid || 'btnadd');
 
                 upgradeProduct();
             })
@@ -242,7 +242,7 @@
                 e.preventDefault();
 
                 //append parameter
-                appendParamIntoUrl(sectionBtn.dataset.btncancelid);
+                appendParamIntoUrl(sectionBtn.dataset.btncancelid || 'btncancel');
 
                 cancelUpgradeProduct();
 
