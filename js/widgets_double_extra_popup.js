@@ -12,7 +12,7 @@
         isTest: utils.getQueryParameter('isCardTest') ? true : false
     });
 
-    let doubleItemId, orderNumber, urlRedirect, orderData, defaultProduct, savePriceValue,
+    let doubleItemId, orderNumber, urlRedirect, orderData, defaultProduct, savePriceValue, btnParamId,
         extraPopup = _q('.extra-popup'),
         dummyInput = _q('#product_00');
 
@@ -144,7 +144,7 @@
                 let slpage = setInterval(function () {
                     if (position === 350) {
                         clearInterval(slpage);
-                        window.location.href = redirectUrl;
+                        window.location.href = redirectUrl + btnParamId;
                     }
                     else {
                         position += 10;
@@ -165,8 +165,18 @@
             submitDataUpgrade(orderNumber, redirectUrl);
         }
         else {
-            location.href = redirectUrl;
+            location.href = redirectUrl + btnParamId;
         }
+    }
+
+    //Append Identify Parameters
+    let appendParamIntoUrl = function (id) {
+        let currentUrl = window.location.href,
+            param = currentUrl.indexOf('?') > -1 ? `&clickid=${id}` : `?clickid=${id}`;
+
+        const newurl = currentUrl + param;
+        btnParamId = param;
+        window.history.pushState({ path: newurl }, '', newurl);
     }
 
     //Event upgrade product for Paypal & Creditcard
@@ -213,11 +223,15 @@
     //Attach event Upgrade and cancelUpgrade for button add & button-cancel
     let handleEventButton = function () {
         let btnAdd = _qAll('.extra-popup .btn-add'),
-            btnCancel = _qAll('.extra-popup .btn-cancel, .extra-popup .btn-close');
+            btnCancel = _qAll('.extra-popup .btn-cancel, .extra-popup .btn-close'),
+            sectionBtn = _q('.extra-popup .footer-modal');
 
         for (let item of btnAdd) {
             item.addEventListener('click', function (e) {
                 e.preventDefault();
+
+                //append parameter
+                appendParamIntoUrl(sectionBtn.dataset.btnaddid);
 
                 upgradeProduct();
             })
@@ -227,7 +241,11 @@
             item.addEventListener('click', function (e) {
                 e.preventDefault();
 
+                //append parameter
+                appendParamIntoUrl(sectionBtn.dataset.btncancelid);
+
                 cancelUpgradeProduct();
+
             })
         }
 
@@ -247,9 +265,28 @@
         return upgradeProduct;
     }
 
+    //Clear Parameter tracking double popup id
+    let clearPopupParameters = function () {
+        let currentUrl = window.location.href,
+            sectionBtn = _q('.extra-popup .footer-modal'),
+            btnAddId = `clickid=${sectionBtn.dataset.btnaddid}`,
+            btnCancelId = `clickid=${sectionBtn.dataset.btncancelid}`;
+
+        if (currentUrl.indexOf(btnAddId) > - 1) {
+            currentUrl = currentUrl.replace(currentUrl.substr(currentUrl.indexOf(btnAddId) - 1, btnAddId.length + 1), '');
+        }
+        else if (currentUrl.indexOf(btnCancelId) > - 1) {
+            currentUrl = currentUrl.replace(currentUrl.substr(currentUrl.indexOf(btnCancelId) - 1, btnCancelId.length + 1), '');
+        }
+
+        const newurl = currentUrl;
+        window.history.pushState({ path: newurl }, '', newurl);
+    }
+
     let initial = function () {
         //excute functional
         handleEventButton();
+        clearPopupParameters();
     }
 
     //register event bindOrderPage at first load
