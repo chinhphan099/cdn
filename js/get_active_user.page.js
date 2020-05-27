@@ -2,7 +2,7 @@
     function getActiveUser(isByPage) {
         let url = 'https://ctrwow-prod-fingerprint-microservice.azurewebsites.net/api/onlineUsers';
 
-        if(!!isByPage) {
+        if (!!isByPage) {
             url += '?byPage=true&for=' + window.location.href.replace('//test.', '//www.');
         }
         else {
@@ -11,17 +11,17 @@
 
         let setting = {
             method: 'GET',
-            headers: {'content-type': 'application/json'}
+            headers: { 'content-type': 'application/json' }
         };
         fetch(url, setting).then((response) => {
             if (response.ok) {
                 return response.json();
             }
         })
-        .then(function(data) {
-            if(!!document.querySelector('.item-view')) {
+        .then(function (data) {
+            if (!!document.querySelector('.item-view')) {
                 document.querySelector('.item-view').innerHTML = document.querySelector('.item-view').innerHTML.replace('{itemView}', data);
-                if(!isNaN(data)) {
+                if (!isNaN(data)) {
                     document.querySelector('.item-view').style.display = 'block';
                 }
             }
@@ -32,10 +32,10 @@
     };
 
     window.addEventListener('DOMContentLoaded', () => {
-        if(window.location.origin.indexOf('dfocms.com') === -1) {
+        if (window.location.origin.indexOf('dfocms') === -1 && window.location.origin.indexOf('dotcmscloud') === -1) {
             getActiveUser(false);
         }
-        else if(!!document.querySelector('.item-view')) {
+        else if (!!document.querySelector('.item-view')) {
             document.querySelector('.item-view').style.display = 'block';
         }
     });

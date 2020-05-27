@@ -158,7 +158,7 @@
                 utils.redirectPage(siteSetting.declineUrl);
             }
         })
-    }
+    };
 
     let activateCreditCardUpgrade = function (orderNumber, redirectUrl) {
         if (!!orderNumber) {
@@ -167,7 +167,7 @@
         else {
             location.href = redirectUrl + btnParamId;
         }
-    }
+    };
 
     //Append Identify Parameters
     let appendParamIntoUrl = function (id) {
@@ -177,7 +177,7 @@
         const newurl = currentUrl + param;
         btnParamId = param;
         window.history.pushState({ path: newurl }, '', newurl);
-    }
+    };
 
     //Event upgrade product for Paypal & Creditcard
     let upgradeProduct = function () {
@@ -201,7 +201,7 @@
         if (!!extraPopup) {
             extraPopup.style.display = 'none';
         }
-    }
+    };
 
     //Event cancelling to upgrade product for Paypal & Creditcard
     let cancelUpgradeProduct = function (paymentType) {
@@ -218,7 +218,7 @@
         if (!!extraPopup) {
             extraPopup.style.display = 'none';
         }
-    }
+    };
 
     //Attach event Upgrade and cancelUpgrade for button add & button-cancel
     let handleEventButton = function () {
@@ -256,14 +256,14 @@
                 renderPrice();
             });
         }
-    }
+    };
 
     //Get information of Product to selected to upgrade
     let getUpgradeProductInfo = function () {
         let upgradeProduct = JSON.parse(_q('#product_' + doubleItemId).dataset.product);
 
         return upgradeProduct;
-    }
+    };
 
     //Clear Parameter tracking double popup id
     let clearPopupParameters = function () {
@@ -281,13 +281,36 @@
 
         const newurl = currentUrl;
         window.history.pushState({ path: newurl }, '', newurl);
-    }
+    };
+
+    let countDownSeconds = function (extraPopup) {
+        try {
+            const countDownSecondElms = extraPopup.querySelector('.count-seconds');
+            if (!countDownSecondElms) {
+                return;
+            }
+            let seconds = Number(countDownSecondElms.textContent);
+            let secondsInterval = setInterval(() => {
+                if (seconds === 0) {
+                    clearInterval(secondsInterval);
+                    if (!!extraPopup.querySelector('.btn-cancel')) {
+                        extraPopup.querySelector('.btn-cancel').click();
+                    }
+                }
+                --seconds;
+                countDownSecondElms.textContent = seconds < 10 ? `0${seconds}` : seconds;
+            }, 1000);
+        }
+        catch (e) {
+            console.log(e);
+        }
+    };
 
     let initial = function () {
         //excute functional
         handleEventButton();
         clearPopupParameters();
-    }
+    };
 
     //register event bindOrderPage at first load
     utils.events.on('bindOrderPage', renderPrice);
@@ -300,6 +323,7 @@
             //display popup
             if (!!extraPopup) {
                 extraPopup.style.display = 'block';
+                countDownSeconds(extraPopup);
             }
         });
     });
@@ -329,6 +353,7 @@
         //display popup
         if (!!extraPopup) {
             extraPopup.style.display = 'block';
+            countDownSeconds(extraPopup);
         }
     }, true);
 
