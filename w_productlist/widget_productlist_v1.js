@@ -537,6 +537,9 @@
                     utils.localStorage().set('ip', data.location.ip);
                     utils.localStorage().set('mainCampaignName', data.campaignName);
                     utils.localStorage().set('mainWebKey', window.siteSetting.webKey);
+                    if (!!window.pageType && window.pageType !== 'normal') {
+                        utils.localStorage().set('pageType', window.pageType);
+                    }
                 }, 1000);
                 utils.events.emit('triggerAddressForm', siteSetting.countryCode);
                 utils.events.emit('triggerProductBannerSidebar', productInfo);

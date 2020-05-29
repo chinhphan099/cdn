@@ -355,6 +355,9 @@
         if (utils.localStorage().get('preOrder') === 'true') {
             _q('.receipt-list .title').innerHTML = js_translate.pre_order_title || 'ITEMS PRE-ORDERED';
         }
+        if (utils.localStorage().get('pageType') === 'pre-order') {
+            _q('body').classList.add('pre-order-type');
+        }
 
         //Create Button Claim deals
         createButtonClaimDeals();
