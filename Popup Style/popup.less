@@ -1,0 +1,63 @@
+.global-popup {
+    .edit_mode & {
+        position: relative;
+    }
+    .position(fixed, 0 null null 0);
+    .size(100%);
+    z-index: 9;
+    overflow: hidden;
+    background-color: #333;
+    .modal-dialog {
+        .flex-display();
+        .align-items(center);
+        .flex-direction(column);
+        .justify-content(center);
+        height: 100%;
+        max-width: 630px;
+        padding: 15px 10px;
+        margin: 0 auto;
+        pointer-events: none;
+    }
+    .modal-content {
+        .flex-display();
+        .flex-direction(column);
+        .border-radius(7px);
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        background-color: #fff;
+        border: 2px solid #E60000;
+        pointer-events: auto;
+        background-clip: padding-box;
+    }
+    .modal-head {}
+    .modal-body {
+        position: relative;
+        .flex(1 1 auto);
+        padding: 25px 10px 22px;
+        overflow-y: auto;
+        text-align: center;
+    }
+    .modal-foot {}
+    .icon-close {
+        .position(15px 15px);
+        z-index: 2;
+        color: #ccc;
+        font-size: 17px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    @media (min-width: 375px) {
+    }
+    @media (min-width: 576px) {
+        .modal-body {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+    }
+    @media (min-width: 768px) {
+        .modal-body {
+            padding: 40px 35px 30px;
+        }
+    }
+}
