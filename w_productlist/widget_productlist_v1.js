@@ -770,7 +770,9 @@
             for (let tabItem of tabItems) {
                 if (!!titleElm) {
                     tabItem.addEventListener('mouseenter', function () {
-                        titleElm.innerHTML = tabItem.dataset.replacetext;
+                        if (!!tabItem.dataset.replacetext) {
+                            titleElm.innerHTML = tabItem.dataset.replacetext;
+                        }
                     }, false);
 
                     tabItem.addEventListener('mouseleave', function () {
@@ -780,7 +782,7 @@
 
                 tabItem.addEventListener('click', function () {
                     // Update Text
-                    if (!!titleElm) {
+                    if (!!titleElm && !!tabItem.dataset.replacetext) {
                         activeText = tabItem.dataset.replacetext;
                         titleElm.innerHTML = activeText;
                     }
