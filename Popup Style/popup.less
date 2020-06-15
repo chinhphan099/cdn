@@ -78,9 +78,9 @@
   }
   &_outer {
     padding: 0 10px;
-    margin: 15px auto;
+    margin: 20px auto;
     width: 100%;
-    min-height: calc(~"100% - 30px");
+    min-height: calc(~"100% - 40px");
     display: -webkit-flex;
     display: -ms-flexbox;
     display: -ms-flex;
@@ -95,7 +95,7 @@
 
     &--scrollable {
       height: 100%;
-      max-height: calc(~"100% - 30px");
+      max-height: calc(~"100% - 40px");
       -webkit-flex-direction: column;
       -ms-flex-direction: column;
       flex-direction: column;
@@ -147,7 +147,7 @@
     }
 
     &--centered {
-      min-height: calc(~"100% - 30px");
+      min-height: calc(~"100% - 40px");
       -webkit-align-items: center;
       -ms-align-items: center;
       align-items: center;
@@ -156,7 +156,7 @@
       //! FOR IE11
       &:before {
         content: "";
-        height: calc(~"100vh - 30px");
+        height: calc(~"100vh - 40px");
         height: -webkit-min-content;
         height: -moz-min-content;
         height: min-content;
@@ -201,6 +201,7 @@
       line-height: 26px;
       color: white;
       background-color: black;
+      -webkit-border-radius: 50%;
       border-radius: 50%;
       border: 2px solid white;
       cursor: pointer;
@@ -215,11 +216,12 @@
     -ms-flex-direction: column;
     flex-direction: column;
     width: 100%;
-    outline: 0;
-    pointer-events: auto;
     background-color: #fff;
     border: 3px solid #FAE500;
-    border-radius: 15px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    outline: 0;
+    pointer-events: auto;
     .icon-close {
       position: absolute;
       right: 10px;
@@ -236,10 +238,10 @@
 }
 
 //! Fix Scroll inside position middle for IE11
-.popup_widget_theme_1 .popup_widget_outer--scrollable.popup_widget_outer--centered .popup_widget_inner {
+.popup_widget--theme_1 .popup_widget_outer--scrollable.popup_widget_outer--centered .popup_widget_inner {
   height: auto;
 }
-_:-ms-fullscreen, :root .popup_widget_theme_1 .popup_widget_outer--scrollable.popup_widget_outer--centered .popup_widget_content {
+_:-ms-fullscreen, :root .popup_widget--theme_1 .popup_widget_outer--scrollable.popup_widget_outer--centered .popup_widget_content {
   max-height: calc(100vh - 60px);
   overflow-y: auto;
 }
