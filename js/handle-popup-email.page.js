@@ -84,7 +84,11 @@
 
   function saveEmailToServer(email, callbackFn) {
     if (window.siteSetting && window.siteSetting.campaignName !== '') {
-      eCRM.Order.submitEmailToServerFp(email, window.siteSetting.campaignName, 4, callbackFn);
+      // eCRM.Order.submitEmailToServerFp(email, window.siteSetting.campaignName, 4, callbackFn);
+      eCRM.Order.submitEmailToLeadgen({
+        'email': email,
+        'isFromEmailWidget': 'true'
+      }, callbackFn);
     } else {
       console.log('siteSetting is null');
       labelError.innerHTML = window.messages ? window.messages.serverBusy || "Server is busy! Please try again." : "Server is busy! Please try again.";

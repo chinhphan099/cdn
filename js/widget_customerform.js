@@ -244,7 +244,11 @@
   function saveEmailToServer(emailElem) {
     if (!emailElem.classList.contains('input-error')) {
       if (window.siteSetting && window.siteSetting.campaignName !== '') {
-        eCRM.Order.submitEmailToServerFp(emailElem.value, window.siteSetting.campaignName, 4, receiveData);
+        // eCRM.Order.submitEmailToServerFp(emailElem.value, window.siteSetting.campaignName, 4, receiveData);
+        eCRM.Order.submitEmailToLeadgen({
+          'email': emailElem.value,
+          'isFromEmailWidget': 'false'
+        }, receiveData);
       } else {
         console.log('siteSetting is null');
       }
