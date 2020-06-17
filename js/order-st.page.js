@@ -377,11 +377,11 @@
 
     let isClickedInput = false;
     function onClickInputSelect() {
-        let checkQT = false;
+        let wasteClick = false;
         Array.prototype.slice.call(_qAll('input')).forEach(input => {
             input.addEventListener('change', (e) => {
-                if (!!utils.getQueryParameter('qt') && !checkQT) {
-                    checkQT = true;
+                if ((!!utils.getQueryParameter('temp') || !!utils.getQueryParameter('qt')) && !wasteClick) {
+                    wasteClick = true;
                     return;
                 }
                 isClickedInput = true;
