@@ -159,9 +159,9 @@
                     line-height: 1.25em;
                     .plural {
                         display: none;
-                    }
-                    .plural-item& {
-                        display: inline;
+                        .plural-item& {
+                            display: inline;
+                        }
                     }
                 }
                 .price-item {
@@ -307,8 +307,10 @@
             h3 {
                 font-size: 26px;
             }
-            .item-details {
-                font-size: 18px;
+            .wrap-item {
+                .item-details {
+                    font-size: 18px;
+                }
             }
         }
         @media (min-width: 992px) {
