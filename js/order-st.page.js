@@ -377,18 +377,17 @@
 
     let isClickedInput = false;
     function onClickInputSelect() {
-        let wasteClick = false;
         Array.prototype.slice.call(_qAll('input')).forEach(input => {
             input.addEventListener('change', (e) => {
-                if ((!!utils.getQueryParameter('temp') || !!utils.getQueryParameter('qt')) && !wasteClick) {
-                    wasteClick = true;
+                if (!!e.target.dataset.product) {
+                    loadStatistical();
+                }
+                if (((!!utils.getQueryParameter('temp') || !!utils.getQueryParameter('qt'))) && !_q('body').classList.contains('wasteClick')) {
+                    console.log('wasteClick');
                     return;
                 }
                 isClickedInput = true;
                 hidePopup(true);
-                if (!!e.target.dataset.product) {
-                    loadStatistical();
-                }
             }, false);
         });
 

@@ -17,16 +17,16 @@
                 Element.prototype.msMatchesSelector ||
                 Element.prototype.oMatchesSelector ||
                 Element.prototype.webkitMatchesSelector ||
-                function(s) {
+                function (s) {
                     let matches = (this.document || this.ownerDocument).querySelectorAll(s),
                         i = matches.length;
-                    while (--i >= 0 && matches.item(i) !== this) {}
+                    while (--i >= 0 && matches.item(i) !== this) { }
                     return i > -1;
                 }
         }
 
         // Get the closest matching element
-        for ( ; elem && elem !== document; elem = elem.parentNode ) {
+        for (; elem && elem !== document; elem = elem.parentNode) {
             if (elem.matches(selector)) {
                 return elem;
             }
@@ -52,21 +52,21 @@
     //Save Listicle Referrer Url  before clear all
     let listicleReferrerUrl = window.localStorage.getItem('referrerUrl');
 
-	let ctrWowSurvey__id = window.localStorage.getItem('ctrWowSurvey__id');
+    let ctrWowSurvey__id = window.localStorage.getItem('ctrWowSurvey__id');
 
     let campProducts = window.localStorage.getItem('campproducts');
     window.localStorage.clear(); //clear all items
 
     //Add Listicle Referrer Url  after clear all
-    if(listicleReferrerUrl) {
+    if (listicleReferrerUrl) {
         window.localStorage.setItem('referrerUrl', listicleReferrerUrl);
     }
 
-	if(ctrWowSurvey__id) {
+    if (ctrWowSurvey__id) {
         window.localStorage.setItem('ctrWowSurvey__id', ctrWowSurvey__id);
     }
 
-    if(campProducts) {
+    if (campProducts) {
         window.localStorage.setItem('campproducts', campProducts);
     }
 
@@ -82,11 +82,11 @@
         }
 
         //installment payment : bind installment month
-        if(window.widget && window.widget.installmentpayment) {
+        if (window.widget && window.widget.installmentpayment) {
             const maxMonth = window.widget.installmentpayment.defaultMonths[window.widget.installmentpayment.defaultMonths.length - 1];
             //top promo
             const topPromo = _q('.top-promo');
-            if(topPromo) {
+            if (topPromo) {
                 topPromo.innerHTML = topPromo.innerHTML.replace('{installmentMonth}', maxMonth);
             }
 
@@ -97,7 +97,7 @@
 
             //credit card method : caption
             const w_cc_caption = _q('.w_creditcard .w_caption');
-            if(w_cc_caption) {
+            if (w_cc_caption) {
                 w_cc_caption.innerHTML = w_cc_caption.innerHTML.replace('{installmentMonth}', maxMonth);
             }
         }
@@ -110,10 +110,10 @@
     registerEvents();
 
     function checkIsSpecialItem() {
-        if(!_q('input[name="product"]:checked')) return;
+        if (!_q('input[name="product"]:checked')) return;
         const checkedItem = _q('input[name="product"]:checked');
         const proItem = getClosest(checkedItem, '.productRadioListItem');
-        if(proItem.classList.contains('special_offer')) {
+        if (proItem.classList.contains('special_offer')) {
             utils.localStorage().set('isSpecialOffer', 'true');
         }
         else {
@@ -124,8 +124,8 @@
 
     function handleInputChange() {
         const prodInputs = _qAll('.productRadioListItem input');
-        for(const prodInput of prodInputs) {
-            prodInput.addEventListener('click', function() {
+        for (const prodInput of prodInputs) {
+            prodInput.addEventListener('click', function () {
                 checkIsSpecialItem();
             });
         }
@@ -135,27 +135,27 @@
     function bindOrderPage(data) {
         if (data) {
             const textDiscountPriceElms = _qAll('.textDiscountPrice');
-            for(const textDiscountPriceElm of textDiscountPriceElms) {
+            for (const textDiscountPriceElm of textDiscountPriceElms) {
                 textDiscountPriceElm.innerHTML = data.discountPrice;
             }
 
             const textFullPrices = _qAll('.textFullPrice');
-            for(const textFullPrice of textFullPrices) {
+            for (const textFullPrice of textFullPrices) {
                 textFullPrice.innerHTML = data.fullPrice;
             }
 
             //Check and hide sentence : All pricing is in United States Dollar.
             if (!!data.currencyCode) {
-				if((data.currencyCode == '' || data.currencyCode.toLowerCase() !== 'usd' || (!!data.fCurrency && data.fCurrency.indexOf("$")) === -1)){
-					if(_q('.js-currency-usd')) {
-						_q('.js-currency-usd').style.display = 'none';
-					}
-				}
-            }else{
-				if(_q('.js-currency-usd')) {
+                if ((data.currencyCode == '' || data.currencyCode.toLowerCase() !== 'usd' || (!!data.fCurrency && data.fCurrency.indexOf("$")) === -1)) {
+                    if (_q('.js-currency-usd')) {
+                        _q('.js-currency-usd').style.display = 'none';
+                    }
+                }
+            } else {
+                if (_q('.js-currency-usd')) {
                     _q('.js-currency-usd').style.display = 'none';
                 }
-			}
+            }
         }
     }
 
@@ -166,9 +166,9 @@
                             </span>`;
 
         // Coupon
-        if(!!_q('.coupon-popup-new')) {
+        if (!!_q('.coupon-popup-new')) {
             const promoText = _q('.coupon-popup-new .w_promo_text');
-            if(!!promoText) {
+            if (!!promoText) {
                 promoText.innerHTML = promoText.innerHTML.replace(/{couponPrice}/g, iconloading);
             }
         }
@@ -176,13 +176,13 @@
 
     loadingIcons();
 
-	/*--------start : run common order------------*/
-	const CommonOrder = utils.CommonOrder;
-	class Order extends CommonOrder {
-	}
-	const insOrder = new Order();
-	insOrder.init();
-	/*--------/end : run common order------------*/
+    /*--------start : run common order------------*/
+    const CommonOrder = utils.CommonOrder;
+    class Order extends CommonOrder {
+    }
+    const insOrder = new Order();
+    insOrder.init();
+    /*--------/end : run common order------------*/
 
 })(window.utils);
 
@@ -197,8 +197,8 @@ const quantity = ((utils) => {
         let visibleElms = [];
         const productItems = _qAll('.productRadioListItem');
 
-        for(let item of productItems) {
-            if(window.getComputedStyle(item).display !== 'none') {
+        for (let item of productItems) {
+            if (window.getComputedStyle(item).display !== 'none') {
                 visibleElms.push(item);
             }
         }
@@ -210,22 +210,23 @@ const quantity = ((utils) => {
         let qt = utils.getQueryParameter('qt'),
             qtNumber = Number(qt);
 
-        if(!!qt && qtNumber > 0 && qtNumber <= visibleItems.length) {
+        if (!!qt && qtNumber > 0 && qtNumber <= visibleItems.length) {
             qtNumber -= 1;
-            if(utils.getQueryParameter('et') === '1') {
+            if (utils.getQueryParameter('et') === '1') {
                 qtNumber = 0;
             }
 
             const listProduct = _qAll('.productRadioListItem');
-            for(let itemProduct of listProduct) {
-                itemProduct.classList.remove('default');
+            for (let itemProduct of listProduct) {
+                itemProduct.classList.remove('default', 'checked-item');
             }
-            visibleItems[qtNumber].classList.add('default');
-            if(!isChangeTab) {
+            visibleItems[qtNumber].classList.add('default', 'checked-item');
+            if (!isChangeTab) {
                 visibleItems[qtNumber].querySelector('input').click();
-                if(typeof exitPopup !== 'undefined') {
+                if (typeof exitPopup !== 'undefined') {
                     exitPopup.handleEvents();
                 }
+                _q('body').classList.add('wasteClick');
             }
         }
     };
@@ -236,9 +237,9 @@ const quantity = ((utils) => {
 
     const onClickTabPackage = () => {
         const tabItems = _qAll('.js-list-group li');
-        if(!!tabItems.length) {
-            for(let tabItem of tabItems) {
-                tabItem.addEventListener('click', function() {
+        if (!!tabItems.length) {
+            for (let tabItem of tabItems) {
+                tabItem.addEventListener('click', function () {
                     isChangeTab = true;
                     setActiveItem();
                 }, false);
@@ -248,9 +249,9 @@ const quantity = ((utils) => {
 
     const onClickListAdapter = () => {
         const tabItems = _qAll('.list-adapters input');
-        if(!!tabItems.length) {
-            for(let tabItem of tabItems) {
-                tabItem.addEventListener('change', function() {
+        if (!!tabItems.length) {
+            for (let tabItem of tabItems) {
+                tabItem.addEventListener('change', function () {
                     isChangeTab = true;
                     setActiveItem();
                 }, false);

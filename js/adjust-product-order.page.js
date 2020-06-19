@@ -5,13 +5,13 @@
 
     function init() {
         if (utils.getQueryParameter('temp') === 'hcvr') {
-            _q('body').classList.add('hcvr');
             _q('.productRadioListItem.item-1:not(.hidden) .js-unitDiscountRate').click();
+            _q('body').classList.add('hcvr', 'wasteClick');
         }
 
         if (utils.getQueryParameter('temp') === 'haov') {
-            _q('body').classList.add('haov');
             _q('.productRadioListItem.item-3:not(.hidden) .js-unitDiscountRate').click();
+            _q('body').classList.add('haov', 'wasteClick');
         }
     }
 
