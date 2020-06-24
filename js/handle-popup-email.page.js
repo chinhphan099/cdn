@@ -1,3 +1,4 @@
+/* Common_JS_Hanlde_Popup_Email */
 (() => {
   const iconClose = _q('.email-form .icon-close');
   const hamgurgerIcon = document.querySelector('.hamburger-icon');
@@ -36,6 +37,8 @@
   }
 
   function afterSendSuccess() {
+    saveCustomerEmails(inputEmail.value);
+
     //Clear form and hide form
     inputEmail.value = "";
     title.classList.add('hidden');
@@ -75,7 +78,8 @@
       utils.events.emit('onSavedCustomerEmail', result);
       afterSendSuccess();
       flagClose = true;
-    } else {
+    }
+    else {
       labelError.innerHTML = window.messages ? window.messages.serverBusy || "Server is busy! Please try again." : "Server is busy! Please try again.";
       labelError.classList.remove('hidden');
     }
@@ -96,10 +100,28 @@
     }
   }
 
+  function isExistingEmail(email) {
+    let customerEmails = JSON.parse(utils.localStorage().get('customerEmails'));
+    if (!customerEmails) {
+      return;
+    }
+    if (customerEmails.includes(email)) {
+      return true;
+    }
+    return false;
+  }
+
+  function saveCustomerEmails(email) {
+    const customerEmails = JSON.parse(utils.localStorage().get('customerEmails')) || [];
+    customerEmails.push(email);
+    utils.localStorage().set('customerEmails', JSON.stringify(customerEmails));
+  }
+
   function handleSubmit() {
     const email = inputEmail.value;
     const validEmail = window.messages ? window.messages.invalidEmail || "Please enter valid email address." : "Please enter valid email address.";
     const requireEmail = window.messages ? window.messages.required || "This field is required." : "This field is required.";
+    const existingEmail = window.messages ? window.messages.existingEmail || "This email is existing." : "This email is existing.";
     if (email) {
       const isEmail = utils.isEmail(email);
       if (!isEmail) {
@@ -107,10 +129,17 @@
         labelError.classList.remove('hidden');
         return;
       }
+      // Check email existing
+      if (isExistingEmail(email)) {
+        labelError.innerHTML = existingEmail;
+        labelError.classList.remove('hidden');
+        return;
+      }
       labelError.classList.add('hidden');
       showLoading(true);
       saveEmailToServer(email, callbackFn);
-    } else {
+    }
+    else {
       labelError.innerHTML = requireEmail;
       labelError.classList.remove('hidden');
     }
@@ -121,6 +150,12 @@
       if (flagClose === true) return;
       popupEmail();
     });
+
+    if (inputEmail) {
+      inputEmail.addEventListener('keyup', () => {
+        labelError.classList.add('hidden');
+      });
+    }
 
     if (iconClose) {
       iconClose.addEventListener('click', function () {
