@@ -42,8 +42,12 @@
           }
 
           if (input.id === 'customer_email') {
+            const customerEmailSaved = window.localStorage.getItem('customer_email');
+            if (customerEmailSaved && customerEmailSaved === input.value) return;
+
             utils.saveUserInfoWithFingerprint();
             saveEmailToServer(input);
+            localStorage.setItem('customer_email', input.value);
           }
         });
 
