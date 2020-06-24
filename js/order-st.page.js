@@ -953,13 +953,24 @@
         }
     }
 
+    function personalizationFirstName() {
+        const firstName = utils.getQueryParameter('firstname');
+        if (!firstName || !js_translate.personalizationText || !_q('.top-header .breakcrum')) {
+            return;
+        }
+
+        const personalizationText = js_translate.personalizationText.replace(/firstName/gi, firstName).replace(/\%20/g, ' ');
+        _q('.top-header .breakcrum').insertAdjacentHTML('afterBegin', `<div class="personalization">${personalizationText}</div>`);
+    }
+
     function initial() {
         adjustLayout();
         implementYearDropdown();
         implementMonthDropdown();
         setExpirationValue();
-        listener();
         hiddenElementByParamUrl();
+        personalizationFirstName();
+        listener();
     }
 
     window.addEventListener('load', () => {
