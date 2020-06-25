@@ -91,15 +91,20 @@
     }
 
     function hideSocialButton() {
-        if (utils.getQueryParameter('sm') === '0') {
-            for(let btn of _qAll('.socialBtn')) {
-                btn.classList.add('hidden');
+        try {
+            if (utils.getQueryParameter('sm') === '0') {
+                for(let btn of _qAll('.socialBtn')) {
+                    btn.classList.add('hidden');
+                }
+            }
+            else {
+                for(let btn of _qAll('.socialBtn')) {
+                    btn.classList.remove('hidden');
+                }
             }
         }
-        else {
-            for(let btn of _qAll('.socialBtn')) {
-                btn.classList.remove('hidden');
-            }
+        catch(error) {
+            console.log(error);
         }
     }
 
