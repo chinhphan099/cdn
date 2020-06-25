@@ -82,7 +82,7 @@
         }
 
         //detect window offet Y scroll over marked element (Tick Element) - Tu Nguyen
-        if(elemRect.top + elemRect.height <= 0){
+        if(elemRect.top + elemRect.height <= 0) {
             floatingElm.classList.add('marked-elm');
         }
         else {
@@ -91,7 +91,7 @@
     }
 
     function hideSocialButton() {
-        if (!!utils.getQueryParameter('sm') && utils.getQueryParameter('sm') === '0') {
+        if (utils.getQueryParameter('sm') === '0') {
             for(let btn of _qAll('.socialBtn')) {
                 btn.classList.add('hidden');
             }
