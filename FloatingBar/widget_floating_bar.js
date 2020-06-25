@@ -90,14 +90,14 @@
         }
     }
 
-    function hideSocialButton(){
+    function hideSocialButton() {
         if (!!utils.getQueryParameter('sm') && utils.getQueryParameter('sm') === '0') {
-            for(let btn of _qAll('.socialBtn')){
+            for(let btn of _qAll('.socialBtn')) {
                 btn.classList.add('hidden');
             }
         }
         else {
-            for(let btn of _qAll('.socialBtn')){
+            for(let btn of _qAll('.socialBtn')) {
                 btn.classList.remove('hidden');
             }
         }
@@ -113,7 +113,9 @@
         floatingBar();
         listener();
     }
-    hideSocialButton();
+    window.addEventListener('DOMContentLoaded', () => {
+        hideSocialButton();
+    });
     window.addEventListener('load', () => {
         initial();
     });
