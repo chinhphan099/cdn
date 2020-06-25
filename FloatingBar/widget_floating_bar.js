@@ -80,6 +80,27 @@
                 floatingElm.classList.remove('floating-visible');
             }
         }
+
+        //detect window offet Y scroll over marked element (Tick Element) - Tu Nguyen
+        if(elemRect.top + elemRect.height <= 0){
+            floatingElm.classList.add('marked-elm');
+        }
+        else {
+            floatingElm.classList.remove('marked-elm');
+        }
+    }
+
+    function hideSocialButton(){
+        if (!!utils.getQueryParameter('sm') && utils.getQueryParameter('sm') === '0') {
+            for(let btn of _qAll('.socialBtn')){
+                btn.classList.add('hidden');
+            }
+        }
+        else {
+            for(let btn of _qAll('.socialBtn')){
+                btn.classList.remove('hidden');
+            }
+        }
     }
 
     function listener() {
@@ -92,7 +113,7 @@
         floatingBar();
         listener();
     }
-
+    hideSocialButton();
     window.addEventListener('load', () => {
         initial();
     });
