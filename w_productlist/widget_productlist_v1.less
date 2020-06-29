@@ -19,6 +19,23 @@
     position: relative;
     padding: 12px 15px;
     border-bottom: 1px solid #ddd;
+    //Apply Golden border style - Tu Nguyen
+    &.checked-item {
+        .golden-border & {
+            border-image: linear-gradient(to right,#bd8f2f 0,#f9f1b2 66%,#bd8f2f 100%);
+            -webkit-border-image: linear-gradient(to right,#bd8f2f 0,#f9f1b2 66%,#bd8f2f 100%);
+            border-image-slice: 1;
+            background-color: #fffefa;
+        }
+    }
+    &.golden-border-item {
+        border-width: 3px;
+        border-image: linear-gradient(to right,#bd8f2f 0,#f9f1b2 66%,#bd8f2f 100%);
+        -webkit-border-image: linear-gradient(to right,#bd8f2f 0,#f9f1b2 66%,#bd8f2f 100%);
+        border-image-slice: 1;
+        background-color: #fffefa;
+    }
+    //End - Tu Nguyen
     &.default {
         background-color: #fef46e;
         label {
@@ -63,4 +80,10 @@
             }
         }
     }
+}
+
+input[name="product"] {
+    position: fixed;
+    opacity: 0;
+    pointer-events: none;
 }
