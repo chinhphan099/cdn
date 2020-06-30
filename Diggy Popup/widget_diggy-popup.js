@@ -65,6 +65,9 @@
         if (productData.quantity > 1) {
             diggyPopup.classList.add('plural-item');
         }
+        else {
+            diggyPopup.classList.remove('plural-item');
+        }
 
         //Dynamic content
         let dynamicProductName = _qAll('.dynamic-name'),
