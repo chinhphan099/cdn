@@ -11,7 +11,7 @@
 
     let product = null;
 
-    var getLifetimePrice = function(product) {
+    var getLifetimePrice = function (product) {
         const warrantyRate = [0.1, 0.2, 0.2, 0.2, 0.2, 0.3, 0.5, 0.15, 0.25, 0.35, 0.4, 0.45, 0.55, 0.6];
         const funnelId = document.querySelector('#txtProductWarranty').value;
         const funnelPrice = warrantyRate[parseInt(funnelId) - 1];
@@ -52,9 +52,9 @@
         product = getSelectedProduct();
 
         let useShippingAddressForBilling = true;
-        if(_q('.widget-billing-form')) {
+        if (_q('.widget-billing-form')) {
             const checkedRadio = _q('input[name="radio_choose_billing"]:checked');
-            if(checkedRadio && checkedRadio.id === 'radio_different_shipping') {
+            if (checkedRadio && checkedRadio.id === 'radio_different_shipping') {
                 useShippingAddressForBilling = false;
             }
         }
@@ -64,7 +64,7 @@
         let phoneNumber = _qById('customer_phone') ? _qById('customer_phone').value : '';
 
         let billingAddress = null;
-        if(!useShippingAddressForBilling) {
+        if (!useShippingAddressForBilling) {
             billingAddress = {
                 'firstName': !!_qById('billing_firstname') ? _qById('billing_firstname').value : firstName,
                 'lastName': !!_qById('billing_lastname') ? _qById('billing_lastname').value : lastName,
@@ -83,9 +83,9 @@
         const expiremonth = _qById('cardExpirationMonth');
         const expireyear = _qById('cardExpirationYear');
         let expiration = '';
-        if(expiredate) {
+        if (expiredate) {
             expiration = expiredate.value.replace('/', '/20');
-        } else if(expiremonth && expireyear) {
+        } else if (expiremonth && expireyear) {
             expiration = expiremonth.value + '/' + expireyear.value;
         }
 
@@ -112,7 +112,7 @@
         //Addtional Miniupsell Data
         const miniUpsell = _qById('txtMiniUpsellPID');
         if (miniUpsell) {
-            if(miniUpsell.checked) {
+            if (miniUpsell.checked) {
                 orderData.miniUpsell = {
                     'productId': Number(miniUpsell.dataset.id),
                     'shippingMethodId': Number(_qById('txtMiniUpsellShippingID').dataset.id)
@@ -120,8 +120,18 @@
             }
         }
 
-        if(_qById('ddl_installpayment')) {
+        if (_qById('ddl_installpayment')) {
             orderData.payment.Instalments = _qById('ddl_installpayment').value;
+        }
+
+        //Adding Maropost Id - Tu Nguyen - CTAButton
+        if (!!window.maroPostSettingId && maroPostSettingId.isSelected) {
+            if (maroPostSettingId.id.trim() !== "") {
+                orderData.additionalInfo = [{
+                    "key": "MaropostSettingsId",
+                    "value": maroPostSettingId.id
+                }];
+            }
         }
 
         return orderData;
@@ -136,20 +146,20 @@
         const fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
         const pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
 
-        if(product.shippings != null && product.shippings.length > 0) {
+        if (product.shippings != null && product.shippings.length > 0) {
             shippingFee = product.shippings[0].price;
         }
 
-        if(_qById('txtProductWarranty') != null) {
-            if(_qById('txtProductWarranty').checked === true) {
+        if (_qById('txtProductWarranty') != null) {
+            if (_qById('txtProductWarranty').checked === true) {
                 let lifeTimeInfo = getLifetimePrice(product);
                 lifetimePrice = lifeTimeInfo[0];
                 lifetimeRate = lifeTimeInfo[1];
             }
         }
-        if(_q('#txtMiniUpsellPID') != null) {
-            if(_q('#txtMiniUpsellPID').checked === true) {
-                if(!!_q('.warrantyDiscountPrice')) {
+        if (_q('#txtMiniUpsellPID') != null) {
+            if (_q('#txtMiniUpsellPID').checked === true) {
+                if (!!_q('.warrantyDiscountPrice')) {
                     productWarranty = parseFloat(_q('.warrantyDiscountPrice').dataset.warrantydiscountprice);
                 }
             }
@@ -168,7 +178,7 @@
             'orderTotal': product.productPrices.DiscountedPrice.Value,
             'lifetimePrice': lifetimePrice,
             'lifetimeRate': lifetimeRate,
-            'orderTotalFull': Number((product.productPrices.DiscountedPrice.Value + shippingFee + lifetimePrice + productWarranty).toFixed(2)),
+            'orderTotalFull': product.productPrices.DiscountedPrice.Value + shippingFee + lifetimePrice + productWarranty,
             'savedTotal': product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value,
             'quantity': product.quantity,
             'feeShipping': shippingFee,
@@ -185,7 +195,6 @@
             installmentText: (window.widget && window.widget.installmentpayment) ? window.widget.installmentpayment.optionText : '',
             url: location.pathname
         };
-
         utils.localStorage().set('orderInfo', JSON.stringify(orderInfo));
     }
 
@@ -204,9 +213,9 @@
             let checkBillingForm = true;
 
             //check billing if exist
-            if(_q('.widget-billing-form')) {
+            if (_q('.widget-billing-form')) {
                 const checkedRadio = _q('input[name="radio_choose_billing"]:checked');
-                if(checkedRadio && checkedRadio.id === 'radio_different_shipping') {
+                if (checkedRadio && checkedRadio.id === 'radio_different_shipping') {
                     checkBillingForm = utils.billingForm.isValid();
                 }
             }
@@ -225,8 +234,27 @@
         let ctaButton = _qById('js-basic-cta-button'),
             wrapLoadingIcon = _q('.custom-loading .wrap-loading');
 
-            wrapLoadingIcon.style.left = ctaButton.getBoundingClientRect().left + 'px';
-            wrapLoadingIcon.style.top = ctaButton.getBoundingClientRect().top + 'px';
+        wrapLoadingIcon.style.left = ctaButton.getBoundingClientRect().left + 'px';
+        wrapLoadingIcon.style.top = ctaButton.getBoundingClientRect().top + 'px';
+    }
+
+    function _hideAjaxLoading() {
+        const customAjaxLoading = _q('.custom-loading');
+        if (customAjaxLoading) {
+            customAjaxLoading.classList.add('hidden');
+            _q('body').classList.remove('overflow');
+        } else {
+            const preloadingElem = _q('.preloading-wrapper');
+            const preloadingNumber = utils.getQueryParameter('preloading') ? utils.getQueryParameter('preloading') : 1;
+            const preloading = document.getElementById('preloading' + preloadingNumber);
+            if (preloading) {
+                preloading.style.display = 'none';
+                preloading.style.opacity = '0';
+            } else if (preloadingElem) {
+                preloadingElem.style.display = 'none';
+                preloadingElem.style.opacity = '0';
+            }
+        }
     }
 
     function placeMainOrder(paymenttype) {
@@ -235,12 +263,12 @@
         let customAjaxLoading = _q('.custom-loading'),
             time = 0;
 
-        if(!!customAjaxLoading) {
+        if (!!customAjaxLoading) {
             time = 100;
             customAjaxLoading.classList.remove('hidden');
             _q('body').classList.add('overflow');
 
-            if(customAjaxLoading.classList.contains('black-screen')) {
+            if (customAjaxLoading.classList.contains('black-screen')) {
                 recalculateCTAPosition();
             }
         }
@@ -258,15 +286,16 @@
             if (result && result.success) {
                 utils.localStorage().set('user_firstname', orderData.customer.firstName);
                 utils.localStorage().set('user_lastname', orderData.customer.lastName);
+                utils.localStorage().set('customerId', result.customerResult.customerId);
                 saveInforForUpsellPage(result);
                 //Display Message successed
-                if(!!customAjaxLoading) {
+                if (!!customAjaxLoading) {
                     customAjaxLoading.classList.add('successed');
                 }
                 //utils.fireMainOrderToGTMConversionV2();
 
                 //Making delay time to showing successful message when checkout
-                setTimeout(function() {
+                setTimeout(function () {
                     if (result.callBackUrl) {
                         document.location = result.callBackUrl;
                     }
@@ -277,7 +306,7 @@
                         const redirectUrl = result.upsells[0].upsellUrl.substr(result.upsells[0].upsellUrl.lastIndexOf('/') + 1);
 
                         //Check flag: fireAfterSuccess - to emit event fireAfterSuccess
-                        if(!!window.emitAfterSuccessCredit){
+                        if (!!window.emitAfterSuccessCredit) {
                             utils.events.emit('fireAfterSuccessCC', {
                                 result: result,
                                 redirectUrl: redirectUrl,
@@ -285,9 +314,9 @@
                             });
 
                             //Prevent Redirect next Url
-                            if(window.stopRedirect) return;
+                            if (window.stopRedirect) return;
                         }
-                        else if(!!window.emitAfterSuccess){
+                        else if (!!window.emitAfterSuccess) {
                             utils.events.emit('fireAfterSuccess', {
                                 result: result,
                                 redirectUrl: redirectUrl,
@@ -295,14 +324,14 @@
                             });
                         }
 
-                        if(!customAjaxLoading) {
+                        if (!customAjaxLoading) {
                             window.location.href = redirectUrl;
                         }
                         else {
                             let page = _q('body');
                             let position = 0;
                             let op = 1;
-                            let slpage = setInterval(function() {
+                            let slpage = setInterval(function () {
                                 if (position === 350) {
                                     clearInterval(slpage);
                                     window.location.href = redirectUrl;
@@ -322,28 +351,67 @@
                 }, time);
             }
             else {
-                utils.localStorage().set('userPaymentType', 'creditcard');
-                utils.redirectPage(siteSetting.declineUrl);
+                //split test on the page order-miniac-v1-info.html
+                if (document.body.getAttribute('class').indexOf('order-miniac-v1-info') > 0) {
+                    _openCCDeclinePopup();
+                } else {
+                    utils.localStorage().set('userPaymentType', 'creditcard');
+                    utils.redirectPage(siteSetting.declineUrl);
+                }
             }
         });
     }
 
+    function _openCCDeclinePopup() {
+        _hideAjaxLoading();
+
+        const ccDeclinePopup = _qById('js-cc-decline-popup');
+        if(ccDeclinePopup) {
+            ccDeclinePopup.classList.remove('hidden');
+        }
+
+        //focus cc number field
+        const ccNumber = _qById('creditcard_creditcardnumber');
+        if(ccNumber) {
+            ccNumber.focus();
+            window.scrollTo(ccNumber.getBoundingClientRect().left, ccNumber.getBoundingClientRect().top);
+        }
+    }
+
     function handleButtonClick() {
-        _qById('js-basic-cta-button').addEventListener('click', function (e) {
+        const ctaButton = _qById('js-basic-cta-button');
+        if (!ctaButton) return;
+
+        ctaButton.addEventListener('click', function (e) {
             e.preventDefault();
             window.ccFlag = true;
             window.paypalFlag = false;
-            if(!isValidInfos()) {
+            if (!isValidInfos()) {
                 return;
             }
-            if(!!_q('.widget_modal_upsell')) {
+            if (!!_q('.widget_modal_upsell')) {
                 _q('.widget_modal_upsell').style.display = 'block';
             }
-            else if(!!window.preventCheckoutCredit || !!window.preventCheckout){
+            else if (!!window.preventCheckoutCredit || !!window.preventCheckout) {
                 return;
             }
             else {
                 placeMainOrder('creditcard');
+
+                //store into localStorage, when user back from decline page it will be autofill
+                const customerInfo = {
+                    email: _qById('customer_email').value,
+                    fName: _qById('customer_firstname').value,
+                    lName: _qById('customer_lastname').value,
+                    phone: _qById('customer_phone').value,
+                    address1: _qById('shipping_address1').value,
+                    address2: _qById('shipping_address2').value,
+                    city: _qById('shipping_city').value,
+                    country: _qById('shipping_country').value,
+                    state: _qById('shipping_province').value,
+                    postcode: _qById('shipping_postal').value
+                };
+                utils.localStorage().set('customerInfo', JSON.stringify(customerInfo));
             }
         });
     }
