@@ -55,6 +55,8 @@
     let ctrWowSurvey__id = window.localStorage.getItem('ctrWowSurvey__id');
 
     let campProducts = window.localStorage.getItem('campproducts');
+    let customerInfo = window.localStorage.getItem('customerInfo');
+
     window.localStorage.clear(); //clear all items
 
     //Add Listicle Referrer Url  after clear all
@@ -68,6 +70,95 @@
 
     if (campProducts) {
         window.localStorage.setItem('campproducts', campProducts);
+    }
+
+    if (customerInfo) {
+        window.localStorage.setItem('customerInfo', customerInfo);
+        if (document.body.getAttribute('class').indexOf('order-miniac-v1-info') > 0) {
+            bindCustomerInfo();
+        }
+
+    }
+
+    function bindCustomerInfo() {
+        const customerInfoObject = JSON.parse(customerInfo);
+
+        const email = _qById('customer_email');
+        if (email) {
+            email.value = customerInfoObject.email;
+            email.parentElement.classList.add("focused");
+        }
+
+        const customer_firstname = _qById('customer_firstname');
+        if (customer_firstname) {
+            customer_firstname.value = customerInfoObject.fName;
+            customer_firstname.parentElement.classList.add("focused");
+        }
+
+        const customer_lastname = _qById('customer_lastname');
+        if (customer_lastname) {
+            customer_lastname.value = customerInfoObject.lName;
+            customer_lastname.parentElement.classList.add("focused");
+        }
+
+        const customer_phone = _qById('customer_phone');
+        if (customer_phone) {
+            customer_phone.value = customerInfoObject.phone;
+            customer_phone.parentElement.classList.add("focused");
+        }
+
+        const shipping_address1 = _qById('shipping_address1');
+        if (shipping_address1) {
+            shipping_address1.value = customerInfoObject.address1;
+            shipping_address1.parentElement.classList.add("focused");
+        }
+
+        const shipping_address2 = _qById('shipping_address2');
+        if (shipping_address2) {
+            shipping_address2.value = customerInfoObject.address2;
+            shipping_address2.parentElement.classList.add("focused");
+        }
+
+        const shipping_city = _qById('shipping_city');
+        if (shipping_city) {
+            shipping_city.value = customerInfoObject.city;
+            shipping_city.parentElement.classList.add("focused");
+        }
+
+        const shipping_country = _qById('shipping_country');
+        if (shipping_country) {
+            const timer = setInterval(() => {
+                for (let option of shipping_country.options) {
+                    if (option.value === customerInfoObject.country) {
+                        shipping_country.value = customerInfoObject.country;
+                        const event = document.createEvent('Event');
+                        event.initEvent('change', true, true);
+                        shipping_country.dispatchEvent(event);
+                        clearInterval(timer);
+                    }
+                }
+            }, 500);
+
+        }
+
+        const shipping_province = _qById('shipping_province');
+        if (shipping_province) {
+            const timer = setInterval(() => {
+                for (let option of shipping_province.options) {
+                    if (option.value === customerInfoObject.state) {
+                        shipping_province.value = customerInfoObject.state;
+                        clearInterval(timer);
+                    }
+                }
+            }, 500);
+            shipping_province.value = customerInfoObject.state;
+        }
+
+        const shipping_postal = _qById('shipping_postal');
+        if (shipping_postal) {
+            shipping_postal.value = customerInfoObject.postcode;
+            shipping_postal.parentElement.classList.add("focused");
+        }
     }
 
     function replaceBracketsStrings() {
