@@ -743,6 +743,12 @@
                     utils.localStorage().set('couponValue', window.couponValue);
                 }
             }
+
+            //Enable Maropost Setting ID After clicked Button Accept - Tu Nguyen
+            if(!!window.maroPostSettingId){
+                maroPostSettingId.isSelected = true;
+            }
+
             loadStatistical();
             hidePopup(true);
         }, false);
