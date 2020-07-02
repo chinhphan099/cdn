@@ -686,9 +686,7 @@
             // Remove class default for all visible item
             const visibleItems = getVisibleItems();
             for (let i = 0, n = visibleItems.length; i < n; i++) {
-                visibleItems[i].classList.remove('default');
-                visibleItems[i].classList.remove('special');
-                visibleItems[i].classList.remove('checked-item');
+                visibleItems[i].classList.remove('default', 'special', 'checked-item');
                 if (!!visibleItems[i].querySelector('.best-seller-text')) {
                     visibleItems[i].querySelector('.best-seller-text').parentNode.removeChild(visibleItems[i].querySelector('.best-seller-text'));
                 }
