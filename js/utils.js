@@ -101,8 +101,8 @@
         }
     }
 
-    function formatPrice(price, fCurrency, shortestPriceFormatted) {
-        if (shortestPriceFormatted.indexOf(',') > -1) {
+    function formatPrice(price, fCurrency, shippingPriceFormatted) {
+        if (shippingPriceFormatted.indexOf(',') > -1) {
             return fCurrency.replace('######', price.toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')); // x.xxx.xxx,xx
         }
         return fCurrency.replace('######', price.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')); // x,xxx,xxx.xx
@@ -645,6 +645,55 @@
         }
     }
 
+    function trackConversionWithFP() {
+        try {
+            if (utils.localStorage().get('isCrmConversionTracked')) {
+                return;
+            }
+
+            const orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
+            const currencyCode = utils.localStorage().get('currencyCode');
+            const ip = utils.localStorage().get('ip');
+            const mainCampaignName = utils.localStorage().get('mainCampaignName');
+            const mainWebKey = utils.localStorage().get('mainWebKey');
+            const user_firstname = utils.localStorage().get('user_firstname');
+            const user_lastname = utils.localStorage().get('user_lastname');
+            const customerId = utils.localStorage().get('customerId');
+
+            const timer = setInterval(() => {
+                if (window._EA_ID && window._EA_PUSH) {
+                    if (orderInfo && typeof window._EA_PUSH === "function") {
+                        const mainProd = orderInfo.orderedProducts.filter(prod => { return prod.type === 'main' });
+                        if (!mainProd || mainProd.length < 1) return;
+
+                        _EA_PUSH('CONVERSION', [{
+                            "orderNumber": orderInfo.orderNumber,
+                            "currencyCode": currencyCode ? currencyCode : "",
+                            "orderPrice": parseFloat(orderInfo.orderTotalFull).toFixed(2),
+                            "ip": ip ? ip : "",
+                            "productId": mainProd[0].pid,
+                            //"productName": mainProd[0].name,
+                            "sku": mainProd[0].sku,
+                            "campaignName": mainCampaignName ? mainCampaignName : "",
+                            "campaignWebKey": mainWebKey ? mainWebKey : "",
+                            "customeremail": orderInfo.cusEmail,
+                            "customerId": customerId ? customerId : "",
+                            "firstName": user_firstname ? user_firstname : "",
+                            "lastName": user_lastname ? user_lastname : ""
+                        }]);
+
+                        console.log('isCrmConversionTracked');
+                        utils.localStorage().set('isCrmConversionTracked', true);
+                    }
+
+                    clearInterval(timer);
+                }
+            }, 1000);
+        } catch (err) {
+            console.log("trackConversionWithFP error: ", err);
+        }
+    }
+
     function _updateThrottled(throttled, siteDomain) {
         try {
             const affParam = utils.getQueryParameter('Affid');
@@ -715,13 +764,14 @@
         //Fire Pixels
         //utils.fireCakePixel();
         const ersParam = utils.getQueryParameter('ERS');
-        if(!ersParam || ersParam.toLowerCase() !== 'y') {
+        if (!ersParam || ersParam.toLowerCase() !== 'y') {
             utils.fireEverFlow();
         } else {
             console.log('not fire EF');
         }
         utils.firePicksell();
         utils.fireMainOrderToGTMConversion();
+        utils.trackConversionWithFP();
     }
 
     //check and fire gtm convertion event for order pages
@@ -831,6 +881,16 @@
         } catch (err) {
             console.log(err);
         }
+    }
+
+    //CTRwow FP tracking pixel
+    function ctrwowTrackingFPPixel() {
+        window.__CTR_FP_TRACKING_SETTINGS = { MODE: "prod" };
+
+        const script = document.createElement('script');
+        script.src = 'https://ctrwow-commonstorage.azureedge.net/common/js/CTR_FP_TRACKING-v1.0.1.min.js';
+        script.defer = true;
+        document.body.appendChild(script);
     }
 
     function createCookie(name, value, days) {
@@ -1012,8 +1072,26 @@
         try {
             if (typeof window.applyTax === 'undefined') return;
 
-            const countryCode = window.localStorage.getItem('countryCode');
-            const stateCode = window.localStorage.getItem('stateCode');
+            let countryCode = window.localStorage.getItem('countryCode');
+            let stateCode = window.localStorage.getItem('stateCode');
+
+            const userPaymentType = window.localStorage.getItem('userPaymentType');
+            if (userPaymentType && userPaymentType === 'paypal') {
+                let campProducts = window.localStorage.getItem('campproducts');
+                const mainWebKey = window.localStorage.getItem('mainWebKey');
+                if (campProducts && mainWebKey) {
+                    campProducts = JSON.parse(campProducts);
+                    const camp = campProducts.camps.filter(camp => {
+                        return camp[mainWebKey];
+                    });
+
+                    if (camp && camp.length > 0) {
+                        countryCode = camp[0][mainWebKey].location.countryCode;
+                        stateCode = camp[0][mainWebKey].location.regionCode;
+                    }
+                }
+            }
+
             if (!countryCode || !stateCode) {
                 const spanUpsellPriceElems = _qAll('.spanUpsellPrice');
                 for (let spanUpsellPrice of spanUpsellPriceElems) {
@@ -1064,13 +1142,23 @@
         init() {
             //this.fireMainOrderToGTMConversion();
             this.fireGtmPurchaseEvent();
+            utils.ctrwowTrackingFPPixel();
         }
     }
 
     //Common Order classs is used in all sites
     class CommonOrder {
+        //Save gtmId to localStorage to use in confirm page for multiple flow order
+        saveGtmId() {
+            const gtmId = document.getElementById('gtmId');
+            if (gtmId) {
+                window.localStorage.setItem('orderGtmId', gtmId.value);
+            }
+        }
+
         init() {
-            //console.log('nothing in common');
+            this.saveGtmId();
+            utils.ctrwowTrackingFPPixel();
         }
     }
 
@@ -1092,14 +1180,14 @@
 
     //Custom Events inject to CTA Button - Tu Nguyen
     class injectCustomEventsToCTABtn {
-        preventCheckout(paypentType = true, cbFnc){
+        preventCheckout(paypentType = true, cbFnc) {
             //Paypemt Type
-                //-- 'paypal' : prevent checkout only with paypal
-                //-- 'cc' : prevent checkout only with creditcard
-                //-- true : prevent checkout with both of paypal and creditcard
+            //-- 'paypal' : prevent checkout only with paypal
+            //-- 'cc' : prevent checkout only with creditcard
+            //-- true : prevent checkout with both of paypal and creditcard
             //cbFnc
-                //-- Excute callback function
-            switch(paypentType){
+            //-- Excute callback function
+            switch (paypentType) {
                 case 'paypal':
                     window.preventCheckoutPaypal = true;
                     break;
@@ -1109,27 +1197,46 @@
                 default:
                     window.preventCheckout = true;
             }
-            if(typeof cbFnc === 'function'){
+            if (typeof cbFnc === 'function') {
                 cbFnc();
             }
         }
 
-        emitEventAfterCheckout(paypentType = true, registerFnc, stopRedirect = false){
-            //@paypentType
-                //-- 'paypal' : emit events only with paypal successfully
-                //-- 'cc' : emit events only with credit card successfully
-                //-- true : emit events with both of paypal  and creditcard successfully
-            //@stopRedirect
-                //-- if @true, enable variable window.stopRedirect & prevent page are moving on next Url
-            //@registerFnc
-                //-- register Event to emitted after checkout success page.
+        //Enable Checkout normally
+        disablePreventCheckout(paypentType = true, cbFnc) {
+            switch (paypentType) {
+                case 'paypal':
+                    window.preventCheckoutPaypal = false;
+                    break;
+                case 'cc':
+                    window.preventCheckoutCredit = false;
+                    break;
+                default:
+                    window.preventCheckoutPaypal = false;
+                    window.preventCheckoutCredit = false;
+                    window.preventCheckout = false;
+            }
+            if (typeof cbFnc === 'function') {
+                cbFnc();
+            }
+        }
 
-            switch(paypentType){
+        emitEventAfterCheckout(paypentType = true, registerFnc, stopRedirect = false) {
+            //@paypentType
+            //-- 'paypal' : emit events only with paypal successfully
+            //-- 'cc' : emit events only with credit card successfully
+            //-- true : emit events with both of paypal  and creditcard successfully
+            //@stopRedirect
+            //-- if @true, enable variable window.stopRedirect & prevent page are moving on next Url
+            //@registerFnc
+            //-- register Event to emitted after checkout success page.
+
+            switch (paypentType) {
                 case 'paypal':
                     window.emitAfterSuccessPaypal = true;
                     //Register Events
-                    if(typeof registerFnc === 'function') {
-                        utils.events.on('fireAfterSuccessPP', function(data){
+                    if (typeof registerFnc === 'function') {
+                        utils.events.on('fireAfterSuccessPP', function (data) {
                             registerFnc(data);
                         });
                     }
@@ -1137,10 +1244,10 @@
                 case 'cc':
                     window.emitAfterSuccessCredit = true;
 
-                    if(!!stopRedirect) window.stopRedirect = true;
+                    if (!!stopRedirect) window.stopRedirect = true;
 
-                    if(typeof registerFnc === 'function') {
-                        utils.events.on('fireAfterSuccessCC', function(data){
+                    if (typeof registerFnc === 'function') {
+                        utils.events.on('fireAfterSuccessCC', function (data) {
                             registerFnc(data);
                         });
                     }
@@ -1148,11 +1255,11 @@
                 default:
                     window.emitAfterSuccess = true;
 
-                if(typeof registerFnc === 'function') {
-                    utils.events.on('fireAfterSuccess', function(data){
-                        registerFnc(data);
-                    });
-                }
+                    if (typeof registerFnc === 'function') {
+                        utils.events.on('fireAfterSuccess', function (data) {
+                            registerFnc(data);
+                        });
+                    }
             }
         }
     }
@@ -1188,6 +1295,7 @@
         fireCakePixel: fireCakePixel,
         fireEverFlow: fireEverFlow,
         firePicksell: firePicksell,
+        trackConversionWithFP: trackConversionWithFP,
         checkAffAndFireEvents: checkAffAndFireEvents,
         fireMainOrderToGTMConversion: fireMainOrderToGTMConversion,
         fireMainOrderToGTMConversionV2: fireMainOrderToGTMConversionV2,
@@ -1200,6 +1308,7 @@
         focusErrorInputField: focusErrorInputField,
         saveUserInfoWithFingerprint: saveUserInfoWithFingerprint,
         bindTaxForUpsell: bindTaxForUpsell,
-        injectCustomEventsToCTABtn: injectCustomEventsToCTABtn
+        injectCustomEventsToCTABtn: injectCustomEventsToCTABtn,
+        ctrwowTrackingFPPixel: ctrwowTrackingFPPixel
     }
 })(window, document);
