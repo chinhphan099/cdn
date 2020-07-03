@@ -993,8 +993,10 @@
             upsell.orderInfo.isUpsellOrdered = 1;
             const { upsellUrls = [] } = upsell.orderInfo;
             upsellUrls.push({
+                index: upsell.orderInfo.upsellIndex,
                 orderNumber: responseData.orderNumber,
-                url: location.pathname
+                url: location.pathname,
+                price: upsell.products[window.upsell_productindex].productPrices.DiscountedPrice.Value
             });
             upsell.orderInfo.upsellUrls = upsellUrls;
             utils.localStorage().set('orderInfo', JSON.stringify(upsell.orderInfo));

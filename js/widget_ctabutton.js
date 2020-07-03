@@ -126,10 +126,10 @@
 
         //Adding Maropost Id - Tu Nguyen - CTAButton
         if (!!window.maroPostSettingId && maroPostSettingId.isSelected) {
-            if (maroPostSettingId.id.trim() !== '') {
+            if (maroPostSettingId.id.trim() !== "") {
                 orderData.additionalInfo = [{
-                    'key': 'MaropostSettingsId',
-                    'value': maroPostSettingId.id
+                    "key": "MaropostSettingsId",
+                    "value": maroPostSettingId.id
                 }];
             }
         }
@@ -350,10 +350,11 @@
                     }
                 }, time);
             }
-            else {
-                //split test on the page order-miniac-v1-info.html
-                if (document.body.getAttribute('class').indexOf('order-miniac-v1-info') > 0) {
-                    _openCCDeclinePopup();
+            else {                
+                if (location.href.indexOf('en/order-ac-dcl1.html') > 0 && _q('.js-cc-decline-message')) { //split test on the page en/order-ac-dcl1.html
+                    _showCCDeclineMessage();
+                } else if (location.href.indexOf('en/order-ac-dcl2.html') > 0 && _qById('js-cc-decline-popup')) { ////split test on the page en/order-ac-dcl2.html
+                    _showCCDeclinePopup();
                 } else {
                     utils.localStorage().set('userPaymentType', 'creditcard');
                     utils.redirectPage(siteSetting.declineUrl);
@@ -362,20 +363,80 @@
         });
     }
 
-    function _openCCDeclinePopup() {
+    function _showCCDeclineMessage() {
+        _hideAjaxLoading();
+
+        const ccDeclineMessage = _q('.js-cc-decline-message');
+        if (ccDeclineMessage) {
+            ccDeclineMessage.classList.remove('hidden');
+
+            _showErrorAndFocusCCForm();
+        }
+    }
+
+    function _showErrorAndFocusCCForm() {
+        const ccNumber = _qById('creditcard_creditcardnumber');
+        if (ccNumber) {
+            ccNumber.classList.remove('input-valid');
+            ccNumber.classList.add('input-error');
+            ccNumber.focus();
+            if (window.navigator.userAgent.indexOf("MSIE ") > 0) { //IE
+                ccDeclineMessage.scrollIntoView();
+            } else {
+                ccDeclineMessage.scrollIntoView({ behavior: "smooth" });
+            }
+        }
+
+        const cvv = _qById('creditcard_cvv');
+        if (cvv) {
+            cvv.classList.remove('input-valid');
+            cvv.classList.add('input-error');
+        }
+    }
+
+    function _showCCDeclinePopup() {
         _hideAjaxLoading();
 
         const ccDeclinePopup = _qById('js-cc-decline-popup');
-        if(ccDeclinePopup) {
-            ccDeclinePopup.classList.remove('hidden');
-        }
+        if (ccDeclinePopup) {
+            //bind close event
+            const btnOK = ccDeclinePopup.querySelector('.btn_ok');
+            if(btnOK) {
+                btnOK.addEventListener('click', e => {
+                    e.preventDefault();
+                    window.closePopup('js-cc-decline-popup');
+                    _showErrorAndFocusCCForm();
+                });
+            }
 
-        //focus cc number field
-        const ccNumber = _qById('creditcard_creditcardnumber');
-        if(ccNumber) {
-            ccNumber.focus();
-            window.scrollTo(ccNumber.getBoundingClientRect().left, ccNumber.getBoundingClientRect().top);
+            const iconClose = ccDeclinePopup.querySelector('.icon-close');
+            if(iconClose) {
+                iconClose.addEventListener('click', e => {
+                    e.preventDefault();
+                    window.closePopup('js-cc-decline-popup');
+                    _showErrorAndFocusCCForm();
+                });
+            } 
+
+            //show popup
+            window.showPopup('js-cc-decline-popup');            
         }
+    }
+
+    function _openCCDeclinePopup() {
+        // _hideAjaxLoading();
+
+        // const ccDeclinePopup = _qById('js-cc-decline-popup');
+        // if(ccDeclinePopup) {
+        //     ccDeclinePopup.classList.remove('hidden');
+        // }
+
+        // //focus cc number field
+        // const ccNumber = _qById('creditcard_creditcardnumber');
+        // if(ccNumber) {
+        //     ccNumber.focus();
+        //     window.scrollTo(ccNumber.getBoundingClientRect().left, ccNumber.getBoundingClientRect().top);
+        // }
     }
 
     function handleButtonClick() {
@@ -399,24 +460,19 @@
                 placeMainOrder('creditcard');
 
                 //store into localStorage, when user back from decline page it will be autofill
-                try {
-                    const customerInfo = {
-                        email: !!_qById('customer_email') ? _qById('customer_email').value : '',
-                        fName: !!_qById('customer_firstname') ? _qById('customer_firstname').value : '',
-                        lName: !!_qById('customer_lastname') ? _qById('customer_lastname').value : '',
-                        phone: !!_qById('customer_phone') ? _qById('customer_phone').value : '',
-                        address1: !!_qById('shipping_address1') ? _qById('shipping_address1').value : '',
-                        address2: !!_qById('shipping_address2') ? _qById('shipping_address2').value : '',
-                        city: !!_qById('shipping_city') ? _qById('shipping_city').value : '',
-                        country: !!_qById('shipping_country') ? _qById('shipping_country').value : '',
-                        state: !!_qById('shipping_province') ? _qById('shipping_province').value : '',
-                        postcode: !!_qById('shipping_postal') ? _qById('shipping_postal').value : ''
-                    };
-                    utils.localStorage().set('customerInfo', JSON.stringify(customerInfo));
-                }
-                catch(error) {
-                    console.log(error);
-                }
+                const customerInfo = {
+                    email: _qById('customer_email').value,
+                    fName: _qById('customer_firstname').value,
+                    lName: _qById('customer_lastname').value,
+                    phone: _qById('customer_phone').value,
+                    address1: _qById('shipping_address1').value,
+                    address2: _qById('shipping_address2').value,
+                    city: _qById('shipping_city').value,
+                    country: _qById('shipping_country').value,
+                    state: _qById('shipping_province').value,
+                    postcode: _qById('shipping_postal').value
+                };
+                utils.localStorage().set('customerInfo', JSON.stringify(customerInfo));
             }
         });
     }
@@ -426,7 +482,6 @@
     });
 
     window.cc = {
-        isValidInfos: isValidInfos,
         placeMainOrder: placeMainOrder,
     };
 })(window.utils);

@@ -156,6 +156,16 @@
             }
         }
 
+        //Adding Maropost Id - Tu Nguyen - Paypal Button
+        if(!!window.maroPostSettingId && maroPostSettingId.isSelected){
+            if(maroPostSettingId.id.trim() !== ""){
+                orderData.additionalInfo = [{
+                    "key": "MaropostSettingsId",
+                    "value": maroPostSettingId.id
+                }];
+            }
+        }
+
         return orderData;
     }
 
@@ -218,6 +228,7 @@
             'fCurrency': fCurrency,
             'orderedProducts': [
                 {
+					type: 'main',
                     sku: product.sku,
                     pid: product.productId
                 }
