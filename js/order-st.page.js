@@ -985,4 +985,8 @@
     document.addEventListener('DOMContentLoaded', () => {
         initial();
     });
+
+    window.orderst = {
+        handleExitPopupEvents: handleExitPopupEvents
+    };
 })(window.utils);
