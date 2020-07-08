@@ -332,6 +332,9 @@
     let injectCustomEvents = new utils.injectCustomEventsToCTABtn;
 
     injectCustomEvents.preventCheckout('paypal', function () {
+        if (!_q('#js-paypal-oneclick-button .w_radio')) {
+            return;
+        }
         _q('#js-paypal-oneclick-button .w_radio').addEventListener('click', function () {
             if (!!diggyPopup) {
                 window.showPopup('diggyPopup');
