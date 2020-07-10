@@ -5,6 +5,7 @@
     }
 
     window.isNotCallApiUpsell = true;
+    window.widget = window.widget ? window.widget : {};
     let retailPriceDepositOneUnit = 1;
 
     function q(selector) {
@@ -836,7 +837,7 @@
             }
             return isValid;
         };
-        window.widget = window.widget ? window.widget : {};
+
         window.widget.productlist = {
             isValidProductList: isValidProductList
         };
