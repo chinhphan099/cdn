@@ -713,6 +713,7 @@
     }
 
     function onActiveCoupon() {
+        utils.events.emit('onPrepareButtonEvent');
         _qById('couponBtn').classList.remove('disabled');
         _qById('couponBtn').addEventListener('click', (e) => {
             e.target.disabled = true;
