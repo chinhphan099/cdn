@@ -120,6 +120,10 @@
             }
         }
 
+        if(!!window.multipleMiniUpsells && window.multipleMiniUpsells.length > 0) {
+            orderData.multipleMiniUpsells = window.multipleMiniUpsells;
+        }
+
         if (_qById('ddl_installpayment')) {
             orderData.payment.Instalments = _qById('ddl_installpayment').value;
         }
