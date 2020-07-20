@@ -1,0 +1,50 @@
+#if($UtilMethods.isSet($siteData.footer.facebookPixelIds))
+    #set($fbIds = $siteData.footer.facebookPixelIds)
+
+    #if($pagetitle.indexOf('order-pre-index-confirm') > -1)
+        #if($UtilMethods.isSet($siteData.footer.facebookPixelIds))
+          <script>
+            !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','//connect.facebook.net/en_US/fbevents.js');
+            #foreach($fbId in $fbIds.split(','))
+            fbq('init', '$fbId.trim()');
+            #end
+            fbq('track', 'PageView');
+            #if($dotPageContent.url.indexOf('order.html') > -1)
+            fbq('track', 'InitiateCheckout')
+            #end
+          </script>
+          <noscript>
+            #foreach($fbId in $fbIds.split(','))
+              <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=$fbId.trim()&ev=PageView&noscript=1" />
+            #end
+          </noscript>
+        #end
+    #end
+
+    #if($dotPageContent.url.indexOf('first-upsell-name') > -1)
+        <script>
+            function getQueryParameter(param) {
+                let href = '';
+                if (location.href.indexOf('?')) {
+                    href = location.href.substr(location.href.indexOf('?'));
+                }
+
+                const value = href.match(new RegExp('[\?\&]' + param + '=([^\&]*)(\&?)', 'i'));
+                return value ? value[1] : null;
+            }
+            if(getQueryParameter('Affid') === '2908') {
+                if (document.location.href.search('gtm-msr.appspot') == -1) {
+                    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','//connect.facebook.net/en_US/fbevents.js');
+                    var orderInfo_mini = JSON.parse(localStorage.getItem('orderInfo'));
+                    var currencyCode_mini = localStorage.getItem('currencyCode');
+                    #foreach($fbId in $fbIds.split(','))
+                        fbq('init', '$fbId.trim()');
+                        if(orderInfo_mini && orderInfo_mini.orderTotal) {
+                            fbq('trackSingle', '$fbId.trim()', 'Purchase', { value: orderInfo_mini.orderTotal,currency: currencyCode_mini, });
+                        }
+                    #end
+                }
+            }
+        </script>
+    #end
+#end

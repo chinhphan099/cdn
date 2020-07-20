@@ -1,0 +1,4 @@
+#set($languageFolder = $dotPageContent.url.substring(1, 3))
+#set($fileName = $dotPageContent.url.replaceAll("^.*(\\|\/|:)", "").replaceAll("\.[a-z]*", ""))
+#define($pageJson)#include($webapi.getAssetPath("/application/data/${fileName}-${languageFolder}.json", $host.identifier))#end
+#set($pageData = $json.generate($pageJson.toString()))
