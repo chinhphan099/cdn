@@ -156,6 +156,10 @@
             }
         }
 
+        if(!!window.multipleMiniUpsells && window.multipleMiniUpsells.length > 0) {
+            orderData.multipleMiniUpsells = window.multipleMiniUpsells;
+        }
+
         //Adding Maropost Id - Tu Nguyen - Paypal Button
         if(!!window.maroPostSettingId && maroPostSettingId.isSelected){
             if(maroPostSettingId.id.trim() !== ""){

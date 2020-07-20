@@ -120,6 +120,10 @@
             }
         }
 
+        if(!!window.multipleMiniUpsells && window.multipleMiniUpsells.length > 0) {
+            orderData.multipleMiniUpsells = window.multipleMiniUpsells;
+        }
+
         if (_qById('ddl_installpayment')) {
             orderData.payment.Instalments = _qById('ddl_installpayment').value;
         }
@@ -350,7 +354,7 @@
                     }
                 }, time);
             }
-            else {                
+            else {
                 if (location.href.indexOf('en/order-ac-dcl1.html') > 0 && _q('.js-cc-decline-message')) { //split test on the page en/order-ac-dcl1.html
                     _showCCDeclineMessage();
                 } else if (location.href.indexOf('en/order-ac-dcl2.html') > 0 && _qById('js-cc-decline-popup')) { ////split test on the page en/order-ac-dcl2.html
@@ -416,10 +420,10 @@
                     window.closePopup('js-cc-decline-popup');
                     _showErrorAndFocusCCForm();
                 });
-            } 
+            }
 
             //show popup
-            window.showPopup('js-cc-decline-popup');            
+            window.showPopup('js-cc-decline-popup');
         }
     }
 
