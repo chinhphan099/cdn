@@ -965,7 +965,7 @@
         }
 
         const personalizationText = js_translate.personalizationText.replace(/firstName/gi, firstName).replace(/\%20/g, ' ');
-        _q('.top-header .breakcrum').insertAdjacentHTML('afterBegin', `<div class="personalization">${personalizationText}</div>`);
+        _q('.top-header .breakcrum').insertAdjacentHTML('afterBegin', `<div class="personalization" style="padding: 0 15px; margin-top: 20px; margin-bottom: -10px; font-size: 17px; line-height: 1.3; text-align: center; font-weight: 700;">${personalizationText}</div>`);
     }
 
     function initial() {
