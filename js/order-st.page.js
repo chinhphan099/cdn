@@ -1,3 +1,4 @@
+// Order ST
 ((utils) => {
     if (!utils) {
         console.log('utils module is not found');
@@ -382,7 +383,13 @@
                 if (!!e.target.dataset.product) {
                     loadStatistical();
                 }
-                if (((!!utils.getQueryParameter('temp') || !!utils.getQueryParameter('qt'))) && !_q('body').classList.contains('wasteClick')) {
+                /*
+                    - setup wasteClick -
+                    window.isWasteClick = true; // 1. set value
+                    _q('.productRadioListItem.item-3 .js-unitDiscountRate').click(); // 2. Trigger Event here
+                    _q('body').classList.add('wasteClick'); // 3. Add class
+                */
+                if ((!!utils.getQueryParameter('temp') || !!utils.getQueryParameter('qt') || !!window.isWasteClick) && !_q('body').classList.contains('wasteClick')) {
                     console.log('wasteClick');
                     return;
                 }
