@@ -177,6 +177,7 @@
             'orderNumber': orderResponse.orderNumber,
             'cusEmail': _qById('customer_email').value,
             'cardId': orderResponse.cardId,
+            'cardType': !!_qById('creditcard_creditcardnumber') ? _qById('creditcard_creditcardnumber').dataset.cardtype : "",
             'paymentProcessorId': orderResponse.paymentProcessorId,
             'addressId': orderResponse.customerResult.shippingAddressId,
             'orderTotal': product.productPrices.DiscountedPrice.Value,
