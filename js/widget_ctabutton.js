@@ -444,6 +444,23 @@
         // }
     }
 
+    function saveCustomerInfo() {
+        //store into localStorage, when user back from decline page it will be autofill
+        const customerInfo = {
+            email: !!_qById('customer_email') ? _qById('customer_email').value : '',
+            fName: !!_qById('customer_firstname') ? _qById('customer_firstname').value : '',
+            lName: !!_qById('customer_lastname') ? _qById('customer_lastname').value : '',
+            phone: !!_qById('customer_phone') ? _qById('customer_phone').value : '',
+            address1: !!_qById('shipping_address1') ? _qById('shipping_address1').value : '',
+            address2: !!_qById('shipping_address2') ? _qById('shipping_address2').value : '',
+            city: !!_qById('shipping_city') ? _qById('shipping_city').value : '',
+            country: !!_qById('shipping_country') ? _qById('shipping_country').value : '',
+            state: !!_qById('shipping_province') ? _qById('shipping_province').value : '',
+            postcode: !!_qById('shipping_postal') ? _qById('shipping_postal').value : ''
+        };
+        utils.localStorage().set('customerInfo', JSON.stringify(customerInfo));
+    }
+
     function handleButtonClick() {
         const ctaButton = _qById('js-basic-cta-button');
         if (!ctaButton) return;
@@ -452,32 +469,24 @@
             e.preventDefault();
             window.ccFlag = true;
             window.paypalFlag = false;
-            if (!isValidInfos()) {
-                return;
-            }
+
             if (!!_q('.widget_modal_upsell')) {
+                if (!isValidInfos()) {
+                    return;
+                }
+
                 _q('.widget_modal_upsell').style.display = 'block';
             }
             else if (!!window.preventCheckoutCredit || !!window.preventCheckout) {
                 return;
             }
             else {
-                placeMainOrder('creditcard');
+                if (!isValidInfos()) {
+                    return;
+                }
 
-                //store into localStorage, when user back from decline page it will be autofill
-                const customerInfo = {
-                    email: _qById('customer_email').value,
-                    fName: _qById('customer_firstname').value,
-                    lName: _qById('customer_lastname').value,
-                    phone: _qById('customer_phone').value,
-                    address1: _qById('shipping_address1').value,
-                    address2: _qById('shipping_address2').value,
-                    city: _qById('shipping_city').value,
-                    country: _qById('shipping_country').value,
-                    state: _qById('shipping_province').value,
-                    postcode: _qById('shipping_postal').value
-                };
-                utils.localStorage().set('customerInfo', JSON.stringify(customerInfo));
+                placeMainOrder('creditcard');
+                saveCustomerInfo();
             }
         });
     }
@@ -487,6 +496,8 @@
     });
 
     window.cc = {
+        isValidInfos: isValidInfos,
+        // saveCustomerInfo: saveCustomerInfo, // Still split test and not apply yet, so don't export this function!
         placeMainOrder: placeMainOrder,
     };
 })(window.utils);
