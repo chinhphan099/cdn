@@ -11,6 +11,8 @@
             if(elem.children.length === 0 || elem.tagName.toLowerCase() === 'span') {
                 elem.innerHTML = elem.innerHTML.replace(/{unitprice}/g, '<span class="spanUnitUpsellPrice"></span>');
                 elem.innerHTML = elem.innerHTML.replace(/{unitfullprice}/g, '<span class="spanUnitFullPrice"></span>');
+                elem.innerHTML = elem.innerHTML.replace(/{saveprice}/g, '<span class="spanSavePrice"></span>');
+                elem.innerHTML = elem.innerHTML.replace(/{shipping}/g, '<span class="spanShipping"></span>');
             }
         }
     }
@@ -28,6 +30,16 @@
         const spanFullPriceElems = _qAll('.spanFullPrice');
         for(let spanFullPrice of spanFullPriceElems) {
             spanFullPrice.innerHTML = data.fullPrice;
+        }
+
+        const spanSavePriceElems = _qAll('.spanSavePrice');
+        for(let spanSavePrice of spanSavePriceElems) {
+            spanSavePrice.innerHTML = data.savePrice;
+        }
+
+        const spanShippingElems = _qAll('.spanShipping');
+        for(let spanShipping of spanShippingElems) {
+            spanShipping.innerHTML = data.priceShipping;
         }
 
         const spanUnitPriceElems = _qAll('.spanUnitUpsellPrice');
@@ -108,6 +120,9 @@
             unitFullRateValue = product.productPrices.UnitFullRetailPrice.Value;
         }
 
+        let savePriceValue = (product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value).toFixed(2),
+            savePrice = utils.formatPrice(savePriceValue, fCurrency, product.productPrices.DiscountedPrice.FormattedValue);
+
         result = {
             productId: product.productId,
             quantity: product.quantity,
@@ -120,6 +135,8 @@
             unitDiscountPriceValue: product.productPrices.UnitDiscountRate.Value,
             fullPrice: product.productPrices.FullRetailPrice.FormattedValue,
             fullPriceValue: product.productPrices.FullRetailPrice.Value,
+            savePrice: savePrice,
+            savePriceValue: savePriceValue,
             unitFullPrice: unitFullRateText,
             unitFullPriceValue: unitFullRateValue,
             currencyCode: product.productPrices.FullRetailPrice.GlobalCurrencyCode != null ? product.productPrices.FullRetailPrice.GlobalCurrencyCode : '',
