@@ -159,7 +159,7 @@
                     }
                     if (position === 350) {
                         clearInterval(slpage);
-                        window.location.href = redirectUrl + btnParamId;
+                        window.location.href = redirectUrl;
                     }
                     else {
                         position += 10;
