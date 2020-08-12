@@ -251,7 +251,7 @@
                 activateCreditCardUpgrade(false, window.urlRedirect);
                 break;
         }
-    };
+    }
 
     //Attach event Upgrade and cancelUpgrade for button add & button-cancel
     function handleEventButton() {
@@ -277,7 +277,7 @@
                 renderPrice();
             });
         });
-    };
+    }
 
     //Clear Parameter tracking double popup id
     function clearPopupParameters() {
