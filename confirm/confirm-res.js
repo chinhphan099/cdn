@@ -61,7 +61,7 @@
                     .replace('customerName', data.firstName + ' ' + data.lastName)
                     .replace('customerEmail', data.customerEmail)
                     .replace('orderTotalValue', orderTotal.toFixed(2))
-                    .replace('currencyCode', data.currencyCode)
+                    .replace(/\{priceDeposit\}/g, data.receipts[0].formattedAmount)
                     .replace('orderTotal', utils.formatPrice(orderTotal.toFixed(2), fCurrency, shippingPriceFormatted))
                     .replace('orderSaved', utils.formatPrice(confirm.orderInfo.savedTotal.toFixed(2), fCurrency, shippingPriceFormatted));
             }
