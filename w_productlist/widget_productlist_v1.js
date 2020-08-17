@@ -541,6 +541,10 @@
                     if (!!window.pageType && window.pageType !== 'normal') {
                         utils.localStorage().set('pageType', window.pageType);
                     }
+                    // Set main webkey according active Tab
+                    if (!!_q('.js-list-group .active') && !!_q('.js-list-group .active').dataset.webkey) {
+                        siteSetting.webKey = _q('.js-list-group .active').dataset.webkey;
+                    }
                 }, 1000);
                 utils.events.emit('triggerAddressForm', siteSetting.countryCode);
                 utils.events.emit('triggerProductBannerSidebar', productInfo);
