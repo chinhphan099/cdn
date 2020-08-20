@@ -71,7 +71,7 @@
     }
 
     function changeOrderElem(){
-        if(document.querySelector('.step-2')){
+        if(document.querySelector('.step-2') && document.querySelector('.js-list-group')) {
             let _elem = document.querySelector('.js-list-group');
             let _target = document.querySelector('.step-2');
             _target.parentNode.insertBefore(_elem, _target);
