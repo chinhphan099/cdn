@@ -71,14 +71,14 @@
     }
 
     function changeOrderElem(){
-        if(document.querySelector('.step-2')){
+        if(document.querySelector('.step-2') && document.querySelector('.js-list-group')) {
             let _elem = document.querySelector('.js-list-group');
             let _target = document.querySelector('.step-2');
             _target.parentNode.insertBefore(_elem, _target);
         }
     }
 
-	function replaceUserString() {
+    function replaceUserString() {
         //Product List Widget
         if(_qAll('.js-list-group li').length > 0 && !!_q('.js-list-group li.active p > span')) {
             const plug = _q('.js-list-group li.active p > span').innerText;
@@ -97,7 +97,7 @@
         }
     }
 
-	function changeTabs() {
+    function changeTabs() {
         replaceUserString();
         if(_qAll('.js-list-group li').length > 0) {
             Array.prototype.slice.call(_qAll('.js-list-group li')).forEach(item => {
@@ -115,13 +115,13 @@
                 }
             });
         }
-	}
+    }
 
     window.addEventListener('DOMContentLoaded', () => {
         activatedProductItem();
         focusedInputField();
         changeOrderElem();
-		changeTabs();
+        changeTabs();
     });
 
 })(window.utils);

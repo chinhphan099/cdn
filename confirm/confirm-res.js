@@ -50,9 +50,11 @@
             for(let i = 0, n = orderSummaryElem.length; i < n; i++) {
                 let orderTotal = data.orderPrice;
 
-                for(let i = 0; i < data.relatedOrders.length; i++ ) {
-                    if(data.relatedOrders[i].orderStatus !== 'Cancel') {
-                        orderTotal += data.relatedOrders[i].orderPrice;
+                if (!!data.relatedOrders) {
+                    for(let i = 0; i < data.relatedOrders.length; i++ ) {
+                        if(data.relatedOrders[i].orderStatus !== 'Cancel') {
+                            orderTotal += data.relatedOrders[i].orderPrice;
+                        }
                     }
                 }
 
@@ -61,7 +63,7 @@
                     .replace('customerName', data.firstName + ' ' + data.lastName)
                     .replace('customerEmail', data.customerEmail)
                     .replace('orderTotalValue', orderTotal.toFixed(2))
-                    .replace('currencyCode', data.currencyCode)
+                    .replace(/\{priceDeposit\}/g, data.receipts[0].formattedAmount)
                     .replace('orderTotal', utils.formatPrice(orderTotal.toFixed(2), fCurrency, shippingPriceFormatted))
                     .replace('orderSaved', utils.formatPrice(confirm.orderInfo.savedTotal.toFixed(2), fCurrency, shippingPriceFormatted));
             }
@@ -248,71 +250,73 @@
             }
         }
 
-        for(let i = 0; i < data.relatedOrders.length; i++) {
-            if(data.relatedOrders[i].orderStatus === 'Cancel') continue;
+        if (!!data.relatedOrders) {
+            for(let i = 0; i < data.relatedOrders.length; i++) {
+                if(data.relatedOrders[i].orderStatus === 'Cancel') continue;
 
-            if(confirm.orderInfo.installmentValue && confirm.orderInfo.installmentValue !== '') {
-                const mainPrice = (data.relatedOrders[i].orderPrice / confirm.orderInfo.installmentValue).toFixed(2);
-                installmentText = ' (' + confirm.orderInfo.installmentText
-                    .replace(/N/, confirm.orderInfo.installmentValue)
-                    .replace(/\$price/, utils.formatPrice(mainPrice, fCurrency, shippingPriceFormatted)) + ')';
-            }
-
-            let itemTmp = '';
-            if(data.relatedOrders[i].productName.toLowerCase().indexOf('warranty')>-1 && utils.localStorage().get('preOrderWarranty') !== 'true' && utils.localStorage().get('warrantyMonthlyCharge') !== 'true'){
-                itemTmp = productItemTmpWarranty.replace('{productName}', data.relatedOrders[i].productName)
-                    .replace(/\{productPrice\}/g, data.relatedOrders[i].orderPriceFormatted)
-                    .replace(/\{remainingBalancePrice\}/g, data.relatedOrders[i].orderPriceFormatted)
-                    .replace(/\{tax\}/g, '')
-                    .replace(/\{productTotalPreOrder\}/g, `${totalPreOrder}<em>${installmentText}</em>`)
-                    .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}<em>${installmentText}</em>`)
-                    .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
-                    .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
-                    .replace(/\{orderNumber\}/g, data.relatedOrders[i].orderNumber);
-
-                totalBalance = totalBalance + data.relatedOrders[i].orderPrice;
-                grandTotal += data.relatedOrders[i].orderPrice;
-            }else if(data.relatedOrders[i].productName.toLowerCase().indexOf('warranty')>-1 && utils.localStorage().get('preOrderWarranty') !== 'true' && utils.localStorage().get('warrantyMonthlyCharge') === 'true'){
-                itemTmp = productItemTmpWarrantyMonthLyCharge.replace('{productName}', data.relatedOrders[i].productName)
-                    .replace(/\{productPrice\}/g, data.relatedOrders[i].receipts[0].formattedAmount)
-                    .replace(/\{remainingBalancePrice\}/g, data.relatedOrders[i].receipts[0].formattedAmount)
-                    .replace(/\{tax\}/g, '')
-                    .replace(/\{productTotalPreOrder\}/g, `${totalPreOrder}<em>${installmentText}</em>`)
-                    .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}<em>${installmentText}</em>`)
-                    .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
-                    .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
-                    .replace(/\{orderNumber\}/g, data.relatedOrders[i].orderNumber);
-
-                totalBalance = totalBalance + data.relatedOrders[i].orderPrice;
-                grandTotal += data.relatedOrders[i].orderPrice;
-            }
-            else {
-                //set Total for upsells preOrder
-                let pricePreOrder = data.relatedOrders[i].futureEvents.length > 0 ? Number(data.relatedOrders[i].futureEvents[0].price) : data.relatedOrders[i].orderProductPrice;
-                totalPreOrder = utils.formatPrice(((data.relatedOrders[i].orderPrice - pricePreOrder).toFixed(2)),
-                    fCurrency, shippingPriceFormatted);
-                //grandTotal += data.relatedOrders[i].orderPrice - data.relatedOrders[i].orderProductPrice;
-                totalBalance += pricePreOrder;
-                totalProductsWhenReady += (data.relatedOrders[i].orderPrice - pricePreOrder);
-                let productPrice = data.relatedOrders[i].futureEvents.length > 0 ? data.relatedOrders[i].futureEvents[0].price : data.relatedOrders[i].orderProductPrice;
-                productPrice = utils.formatPrice(productPrice.toFixed(2), fCurrency, shippingPriceFormatted);
-                itemTmp = productItemTmp.replace('{productName}', data.relatedOrders[i].productName)
-                    .replace(/\{productPrice\}/g, productPrice)
-                    .replace(/\{remainingBalancePrice\}/g, data.relatedOrders[i].orderPriceFormatted)
-                    .replace(/\{tax\}/g, '')
-                    .replace(/\{productTotalPreOrder\}/g, `${totalPreOrder}<em>${installmentText}</em>`)
-                    .replace(/\{productTotal\}/g, `${productPrice}<em>${installmentText}</em>`)
-                    .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
-                    .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
-                    .replace(/\{orderNumber\}/g, data.relatedOrders[i].orderNumber);
-            }
-
-            if(!!upsellProductNames) {
-                for(let j = 0; j < upsellProductNames.length; j++) {
-                    itemTmp = itemTmp.replace(upsellProductNames[j].replace(/\,/, '::').split('::')[0].trim(), upsellProductNames[j].replace(/\,/, '::').split('::')[1].trim());
+                if(confirm.orderInfo.installmentValue && confirm.orderInfo.installmentValue !== '') {
+                    const mainPrice = (data.relatedOrders[i].orderPrice / confirm.orderInfo.installmentValue).toFixed(2);
+                    installmentText = ' (' + confirm.orderInfo.installmentText
+                        .replace(/N/, confirm.orderInfo.installmentValue)
+                        .replace(/\$price/, utils.formatPrice(mainPrice, fCurrency, shippingPriceFormatted)) + ')';
                 }
+
+                let itemTmp = '';
+                if(data.relatedOrders[i].productName.toLowerCase().indexOf('warranty')>-1 && utils.localStorage().get('preOrderWarranty') !== 'true' && utils.localStorage().get('warrantyMonthlyCharge') !== 'true'){
+                    itemTmp = productItemTmpWarranty.replace('{productName}', data.relatedOrders[i].productName)
+                        .replace(/\{productPrice\}/g, data.relatedOrders[i].orderPriceFormatted)
+                        .replace(/\{remainingBalancePrice\}/g, data.relatedOrders[i].orderPriceFormatted)
+                        .replace(/\{tax\}/g, '')
+                        .replace(/\{productTotalPreOrder\}/g, `${totalPreOrder}<em>${installmentText}</em>`)
+                        .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}<em>${installmentText}</em>`)
+                        .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
+                        .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
+                        .replace(/\{orderNumber\}/g, data.relatedOrders[i].orderNumber);
+
+                    totalBalance = totalBalance + data.relatedOrders[i].orderPrice;
+                    grandTotal += data.relatedOrders[i].orderPrice;
+                }else if(data.relatedOrders[i].productName.toLowerCase().indexOf('warranty')>-1 && utils.localStorage().get('preOrderWarranty') !== 'true' && utils.localStorage().get('warrantyMonthlyCharge') === 'true'){
+                    itemTmp = productItemTmpWarrantyMonthLyCharge.replace('{productName}', data.relatedOrders[i].productName)
+                        .replace(/\{productPrice\}/g, data.relatedOrders[i].receipts[0].formattedAmount)
+                        .replace(/\{remainingBalancePrice\}/g, data.relatedOrders[i].receipts[0].formattedAmount)
+                        .replace(/\{tax\}/g, '')
+                        .replace(/\{productTotalPreOrder\}/g, `${totalPreOrder}<em>${installmentText}</em>`)
+                        .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}<em>${installmentText}</em>`)
+                        .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
+                        .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
+                        .replace(/\{orderNumber\}/g, data.relatedOrders[i].orderNumber);
+
+                    totalBalance = totalBalance + data.relatedOrders[i].orderPrice;
+                    grandTotal += data.relatedOrders[i].orderPrice;
+                }
+                else {
+                    //set Total for upsells preOrder
+                    let pricePreOrder = data.relatedOrders[i].futureEvents.length > 0 ? Number(data.relatedOrders[i].futureEvents[0].price) : data.relatedOrders[i].orderProductPrice;
+                    totalPreOrder = utils.formatPrice(((data.relatedOrders[i].orderPrice - pricePreOrder).toFixed(2)),
+                        fCurrency, shippingPriceFormatted);
+                    //grandTotal += data.relatedOrders[i].orderPrice - data.relatedOrders[i].orderProductPrice;
+                    totalBalance += pricePreOrder;
+                    totalProductsWhenReady += (data.relatedOrders[i].orderPrice - pricePreOrder);
+                    let productPrice = data.relatedOrders[i].futureEvents.length > 0 ? data.relatedOrders[i].futureEvents[0].price : data.relatedOrders[i].orderProductPrice;
+                    productPrice = utils.formatPrice(productPrice.toFixed(2), fCurrency, shippingPriceFormatted);
+                    itemTmp = productItemTmp.replace('{productName}', data.relatedOrders[i].productName)
+                        .replace(/\{productPrice\}/g, productPrice)
+                        .replace(/\{remainingBalancePrice\}/g, data.relatedOrders[i].orderPriceFormatted)
+                        .replace(/\{tax\}/g, '')
+                        .replace(/\{productTotalPreOrder\}/g, `${totalPreOrder}<em>${installmentText}</em>`)
+                        .replace(/\{productTotal\}/g, `${productPrice}<em>${installmentText}</em>`)
+                        .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
+                        .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
+                        .replace(/\{orderNumber\}/g, data.relatedOrders[i].orderNumber);
+                }
+
+                if(!!upsellProductNames) {
+                    for(let j = 0; j < upsellProductNames.length; j++) {
+                        itemTmp = itemTmp.replace(upsellProductNames[j].replace(/\,/, '::').split('::')[0].trim(), upsellProductNames[j].replace(/\,/, '::').split('::')[1].trim());
+                    }
+                }
+                listProduct += itemTmp;
             }
-            listProduct += itemTmp;
         }
         const ul = document.createElement('ul');
         ul.innerHTML = listProduct;
