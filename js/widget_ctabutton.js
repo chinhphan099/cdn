@@ -263,6 +263,9 @@
     }
 
     function placeMainOrder(paymenttype) {
+        //Detect upsell url to skip warranty page - TuNguyen
+        const warrantyUpsell = !!window.warrantyParam ? warrantyParam.appendParameter() : 0;
+
         //Show Ajax Custom Loading
         //utils.showAjaxLoading();
         let customAjaxLoading = _q('.custom-loading'),
@@ -308,7 +311,7 @@
                         document.location = result.paymentContinueResult.actionUrl;
                     }
                     else if (result.upsells.length > 0 && result.upsells[0].upsellUrl !== '') {
-                        const redirectUrl = result.upsells[0].upsellUrl.substr(result.upsells[0].upsellUrl.lastIndexOf('/') + 1);
+                        const redirectUrl = result.upsells[warrantyUpsell].upsellUrl.substr(result.upsells[warrantyUpsell].upsellUrl.lastIndexOf('/') + 1);
 
                         //Check flag: fireAfterSuccess - to emit event fireAfterSuccess
                         if (!!window.emitAfterSuccessCredit) {

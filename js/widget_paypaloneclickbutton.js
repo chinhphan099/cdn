@@ -17,7 +17,8 @@
         return [lifetimePrice, funnelPrice];
     };
 
-    let product = null;
+    let product = null,
+        upsellIndex = 0;
 
     const eCRM = new EmanageCRMJS({
         webkey: siteSetting.webKey,
@@ -45,6 +46,9 @@
     }
 
     function placeMainOrder() {
+        //Detect upsell url to skip warranty page - TuNguyen
+        upsellIndex = !!window.warrantyParam ? warrantyParam.appendParameter() : 0;
+
         const paymenttype = 'paypal';
         const paypalLoading = _q('.paypal-loading-overlay');
         const checkProductListValue = window.widget.productlist !== undefined ? window.widget.productlist.isValidProductList() : true;
@@ -215,7 +219,7 @@
         var orderInfo = {
             'orderParams': location.search.substr(1),
             'upsells': orderResponse.upsells,
-            'upsellIndex': 0,
+            'upsellIndex': upsellIndex,
             'countryCode': siteSetting.countryCode,
             'orderNumber': orderResponse.orderNumber,
             'cusEmail': _qById('customer_email').value === '' ? null : _qById('customer_email').value,
