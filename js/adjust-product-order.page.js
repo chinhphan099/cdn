@@ -13,6 +13,16 @@
             _q('.productRadioListItem.item-3:not(.hidden) .js-unitDiscountRate').click();
             _q('body').classList.add('haov', 'wasteClick');
         }
+
+        if (utils.getQueryParameter('temp') === 'hcvr3') {
+            _q('.productRadioListItem.item-2:not(.hidden) .js-unitDiscountRate').click();
+            _q('body').classList.add('hcvr3', 'wasteClick');
+        }
+
+        if (utils.getQueryParameter('temp') === 'haov3') {
+            _q('.productRadioListItem.item-2:not(.hidden) .js-unitDiscountRate').click();
+            _q('body').classList.add('haov3', 'wasteClick');
+        }
     }
 
     utils.events.on('bindOrderPage', () => {
