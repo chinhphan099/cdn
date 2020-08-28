@@ -779,49 +779,6 @@
         });
     }
 
-    function implementCoupon(data) {
-        fCurrency = data.fCurrency;
-        if (!!window.couponCodeId && (utils.getQueryParameter('iep') === 'true' || !!_q('.nightowls') || !!_q('.gamefiedWrap')) && !!_q('.coupon-popup')) {
-            if (!window.couponValue.trim()) {
-                return;
-            }
-            let couponValFormat = window.couponValue;
-            let couponVal = Number(couponValFormat.replace('%', ''));
-            couponDiscount = couponVal;
-
-            if (window.couponValue.indexOf('%') === -1) {
-                typeCoupon = 'Money Amount';
-                couponValFormat = utils.formatPrice(couponVal, fCurrency, data.shippingValue.toString());
-            }
-            const promoText = _q('.w_exit_popup .w_promo_text');
-            if (!!promoText) {
-                promoText.innerHTML = promoText.innerHTML.replace(/{couponPrice}/g, couponValFormat);
-            }
-
-            const couponApplyText = _q('.coupon-apply');
-            if (!!couponApplyText) {
-                couponApplyText.innerHTML = couponApplyText.innerHTML.replace(/{couponPrice}/g, couponValFormat);
-            }
-
-            // New Code
-            const jsImageLoadings = _qAll('.w_exit_popup .js-img-loading');
-            for (const jsImageLoading of jsImageLoadings) {
-                jsImageLoading.innerText = couponValFormat;
-            }
-            window.additionText = window.additionText.replace(/{couponPrice}/g, couponValFormat);
-            if (!!window.additionTextSumary) {
-                window.additionTextSumary = window.additionTextSumary.replace(/{couponPrice}/g, couponValFormat);
-            }
-
-            if (!!_qById('couponBtn')) {
-                onActiveCoupon();
-            }
-            if (!!_qById('close-expopup')) {
-                onCloseExitPopup();
-            }
-        }
-    }
-
     function handleExitPopupEvents() {
         if (utils.getQueryParameter('iep') !== 'true' || !_q('.coupon-popup') || utils.getQueryParameter('et') === '1') {
             return;
@@ -927,6 +884,49 @@
         const currencyItems = _qAll('.w_exit_popup .currency');
         for (const currencyItem of currencyItems) {
             currencyItem.innerText = utils.formatPrice(currencyItem.textContent, data.fCurrency, data.discountPrice);
+        }
+    }
+
+    function implementCoupon(data) {
+        fCurrency = data.fCurrency;
+        if (!!window.couponCodeId && (utils.getQueryParameter('iep') === 'true' || !!_q('.nightowls') || !!_q('.gamefiedWrap')) && !!_q('.coupon-popup')) {
+            if (!window.couponValue.trim()) {
+                return;
+            }
+            let couponValFormat = window.couponValue;
+            let couponVal = Number(couponValFormat.replace('%', ''));
+            couponDiscount = couponVal;
+
+            if (window.couponValue.indexOf('%') === -1) {
+                typeCoupon = 'Money Amount';
+                couponValFormat = utils.formatPrice(couponVal, fCurrency, data.shippingValue.toString());
+            }
+            const promoText = _q('.w_exit_popup .w_promo_text');
+            if (!!promoText) {
+                promoText.innerHTML = promoText.innerHTML.replace(/{couponPrice}/g, couponValFormat);
+            }
+
+            const couponApplyText = _q('.coupon-apply');
+            if (!!couponApplyText) {
+                couponApplyText.innerHTML = couponApplyText.innerHTML.replace(/{couponPrice}/g, couponValFormat);
+            }
+
+            // New Code
+            const jsImageLoadings = _qAll('.w_exit_popup .js-img-loading');
+            for (const jsImageLoading of jsImageLoadings) {
+                jsImageLoading.innerText = couponValFormat;
+            }
+            window.additionText = window.additionText.replace(/{couponPrice}/g, couponValFormat);
+            if (!!window.additionTextSumary) {
+                window.additionTextSumary = window.additionTextSumary.replace(/{couponPrice}/g, couponValFormat);
+            }
+
+            if (!!_qById('couponBtn')) {
+                onActiveCoupon();
+            }
+            if (!!_qById('close-expopup')) {
+                onCloseExitPopup();
+            }
         }
     }
 
