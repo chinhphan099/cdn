@@ -762,30 +762,13 @@
             }
 
             //Enable Maropost Setting ID After clicked Button Accept - Tu Nguyen
-            if(!!window.maroPostSettingId){
+            if(!!window.maroPostSettingId) {
                 maroPostSettingId.isSelected = true;
             }
 
             loadStatistical();
             hidePopup(true);
         }, false);
-    }
-
-    function renderSecondPopup() {
-        secondPopupFlag = true;
-        // Update Maropost
-        window.maroPostSettingId.id = _q('.w_exit_popup').dataset.secondmaropostid;
-
-        _q('body').classList.add('render-second-popup');
-        const couponValueFirst = utils.formatPrice(window.couponValue, window.fCurrency, window.couponValue); // $10
-        window.couponValue = window.couponValue2;
-        const couponValFormat = utils.formatPrice(window.couponValue, window.fCurrency, window.couponValue); // $15
-
-        window.additionText = additionTextTmp.replace(/{couponPrice}/g, couponValFormat);
-        window.additionTextSumary = additionTextSumaryTmp.replace(/{couponPrice}/g, couponValFormat);
-        _q('.coupon-apply .title').textContent = _q('.coupon-apply .title').textContent.replace(couponValueFirst, couponValFormat);
-
-        showSecondPopupAfterATime(5000);
     }
 
     function showSecondPopupAfterATime(second) {
@@ -797,6 +780,27 @@
         }, second);
     }
 
+    function renderSecondPopup() {
+        secondPopupFlag = true;
+        // Update Maropost
+        if(!!window.maroPostSettingId && !!_q('.w_exit_popup').dataset.secondmaropostid) {
+            window.maroPostSettingId.id = _q('.w_exit_popup').dataset.secondmaropostid;
+        }
+
+        _q('body').classList.add('render-second-popup');
+        const couponValueFirst = utils.formatPrice(window.couponValue, window.fCurrency, window.couponValue); // $10
+        window.couponValue = window.couponValue2 || window.couponValue;
+        const couponValFormat = utils.formatPrice(window.couponValue, window.fCurrency, window.couponValue); // $15
+
+        window.additionText = additionTextTmp.replace(/{couponPrice}/g, couponValFormat);
+        window.additionTextSumary = additionTextSumaryTmp.replace(/{couponPrice}/g, couponValFormat);
+        if (!!_q('.coupon-apply .title')) {
+            _q('.coupon-apply .title').textContent = _q('.coupon-apply .title').textContent.replace(couponValueFirst, couponValFormat);
+        }
+
+        showSecondPopupAfterATime(5000);
+    }
+
     let isClicked = false;
     function onCloseExitPopup() {
         _qById('close-expopup').addEventListener('click', () => {
@@ -805,7 +809,7 @@
                 isClicked = true;
             }
 
-            if (!secondPopupFlag) {
+            if (!secondPopupFlag && !!_q('.w_exit_popup').classList.contains('two-coupon-popup')) {
                 renderSecondPopup();
                 handleExitPopupEvents();
             }
@@ -818,7 +822,7 @@
                     isClicked = true;
                 }
 
-                if (!secondPopupFlag) {
+                if (!secondPopupFlag && !!_q('.w_exit_popup').classList.contains('two-coupon-popup')) {
                     renderSecondPopup();
                     handleExitPopupEvents();
                 }
