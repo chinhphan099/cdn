@@ -15,8 +15,8 @@
     let isPopupShowing = false;
     let secondPopupTimer;
     let secondPopupFlag = false;
-    let additionTextTmp = window.additionText;
-    let additionTextSumaryTmp = window.additionTextSumary;
+    let additionTextTmp = window.additionText || '';
+    let additionTextSumaryTmp = window.additionTextSumary || '';
     window.shippingIndex = 0;
 
     // Count down
@@ -257,7 +257,7 @@
                 if (!!tdNameElm.querySelector('.text-coupon')) {
                     tdNameElm.querySelector('.text-coupon').parentNode.removeChild(tdNameElm.querySelector('.text-coupon'));
                 }
-                tdNameElm.insertAdjacentHTML('beforeend', ' ' + window.additionTextSumary.replace('{priceCoupon}', fCurrency.replace('######', window.couponValue)));
+                tdNameElm.insertAdjacentHTML('beforeend', ' ' + window.additionTextSumary);
             }
         });
 
@@ -967,9 +967,9 @@
             for (const jsImageLoading of jsImageLoadings) {
                 jsImageLoading.innerText = couponValFormat;
             }
-            window.additionText = window.additionText.replace(/{couponPrice}/g, couponValFormat);
+            window.additionText = additionTextTmp.replace(/{couponPrice}/g, couponValFormat);
             if (!!window.additionTextSumary) {
-                window.additionTextSumary = window.additionTextSumary.replace(/{couponPrice}/g, couponValFormat);
+                window.additionTextSumary = additionTextSumaryTmp.replace(/{couponPrice}/g, couponValFormat);
             }
 
             if (!!_qById('couponBtn')) {
