@@ -1,4 +1,4 @@
-(function (utils) {
+((utils) => {
     if (!utils) {
         console.log('modules is not found');
         return;
@@ -8,33 +8,6 @@
         console.log('window.siteSetting object is not found');
         return;
     }
-
-    function getClosest(elem, selector) {
-        if (!Element.prototype.matches) {
-            Element.prototype.matches =
-                Element.prototype.matchesSelector ||
-                Element.prototype.mozMatchesSelector ||
-                Element.prototype.msMatchesSelector ||
-                Element.prototype.oMatchesSelector ||
-                Element.prototype.webkitMatchesSelector ||
-                function (s) {
-                    let matches = (this.document || this.ownerDocument).querySelectorAll(s),
-                        i = matches.length;
-                    while (--i >= 0 && matches.item(i) !== this) { }
-                    return i > -1;
-                }
-        }
-
-        // Get the closest matching element
-        for (; elem && elem !== document; elem = elem.parentNode) {
-            if (elem.matches(selector)) {
-                return elem;
-            }
-        }
-        return null;
-    }
-
-
 
     //clear local storage
     // utils.localStorage().remove('orderInfo');
@@ -77,7 +50,6 @@
         if (document.body.getAttribute('class').indexOf('order-miniac-v1-info') > 0) {
             bindCustomerInfo();
         }
-
     }
 
     function bindCustomerInfo() {
@@ -138,7 +110,6 @@
                     }
                 }
             }, 500);
-
         }
 
         const shipping_province = _qById('shipping_province');
@@ -203,7 +174,7 @@
     function checkIsSpecialItem() {
         if (!_q('input[name="product"]:checked')) return;
         const checkedItem = _q('input[name="product"]:checked');
-        const proItem = getClosest(checkedItem, '.productRadioListItem');
+        const proItem = _getClosest(checkedItem, '.productRadioListItem');
         if (proItem.classList.contains('special_offer')) {
             utils.localStorage().set('isSpecialOffer', 'true');
         }
@@ -250,7 +221,6 @@
         }
     }
 
-
     function loadingIcons() {
         const iconloading = `<span class="js-img-loading">
                                 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" width="20" height="10" data-src="//d16hdrba6dusey.cloudfront.net/sitecommon/images/loading-price-v1.gif">
@@ -264,8 +234,30 @@
             }
         }
     }
-
     loadingIcons();
+
+    function clearParameter(...params) {
+        for(let param of params) {
+            let url = document.location.href;
+            const urlparts = url.split('?');
+
+            if (urlparts.length >= 2) {
+                const urlBase = urlparts.shift();
+                const queryString = urlparts.join('?');
+
+                const prefix = encodeURIComponent(param) + '=';
+                const pars = queryString.split(/[&;]/g);
+                for (let i = pars.length; i-->0;) {
+                    if (pars[i].lastIndexOf(prefix, 0) !== -1) {
+                        pars.splice(i, 1);
+                    }
+                }
+                url = urlBase + '?' + pars.join('&');
+                window.history.pushState('', document.title, url);
+            }
+        }
+    }
+    clearParameter('10pop', '15pop', 'clickid');
 
     /*--------start : run common order------------*/
     const CommonOrder = utils.CommonOrder;
@@ -277,7 +269,7 @@
 
 })(window.utils);
 
-const quantity = ((utils) => {
+((utils) => {
     if (!utils) {
         console.log('modules is not found');
         return;
@@ -359,13 +351,8 @@ const quantity = ((utils) => {
         listener();
     };
 
-    return {
-        initial: initial,
-        waitingOrderData: waitingOrderData
-    }
+    waitingOrderData();
+    window.addEventListener('DOMContentLoaded', () => {
+        initial();
+    });
 })(window.utils);
-
-quantity.waitingOrderData();
-window.addEventListener('DOMContentLoaded', () => {
-    quantity.initial();
-});
