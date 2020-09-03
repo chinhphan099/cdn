@@ -640,6 +640,13 @@
     }
 
     function afterActiveCoupon() {
+        if (!!secondPopupFlag) {
+            appendParamIntoUrl('15pop', '1');
+        }
+        else {
+            appendParamIntoUrl('10pop', '1');
+        }
+
         if (_q('.coupon-apply')) {
             _q('.coupon-apply').style.display = 'block';
         }
@@ -801,12 +808,27 @@
         showSecondPopupAfterATime(5000);
     }
 
+    function appendParamIntoUrl(param, value) {
+        let currentUrl = window.location.href,
+            newparam = currentUrl.indexOf('?') > -1 ? `&${param}=${value}` : `?${param}=${value}`;
+
+        const newurl = currentUrl + newparam;
+        window.history.pushState({ path: newurl }, '', newurl);
+    }
+
     let isClicked = false;
     function onCloseExitPopup() {
         _qById('close-expopup').addEventListener('click', () => {
             hidePopup(isClicked);
             if (!isClicked) {
                 isClicked = true;
+            }
+
+            if (!!secondPopupFlag) {
+                appendParamIntoUrl('15pop', '0');
+            }
+            else {
+                appendParamIntoUrl('10pop', '0');
             }
 
             if (!secondPopupFlag && !!_q('.w_exit_popup').classList.contains('two-coupon-popup')) {
@@ -820,6 +842,13 @@
                 hidePopup(isClicked);
                 if (!isClicked) {
                     isClicked = true;
+                }
+
+                if (!!secondPopupFlag) {
+                    appendParamIntoUrl('15pop', '0');
+                }
+                else {
+                    appendParamIntoUrl('10pop', '0');
                 }
 
                 if (!secondPopupFlag && !!_q('.w_exit_popup').classList.contains('two-coupon-popup')) {
