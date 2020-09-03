@@ -241,7 +241,7 @@
         }
 
         Array.prototype.slice.call(_qAll('.td-name')).forEach(tdNameElm => {
-            tdNameElm.innerHTML = productNameText + ' ' + productItem.querySelector('.product-name p').innerHTML;
+            tdNameElm.innerHTML = productNameText + ' ' + productItem.querySelector('.product-name p').innerHTML.replace(/&nbsp;/gi, ' ');
             if (!!window.additionTextSumary && _q('.statistical').classList.contains('coupon-actived')) {
                 if (!!tdNameElm.querySelector('.text-coupon')) {
                     tdNameElm.querySelector('.text-coupon').parentNode.removeChild(tdNameElm.querySelector('.text-coupon'));

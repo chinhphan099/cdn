@@ -1,5 +1,5 @@
 (() => {
-  const bodyElm = _q('body');
+  const bodyElm = document.querySelector('body');
   function getScrollbarWidth() {
     const scrollDiv = document.createElement('div');
     scrollDiv.className = 'scrollbar-measure';
