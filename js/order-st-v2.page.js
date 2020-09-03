@@ -252,7 +252,7 @@
         }
 
         Array.prototype.slice.call(_qAll('.td-name')).forEach(tdNameElm => {
-            tdNameElm.innerHTML = productNameText + ' ' + productItem.querySelector('.product-name p').innerHTML;
+            tdNameElm.innerHTML = productNameText + ' ' + productItem.querySelector('.product-name p').innerHTML.replace(/&nbsp;/gi, ' ');
             if (!!window.additionTextSumary && _q('.statistical').classList.contains('coupon-actived')) {
                 if (!!tdNameElm.querySelector('.text-coupon')) {
                     tdNameElm.querySelector('.text-coupon').parentNode.removeChild(tdNameElm.querySelector('.text-coupon'));
@@ -745,6 +745,11 @@
             utils.events.emit('onActivePopup');
             let paramPidOne = utils.getQueryParameter('pid') == 1 && !!_q('.holiday');
             let paramPidTwo = utils.getQueryParameter('pid') == 2 && !!_q('.gift');
+
+            if (!!secondPopupFlag) {
+                onActiveSecondPopup();
+            }
+
             if (!!_q('.w_exit_popup').classList.contains('gift-popup') && (paramPidOne || paramPidTwo)) {
                 activePackageGift();
             }
@@ -773,28 +778,34 @@
                 maroPostSettingId.isSelected = true;
             }
 
-            loadStatistical();
             hidePopup(true);
+
+            if (!secondPopupFlag && !!_q('.w_exit_popup').classList.contains('two-coupon-popup')) {
+                secondPopupFlag = true;
+                _q('body').classList.add('render-second-popup');
+                showSecondPopupAfterATime(5000);
+                handleExitPopupEvents();
+            }
+
+            loadStatistical();
         }, false);
     }
 
     function showSecondPopupAfterATime(second) {
         secondPopupTimer = setTimeout(() => {
-            renderSecondPopup();
+            handleSecondPopup();
             generateCountDown();
             document.removeEventListener('mouseout', handleMouseOut);
             window.removeEventListener('touchmove', handleTouchMove);
         }, second);
     }
 
-    function renderSecondPopup() {
-        secondPopupFlag = true;
+    function onActiveSecondPopup() {
         // Update Maropost
         if(!!window.maroPostSettingId && !!_q('.w_exit_popup').dataset.secondmaropostid) {
             window.maroPostSettingId.id = _q('.w_exit_popup').dataset.secondmaropostid;
         }
 
-        _q('body').classList.add('render-second-popup');
         const couponValueFirst = utils.formatPrice(window.couponValue, window.fCurrency, window.couponValue); // $10
         window.couponValue = window.couponValue2 || window.couponValue;
         const couponValFormat = utils.formatPrice(window.couponValue, window.fCurrency, window.couponValue); // $15
@@ -804,8 +815,11 @@
         if (!!_q('.coupon-apply .title')) {
             _q('.coupon-apply .title').textContent = _q('.coupon-apply .title').textContent.replace(couponValueFirst, couponValFormat);
         }
+    }
 
-        showSecondPopupAfterATime(5000);
+    function handleSecondPopup() {
+        secondPopupFlag = true;
+        _q('body').classList.add('render-second-popup');
     }
 
     function appendParamIntoUrl(param, value) {
@@ -832,7 +846,8 @@
             }
 
             if (!secondPopupFlag && !!_q('.w_exit_popup').classList.contains('two-coupon-popup')) {
-                renderSecondPopup();
+                handleSecondPopup();
+                showSecondPopupAfterATime(5000);
                 handleExitPopupEvents();
             }
         }, false);
@@ -852,7 +867,8 @@
                 }
 
                 if (!secondPopupFlag && !!_q('.w_exit_popup').classList.contains('two-coupon-popup')) {
-                    renderSecondPopup();
+                    handleSecondPopup();
+                    showSecondPopupAfterATime(5000);
                     handleExitPopupEvents();
                 }
             }, false);
