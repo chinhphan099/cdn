@@ -1,8 +1,18 @@
 (() => {
+    function getQueryParameter(param) {
+        let href = '';
+        if (location.href.indexOf('?')) {
+            href = location.href.substr(location.href.indexOf('?'));
+        }
+
+        const value = href.match(new RegExp('[\?\&]' + param + '=([^\&]*)(\&?)', 'i'));
+        return value ? value[1] : null;
+    }
+
     function isInScreenView(winTop, winBot, elmPositions) {
         let ret = false;
-        for(const elmPos of elmPositions) {
-            if(winBot > elmPos && elmPos > winTop) {
+        for (const elmPos of elmPositions) {
+            if (winBot > elmPos && elmPos > winTop) {
                 ret = true;
                 break;
             }
@@ -13,11 +23,11 @@
     function getElmPosition(clsNames) {
         let elmPositions = [];
 
-        for(const clsName of clsNames) {
+        for (const clsName of clsNames) {
             const elms = document.querySelectorAll(clsName);
 
-            for(const elm of elms) {
-                if(!!(elm.offsetWidth || elm.offsetHeight || elm.getClientRects().length)) {
+            for (const elm of elms) {
+                if (!!(elm.offsetWidth || elm.offsetHeight || elm.getClientRects().length)) {
                     let bodyRect = document.body.getBoundingClientRect(),
                         elemRect = elm.getBoundingClientRect(),
                         tickTopY = elemRect.top - bodyRect.top,
@@ -32,71 +42,73 @@
 
     function floatingBar() {
         let elmPositions;
-        const floatingElm = document.querySelector('.floating-bar'),
+        const floatingElm = document.querySelector ('.floating-bar'),
             winTop = window.pageYOffset,
             winBot = winTop + window.innerHeight,
             clsNames = floatingElm.dataset.class.split(',').map((cls) => {return cls.trim();});
 
-        if(!!clsNames[0]) {
+        if (!!clsNames[0]) {
             elmPositions = getElmPosition(clsNames);
         }
 
         let elmTick, winPos;
-        if(!!floatingElm.dataset.ticktopelm) {
+        if (!!floatingElm.dataset.ticktopelm) {
             elmTick = floatingElm.dataset.ticktopelm;
             winPos = winTop;
         }
-        else if(!!floatingElm.dataset.tickbottomelm) {
+        else if (!!floatingElm.dataset.tickbottomelm) {
             elmTick = floatingElm.dataset.tickbottomelm;
             winPos = winBot;
         }
 
         let bodyRect = document.body.getBoundingClientRect(),
-            elemRect = document.querySelector(elmTick).getBoundingClientRect(),
+            elemRect = document.querySelector (elmTick).getBoundingClientRect(),
             tickPos = elemRect.top - bodyRect.top;
 
-        if(winPos >= tickPos) {
-            if(!clsNames[0]) {
-                if(!floatingElm.classList.contains('floating-visible')) {
+        if (winPos >= tickPos) {
+            if (!clsNames[0]) {
+                if (!floatingElm.classList.contains('floating-visible')) {
                     floatingElm.classList.add('floating-visible');
                 }
             }
             else {
                 let isInScreen = isInScreenView(winTop, winBot, elmPositions);
-                if(isInScreen) {
-                    if(floatingElm.classList.contains('floating-visible')) {
+                if (isInScreen) {
+                    if (floatingElm.classList.contains('floating-visible')) {
                         floatingElm.classList.remove('floating-visible');
                     }
                 }
                 else {
-                    if(!floatingElm.classList.contains('floating-visible')) {
+                    if (!floatingElm.classList.contains('floating-visible')) {
                         floatingElm.classList.add('floating-visible');
                     }
                 }
             }
         }
         else {
-            if(floatingElm.classList.contains('floating-visible')) {
+            if (floatingElm.classList.contains('floating-visible')) {
                 floatingElm.classList.remove('floating-visible');
             }
         }
 
         //detect window offet Y scroll over marked element (Tick Element) - Tu Nguyen
-        if(elemRect.top + elemRect.height <= 0){
+        if (elemRect.top + elemRect.height <= 0){
             floatingElm.classList.add('marked-elm');
-        } else {
+        }
+        else {
             floatingElm.classList.remove('marked-elm');
         }
     }
 
     function hideSocialButton(){
-        if(!!utils.getQueryParameter("sm") && utils.getQueryParameter("sm") === "0"){
-            for(let btn of _qAll(".socialBtn")){
-                btn.classList.add("hidden");
+        if (getQueryParameter('sm') === '0') {
+            for (let btn of document.querySelectorAll('.socialBtn')) {
+                btn.classList.add('hidden');
             }
-        }else{
-            for(let btn of _qAll(".socialBtn")){
-                btn.classList.remove("hidden");
+        }
+        else {
+            for (let btn of document.querySelectorAll('.socialBtn')){
+                btn.classList.remove('hidden');
             }
         }
     }
