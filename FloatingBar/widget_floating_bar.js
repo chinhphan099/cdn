@@ -100,7 +100,34 @@
         }
     }
 
-    function hideSocialButton(){
+    function hideAdvertorialText() {
+        if (getQueryParameter('ads') !== '0') {
+            return;
+        }
+        let adsTexts = [
+            'advertorial', 'Redaktionelle Anzeige', 'Publicité', 'Publirreportaje', 'Publieditorial', 'Publirreportagem',
+            '广告', 'Redazionale', '광고', 'Mainosartikkeli', 'Reklammeddelande', 'Annonce',
+            'Annonsetekst', 'Advertorial', '記事体広告', 'Bài viết quảng cáo'
+        ];
+        let isStop = false;
+        Array.prototype.slice.call(_qAll('.wrapper *')).some(elm => {
+            for (let adsText of adsTexts) {
+                if (elm.textContent.trim().toLowerCase() === adsText.toLowerCase()) {
+                    elm.style.opacity = '0';
+                    elm.style.height = '1px';
+                    elm.style.pointerEvents = 'none';
+                    isStop = true;
+                    break;
+                }
+            }
+            if (!!isStop) {
+                return true;
+            }
+        });
+    }
+    hideAdvertorialText();
+
+    function hideSocialButton() {
         if (getQueryParameter('sm') === '0') {
             for (let btn of document.querySelectorAll('.socialBtn')) {
                 btn.classList.add('hidden');
