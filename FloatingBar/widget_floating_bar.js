@@ -82,31 +82,25 @@
         }
 
         //detect window offet Y scroll over marked element (Tick Element) - Tu Nguyen
-        if(elemRect.top + elemRect.height <= 0) {
+        if(elemRect.top + elemRect.height <= 0){
             floatingElm.classList.add('marked-elm');
-        }
-        else {
+        } else {
             floatingElm.classList.remove('marked-elm');
         }
     }
 
-    function hideSocialButton() {
-        try {
-            if (utils.getQueryParameter('sm') === '0') {
-                for(let btn of _qAll('.socialBtn')) {
-                    btn.classList.add('hidden');
-                }
+    function hideSocialButton(){
+        if(!!utils.getQueryParameter("sm") && utils.getQueryParameter("sm") === "0"){
+            for(let btn of _qAll(".socialBtn")){
+                btn.classList.add("hidden");
             }
-            else {
-                for(let btn of _qAll('.socialBtn')) {
-                    btn.classList.remove('hidden');
-                }
+        }else{
+            for(let btn of _qAll(".socialBtn")){
+                btn.classList.remove("hidden");
             }
-        }
-        catch(error) {
-            console.log(error);
         }
     }
+    hideSocialButton();
 
     function listener() {
         window.addEventListener('scroll', () => {
@@ -118,9 +112,6 @@
         floatingBar();
         listener();
     }
-    window.addEventListener('DOMContentLoaded', () => {
-        hideSocialButton();
-    });
     window.addEventListener('load', () => {
         initial();
     });
