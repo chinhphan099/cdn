@@ -1,3 +1,4 @@
+/* Functions for Pre/Index pages */
 (() => {
     function getQueryParameter(param) {
         let href = '';
@@ -8,6 +9,7 @@
         const value = href.match(new RegExp('[\?\&]' + param + '=([^\&]*)(\&?)', 'i'));
         return value ? value[1] : null;
     }
+
     function hideAdvertorialText() {
         if (getQueryParameter('ads') !== '0') {
             return;
@@ -49,8 +51,19 @@
         }
     }
     hideSocialButton();
+
+    function hideCommentSection() {
+        if (getQueryParameter('testi') !== '0' || window.location.pathname.indexOf('index') === -1) { return; }
+
+        Array.prototype.slice.call(document.querySelectorAll('.average-rating, .rating-block')).forEach(elm => {
+            const section = elm.closest('section');
+            section.classList.add('hidden');
+        });
+    }
+    hideCommentSection();
 })();
 
+/* Load Price */
 ((utils) => {
     const key = 'campproducts';
     let retailPriceDepositOneUnit = 1;
