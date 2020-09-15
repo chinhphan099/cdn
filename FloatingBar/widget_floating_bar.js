@@ -112,9 +112,10 @@
         let isStop = false;
         Array.prototype.slice.call(_qAll('.wrapper *')).some(elm => {
             for (let adsText of adsTexts) {
-                if (elm.textContent.trim().toLowerCase() === adsText.toLowerCase()) {
+                if (elm.innerHTML.trim().toLowerCase() === adsText.toLowerCase()) {
                     elm.style.opacity = '0';
                     elm.style.height = '1px';
+                    elm.style.width = '1px';
                     elm.style.pointerEvents = 'none';
                     isStop = true;
                     break;
