@@ -28,6 +28,7 @@
                     elm.style.width = '1px';
                     elm.style.pointerEvents = 'none';
                     isStop = true;
+                    document.querySelector('body').classList.add('hidden-ads');
                     break;
                 }
             }
