@@ -55,7 +55,7 @@
     function hideCommentSection() {
         if (getQueryParameter('testi') !== '0' || window.location.pathname.indexOf('index') === -1) { return; }
 
-        Array.prototype.slice.call(document.querySelectorAll('.average-rating, .rating-block')).forEach(elm => {
+        Array.prototype.slice.call(document.querySelectorAll('.average-rating, .rating-block, .list-rating, .comment-block')).forEach(elm => {
             const section = elm.closest('section');
             section.classList.add('hidden');
         });
