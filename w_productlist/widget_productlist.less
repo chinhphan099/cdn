@@ -1,16 +1,19 @@
+@import "../components/mixin.less";
+
 .products-widget {
     margin-bottom: 20px;
 }
 
 // Product Heading
-.product-heading {
+.product-heading  {
     padding: 0 15px 5px;
-    display: flex;
+    .flex-display();
+    .justify-content(space-between);
     -webkit-box-pack: justify;
     -ms-flex-pack: justify;
     justify-content: space-between;
-    font-weight: bold;
-    font-size: 17px;
+    .bold();
+    .font-size(17px);
     border-bottom: 1px solid #ddd;
 }
 
@@ -19,23 +22,6 @@
     position: relative;
     padding: 12px 15px;
     border-bottom: 1px solid #ddd;
-    //Apply Golden border style - Tu Nguyen
-    &.checked-item {
-        .golden-border & {
-            border-image: linear-gradient(to right,#bd8f2f 0,#f9f1b2 66%,#bd8f2f 100%);
-            -webkit-border-image: linear-gradient(to right,#bd8f2f 0,#f9f1b2 66%,#bd8f2f 100%);
-            border-image-slice: 1;
-            background-color: #fffefa;
-        }
-    }
-    &.golden-border-item {
-        border-width: 3px;
-        border-image: linear-gradient(to right,#bd8f2f 0,#f9f1b2 66%,#bd8f2f 100%);
-        -webkit-border-image: linear-gradient(to right,#bd8f2f 0,#f9f1b2 66%,#bd8f2f 100%);
-        border-image-slice: 1;
-        background-color: #fffefa;
-    }
-    //End - Tu Nguyen
     &.default {
         background-color: #fef46e;
         label {
@@ -48,44 +34,8 @@
         }
     }
     .spanUnitDiscountRate {
-        display: inline;
+        display: inline !important;
     }
-}
-
-.js-list-group {
-    padding: 0 15px 10px;
-    ul {
-        padding-left: 0;
-        list-style: none;
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -webkit-box-pack: justify;
-        -ms-flex-pack: justify;
-        justify-content: space-between;
-        li {
-            padding: 15px;
-            text-align: center;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            width: calc(~"100% / 3 - 10px");
-            color: black;
-            cursor: pointer;
-            -webkit-transition: all 150ms ease;
-            -o-transition: all 150ms ease;
-            transition: all 150ms ease;
-            &:hover,
-            &.active {
-                border-color: #10558c;
-            }
-        }
-    }
-}
-
-input[name="product"] {
-    position: fixed;
-    opacity: 0;
-    pointer-events: none;
 }
 
 // Secure Process
