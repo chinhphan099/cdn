@@ -189,6 +189,12 @@
         colWrap.appendChild(securePayment);
         colWrap.appendChild(guaranteeBlock);
         colWrap.removeChild(stepTitle4);
+
+        // Detect .secure-process-common
+        if (!!_q('.secure-process-common')) {
+            const firstTitle = colWrap.querySelector('.step-title');
+            firstTitle.insertAdjacentElement('afterend', _q('.secure-process-common'));
+        }
     }
 
     let buttonEvents = function () {
