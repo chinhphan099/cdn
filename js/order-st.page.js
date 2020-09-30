@@ -756,7 +756,14 @@
             }
 
             loadStatistical();
-            hidePopup(true);
+
+            //Stop triggering close popup by flag - Tu nguyen
+                //intial global variable to activate - window.isStopTriggerClosePopup = true/false.
+            if(!!window.isStopTriggerClosePopup){
+                utils.events.emit('stopTriggerClosePopup', hidePopup);
+            } else {
+                hidePopup(true);
+            }
         }, false);
     }
 
