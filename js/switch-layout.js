@@ -158,9 +158,13 @@
         //Append children
         stepTitle2.querySelector('h2').innerText = layoutData.stepTitle2;
         colWrap.appendChild(stepTitle2);
-        colWrap.appendChild(paypalButton);
-        devider.querySelector('.title').innerText = layoutData.devider;
-        colWrap.appendChild(devider);
+        if (!!paypalButton) {
+            colWrap.appendChild(paypalButton);
+        }
+        if (!!devider) {
+            devider.querySelector('.title').innerText = layoutData.devider;
+            colWrap.appendChild(devider);
+        }
         colWrap.appendChild(paymentImage);
         colWrap.appendChild(btnNextCheckout);
 
@@ -179,7 +183,7 @@
             divWrap.appendChild(warrantyBlock);
         }
         divWrap.appendChild(ctaButton);
-        
+
         //End wrap div
         colWrap.appendChild(divWrap);
         colWrap.appendChild(securePayment);
