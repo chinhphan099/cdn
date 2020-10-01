@@ -396,7 +396,10 @@
 
                         product.productPrices.UnitDiscountRate = product.productPrices.UnitDiscountRate || {};
                         if (!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
-                            product.productPrices.UnitDiscountRate.Value = Number((product.productPrices.DiscountedPrice.Value / quantity).toFixed(2));
+                            //Detect Data returns unitDiscountRate to calculate as quantity - Tu Nguyen
+                            if(!product.productPrices.UnitDiscountRate || !product.productPrices.UnitDiscountRate.Value || (!!product.productPrices.UnitDiscountRate && product.productPrices.UnitDiscountRate.Value === 0)){
+                                product.productPrices.UnitDiscountRate.Value = Number((product.productPrices.DiscountedPrice.Value / quantity).toFixed(2));
+                            }
                         }
                         else {
                             product.productPrices.UnitDiscountRate.Value = Number(((product.productPrices.DiscountedPrice.Value + product.productPrices.FullRetailPrice.Value) / quantity).toFixed(2));
