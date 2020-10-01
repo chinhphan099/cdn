@@ -96,8 +96,7 @@
                         let fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, ''),
                             pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, ''),
                             objMiniUpsell = {productId: product.productId, shippingMethodId: product.shippings[0].shippingMethodId};
-                            window.fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
-
+                        window.fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
 
                         buttonElm.setAttribute('data-upsell', JSON.stringify(objMiniUpsell));
 
@@ -143,7 +142,6 @@
             }
         });
     }
-
     initWidgetMiniUpsells();
 
     function listener() {
