@@ -396,7 +396,10 @@
 
                         product.productPrices.UnitDiscountRate = product.productPrices.UnitDiscountRate || {};
                         if (!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
-                            product.productPrices.UnitDiscountRate.Value = Number((product.productPrices.DiscountedPrice.Value / quantity).toFixed(2));
+                            //Detect Data returns unitDiscountRate to calculate as quantity - Tu Nguyen
+                            if(!product.productPrices.UnitDiscountRate || !product.productPrices.UnitDiscountRate.Value || (!!product.productPrices.UnitDiscountRate && product.productPrices.UnitDiscountRate.Value === 0)){
+                                product.productPrices.UnitDiscountRate.Value = Number((product.productPrices.DiscountedPrice.Value / quantity).toFixed(2));
+                            }
                         }
                         else {
                             product.productPrices.UnitDiscountRate.Value = Number(((product.productPrices.DiscountedPrice.Value + product.productPrices.FullRetailPrice.Value) / quantity).toFixed(2));
@@ -689,6 +692,7 @@
             checkProduct();
         };
         const setupTab = () => {
+            _q('body').classList.add('package-active-1');
             if (!!titleElm) {
                 activeText = rootActiveText;
                 titleElm.innerHTML = activeText;
@@ -709,7 +713,22 @@
                 saveActiveTabIndex();
             }, 3000);
         };
+        const handleBodyClass = (tabItem) => {
+            try {
+                for (let i = 1, n = tabItems.length; i <= n; i++) {
+                    _q('body').classList.remove(`package-active-${i}`);
+                }
+
+                let tabIndex = Array.prototype.slice.call(tabItems).indexOf(tabItem) || 0;
+                _q('body').classList.add(`package-active-${++tabIndex}`);
+            }
+            catch(e) {
+                console.log(e);
+            }
+        };
         const activeTab = (tabItem) => {
+            handleBodyClass(tabItem);
+
             let isPopup = utils.getQueryParameter('et') === '1';
             updateIndexItem();
 

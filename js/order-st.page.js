@@ -756,7 +756,14 @@
             }
 
             loadStatistical();
-            hidePopup(true);
+
+            //Stop triggering close popup by flag - Tu nguyen
+                //intial global variable to activate - window.isStopTriggerClosePopup = true/false.
+            if(!!window.isStopTriggerClosePopup){
+                utils.events.emit('stopTriggerClosePopup', hidePopup);
+            } else {
+                hidePopup(true);
+            }
         }, false);
     }
 
@@ -967,12 +974,17 @@
 
     function personalizationFirstName() {
         const firstName = utils.getQueryParameter('firstname');
-        if (!firstName || !js_translate.personalizationText || !_q('.top-header .breakcrum')) {
+        if (!firstName || !js_translate.personalizationText) {
             return;
         }
 
         const personalizationText = js_translate.personalizationText.replace(/firstName/gi, firstName).replace(/\%20/g, ' ');
-        _q('.top-header .breakcrum').insertAdjacentHTML('afterBegin', `<div class="personalization" style="padding: 0 15px; margin-top: 20px; margin-bottom: -10px; font-size: 17px; line-height: 1.3; text-align: center; font-weight: 700;">${personalizationText}</div>`);
+        if (!!_q('.top-header .breakcrum')) {
+            _q('.top-header .breakcrum').insertAdjacentHTML('afterBegin', `<div class="personalization" style="padding: 0 15px; margin-top: 20px; margin-bottom: -10px; font-size: 17px; line-height: 1.3; text-align: center; font-weight: 700;">${personalizationText}</div>`);
+        }
+        else if (!!_q('.steps .secure-checkout')) {
+            _q('.steps .secure-checkout').insertAdjacentHTML('beforeBegin', `<div class="personalization" style="padding: 0 15px; margin-top: 20px; margin-bottom: 25px; font-size: 17px; line-height: 1.3; text-align: center; font-weight: 700;">${personalizationText}</div>`);
+        }
     }
 
     function initial() {
