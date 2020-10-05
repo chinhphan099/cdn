@@ -1,14 +1,24 @@
 
-(function (utils) {
+((utils) => {
     if (!utils) {
         console.log('modules is not found');
         return;
     }
 
+    function replaceDate() {
+        const loadingImg = `<img width="20" height="10" src="//d16hdrba6dusey.cloudfront.net/sitecommon/images/loading-price-v1.gif" class="no-lazy">`;
+        const clsName = Array.prototype.slice.call(_qAll('[class^="date-format"]'));
+        clsName.forEach(cls => {
+            cls.dataset.date = cls.textContent;
+            cls.innerHTML = loadingImg;
+        });
+    }
+    replaceDate();
+
     const dateFn = {
         num: 6,
         countFormat: 10,
-        dateFormat: function(date) {
+        dateFormat: function(dateStr) {
             if (!!window.months) {
                 for (let count = 0; count < this.countFormat; count++) {
                     let clsName = '.date-format';
@@ -20,17 +30,17 @@
                     }
 
                     if (!_qAll(clsName)) continue;
-                    for(const el of _qAll(clsName)){
-                        let numReplace = el.textContent.toLowerCase().replace('{date-', '').replace('{date+', '').replace('}', '');
+                    for(const el of _qAll(clsName)) {
+                        let numReplace = el.dataset.date.toLowerCase().replace('{date-', '').replace('{date+', '').replace('}', '');
                         if (numReplace !== '' && isNaN(numReplace) === false) {
                             this.num = parseInt(numReplace);
                         }
 
-                        let vDate, current = date || new Date();
-                        if (el.textContent.indexOf('-') > -1) {
+                        let vDate, current = new Date(dateStr) || new Date();
+                        if (el.dataset.date.indexOf('-') > -1) {
                             vDate = new Date(current.setDate(current.getDate() - this.num));
                         }
-                        else if (el.textContent.indexOf('+') > -1) {
+                        else if (el.dataset.date.indexOf('+') > -1) {
                             vDate = new Date(current.setDate(current.getDate() + this.num));
                         }
                         else {
@@ -86,14 +96,9 @@
         isTest: utils.getQueryParameter('isCardTest') ? true : false
     });
 
-    function implementDateTime(dateStr) {
-        const date = new Date(dateStr);
-        dateFn.dateFormat(date);
-    }
-
     eCRM.Order.getRelatedOrders(confirm.orderInfo.orderNumber, function (result) {
         console.log(result);
-        implementDateTime(result.createDate);
+        dateFn.dateFormat(result.createDate);
         utils.events.emit('bindGtmEvents', result);
         bindData(result);
     });
