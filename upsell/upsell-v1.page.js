@@ -30,6 +30,7 @@
                 elem.innerHTML = elem.innerHTML.replace(/{FirstCharge}/g, '<span class="spanFirstCharge"></span>');
                 elem.innerHTML = elem.innerHTML.replace(/{RemainAmount}/g, '<span class="spanRemainAmount"></span>');
                 elem.innerHTML = elem.innerHTML.replace(/{fullprice}/g, '<span class="spanFullPrice"></span>');
+                elem.innerHTML = elem.innerHTML.replace(/{shippingFee}/g, '<span class="spanShippingFee"></span>');
             }
         }
     }
@@ -46,6 +47,10 @@
 
         Array.prototype.slice.call(_qAll('.spanFullPrice')).forEach((spanFullPrice) => {
             spanFullPrice.innerHTML = products.prices[0].productPrices.FullRetailPrice.FormattedValue;
+        });
+
+        Array.prototype.slice.call(_qAll('.spanShippingFee')).forEach((spanShippingFee) => {
+            spanShippingFee.innerHTML = products.prices[0].shippings[0].formattedPrice;
         });
 
         Array.prototype.slice.call(_qAll('.spanFirstCharge')).forEach((spanFirstCharge) => {
@@ -188,6 +193,10 @@
             }
         }
 
+        if(!!window.multipleMiniUpsells && window.multipleMiniUpsells.length > 0) {
+            upsellData.multipleMiniUpsells = window.multipleMiniUpsells;
+        }
+
         return upsellData;
     }
 
@@ -214,6 +223,25 @@
             handleLastUpsellOrError();
         }
     }
+
+    //--------------Start--convertCurrency - Tu Nguyen
+    function convertCurrency(){
+        let jsCurrencyCode = window.fCurrency;
+
+        if(!jsCurrencyCode) return;
+
+        let currencyElm =  _qAll('.jsCurrency');
+
+        try {
+            for(let item of currencyElm){
+                item.innerText = jsCurrencyCode.replace("######", item.textContent)
+            }
+        } catch(err){
+            console.log(err);
+        }
+    }
+    convertCurrency();
+    //--------------End--convertCurrency
 
     utils.checkAffAndFireEvents();
 
