@@ -223,7 +223,7 @@
     //--------------Start--convertCurrency - Tu Nguyen
     function convertCurrency(){
         let jsCurrencyCode = window.fCurrency;
-        
+
         if(!jsCurrencyCode) return;
 
         let currencyElm =  _qAll('.jsCurrency');
@@ -232,13 +232,13 @@
             for(let item of currencyElm){
                 item.innerText = jsCurrencyCode.replace("######", item.textContent)
             }
-        } catch(err){   
+        } catch(err){
             console.log(err);
         }
     }
     convertCurrency();
     //--------------End--convertCurrency
-    
+
     utils.checkAffAndFireEvents();
 
     /*
