@@ -193,6 +193,10 @@
             }
         }
 
+        if(!!window.multipleMiniUpsells && window.multipleMiniUpsells.length > 0) {
+            upsellData.multipleMiniUpsells = window.multipleMiniUpsells;
+        }
+
         return upsellData;
     }
 
