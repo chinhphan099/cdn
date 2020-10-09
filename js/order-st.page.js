@@ -264,7 +264,8 @@
                     tdPriceElm.innerText = data.productPrices.DiscountedPrice.Value;
                 }
                 else {
-                    tdPriceElm.innerText = data.productPrices.DiscountedPrice.FormattedValue;
+                    // tdPriceElm.innerText = data.productPrices.DiscountedPrice.FormattedValue;
+                    tdPriceElm.innerText = utils.formatPrice(data.productPrices.DiscountedPrice.Value.toFixed(2), fCurrency, taxes);
                 }
             }
         });

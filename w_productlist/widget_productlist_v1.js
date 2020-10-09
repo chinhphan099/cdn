@@ -381,7 +381,7 @@
                     const radio = _qById('product_' + product.productId);
                     if (radio) {
                         let quantity = !!window.isDoubleQuantity ? product.quantity / 2 : product.quantity,
-                            fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, ''),
+                            fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.|\u00a0]/g, ''),
                             pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
                         window.fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
 
@@ -481,7 +481,9 @@
 
                         Array.prototype.slice.call(wrapElm.querySelectorAll('.fullPrice, .fullRetailPriceDeposit')).forEach(fullPrice => {
                             if (!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
-                                fullPrice.insertAdjacentText('beforeend', product.productPrices.FullRetailPrice.FormattedValue);
+                                // fullPrice.insertAdjacentText('beforeend', product.productPrices.FullRetailPrice.FormattedValue);
+                                let fullPriceFormated = utils.formatPrice(product.productPrices.FullRetailPrice.Value.toFixed(2), window.fCurrency, product.productPrices.FullRetailPrice.FormattedValue);
+                                fullPrice.insertAdjacentText('beforeend', fullPriceFormated);
                             }
                             else if (product.productPrices.hasOwnProperty('FullRetailPriceDeposit')) {
                                 let fullRetailPriceDepositFormat = product.productPrices.FullRetailPriceDeposit.FormattedValue;
