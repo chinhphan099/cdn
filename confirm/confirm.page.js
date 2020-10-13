@@ -184,7 +184,7 @@
             taxLine = `
                         <div class="inner">
                             <span>${js_translate.tax || 'Tax'}</span>
-                            <span>${utils.formatPrice(taxMainValue.toFixed(2), fCurrency, shippingPriceFormatted)}</span>
+                            <span>${utils.formatPrice(Math.abs(taxMainValue).toFixed(2), fCurrency, shippingPriceFormatted)}</span>
                         </div>
                 `;
         }
@@ -224,7 +224,7 @@
                     taxUpsellLine = `
                             <div class="inner">
                                 <span>${js_translate.tax || 'Tax'}</span>
-                                <span>${utils.formatPrice(taxUpsellValue.toFixed(2), fCurrency, shippingPriceFormatted)}</span>
+                                <span>${utils.formatPrice(Math.abs(taxUpsellValue).toFixed(2), fCurrency, shippingPriceFormatted)}</span>
                             </div>
                     `;
                 }
