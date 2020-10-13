@@ -112,11 +112,11 @@
                                         <span>{productName}</span>
                                         <span>{productPrice}</span>
                                     </div>
+                                    {tax}
                                     <div class="inner">
                                         <span>${shipping}</span>
                                         <span>{shippingPrice}</span>
                                     </div>
-                                    {tax}
                                     <div class="inner">
                                         <span>${total}</span>
                                         <span>{productTotal}</span>
@@ -130,11 +130,11 @@
                                         <span>{productName}</span>
                                         <span>{productPrice}</span>
                                     </div>
+                                    {tax}
                                     <div class="inner">
                                         <span>${shipping}</span>
                                         <span>{shippingPrice}</span>
                                     </div>
-                                    {tax}
                                     <div class="inner">
                                         <span>${total}</span>
                                         <span>{productTotal}</span>
@@ -150,11 +150,11 @@
                                         <span>{productName}</span>
                                         <span>{productPrice}</span>
                                     </div>
+                                    {tax}
                                     <div class="inner">
                                         <span>${shipping}</span>
                                         <span>{shippingPrice}</span>
                                     </div>
-                                    {tax}
                                     <div class="inner">
                                         <span>${total}</span>
                                         <span>{productTotalPreOrder}</span>
@@ -178,8 +178,9 @@
         let upsellProductNames = (typeof upsellProducts !== 'undefined') ? upsellProducts : false;
 
         let taxLine = '';
+        const isBindTax = utils.localStorage().get('bindTax') === 'true';
         const taxMainValue = parseFloat(data.orderPrice) - parseFloat(data.orderProductPrice) - parseFloat(data.shippingPrice);
-        if (taxMainValue > 0.1 && utils.localStorage().get('preOrder') !== 'true') {
+        if (isBindTax || (taxMainValue > 0.1 && utils.localStorage().get('preOrder') !== 'true')) {
             taxLine = `
                         <div class="inner">
                             <span>${js_translate.tax || 'Tax'}</span>
@@ -219,7 +220,7 @@
 
                 let taxUpsellLine = '';
                 const taxUpsellValue = parseFloat(data.relatedOrders[i].orderPrice) - parseFloat(data.relatedOrders[i].orderProductPrice) - parseFloat(data.relatedOrders[i].shippingPrice);
-                if (taxUpsellValue > 0.1 && utils.localStorage().get('preOrderUpsell') !== 'true') {
+                if (isBindTax || (taxUpsellValue > 0.1 && utils.localStorage().get('preOrderUpsell') !== 'true')) {
                     taxUpsellLine = `
                             <div class="inner">
                                 <span>${js_translate.tax || 'Tax'}</span>

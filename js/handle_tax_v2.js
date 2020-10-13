@@ -85,6 +85,7 @@
         }
 
         function _bindTax() {
+            window.localStorage.setItem("bindTax", true); // Chinh --- Use for always show Tax line on Confirm page
             const tax = getTaxOfProduct();
             const wPrice = getWarrantyPrice();
             const selectedProduct = document.querySelector('input[name="product"]:checked');
@@ -97,7 +98,7 @@
                 fCurrency: window.localStorage.getItem("jsCurrency"),
                 formatPrice: JSON.parse(selectedProduct.dataset.product).shippings[0].formattedPrice
             };
-                
+
             if (selectedProduct) {
                 const jsonProduct = JSON.parse(selectedProduct.dataset.product);
                 const productPrice = jsonProduct.productPrices.DiscountedPrice.Value;
@@ -110,7 +111,7 @@
                         item.innerHTML = utils.formatPrice(parseFloat(tax.value + (wPrice*tax.percent)).toFixed(2), currencySymbol.fCurrency, currencySymbol.formatPrice);
                     }
 
-                    //bind grand total                                
+                    //bind grand total
                     if (grandTotalElem.length > 0) {
                         const shippingIndex = window.shippingIndex || 0;
                         const totalVal = parseFloat(jsonProduct.shippings[shippingIndex].price + productPrice + parseFloat(tax.value) + (wPrice*tax.percent) + parseFloat(wPrice)).toFixed(2);
