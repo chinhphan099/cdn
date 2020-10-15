@@ -177,6 +177,7 @@
             'countryCode': siteSetting.countryCode, //siteSetting.countryCode is bind from widget_productlist.js
             'orderNumber': orderResponse.orderNumber,
             'cusEmail': _qById('customer_email').value,
+            'cusPhone': _qById('customer_phone') ? _qById('customer_phone').value : '',
             'cardId': orderResponse.cardId,
             'cardType': !!_qById('creditcard_creditcardnumber') ? _qById('creditcard_creditcardnumber').dataset.cardtype : "",
             'paymentProcessorId': orderResponse.paymentProcessorId,
