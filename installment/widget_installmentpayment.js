@@ -24,10 +24,10 @@ class InstallmentPayment {
     generateDropdowList(price) {
         const ddl = _qById('ddl_installpayment');
         if (ddl) {
-			window.widget.installmentpayment.selectedMonth = isNaN(ddl.value) ? "1" : ddl.value;
-			if(this.months.length > 0 && parseInt(window.widget.installmentpayment.selectedMonth) > this.months[this.months.length - 1]){
-				window.widget.installmentpayment.selectedMonth = "1";
-			}
+            window.widget.installmentpayment.selectedMonth = isNaN(ddl.value) ? "1" : ddl.value;
+            if(this.months.length > 0 && parseInt(window.widget.installmentpayment.selectedMonth) > this.months[this.months.length - 1]){
+                window.widget.installmentpayment.selectedMonth = "1";
+            }
             ddl.options.length = 0;
             let installmentpayment = window.widget.installmentpayment;
             let option = '', priceInstallment = '';
