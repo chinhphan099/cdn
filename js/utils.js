@@ -677,6 +677,7 @@
                             "campaignName": mainCampaignName ? mainCampaignName : "",
                             "campaignWebKey": mainWebKey ? mainWebKey : "",
                             "customeremail": orderInfo.cusEmail,
+                            "customerphone": orderInfo.cusPhone || "",
                             "customerId": customerId ? customerId : "",
                             "firstName": user_firstname ? user_firstname : "",
                             "lastName": user_lastname ? user_lastname : ""
@@ -716,7 +717,6 @@
 
     function checkAffAndFireEvents() {
         try {
-            console.log('checkAffAndFireEventsV2');
             const affParam = utils.getQueryParameter('Affid');
             const orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
             const checkedAff = utils.localStorage().get('checkedAff');
@@ -769,9 +769,10 @@
         } else {
             console.log('not fire EF');
         }
-        utils.firePicksell();
+        //utils.firePicksell();
         utils.fireMainOrderToGTMConversion();
         utils.trackConversionWithFP();
+        utils.fireCTRwowTrackingConversion();
     }
 
     //check and fire gtm convertion event for order pages
@@ -888,9 +889,42 @@
         window.__CTR_FP_TRACKING_SETTINGS = { MODE: "prod" };
 
         const script = document.createElement('script');
-        script.src = 'https://ctrwow-commonstorage.azureedge.net/common/js/CTR_FP_TRACKING-v1.0.1.min.js';
+        //script.src = 'https://ctrwow-commonstorage.azureedge.net/common/js/CTR_FP_TRACKING-v1.0.1.min.js';
+        script.src = 'https://ctrwow-commonstorage.azureedge.net/common/js/CTR_FP_TRACKING-v2.0.0.min.js';
         script.defer = true;
         document.body.appendChild(script);
+    }
+
+    function fireCTRwowTrackingConversion() {
+        let count = 0;
+        const timer = setInterval(() => {
+            if (window.__CTR_FP_TRACKING) {
+                try {
+                    const orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
+                    let isMainOrderToCTRwowConversionFired = false;
+                    if (utils.localStorage().get('isMainOrderToCTRwowConversionFired')) {
+                        isMainOrderToCTRwowConversionFired = true;
+                    }
+
+                    if (orderInfo && orderInfo.orderNumber && !isMainOrderToCTRwowConversionFired) {
+                        const totalAmount = orderInfo.orderTotalFull ? orderInfo.orderTotalFull : 0;
+                        window.__CTR_FP_TRACKING.trackExConversion(totalAmount);
+
+                        utils.localStorage().set('isMainOrderToCTRwowConversionFired', true);
+                        console.log('isMainOrderToCTRwowConversionFired fire Conversion event');
+                    }
+                } catch (err) {
+                    console.log(err);
+                }
+
+                clearInterval(timer);
+            } else {
+                count++;
+                if(count > 10) {
+                    clearInterval(timer);
+                }
+            }
+        }, 200);
     }
 
     function createCookie(name, value, days) {
@@ -939,7 +973,7 @@
                     const res = Math.abs(newDate - beforeDate) / 1000;
                     const minutes = Math.floor(res / 60);
                     //console.log('check time of keeping prices in local storage: ', minutes);
-                    if (minutes > 1) isExisted = false;
+                    if (minutes > 20) isExisted = false;
                 } else {
                     isExisted = false;
                 }
@@ -1045,6 +1079,8 @@
         try {
             let firstName = _qById('customer_firstname') ? _qById('customer_firstname').value : _qById('shipping_firstname') ? _qById('shipping_firstname').value : '';
             let lastName = _qById('customer_lastname') ? _qById('customer_lastname').value : _qById('shipping_lastname') ? _qById('shipping_lastname').value : '';
+            let phoneNumber = _qById('customer_phone') ? _qById('customer_phone').value : '';
+
             let emailElem = _qById('customer_email');
             if (window._EA_ID && firstName !== '' && lastName !== '' && emailElem && !emailElem.classList.contains('input-error')) {
                 //const url = `https://ctrwow-dev-fingerprint-microservice.azurewebsites.net/api/userinfo/${window._EA_ID}?code=5twg5EUTiWQLF2LzvHYonk6PsRREMi7qjRlRGCQSNJqHCaxsYVlgsA==`; test env
@@ -1055,7 +1091,8 @@
                         'userInfo': {
                             'firstName': firstName,
                             'lastName': lastName,
-                            'email': emailElem.value
+                            'email': emailElem.value,
+                            'phoneNumber': phoneNumber
                         }
                     }
                 }
@@ -1133,16 +1170,11 @@
 
     //Common Upsell classs is used in all sites
     class CommonUpsell {
-        fireMainOrderToGTMConversion() {
-            utils.fireMainOrderToGTMConversion();
-        }
-
         fireGtmPurchaseEvent() {
             utils.fireGtmPurchaseEvent();
         }
 
         init() {
-            //this.fireMainOrderToGTMConversion();
             this.fireGtmPurchaseEvent();
             utils.ctrwowTrackingFPPixel();
         }
@@ -1166,17 +1198,13 @@
 
     //Common Confirm classs is used in all sites
     class CommonConfirm {
-        fireMainOrderToGTMConversion() {
-            utils.fireMainOrderToGTMConversion();
-        }
-
         fireGtmPurchaseEvent() {
             utils.fireGtmPurchaseEvent();
         }
 
         init() {
-            //this.fireMainOrderToGTMConversion();
             this.fireGtmPurchaseEvent();
+            utils.ctrwowTrackingFPPixel();
         }
     }
 
@@ -1311,6 +1339,7 @@
         saveUserInfoWithFingerprint: saveUserInfoWithFingerprint,
         bindTaxForUpsell: bindTaxForUpsell,
         injectCustomEventsToCTABtn: injectCustomEventsToCTABtn,
-        ctrwowTrackingFPPixel: ctrwowTrackingFPPixel
+        ctrwowTrackingFPPixel: ctrwowTrackingFPPixel,
+        fireCTRwowTrackingConversion: fireCTRwowTrackingConversion
     }
 })(window, document);
