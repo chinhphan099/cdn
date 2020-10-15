@@ -9,7 +9,8 @@
         return;
     }
 
-    let product = null;
+    let product = null,
+        upsellIndex = 0;
 
     var getLifetimePrice = function (product) {
         const warrantyRate = [0.1, 0.2, 0.2, 0.2, 0.2, 0.3, 0.5, 0.15, 0.25, 0.35, 0.4, 0.45, 0.55, 0.6];
@@ -172,7 +173,7 @@
         const fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
         var orderInfo = {
             'upsells': orderResponse.upsells,
-            'upsellIndex': 0,
+            'upsellIndex': upsellIndex,
             'countryCode': siteSetting.countryCode, //siteSetting.countryCode is bind from widget_productlist.js
             'orderNumber': orderResponse.orderNumber,
             'cusEmail': _qById('customer_email').value,
@@ -264,7 +265,7 @@
 
     function placeMainOrder(paymenttype) {
         //Detect upsell url to skip warranty page - TuNguyen
-        const warrantyUpsell = !!window.warrantyParam ? warrantyParam.appendParameter() : 0;
+        upsellIndex = !!window.warrantyParam ? warrantyParam.appendParameter() : 0;
 
         //Show Ajax Custom Loading
         //utils.showAjaxLoading();
@@ -311,7 +312,7 @@
                         document.location = result.paymentContinueResult.actionUrl;
                     }
                     else if (result.upsells.length > 0 && result.upsells[0].upsellUrl !== '') {
-                        const redirectUrl = result.upsells[warrantyUpsell].upsellUrl.substr(result.upsells[warrantyUpsell].upsellUrl.lastIndexOf('/') + 1);
+                        const redirectUrl = result.upsells[upsellIndex].upsellUrl.substr(result.upsells[upsellIndex].upsellUrl.lastIndexOf('/') + 1);
 
                         //Check flag: fireAfterSuccess - to emit event fireAfterSuccess
                         if (!!window.emitAfterSuccessCredit) {
