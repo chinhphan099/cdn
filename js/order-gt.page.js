@@ -13,8 +13,10 @@
             };
         }
         else if (!_qById('ddl_installpayment')) {
-            delete window.widget.installmentpayment.selectedMonth;
-            delete window.widget.installmentpayment.optionText;
+            if (!!window.widget.installmentpayment) {
+                delete window.widget.installmentpayment.selectedMonth;
+                delete window.widget.installmentpayment.optionText;
+            }
         }
     }
 
