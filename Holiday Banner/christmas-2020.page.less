@@ -1,0 +1,54 @@
+@import "//d16hdrba6dusey.cloudfront.net/sitecommon/less/components/mixin.less";
+
+.keyframes(@name, @arguments) {
+    @-webkit-keyframes @name {@arguments();}
+    @-moz-keyframes @name {@arguments();}
+    @-o-keyframes @name {@arguments();}
+    @keyframes @name {@arguments();}
+}
+.keyframes("fadeIn", {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+});
+
+.christmas-2020 {
+    display: none;
+    .show-holiday-banner & {
+        .animation(fadeIn 150ms ease);
+    }
+    .h_close {
+        display: none;
+    }
+    .h_left-block {
+        .flex-display();
+        .align-items(center);
+        .justify-content(center);
+        padding: 4px 15px 0;
+        .h_logo {
+            margin-top: auto;
+            width: 55px;
+            img {
+                width: 55px;
+            }
+        }
+        .h_desc {
+            padding:  2px 0 2px 8px;
+            max-width: calc(~"100% - 55px");
+            p {
+                font-size: 14px;
+                .line-height(19, 14);
+            }
+        }
+        @media (min-width: 768px) {
+            .h_desc {
+                p {
+                    font-size: 18px;
+                }
+            }
+        }
+    }
+}
