@@ -12,8 +12,9 @@
                 optionText: '4 installments of $price every two weeks no interest'
             };
         }
-        else {
-            delete window.widget.installmentpayment;
+        else if (!_qById('ddl_installpayment')) {
+            delete window.widget.installmentpayment.selectedMonth;
+            delete window.widget.installmentpayment.optionText;
         }
     }
 
