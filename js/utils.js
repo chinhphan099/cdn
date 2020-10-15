@@ -792,7 +792,9 @@
                         window.dataLayer.push({
                             'event': 'Conversion',
                             'orderId': orderInfo.orderNumber,
-                            'price': orderInfo.orderTotal
+                            'price': orderInfo.orderTotal,
+                            "customeremail": orderInfo.cusEmail,
+                            "customerphone": orderInfo.cusPhone || ""
                         });
                         clearInterval(timer);
                     }
@@ -802,7 +804,9 @@
                             'event': 'Conversion',
                             'fpid': window._EA_ID,
                             'orderId': orderInfo.orderNumber,
-                            'price': orderInfo.orderTotalFull ? orderInfo.orderTotalFull : ''
+                            'price': orderInfo.orderTotalFull ? orderInfo.orderTotalFull : '',
+                            "customeremail": orderInfo.cusEmail,
+                            "customerphone": orderInfo.cusPhone || ""
                         });
                         clearInterval(timer);
                     }
