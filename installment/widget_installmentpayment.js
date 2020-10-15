@@ -60,7 +60,7 @@ class InstallmentPayment {
     }
 
     bindInstallmentPaymentOnProductList() {
-        const productList = _qAll('input[name="product"]');
+        const productList = _qAll('.productRadioListItem input[name="product"]');
         const months = window.widget.installmentpayment.defaultMonths;
         const maxMonth = months[months.length - 1];
         let product = null, priceInstallment;
