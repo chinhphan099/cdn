@@ -723,11 +723,13 @@
             const mainOrderLink = utils.localStorage().get('mainOrderLink');
             if (affParam && orderInfo && !checkedAff && mainOrderLink && mainOrderLink !== '') {
                 const siteDomain = location.host.replace(/(www|test)\./, '') + mainOrderLink;
+                const countryCode = window.localStorage.getItem('countryCode') ? window.localStorage.getItem('countryCode') : '';
                 utils.callAjax('https://yz3or1urua.execute-api.us-east-1.amazonaws.com/prod/so', {
                     method: 'POST',
                     data: {
                         affId: affParam,
-                        siteDomain: siteDomain
+                        siteDomain: siteDomain,
+                        countryCode: countryCode
                     }
                 }).then(result => {
                     if (result && result.status) {
