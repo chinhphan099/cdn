@@ -814,42 +814,78 @@
 
     function checkAffAndFireEvents() {
         try {
+            console.log('checkAffAndFireEvents V2');
             const affParam = utils.getQueryParameter('Affid');
             const orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
             const checkedAff = utils.localStorage().get('checkedAff');
             const mainOrderLink = utils.localStorage().get('mainOrderLink');
-            if (affParam && orderInfo && !checkedAff && mainOrderLink && mainOrderLink !== '') {
-                const siteDomain = location.host.replace(/(www|test)\./, '') + mainOrderLink;
-                const countryCode = window.localStorage.getItem('countryCode') ? window.localStorage.getItem('countryCode') : '';
-                utils.callAjax('https://yz3or1urua.execute-api.us-east-1.amazonaws.com/prod/so', {
-                    method: 'POST',
-                    data: {
-                        affId: affParam,
-                        siteDomain: siteDomain,
-                        countryCode: countryCode
-                    }
-                }).then(result => {
-                    if (result && result.status) {
-                        utils.localStorage().set('checkedAff', 'true');
+            if (!checkedAff) {
+                if (affParam && orderInfo && mainOrderLink && mainOrderLink !== '') {
+                    const siteDomain = location.host.replace(/(www|test)\./, '') + mainOrderLink;
+                    const countryCode = window.localStorage.getItem('countryCode') ? window.localStorage.getItem('countryCode') : '';
+                    utils.callAjax('https://yz3or1urua.execute-api.us-east-1.amazonaws.com/prod/so', {
+                        method: 'POST',
+                        data: {
+                            affId: affParam,
+                            siteDomain: siteDomain,
+                            countryCode: countryCode
+                        }
+                    }).then(result => {
+                        if (result && result.status) {
+                            utils.localStorage().set('checkedAff', 'true');
 
-                        const aff = result.data;
-                        const shouldThrottled = (aff.percent / 100) * (aff.totalOrders);
-                        if ((shouldThrottled - aff.throttled) >= 1) {
-                            //no fire and update throttled
-                            _updateThrottled(aff.throttled, siteDomain);
+                            const aff = result.data;
+                            const shouldThrottled = (aff.percent / 100) * (aff.totalOrders);
+                            if ((shouldThrottled - aff.throttled) >= 1) {
+                                //no fire and update throttled
+                                _updateThrottled(aff.throttled, siteDomain);
+                            } else {
+                                _fireTracking();
+                            }
                         } else {
                             _fireTracking();
                         }
-                    } else {
+                    }).catch(err => {
+                        console.log(err);
                         _fireTracking();
-                    }
-                }).catch(err => {
-                    console.log(err);
+                    });
+                } else {
                     _fireTracking();
-                });
-            } else {
-                _fireTracking();
+                }
             }
+
+            // if (affParam && orderInfo && !checkedAff && mainOrderLink && mainOrderLink !== '') {
+            //     const siteDomain = location.host.replace(/(www|test)\./, '') + mainOrderLink;
+            //     const countryCode = window.localStorage.getItem('countryCode') ? window.localStorage.getItem('countryCode') : '';
+            //     utils.callAjax('https://yz3or1urua.execute-api.us-east-1.amazonaws.com/prod/so', {
+            //         method: 'POST',
+            //         data: {
+            //             affId: affParam,
+            //             siteDomain: siteDomain,
+            //             countryCode: countryCode
+            //         }
+            //     }).then(result => {
+            //         if (result && result.status) {
+            //             utils.localStorage().set('checkedAff', 'true');
+
+            //             const aff = result.data;
+            //             const shouldThrottled = (aff.percent / 100) * (aff.totalOrders);
+            //             if ((shouldThrottled - aff.throttled) >= 1) {
+            //                 //no fire and update throttled
+            //                 _updateThrottled(aff.throttled, siteDomain);
+            //             } else {
+            //                 _fireTracking();
+            //             }
+            //         } else {
+            //             _fireTracking();
+            //         }
+            //     }).catch(err => {
+            //         console.log(err);
+            //         _fireTracking();
+            //     });
+            // } else {
+            //     _fireTracking();
+            // }
         } catch (err) {
             console.log(err);
             _fireTracking();
@@ -1023,7 +1059,7 @@
                 clearInterval(timer);
             } else {
                 count++;
-                if(count > 10) {
+                if (count > 10) {
                     clearInterval(timer);
                 }
             }
