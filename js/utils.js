@@ -111,7 +111,7 @@
             }
         }
 
-        ascii += '\x80' // Append Ƈ' bit (plus zero padding)
+        ascii += '\x80'
         while (ascii[lengthProperty]%64 - 56) ascii += '\x00' // More zero padding
         for (i = 0; i < ascii[lengthProperty]; i++) {
             j = ascii.charCodeAt(i);
