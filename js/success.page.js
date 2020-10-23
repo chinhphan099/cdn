@@ -70,13 +70,25 @@
                     utils.localStorage().set('user_lastname', result.address.lastName);
 
                     // if(!!result.address.email && successPage.orderInfo.paymentProcessorId == '31') {
-                    if(!!result.address.email) {
-                        let orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
-                        if(!orderInfo.cusEmail) {
-                            orderInfo.cusEmail = result.address.email;
-                            utils.localStorage().set('orderInfo', JSON.stringify(orderInfo));
-                        }
+                    if(!!result.address.email && !successPage.orderInfo.cusEmail) {
+                        successPage.orderInfo.cusEmail = result.address.email || '';
                     }
+                    if(!!result.address.firstName) {
+                        successPage.orderInfo.cusFirstName = result.address.firstName || '';
+                    }
+                    if(!!result.address.lastName) {
+                        successPage.orderInfo.cusLastName = result.address.lastName || '';
+                    }
+                    if(!!result.address.city) {
+                        successPage.orderInfo.cusCity = result.address.city || '';
+                    }
+                    if(!!result.address.state) {
+                        successPage.orderInfo.cusState = result.address.state || '';
+                    }
+                    if(!!result.address.zipCode) {
+                        successPage.orderInfo.cusZip = result.address.zipCode || '';
+                    }
+                    utils.localStorage().set('orderInfo', JSON.stringify(successPage.orderInfo));
 
                     //utils.fireMainOrderToGTMConversionV2();
 
