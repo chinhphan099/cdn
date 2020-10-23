@@ -257,7 +257,7 @@
             }
         }
     }
-    clearParameter('10pop', '15pop', 'clickid');
+    clearParameter('10pop', '15pop', 'clickid', 'banner');
 
     /*--------start : run common order------------*/
     const CommonOrder = utils.CommonOrder;

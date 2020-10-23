@@ -476,6 +476,14 @@
         return value ? value[1] : null;
     }
 
+    function addParamIntoUrl(param, value) {
+        const currentUrl = window.location.href,
+            newparam = currentUrl.indexOf('?') > -1 ? `&${param}=${value}` : `?${param}=${value}`,
+            newurl = currentUrl + newparam;
+
+        window.history.pushState({ path: newurl }, '', newurl);
+    }
+
     function loadLazyImages() {
         new Blazy({
             selector: 'img:not(.no-lazy)', // all images
@@ -1479,6 +1487,7 @@
         bindTaxForUpsell: bindTaxForUpsell,
         injectCustomEventsToCTABtn: injectCustomEventsToCTABtn,
         ctrwowTrackingFPPixel: ctrwowTrackingFPPixel,
+        addParamIntoUrl: addParamIntoUrl,
         fireCTRwowTrackingConversion: fireCTRwowTrackingConversion
     }
 })(window, document);
