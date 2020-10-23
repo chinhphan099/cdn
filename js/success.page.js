@@ -86,6 +86,9 @@
                         if(!!result.address.state) {
                             successPage.orderInfo.cusState = result.address.state || '';
                         }
+                        if(!!result.address.country) {
+                            successPage.orderInfo.cusCountry = result.address.country || '';
+                        }
                         if(!!result.address.zipCode) {
                             successPage.orderInfo.cusZip = result.address.zipCode || '';
                         }
