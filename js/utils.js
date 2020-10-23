@@ -937,7 +937,13 @@
                             'orderId': orderInfo.orderNumber,
                             'price': orderInfo.orderTotal,
                             "customeremail": sha256(orderInfo.cusEmail), // DFSB-6160
-                            "customerphone": !!orderInfo.cusPhone ? sha256(`${Number(orderInfo.cusPhone.match(/\d/g).join(""))}`) : ""
+                            "customerphone": !!orderInfo.cusPhone ? sha256(`${Number(orderInfo.cusPhone.match(/\d/g).join(""))}`) : "",
+                            "customerFirstName": !!orderInfo.cusFirstName ? sha256(orderInfo.cusFirstName) : "",
+                            "customerLastName": !!orderInfo.cusLastName ? sha256(orderInfo.cusLastName) : "",
+                            "customerCity": !!orderInfo.cusCity ? sha256(orderInfo.cusCity) : "",
+                            "customerState": !!orderInfo.cusState ? sha256(orderInfo.cusState) : "",
+                            "customerCountry": !!orderInfo.cusCountry ? sha256(orderInfo.cusCountry) : "",
+                            "customerZip": !!orderInfo.cusZip ? sha256(orderInfo.cusZip) : ""
                         });
                         clearInterval(timer);
                     }
@@ -949,7 +955,13 @@
                             'orderId': orderInfo.orderNumber,
                             'price': orderInfo.orderTotalFull ? orderInfo.orderTotalFull : '',
                             "customeremail": sha256(orderInfo.cusEmail),
-                            "customerphone": !!orderInfo.cusPhone ? sha256(`${Number(orderInfo.cusPhone.match(/\d/g).join(""))}`) : ""
+                            "customerphone": !!orderInfo.cusPhone ? sha256(`${Number(orderInfo.cusPhone.match(/\d/g).join(""))}`) : "",
+                            "customerFirstName": !!orderInfo.cusFirstName ? sha256(orderInfo.cusFirstName) : "",
+                            "customerLastName": !!orderInfo.cusLastName ? sha256(orderInfo.cusLastName) : "",
+                            "customerCity": !!orderInfo.cusCity ? sha256(orderInfo.cusCity) : "",
+                            "customerState": !!orderInfo.cusState ? sha256(orderInfo.cusState) : "",
+                            "customerCountry": !!orderInfo.cusCountry ? sha256(orderInfo.cusCountry) : "",
+                            "customerZip": !!orderInfo.cusZip ? sha256(orderInfo.cusZip) : ""
                         });
                         clearInterval(timer);
                     }
