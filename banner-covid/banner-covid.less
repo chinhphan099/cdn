@@ -1,0 +1,101 @@
+.banner-covid19  {
+    position: relative;
+    padding: 60px 15px 170px;
+    background: url("//d16hdrba6dusey.cloudfront.net/sitecommon/images/covid/covid-banner-pandemic-01-mb.jpg") center center ~"/ cover" no-repeat;
+    font-family: 'Arial', sans-serif;
+    font-size: 22px;
+    text-align: center;
+    .banner_2& {
+        padding: 25px 15px 100%;
+        margin: 15px;
+        background-image: url("//d16hdrba6dusey.cloudfront.net/sitecommon/images/covid/covid-banner-pandemic-02-mb.jpg");
+    }
+    p {
+        line-height: 27px;
+    }
+    .w_thumb {
+        position: absolute;
+        bottom: 15px;
+        left: 0;
+        right: 0;
+        img {
+            max-width: 250px;
+        }
+    }
+    .pro-link-wrap {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        a {
+            display: block;
+            width: 30px;
+            height: 30px;
+            &:hover {
+                opacity: .7;
+            }
+        }
+        .banner_2& {
+            top: -10px;
+            right: -15px;
+        }
+    }
+    @media(min-width: 375px) {
+        .banner_2& {
+            padding-bottom: 70%;
+        }
+    }
+    @media(min-width: 768px) {
+        padding: 30px 60px;
+        background-image: url("//d16hdrba6dusey.cloudfront.net/sitecommon/images/covid/covid-banner-pandemic-01.jpg");
+        max-width: 940px;
+        margin: auto;
+        .banner_2& {
+            background-image: url("//d16hdrba6dusey.cloudfront.net/sitecommon/images/covid/covid-banner-pandemic-02.jpg");
+            padding: 40px 60px;
+            margin: 15px auto;
+        }
+        .w_item {
+            display: flex;
+            justify-content: flex-end;
+            .banner_2& {
+                justify-content: center;
+            }
+        }
+        .w_thumb {
+            left: 20px;
+            right: auto;
+        }
+        .w_desc {
+            max-width: 560px;
+        }
+    }
+    @media(min-width: 992px) {
+        font-size: 23px;
+        .banner_2& {
+            font-size: 21px;
+        }
+    }
+    @media screen and (min-width:320px) and (max-width: 767px) and (orientation:landscape) {
+        background-image: url("//d16hdrba6dusey.cloudfront.net/sitecommon/images/covid/covid-banner-pandemic-01.jpg");
+        padding: 15px 140px 55px;
+        font-size: 14px;
+        .banner_2& {
+            padding: 15px 60px;
+            background-image: url("//d16hdrba6dusey.cloudfront.net/sitecommon/images/covid/covid-banner-pandemic-02.jpg");
+        }
+        .w_desc {
+            img {
+                max-width: 80px;
+            }
+        }
+        p {
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+    }
+    @media(max-width: 991px) {
+        br {
+            display: none;
+        }
+    }
+}
