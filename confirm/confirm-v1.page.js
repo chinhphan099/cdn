@@ -20,13 +20,16 @@
     });
 
     eCRM.Order.getRelatedOrders(confirm.orderInfo.orderNumber, function (result) {
-        console.log(result);
+        //console.log(result);
         utils.events.emit('bindGtmEvents', result);
-        bindData(result);
+        if(result) {
+            bindData(result);
+        }
     });
 
     const isUpdatedUpsells = utils.localStorage().get('isUpdatedUpsells');
-    if (!isUpdatedUpsells && confirm.orderInfo.paymentProcessorId !== 31 && confirm.orderInfo.paymentProcessorId !== 5) {
+    //if (!isUpdatedUpsells && confirm.orderInfo.paymentProcessorId !== 31 && confirm.orderInfo.paymentProcessorId !== 5) {
+        if (!isUpdatedUpsells && (confirm.orderInfo.paymentProcessorId == 28 || confirm.orderInfo.paymentProcessorId == 42)) {    //only for credit card
         //update upsells status in CRM from NEW status to PAID
         eCRM.Order.updateUpsellsStatus(confirm.orderInfo.orderNumber, function (result) {
             utils.localStorage().set('isUpdatedUpsells', 'true');
@@ -41,6 +44,7 @@
 
         const fvalue = data.receipts[0].formattedAmount.replace(/[,|.]/g, '');
         const pValue = data.receipts[0].amount.toFixed(2).toString().replace(/\./, '');
+
         const fCurrency = fvalue.replace(pValue, '######');
         const shippingPriceFormatted = data.shippingPriceFormatted;
 
