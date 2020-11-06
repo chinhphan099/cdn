@@ -20,13 +20,16 @@
     });
 
     eCRM.Order.getRelatedOrders(confirm.orderInfo.orderNumber, function (result) {
-        console.log(result);
+        //console.log(result);
         utils.events.emit('bindGtmEvents', result);
-        bindData(result);
+        if(result) {
+            bindData(result);
+        }
     });
 
     const isUpdatedUpsells = utils.localStorage().get('isUpdatedUpsells');
-    if (!isUpdatedUpsells && confirm.orderInfo.paymentProcessorId !== 31 && confirm.orderInfo.paymentProcessorId !== 5) {
+    //if (!isUpdatedUpsells && confirm.orderInfo.paymentProcessorId !== 31 && confirm.orderInfo.paymentProcessorId !== 5) {
+    if (!isUpdatedUpsells && (confirm.orderInfo.paymentProcessorId == 28 || confirm.orderInfo.paymentProcessorId == 42)) {    //only for credit card
         //update upsells status in CRM from NEW status to PAID
         eCRM.Order.updateUpsellsStatus(confirm.orderInfo.orderNumber, function (result) {
             utils.localStorage().set('isUpdatedUpsells', 'true');
@@ -41,6 +44,7 @@
 
         const fvalue = data.receipts[0].formattedAmount.replace(/[,|.]/g, '');
         const pValue = data.receipts[0].amount.toFixed(2).toString().replace(/\./, '');
+
         const fCurrency = fvalue.replace(pValue, '######');
         const shippingPriceFormatted = data.shippingPriceFormatted;
 
@@ -178,18 +182,31 @@
         let upsellProductNames = (typeof upsellProducts !== 'undefined') ? upsellProducts : false;
 
         let taxLine = '';
+        const isBindTax = utils.localStorage().get('bindTax') === 'true';
+        const taxMainValue = parseFloat(data.orderPrice) - parseFloat(data.orderProductPrice) - parseFloat(data.shippingPrice);
+        if (isBindTax || (taxMainValue > 0.1 && utils.localStorage().get('preOrder') !== 'true')) {
+            taxLine = `
+                        <div class="inner">
+                            <span>${js_translate.tax || 'Tax'}</span>
+                            <span>${utils.formatPrice(Math.abs(taxMainValue).toFixed(2), fCurrency, shippingPriceFormatted)}</span>
+                        </div>
+                `;
+        }
+
         let taxProducts = window.localStorage.getItem('taxProducts');
         let mainProductTax = 0;
         if (taxProducts) {
             taxProducts = JSON.parse(taxProducts);
 
+            if (taxProducts && taxProducts.taxAmount) {
+                mainProductTax = taxProducts.taxAmount;
+            }
             taxLine = `
-                        <div class="inner">
-                            <span>${js_translate.tax || 'Tax'}</span>
-                            <span>${utils.formatPrice(taxProducts.taxAmount.toFixed(2), fCurrency, shippingPriceFormatted)}</span>
-                        </div>
-                    `;
-            mainProductTax = taxProducts.taxAmount;
+                            <div class="inner">
+                                <span>${js_translate.tax || 'Tax'}</span>
+                                <span>${utils.formatPrice(mainProductTax.toFixed(2), fCurrency, shippingPriceFormatted)}</span>
+                            </div>
+                            `;
         }
 
         const mainGrandTotal = parseFloat((data.orderPrice).toPrecision(12)).toFixed(2);
@@ -197,7 +214,8 @@
         let listProduct = productItemMainTmp.replace('{productName}', data.productName)
             .replace(/\{productPrice\}/g, data.orderProductPriceFormatted)
             .replace(/\{tax\}/g, taxLine)
-            .replace(/\{productTotal\}/g, `${utils.formatPrice(mainGrandTotal, fCurrency, shippingPriceFormatted)}<em>${installmentText}</em>`)
+            .replace(/\{productTotal\}/g, `${data.orderPriceFormatted}<em>${installmentText}</em>`)
+            // .replace(/\{productTotal\}/g, `${utils.formatPrice(mainGrandTotal, fCurrency, shippingPriceFormatted)}<em>${installmentText}</em>`)
             .replace(/\{productTotalPreOrder\}/g, `${data.orderProductPriceFormatted}<em>${installmentText}</em>`)
             .replace('{shippingPrice}', data.shippingPriceFormatted)
             .replace('{midDescriptor}', data.receipts[0].midDescriptor ? data.receipts[0].midDescriptor : 'Paypal')
@@ -224,36 +242,49 @@
                 }
 
                 let taxUpsellLine = '';
+                const taxUpsellValue = parseFloat(data.relatedOrders[i].orderPrice) - parseFloat(data.relatedOrders[i].orderProductPrice) - parseFloat(data.relatedOrders[i].shippingPrice);
+                if (isBindTax || (taxUpsellValue > 0.1 && utils.localStorage().get('preOrderUpsell') !== 'true')) {
+                    taxUpsellLine = `
+                            <div class="inner">
+                                <span>${js_translate.tax || 'Tax'}</span>
+                                <span>${utils.formatPrice(Math.abs(taxUpsellValue).toFixed(2), fCurrency, shippingPriceFormatted)}</span>
+                            </div>
+                    `;
+                }
+
                 let upsellTaxAmount = 0;
                 if (taxProducts) {
                     const upsellProduct = taxProducts.upsells.find(item => data.relatedOrders[i].sku === item.sku);
-                    if (upsellProduct) {
-                        taxUpsellLine = `
-                                        <div class="inner">
-                                            <span>${js_translate.tax || 'Tax'}</span>
-                                            <span>${utils.formatPrice(upsellProduct.taxAmount, fCurrency, shippingPriceFormatted)}</span>
-                                        </div>
-                                        `;
+                    if (upsellProduct && upsellProduct.taxAmount) {
                         upsellTaxAmount = upsellProduct.taxAmount;
                     }
+                    taxUpsellLine = `
+                                    <div class="inner">
+                                        <span>${js_translate.tax || 'Tax'}</span>
+                                        <span>${utils.formatPrice(upsellTaxAmount.toFixed(2), fCurrency, shippingPriceFormatted)}</span>
+                                    </div>
+                                    `;
                 }
 
-                let itemTmp = '';
                 // const upsellGrandTotal = parseFloat((data.relatedOrders[i].orderPrice + upsellTaxAmount).toPrecision(12)).toFixed(2);
                 const upsellGrandTotal = parseFloat((data.relatedOrders[i].orderPrice).toPrecision(12)).toFixed(2);
+                let itemTmp = '';
                 if (data.relatedOrders[i].productName.toLowerCase().indexOf('warranty') > -1) {
                     itemTmp = productItemTmpWarranty.replace('{productName}', data.relatedOrders[i].productName)
                         .replace(/\{productPrice\}/g, data.relatedOrders[i].orderProductPriceFormatted)
                         .replace(/\{tax\}/g, taxUpsellLine)
-                        .replace(/\{productTotal\}/g, `${utils.formatPrice(upsellGrandTotal, fCurrency, shippingPriceFormatted)}<em>${installmentText}</em>`)
+                        .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}<em>${installmentText}</em>`)
+                        // .replace(/\{productTotal\}/g, `${utils.formatPrice(upsellGrandTotal, fCurrency, shippingPriceFormatted)}<em>${installmentText}</em>`)
                         .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
                         .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
                         .replace(/\{orderNumber\}/g, data.relatedOrders[i].orderNumber);
-                } else {
+                }
+                else {
                     itemTmp = productItemTmp.replace('{productName}', data.relatedOrders[i].productName)
                         .replace(/\{productPrice\}/g, data.relatedOrders[i].orderProductPriceFormatted)
                         .replace(/\{tax\}/g, taxUpsellLine)
-                        .replace(/\{productTotal\}/g, `${utils.formatPrice(upsellGrandTotal, fCurrency, shippingPriceFormatted)}<em>${installmentText}</em>`)
+                        .replace(/\{productTotal\}/g, `${data.relatedOrders[i].orderPriceFormatted}<em>${installmentText}</em>`)
+                        // .replace(/\{productTotal\}/g, `${utils.formatPrice(upsellGrandTotal, fCurrency, shippingPriceFormatted)}<em>${installmentText}</em>`)
                         .replace(/\{productTotalPreOrder\}/g, `${data.relatedOrders[i].orderProductPriceFormatted}<em>${installmentText}</em>`)
                         .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
                         .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
