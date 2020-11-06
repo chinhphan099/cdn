@@ -307,12 +307,11 @@ const orderList = function(utils){
                     // render product info => checkout
                     var productName = e.currentTarget.querySelector("h3").textContent;
                     //var productImage = e.currentTarget.querySelector("p").innerHTML;
-					var productImage =  e.currentTarget.querySelector("img").getAttribute("src").indexOf("data:image/") < 0 ?
-                                        e.currentTarget.querySelector("img").getAttribute("src") :
-                                        e.currentTarget.querySelector("img").dataset.src;
+                    var imgElm = e.currentTarget.querySelector("img");
+                    var productImage =  imgElm.getAttribute("src").indexOf("data:image/") < 0 ? imgElm.getAttribute("src") : imgElm.dataset.src;
                     var productPrice = e.currentTarget.querySelector(".discountedPrice").textContent;
                     //_q(".section-checkout .product_image").innerHTML = productImage;
-					_q(".section-checkout .product_image").innerHTML = `<img src=${productImage} alt="${productName}"/>`;
+                    _q(".section-checkout .product_image").innerHTML = `<img src=${productImage} alt="${productName}"/>`;
                     _q(".section-checkout .product_name").textContent = productName;
                     _q(".section-checkout .product_price").textContent = productPrice;
                     getCheckoutInfo();
