@@ -272,12 +272,16 @@ const orderList = function(utils){
         var strTotalPrice = _helper.formatPrice(product.productPrices.DiscountedPrice.Value, product.productPrices.DiscountedPrice.FormattedValue, totalPrice.toFixed(2));
         /*display price in float-button*/
         if(!!_q(".floatbutton-bottom")){
-            _q(".floatbutton-bottom .total_price").textContent = strTotalPrice;
+            if (!window.taxArray) {
+                _q(".floatbutton-bottom .total_price").textContent = strTotalPrice;
+            }
         }
         /*display checkout info*/
         if(!!_q(".section-checkout")){
             Array.prototype.slice.call(_qAll(".section-checkout .total_price")).forEach((item)=>{
-                item.textContent = strTotalPrice;
+                if (!window.taxArray) {
+                    item.textContent = strTotalPrice;
+                }
             });
 
             var strShippingPrice = product.shippings[0].price == 0 ? window.js_translate.free : product.shippings[0].formattedPrice;
@@ -285,7 +289,9 @@ const orderList = function(utils){
 
             var tax = 0;
             if(!!_q(".tax_price")){
-                _q(".tax_price").textContent = _helper.formatPrice(product.productPrices.DiscountedPrice.Value, product.productPrices.DiscountedPrice.FormattedValue, tax.toFixed(2));
+                if (!window.taxArray) {
+                    _q(".tax_price").textContent = _helper.formatPrice(product.productPrices.DiscountedPrice.Value, product.productPrices.DiscountedPrice.FormattedValue, tax.toFixed(2));
+                }
             }
         }
     }
