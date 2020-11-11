@@ -206,7 +206,8 @@
             ],
             installmentValue: _qById('ddl_installpayment') ? _qById('ddl_installpayment').value : '',
             installmentText: (window.widget && window.widget.installmentpayment) ? window.widget.installmentpayment.optionText : '',
-            url: location.pathname
+            url: location.pathname,
+            useCreditCard: orderResponse.useCreditCard ? orderResponse.useCreditCard : false
         };
         utils.localStorage().set('orderInfo', JSON.stringify(orderInfo));
     }
