@@ -423,7 +423,7 @@
 #set($con = $dotcontent.find($request.getAttribute('com.dotmarketing.contentlet.edit').inode))
 <ul id="itemList" class="itemList"></ul>
 <button dojoType="dijit.form.Button" class="additem-btn" onclick="addItem">+ <small>Add Item</small></button>
-
+##<pre id="result"></pre>
 <script>
     var count = 1;
     var listItems = {
@@ -818,6 +818,9 @@
     }
 
     function updateValueToCustomField() {
+        if (!!document.getElementById('result')) {
+            document.getElementById('result').textContent = JSON.stringify(listItems.data, null, 2);
+        }
         dojo.byId('items').value = JSON.stringify(listItems);
     }
 
@@ -826,13 +829,15 @@
             e.preventDefault();
             var li = elem.parentNode,
                 item = getItemById(li.id),
-                index = listItems.data.indexOf(item);
+                index = listItems.data.indexOf(item),
+                idNumber = li.id.split('item-')[1];
+
+            tinymce.get('shortDesc' + idNumber).destroy();
 
             listItems.data.splice(index, 1);
             document.getElementById('itemList').removeChild(li);
+
             updateValueToCustomField();
-            count--;
-            tinymce.get('shortDesc' + count).destroy();
         });
     }
 
