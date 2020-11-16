@@ -63,7 +63,10 @@
         if (!!_q('body').classList.contains('edit_mode')) {
             return;
         }
-        _q('.wrapper').insertAdjacentElement('afterbegin', _q('.christmas-2020'));
+        const eventBanners = Array.prototype.slice.call(_qAll('.christmas-2020'));
+        eventBanners.forEach(banner => {
+            _q('.wrapper').insertAdjacentElement('afterbegin', banner);
+        });
     }
     renderBannerCode();
 
