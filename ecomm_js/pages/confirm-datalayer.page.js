@@ -9,6 +9,8 @@ class ConfirmDatalayer {
     fireGtm() {
         if(!this.checkoutSuccessInfo) return;
 
+        this.checkoutSuccessInfo = JSON.parse(this.checkoutSuccessInfo)
+
         let orderTotal = 0;
         let priceType = 'discountedPrice';
 
