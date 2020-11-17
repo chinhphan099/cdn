@@ -29,7 +29,8 @@ class ConfirmDatalayer {
         window.dataLayer = window.dataLayer || [];
         dataLayer.push({
             'event': 'confirmTotal',
-            'orderTotal': orderTotal.toFixed(2)
+            'orderTotal': orderTotal.toFixed(2),
+            'orderId': this.checkoutSuccessInfo.cartNumber
         });
     }
 
