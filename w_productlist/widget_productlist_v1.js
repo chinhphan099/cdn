@@ -793,6 +793,7 @@
             }
         };
         const listener = () => {
+            const defaultMaropostId = window.maroPostSettingId ? window.maroPostSettingId.id : '';
             for (let tabItem of tabItems) {
                 if (!!titleElm) {
                     tabItem.addEventListener('mouseenter', function () {
@@ -815,6 +816,16 @@
 
                     if (!!tabItem.dataset.webkey) {
                         siteSetting.webKey = tabItem.dataset.webkey;
+                    }
+
+                    // ? Update Maropost ID when change tab
+                    if (window.maroPostSettingId) {
+                        if (!!tabItem.dataset.maropostid) {
+                            window.maroPostSettingId.id = tabItem.dataset.maropostid;
+                        }
+                        else {
+                            window.maroPostSettingId.id = defaultMaropostId;
+                        }
                     }
 
                     activeTab(tabItem);
