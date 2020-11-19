@@ -62,6 +62,15 @@
         });
     }
     hideCommentSection();
+
+    function hideCommentPresale() {
+        if (getQueryParameter('testi') !== '0' || window.location.pathname.indexOf('pre') === -1) { return; }
+
+        Array.prototype.slice.call(document.querySelectorAll('.fb-comments')).forEach(elm => {
+            elm.classList.add('hidden');
+        });
+    }
+    hideCommentPresale();
 })();
 
 /* Load Price */
