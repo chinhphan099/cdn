@@ -6,10 +6,10 @@
 
     function triggerButtons() {
         document.addEventListener('click', function(e) {
-            if(e.target.classList.contains('btn-agree')) {
+            if(e.target.closest('.btn-agree')) {
                 _q('.js-btn-place-upsell-order').click();
             }
-            else if(e.target.classList.contains('btn-cancel')) {
+            else if(e.target.closest('.btn-cancel')) {
                 _q('.js-btn-no-thanks').click();
             }
         })
