@@ -550,6 +550,11 @@
                     if (!!_q('.js-list-group .active') && !!_q('.js-list-group .active').dataset.webkey) {
                         siteSetting.webKey = _q('.js-list-group .active').dataset.webkey;
                     }
+
+                    // Set Maropost ID according active tab
+                    if (!!_q('.js-list-group .active') && !!_q('.js-list-group .active').dataset.maropostid && window.maroPostSettingId) {
+                        window.maroPostSettingId.id = _q('.js-list-group .active').dataset.maropostid;
+                    }
                 }, 1000);
                 utils.events.emit('triggerAddressForm', siteSetting.countryCode);
                 utils.events.emit('triggerProductBannerSidebar', productInfo);
