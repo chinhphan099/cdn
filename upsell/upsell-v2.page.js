@@ -15,6 +15,10 @@
         CID: siteSetting.CID
     };
 
+    if(upsell.orderInfo) {
+        console.log(`used field useCreditCard ${upsell.orderInfo.useCreditCard}`);
+    }
+
     const eCRM = new EmanageCRMJS({
         webkey: upsell.mainWebKey,
         cid: upsell.CID,
@@ -24,8 +28,8 @@
 
     function replaceBracketsStrings() {
         const allElements = _qAll('body *');
-        for(let elem of allElements) {
-            if(elem.children.length === 0 || elem.tagName.toLowerCase() === 'span') {
+        for (let elem of allElements) {
+            if (elem.children.length === 0 || elem.tagName.toLowerCase() === 'span') {
                 elem.innerHTML = elem.innerHTML.replace(/{price}/g, '<span class="spanUpsellPrice"></span>');
                 elem.innerHTML = elem.innerHTML.replace(/{FirstCharge}/g, '<span class="spanFirstCharge"></span>');
                 elem.innerHTML = elem.innerHTML.replace(/{RemainAmount}/g, '<span class="spanRemainAmount"></span>');
@@ -54,7 +58,7 @@
         });
 
         Array.prototype.slice.call(_qAll('.spanFirstCharge')).forEach((spanFirstCharge) => {
-            if(products.prices[0].productPrices.hasOwnProperty('PreSaleAmount1')) {
+            if (products.prices[0].productPrices.hasOwnProperty('PreSaleAmount1')) {
                 spanFirstCharge.innerHTML = products.prices[0].productPrices.PreSaleAmount1.FormattedValue;
             }
             else {
@@ -63,7 +67,7 @@
         });
 
         Array.prototype.slice.call(_qAll('.spanRemainAmount')).forEach((spanRemainAmount) => {
-            if(!products.prices[0].productPrices.hasOwnProperty('PreSaleAmount1')) {
+            if (!products.prices[0].productPrices.hasOwnProperty('PreSaleAmount1')) {
                 return;
             }
             let remainAmountNumber = products.prices[0].productPrices.DiscountedPrice.Value - products.prices[0].productPrices.PreSaleAmount1.Value;
@@ -83,7 +87,7 @@
             implementData(products);
         });
     }
-    if(!window.isNotCallApiUpsell) {
+    if (!window.isNotCallApiUpsell) {
         getProduct();
     }
     else {
@@ -92,7 +96,7 @@
 
     function handleBasicUpsellCTAButton() {
         const ctaButtons = _qAll('.js-btn-place-upsell-order');
-        if(ctaButtons) {
+        if (ctaButtons) {
             Array.prototype.slice.call(ctaButtons).forEach(ele => {
                 ele.addEventListener('click', function (e) {
                     e.preventDefault();
@@ -102,7 +106,7 @@
         }
 
         const noThankBtns = _qAll('.js-btn-no-thanks');
-        for(let noThankBtn of noThankBtns) {
+        for (let noThankBtn of noThankBtns) {
             noThankBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 cancelUpsellOrder();
@@ -150,7 +154,14 @@
             cardId: upsell.orderInfo.cardId
         };
 
-        if (upsell.orderInfo.paymentProcessorId == "5" || upsell.orderInfo.paymentProcessorId == "31") {
+        /*
+            5, 31 : paypal
+            39: afterpay
+            42: ideal,
+            41: sofort
+        */
+        //if (upsell.orderInfo.paymentProcessorId == "5" || upsell.orderInfo.paymentProcessorId == "31") { old code
+        if (!upsell.orderInfo.useCreditCard && upsell.orderInfo.paymentProcessorId) {
             pay = {
                 paymentProcessorId: Number(upsell.orderInfo.paymentProcessorId)
             };
@@ -193,7 +204,7 @@
             }
         }
 
-        if(!!window.multipleMiniUpsells && window.multipleMiniUpsells.length > 0) {
+        if (!!window.multipleMiniUpsells && window.multipleMiniUpsells.length > 0) {
             upsellData.multipleMiniUpsells = window.multipleMiniUpsells;
         }
 
@@ -210,7 +221,7 @@
         }
 
         upsell.orderInfo.upsellIndex += 1;
-        if(!!window.clickNoSkipStep && Number(window.clickNoSkipStep) > 0) {
+        if (!!window.clickNoSkipStep && Number(window.clickNoSkipStep) > 0) {
             upsell.orderInfo.upsellIndex += Number(window.clickNoSkipStep);
         }
         utils.localStorage().set('orderInfo', JSON.stringify(upsell.orderInfo));
@@ -225,18 +236,18 @@
     }
 
     //--------------Start--convertCurrency - Tu Nguyen
-    function convertCurrency(){
+    function convertCurrency() {
         let jsCurrencyCode = window.fCurrency;
 
-        if(!jsCurrencyCode) return;
+        if (!jsCurrencyCode) return;
 
-        let currencyElm =  _qAll('.jsCurrency');
+        let currencyElm = _qAll('.jsCurrency');
 
         try {
-            for(let item of currencyElm){
+            for (let item of currencyElm) {
                 item.innerText = jsCurrencyCode.replace("######", item.textContent)
             }
-        } catch(err){
+        } catch (err) {
             console.log(err);
         }
     }
