@@ -10,6 +10,8 @@
         CID: siteSetting.CID
     };
 
+    console.log(`used field useCreditCard ${confirm.orderInfo.useCreditCard}`);
+
     if (!confirm.orderInfo) return;
 
     const eCRM = new EmanageCRMJS({
@@ -28,8 +30,8 @@
     });
 
     const isUpdatedUpsells = utils.localStorage().get('isUpdatedUpsells');
-    //if (!isUpdatedUpsells && confirm.orderInfo.paymentProcessorId !== 31 && confirm.orderInfo.paymentProcessorId !== 5) {
-    if (!isUpdatedUpsells && (confirm.orderInfo.paymentProcessorId == 28 || confirm.orderInfo.paymentProcessorId == 42)) {    //only for credit card
+    //if (!isUpdatedUpsells && confirm.orderInfo.paymentProcessorId !== 31 && confirm.orderInfo.paymentProcessorId !== 5) { //old code    
+    if (!isUpdatedUpsells && confirm.orderInfo.useCreditCard) {    //only for credit card
         //update upsells status in CRM from NEW status to PAID
         eCRM.Order.updateUpsellsStatus(confirm.orderInfo.orderNumber, function (result) {
             utils.localStorage().set('isUpdatedUpsells', 'true');
