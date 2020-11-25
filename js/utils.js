@@ -76,7 +76,7 @@
 
     global.sha256 = function sha256(ascii) {
         function rightRotate(value, amount) {
-            return (value>>>amount) | (value<<(32 - amount));
+            return (value >>> amount) | (value << (32 - amount));
         }
 
         var mathPow = Math.pow;
@@ -86,7 +86,7 @@
         var result = ''
 
         var words = [];
-        var asciiBitLength = ascii[lengthProperty]*8;
+        var asciiBitLength = ascii[lengthProperty] * 8;
 
         //* caching results is optional - remove/add slash from front of this line to toggle
         // Initial hash value: first 32 bits of the fractional parts of the square roots of the first 8 primes
@@ -106,19 +106,19 @@
                 for (i = 0; i < 313; i += candidate) {
                     isComposite[i] = candidate;
                 }
-                hash[primeCounter] = (mathPow(candidate, .5)*maxWord)|0;
-                k[primeCounter++] = (mathPow(candidate, 1/3)*maxWord)|0;
+                hash[primeCounter] = (mathPow(candidate, .5) * maxWord) | 0;
+                k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
             }
         }
 
         ascii += '\x80'
-        while (ascii[lengthProperty]%64 - 56) ascii += '\x00' // More zero padding
+        while (ascii[lengthProperty] % 64 - 56) ascii += '\x00' // More zero padding
         for (i = 0; i < ascii[lengthProperty]; i++) {
             j = ascii.charCodeAt(i);
-            if (j>>8) return; // ASCII check: only accept characters in range 0-255
-            words[i>>2] |= j << ((3 - i)%4)*8;
+            if (j >> 8) return; // ASCII check: only accept characters in range 0-255
+            words[i >> 2] |= j << ((3 - i) % 4) * 8;
         }
-        words[words[lengthProperty]] = ((asciiBitLength/maxWord)|0);
+        words[words[lengthProperty]] = ((asciiBitLength / maxWord) | 0);
         words[words[lengthProperty]] = (asciiBitLength)
 
         // process each chunk
@@ -139,32 +139,32 @@
                 var a = hash[0], e = hash[4];
                 var temp1 = hash[7]
                     + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25)) // S1
-                    + ((e&hash[5])^((~e)&hash[6])) // ch
+                    + ((e & hash[5]) ^ ((~e) & hash[6])) // ch
                     + k[i]
                     // Expand the message schedule if needed
                     + (w[i] = (i < 16) ? w[i] : (
-                            w[i - 16]
-                            + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15>>>3)) // s0
-                            + w[i - 7]
-                            + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2>>>10)) // s1
-                        )|0
+                        w[i - 16]
+                        + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3)) // s0
+                        + w[i - 7]
+                        + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10)) // s1
+                    ) | 0
                     );
                 // This is only used once, so *could* be moved below, but it only saves 4 bytes and makes things unreadble
                 var temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22)) // S0
-                    + ((a&hash[1])^(a&hash[2])^(hash[1]&hash[2])); // maj
+                    + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2])); // maj
 
-                hash = [(temp1 + temp2)|0].concat(hash); // We don't bother trimming off the extra ones, they're harmless as long as we're truncating when we do the slice()
-                hash[4] = (hash[4] + temp1)|0;
+                hash = [(temp1 + temp2) | 0].concat(hash); // We don't bother trimming off the extra ones, they're harmless as long as we're truncating when we do the slice()
+                hash[4] = (hash[4] + temp1) | 0;
             }
 
             for (i = 0; i < 8; i++) {
-                hash[i] = (hash[i] + oldHash[i])|0;
+                hash[i] = (hash[i] + oldHash[i]) | 0;
             }
         }
 
         for (i = 0; i < 8; i++) {
             for (j = 3; j + 1; j--) {
-                var b = (hash[i]>>(j*8))&255;
+                var b = (hash[i] >> (j * 8)) & 255;
                 result += ((b < 16) ? 0 : '') + b.toString(16);
             }
         }
@@ -935,7 +935,8 @@
                         window.dataLayer.push({
                             'event': 'Conversion',
                             'orderId': orderInfo.orderNumber,
-                            'price': orderInfo.orderTotal,
+                            //'price': orderInfo.orderTotal,
+                            'price': orderInfo.orderTotalFull ? orderInfo.orderTotalFull : '',
                             "customeremail": sha256(orderInfo.cusEmail), // DFSB-6160
                             "customerphone": !!orderInfo.cusPhone ? sha256(`${Number(orderInfo.cusPhone.match(/\d/g).join(""))}`) : "",
                             "customerFirstName": !!orderInfo.cusFirstName ? sha256(orderInfo.cusFirstName) : "",
@@ -1176,7 +1177,8 @@
             //store param in localStorage to fire gtm event of purchase
             //const upsellCampaignName = typeof upsell.upsellCampaignName !== 'undefined' ? upsell.upsellCampaignName : _getUpParam();
             utils.localStorage().set('fireUpsellForGTMPurchase', _getUpParam());
-            utils.localStorage().set('paypal_isMainOrder', 'upsell');
+            //utils.localStorage().set('paypal_isMainOrder', 'upsell');
+            utils.localStorage().set('isMainOrder', 'upsell');
             utils.localStorage().set('upsellOrderNumber', responseData.orderNumber);
 
             upsell.orderInfo.upsellIndex += 1;
@@ -1195,6 +1197,11 @@
             utils.localStorage().set('orderInfo', JSON.stringify(upsell.orderInfo));
 
             utils.localStorage().set('webkey_to_check_paypal', upsell.upsellWebKey);
+
+            //success page will use this trackingNumber to call comfirm payment api
+            if (responseData.trackingNumber) {
+                utils.localStorage().set('trackingNumber', responseData.trackingNumber);
+            }
 
             if (responseData.callBackUrl) {
                 document.location = responseData.callBackUrl;
@@ -1383,6 +1390,12 @@
                 case 'cc':
                     window.preventCheckoutCredit = true;
                     break;
+                case 'ideal':
+                    window.preventCheckoutIdeal = true;
+                    break;
+                case 'redirectCheckout':
+                    window.preventCheckoutRedirect = true;
+                    break;
                 default:
                     window.preventCheckout = true;
             }
@@ -1437,6 +1450,15 @@
 
                     if (typeof registerFnc === 'function') {
                         utils.events.on('fireAfterSuccessCC', function (data) {
+                            registerFnc(data);
+                        });
+                    }
+                    break;
+                case 'redirectCheckout':
+                    window.emitAfterSuccessRedirectCheckout = true;
+                    //Register Events
+                    if (typeof registerFnc === 'function') {
+                        utils.events.on('fireAfterSuccessRedirectCheckout', function (data) {
                             registerFnc(data);
                         });
                     }
