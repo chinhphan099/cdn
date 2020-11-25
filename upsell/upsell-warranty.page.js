@@ -17,7 +17,7 @@
 
     if(upsell.orderInfo) {
         console.log(`used field useCreditCard ${upsell.orderInfo.useCreditCard}`);
-    }    
+    }
 
     const eCRM = new EmanageCRMJS({
         webkey: upsell.mainWebKey,
@@ -178,7 +178,7 @@
     function getUpsellData() {
         let pay = {
             cardId: upsell.orderInfo.cardId
-        };        
+        };
 
         /*
             5, 31 : paypal
@@ -187,7 +187,7 @@
             41: sofort
         */
         //if (upsell.orderInfo.paymentProcessorId == "5" || upsell.orderInfo.paymentProcessorId == "31") { old code
-        if (!upsell.orderInfo.useCreditCard) {
+        if (!upsell.orderInfo.useCreditCard && upsell.orderInfo.paymentProcessorId) {
             pay = {
                 paymentProcessorId: Number(upsell.orderInfo.paymentProcessorId)
             };
@@ -269,7 +269,7 @@
         }
     }
     convertCurrency();
-    //--------------End--convertCurrency 
+    //--------------End--convertCurrency
 
     utils.checkAffAndFireEvents();
 
