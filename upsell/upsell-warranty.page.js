@@ -15,6 +15,10 @@
         CID: siteSetting.CID
     };
 
+    if(upsell.orderInfo) {
+        console.log(`used field useCreditCard ${upsell.orderInfo.useCreditCard}`);
+    }    
+
     const eCRM = new EmanageCRMJS({
         webkey: upsell.mainWebKey,
         cid: upsell.CID,
@@ -24,10 +28,11 @@
 
     function replaceBracketsStrings() {
         const allElements = _qAll('body *');
-        for(let elem of allElements) {
-            if(elem.children.length === 0 || elem.tagName.toLowerCase() === 'span') {
+        for (let elem of allElements) {
+            if (elem.children.length === 0 || elem.tagName.toLowerCase() === 'span') {
                 elem.innerHTML = elem.innerHTML.replace(/{price}/g, '<span class="spanUpsellPrice"></span>');
                 elem.innerHTML = elem.innerHTML.replace(/{fullprice}/g, '<span class="spanFullPrice"></span>');
+                elem.innerHTML = elem.innerHTML.replace(/{unitprice}/g, '<span class="spanUnitPrice"></span>');
             }
         }
     }
@@ -44,27 +49,28 @@
         eCRM2.Campaign.getProducts(function (products) {
             upsell.products = products.prices;
             upsell.upsellCampaignName = typeof products.campaignName !== 'undefined' ? products.campaignName : '';
+            window.upsell = upsell;
             console.log(products);
 
-            if(utils.localStorage().get('orderInfo')){
+            if (utils.localStorage().get('orderInfo')) {
                 let orderedData = JSON.parse(utils.localStorage().get('orderInfo'));
                 let sku = orderedData.orderedProducts[0].sku;
 
-                if(!!utils.localStorage().get('quantityOnUI') && utils.localStorage().get('quantityOnUI') !== '' && utils.localStorage().get('quantityOnUI') !== '0'){
+                if (!!utils.localStorage().get('quantityOnUI') && utils.localStorage().get('quantityOnUI') !== '' && utils.localStorage().get('quantityOnUI') !== '0') {
                     window.upsell_productindex = parseInt(utils.localStorage().get('quantityOnUI')) - 1;
-                }else if(!!utils.localStorage().get('doubleQuantity') && utils.localStorage().get('doubleQuantity') === 'true'){
-                    window.upsell_productindex = Math.round(JSON.parse(utils.localStorage().get('orderInfo')).quantity/2) - 1;
-                }else{
+                } else if (!!utils.localStorage().get('doubleQuantity') && utils.localStorage().get('doubleQuantity') === 'true') {
+                    window.upsell_productindex = Math.round(JSON.parse(utils.localStorage().get('orderInfo')).quantity / 2) - 1;
+                } else {
                     window.upsell_productindex = orderedData.quantity - 1;
-                    if(!!utils.localStorage().get('isActiveFreeGift') && utils.localStorage().get('isActiveFreeGift') === 'true'){
+                    if (!!utils.localStorage().get('isActiveFreeGift') && utils.localStorage().get('isActiveFreeGift') === 'true') {
                         window.upsell_productindex = window.upsell_productindex - 1;
                     }
                 }
 
-                if(sku.indexOf("_3_1") > -1){
-                    for(let i = 0; i < products.prices.length; i++){
+                if (sku.indexOf("_3_1") > -1) {
+                    for (let i = 0; i < products.prices.length; i++) {
                         let item = products.prices[i];
-                        if(item.sku.indexOf("_3_1") > -1){
+                        if (item.sku.indexOf("_3_1") > -1) {
                             window.upsell_productindex = i;
                             break;
                         }
@@ -73,13 +79,18 @@
             }
 
             const spanUpsellPriceElems = _qAll('.spanUpsellPrice');
-            for(let spanUpsellPrice of spanUpsellPriceElems) {
+            for (let spanUpsellPrice of spanUpsellPriceElems) {
                 spanUpsellPrice.innerHTML = products.prices[window.upsell_productindex].productPrices.DiscountedPrice.FormattedValue;
             }
 
             const spanFullPriceElems = _qAll('.spanFullPrice');
-            for(let spanFullPrice of spanFullPriceElems) {
+            for (let spanFullPrice of spanFullPriceElems) {
                 spanFullPrice.innerHTML = products.prices[window.upsell_productindex].productPrices.FullRetailPrice.FormattedValue;
+            }
+
+            const spanUnitPriceElems = _qAll('.spanUnitPrice');
+            for (let spanUnitPrice of spanUnitPriceElems) {
+                spanUnitPrice.innerHTML = products.prices[window.upsell_productindex].productPrices.UnitDiscountRate.FormattedValue;
             }
         });
     }
@@ -87,7 +98,7 @@
 
     function handleBasicUpsellCTAButton() {
         const ctaButtons = _qAll('.js-btn-place-upsell-order');
-        if(ctaButtons) {
+        if (ctaButtons) {
             Array.prototype.slice.call(ctaButtons).forEach(ele => {
                 ele.addEventListener('click', function (e) {
                     e.preventDefault();
@@ -167,15 +178,22 @@
     function getUpsellData() {
         let pay = {
             cardId: upsell.orderInfo.cardId
-        };
+        };        
 
-        if (upsell.orderInfo.paymentProcessorId == "5" || upsell.orderInfo.paymentProcessorId == "31") {
+        /*
+            5, 31 : paypal
+            39: afterpay
+            42: ideal,
+            41: sofort
+        */
+        //if (upsell.orderInfo.paymentProcessorId == "5" || upsell.orderInfo.paymentProcessorId == "31") { old code
+        if (!upsell.orderInfo.useCreditCard) {
             pay = {
                 paymentProcessorId: Number(upsell.orderInfo.paymentProcessorId)
             };
-        }else{
+        } else {
             //add installment
-            if (!!upsell.orderInfo.installmentValue && upsell.orderInfo.installmentValue !== ""){
+            if (!!upsell.orderInfo.installmentValue && upsell.orderInfo.installmentValue !== "") {
                 pay.Instalments = upsell.orderInfo.installmentValue;
             }
         }
@@ -197,7 +215,7 @@
                 webKey: upsell.mainWebKey,
                 relatedOrderNumber: upsell.orderInfo.orderNumber
             },
-            shippingMethodId: upsell.products[window.upsell_productindex].shippings.length > 0 ? upsell.products[window.upsell_productindex].shippings[0].shippingMethodId: null,
+            shippingMethodId: upsell.products[window.upsell_productindex].shippings.length > 0 ? upsell.products[window.upsell_productindex].shippings[0].shippingMethodId : null,
             comment: '',
             useShippingAddressForBilling: true,
             productId: upsell.products[window.upsell_productindex].productId,
@@ -233,6 +251,25 @@
             handleLastUpsellOrError();
         }
     }
+
+    //--------------Start--convertCurrency - Tu Nguyen
+    function convertCurrency() {
+        let jsCurrencyCode = utils.localStorage().get('jsCurrency');
+
+        if (!jsCurrencyCode) return;
+
+        let currencyElm = _qAll('.jsCurrencyNumber');
+
+        try {
+            for (let item of currencyElm) {
+                item.innerText = jsCurrencyCode.replace("######", item.textContent)
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+    convertCurrency();
+    //--------------End--convertCurrency 
 
     utils.checkAffAndFireEvents();
 
