@@ -937,7 +937,7 @@
                             'orderId': orderInfo.orderNumber,
                             //'price': orderInfo.orderTotal,
                             'price': orderInfo.orderTotalFull ? orderInfo.orderTotalFull : '',
-                            "customeremail": sha256(orderInfo.cusEmail), // DFSB-6160
+                            "customeremail": sha256(orderInfo.cusEmailPP || orderInfo.cusEmail), // DFSB-6160
                             "customerphone": !!orderInfo.cusPhone ? sha256(`${Number(orderInfo.cusPhone.match(/\d/g).join(""))}`) : "",
                             "customerFirstName": !!orderInfo.cusFirstName ? sha256(orderInfo.cusFirstName) : "",
                             "customerLastName": !!orderInfo.cusLastName ? sha256(orderInfo.cusLastName) : "",
@@ -955,7 +955,7 @@
                             'fpid': window._EA_ID,
                             'orderId': orderInfo.orderNumber,
                             'price': orderInfo.orderTotalFull ? orderInfo.orderTotalFull : '',
-                            "customeremail": sha256(orderInfo.cusEmail),
+                            "customeremail": sha256(orderInfo.cusEmailPP || orderInfo.cusEmail),
                             "customerphone": !!orderInfo.cusPhone ? sha256(`${Number(orderInfo.cusPhone.match(/\d/g).join(""))}`) : "",
                             "customerFirstName": !!orderInfo.cusFirstName ? sha256(orderInfo.cusFirstName) : "",
                             "customerLastName": !!orderInfo.cusLastName ? sha256(orderInfo.cusLastName) : "",

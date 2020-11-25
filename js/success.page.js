@@ -3,7 +3,7 @@
         console.log('modules is not found');
         return;
     }
-    
+
     //just use for stripe checkout
     const stripe_redirect_status_param = utils.getQueryParameter('redirect_status');
     if(stripe_redirect_status_param && stripe_redirect_status_param == 'failed') {
@@ -65,7 +65,7 @@
     */
     const payments = {
         checkApprove: () => {
-            const trackingNumber = utils.localStorage().get('trackingNumber') ? utils.localStorage().get('trackingNumber') : null;            
+            const trackingNumber = utils.localStorage().get('trackingNumber') ? utils.localStorage().get('trackingNumber') : null;
             if(!trackingNumber) {
                 console.log('Missing trackingNumber');
                 return;
@@ -128,7 +128,7 @@
                     // if(!!result.address.email && successPage.orderInfo.paymentProcessorId == '31') {
                     if (!!result.address) {
                         if (!!result.address.email && !successPage.orderInfo.cusEmail) {
-                            successPage.orderInfo.cusEmail = result.address.email || '';
+                            successPage.orderInfo.cusEmailPP = result.address.email || '';
                         }
                         if (!!result.address.firstName) {
                             successPage.orderInfo.cusFirstName = result.address.firstName || '';
@@ -198,10 +198,10 @@
             });
         }
     }
-    
-    if(userPaymentType) {        
+
+    if(userPaymentType) {
         if(userPaymentType === 'paypal') {
-            paypal.checkPaypalApprove();        
+            paypal.checkPaypalApprove();
         } else if(userPaymentType === 'stripe' || userPaymentType === 'ideal' || userPaymentType === 'google_apple_pay') {
             payments.checkApprove();
         }
