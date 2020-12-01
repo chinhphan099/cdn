@@ -15,12 +15,12 @@
 
         if(beginDate <= currentDate && currentDate < endDate) {
             elm.style.display = 'block';
-            _q('html').classList.add('show-holiday-banner');
+            // _q('html').classList.add('show-holiday-banner');
         }
 
         // Add event for Close button
         elm.querySelector('.h_close').addEventListener('click', function(e) {
-            _q('html').classList.remove('show-holiday-banner');
+            // _q('html').classList.remove('show-holiday-banner');
             _getClosest(e.target, '.christmas-2020').style.display = 'none';
         });
     }
