@@ -6,8 +6,11 @@
                 return;
             }
 
-            const paymentProcessorId = orderInfos.paymentProcessorId;
-            if(paymentProcessorId === 28) {
+            if(orderInfos) {
+                console.log(`used field useCreditCard ${orderInfos.useCreditCard} from file upsell-checkpaymenttype.page.js`);
+            }
+
+            if(orderInfos.useCreditCard) {
                 document.querySelector('body').classList.add('payment-by-cc');
             }
             else {
