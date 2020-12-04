@@ -17,28 +17,37 @@ const initSwiperSlider = (function(){
 
                 //Assign property thumbs to Slider options
                 Object.assign(slider.options,{
-                    thumbs: { 
+                    thumbs: {
                         swiper: thumbSlider
                     }
                 });
             }
 
-            //handle to autoplay wistia Video 
+            //handle to autoplay wistia Video
             if(!!slider.wistiaID){
                 Object.assign(slider.options,{
                     on: {
                         slideChangeTransitionEnd: function(swiper){
-                            let itemElm = this.slides[this.activeIndex],
-                                autoPlayVideo = Boolean(itemElm.querySelector('.sl_video').dataset.autoplay);
+                            try {
+                                let itemElm = this.slides[this.activeIndex],
+                                    autoPlayVideo = false;
 
-                            if(this.slides[this.activeIndex].querySelectorAll('.wistia_embed').length > 0 && !!autoPlayVideo){
-                                //Play next video after slide changed
-                                Wistia.api(this.slides[this.activeIndex].querySelector('.sl_video').dataset.videoid).play();
-                                
-                                //Pause current video before slide changed
-                                Wistia.api(this.slides[this.previousIndex].querySelector('.sl_video').dataset.videoid).pause();
-                            } else {
-                                Wistia.api(this.slides[this.activeIndex].querySelector('.sl_video').dataset.videoid).pause();
+                                if (itemElm.querySelector('.sl_video')) {
+                                    autoPlayVideo = Boolean(itemElm.querySelector('.sl_video').dataset.autoplay);
+                                }
+                                if(this.slides[this.activeIndex].querySelectorAll('.wistia_embed').length > 0 && !!autoPlayVideo){
+                                    //Play next video after slide changed
+                                    Wistia.api(this.slides[this.activeIndex].querySelector('.sl_video').dataset.videoid).play();
+
+                                    //Pause current video before slide changed
+                                    Wistia.api(this.slides[this.previousIndex].querySelector('.sl_video').dataset.videoid).pause();
+                                } else {
+                                    if (this.slides[this.activeIndex].querySelector('.wistia_embed_initialized')) {
+                                        Wistia.api(this.slides[this.activeIndex].querySelector('.sl_video').dataset.videoid).pause();
+                                    }
+                                }
+                            } catch (e) {
+                                console.log(e);
                             }
                         }
                     }
