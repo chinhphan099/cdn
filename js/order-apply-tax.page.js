@@ -120,15 +120,30 @@
         renderTaxRow();
         utils.callAjax(url, options)
             .then((result) => {
-                if (!result) { return; }
-                // window.taxPercent = 6.25; // Will Remove
+                let items = [];
+                if (!result) {
+                    items = postData.items.map((item) => {
+                        item.taxAmount = 0;
+                        item.taxRate = 0;
+                        return item
+                    });
+                }
+                else {
+                    items = result.items;
+                }
                 utils.events.emit('bindTax');
-                window.taxArray = result.items;
+                window.taxArray = items;
                 implementTax(selectedProduct);
             })
             .catch(() => {
-                enableCheckoutBtnEvents();
-                console.log('load tax error');
+                let items = postData.items.map((item) => {
+                    item.taxAmount = 0;
+                    item.taxRate = 0;
+                    return item
+                });
+                utils.events.emit('bindTax');
+                window.taxArray = items;
+                implementTax(selectedProduct);
             });
     }
 
@@ -156,16 +171,11 @@
                 if (camp) {
                     camp = camp[siteSetting.webKey];
                     customerAddress = {
-                        // 'line1': '',
-                        // 'city': camp.location.city,
-                        // 'region': camp.location.regionCode,
-                        // 'country': camp.location.countryCode,
-                        // 'postalCode': camp.location.zipCode
-                        'line1': '555 Burrard ST',
-                        'city': 'Vancouver',
-                        'region': 'BC',
-                        'country': 'CA',
-                        'postalCode': 'V7X 1M8'
+                        'line1': '',
+                        'city': camp.location.city,
+                        'region': camp.location.regionCode,
+                        'country': camp.location.countryCode,
+                        'postalCode': camp.location.zipCode
                     };
                     const postData = {
                         items: [],
