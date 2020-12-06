@@ -61,7 +61,9 @@
             return;
         }
         additionPriceValue = upgradeItem.productPrices.DiscountedPrice.Value - productData.productPrices.DiscountedPrice.Value;
-
+        if (!!window.isPreOrder && !!product.productPrices.hasOwnProperty('PreSaleAmount1') && !!upgradeItem.productPrices.hasOwnProperty('PreSaleAmount1')) {
+            additionPriceValue = (upgradeItem.productPrices.DiscountedPrice.Value + upgradeItem.productPrices.PreSaleAmount1.Value) - (productData.productPrices.DiscountedPrice.Value + productData.productPrices.PreSaleAmount1.Value);
+        }
         if (productData.quantity > 1) {
             diggyPopup.classList.add('plural-item');
         }
