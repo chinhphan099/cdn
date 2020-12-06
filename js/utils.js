@@ -1395,6 +1395,9 @@
                 case 'ideal':
                     window.preventCheckoutIdeal = true;
                     break;
+                case 'gap':
+                    window.preventCheckoutGAP = true;
+                    break;
                 case 'redirectCheckout':
                     window.preventCheckoutRedirect = true;
                     break;
@@ -1441,6 +1444,15 @@
                     //Register Events
                     if (typeof registerFnc === 'function') {
                         utils.events.on('fireAfterSuccessPP', function (data) {
+                            registerFnc(data);
+                        });
+                    }
+                    break;
+                case 'gap':
+                    window.emitAfterSuccessGAP = true;
+                    //Register Events
+                    if (typeof registerFnc === 'function') {
+                        utils.events.on('fireAfterSuccessGAP', function (data) {
                             registerFnc(data);
                         });
                     }

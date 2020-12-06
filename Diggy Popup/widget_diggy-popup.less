@@ -69,8 +69,22 @@
             position: relative;
             top: 5px;
             vertical-align: baseline;
+            .google-in-progress &,
+            .apple-in-progress &,
             .paypal-in-progress & {
                 display: none;
+            }
+        }
+        .google-logo {
+            display: none;
+            .google-in-progress {
+                display: inline;
+            }
+        }
+        .apple-logo {
+            display: none;
+            .apple-in-progress {
+                display: inline;
             }
         }
         @media (min-width: 768px) {
