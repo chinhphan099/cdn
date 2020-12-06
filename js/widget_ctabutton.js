@@ -482,7 +482,9 @@
             e.preventDefault();
             window.ccFlag = true;
             window.paypalFlag = false;
+            window.gapFlag = false;
 
+            _q('body').classList.remove('google-in-progress', 'apple-in-progress');
             if (!!_q('.widget_modal_upsell')) {
                 if (!isValidInfos()) {
                     return;
