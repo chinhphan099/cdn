@@ -207,6 +207,7 @@
             installmentValue: _qById('ddl_installpayment') ? _qById('ddl_installpayment').value : '',
             installmentText: (window.widget && window.widget.installmentpayment) ? window.widget.installmentpayment.optionText : '',
             url: location.pathname,
+            //this property is very important to check use CC
             useCreditCard: orderResponse.useCreditCard ? orderResponse.useCreditCard : false
         };
         utils.localStorage().set('orderInfo', JSON.stringify(orderInfo));
