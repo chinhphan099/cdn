@@ -291,13 +291,13 @@
                 }
                 else {
                     //set Total for upsells preOrder
-                    let pricePreOrder = data.relatedOrders[i].futureEvents.length > 0 ? Number(data.relatedOrders[i].futureEvents[0].price) : data.relatedOrders[i].orderProductPrice;
+                    let pricePreOrder = (data.relatedOrders[i].futureEvents && data.relatedOrders[i].futureEvents.length > 0) ? Number(data.relatedOrders[i].futureEvents[0].price) : data.relatedOrders[i].orderProductPrice;
                     totalPreOrder = utils.formatPrice(((data.relatedOrders[i].orderPrice - pricePreOrder).toFixed(2)),
                         fCurrency, shippingPriceFormatted);
                     //grandTotal += data.relatedOrders[i].orderPrice - data.relatedOrders[i].orderProductPrice;
                     totalBalance += pricePreOrder;
                     totalProductsWhenReady += (data.relatedOrders[i].orderPrice - pricePreOrder);
-                    let productPrice = data.relatedOrders[i].futureEvents.length > 0 ? data.relatedOrders[i].futureEvents[0].price : data.relatedOrders[i].orderProductPrice;
+                    let productPrice = (data.relatedOrders[i].futureEvents && data.relatedOrders[i].futureEvents.length > 0) ? data.relatedOrders[i].futureEvents[0].price : data.relatedOrders[i].orderProductPrice;
                     productPrice = utils.formatPrice(productPrice.toFixed(2), fCurrency, shippingPriceFormatted);
                     itemTmp = productItemTmp.replace('{productName}', data.relatedOrders[i].productName)
                         .replace(/\{productPrice\}/g, productPrice)
