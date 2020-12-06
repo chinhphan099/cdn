@@ -32,6 +32,7 @@
             if (elem.children.length === 0 || elem.tagName.toLowerCase() === 'span') {
                 elem.innerHTML = elem.innerHTML.replace(/{price}/g, '<span class="spanUpsellPrice"></span>');
                 elem.innerHTML = elem.innerHTML.replace(/{fullprice}/g, '<span class="spanFullPrice"></span>');
+                elem.innerHTML = elem.innerHTML.replace(/{FirstCharge}/g, '<span class="spanFirstCharge"></span>');
                 elem.innerHTML = elem.innerHTML.replace(/{unitprice}/g, '<span class="spanUnitPrice"></span>');
             }
         }
@@ -81,6 +82,13 @@
             const spanUpsellPriceElems = _qAll('.spanUpsellPrice');
             for (let spanUpsellPrice of spanUpsellPriceElems) {
                 spanUpsellPrice.innerHTML = products.prices[window.upsell_productindex].productPrices.DiscountedPrice.FormattedValue;
+            }
+
+            const spanFirstChargeElems = _qAll('.spanFirstCharge');
+            for (let spanFirstCharge of spanFirstChargeElems) {
+                if (products.prices[window.upsell_productindex].productPrices.PreSaleAmount1) {
+                    spanFirstCharge.innerHTML = products.prices[window.upsell_productindex].productPrices.PreSaleAmount1.FormattedValue;
+                }
             }
 
             const spanFullPriceElems = _qAll('.spanFullPrice');
