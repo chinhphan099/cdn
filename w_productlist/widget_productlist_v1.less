@@ -27,6 +27,27 @@
             border-image-slice: 1;
             background-color: #fffefa;
         }
+        .halloween & {
+            position: relative;
+
+            border: 0px;
+            border-radius: 3px;
+            background-color: #F3FDFF;
+            overflow: hidden;
+            &::before {
+                position: absolute;
+                content: "";
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+
+                border: 3px solid #ccc;
+                border-image: linear-gradient(to right,#009fea 0,#006ec4 60%,#0047a6 100%);
+                -webkit-border-image: linear-gradient(to right,#009fea 0,#006ec4 60%,#0047a6 100%);
+                border-image-slice: 1;
+            }
+        }
     }
     &.golden-border-item {
         border-width: 3px;
