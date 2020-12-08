@@ -689,7 +689,7 @@
 
     function fireEverFlow() {
         const orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
-        const everFlowUrl = 'https://#DOMAIN/?nid=#NETWORK_ID&oid=#OFFER_ID&transaction_id=#TRANSACTION_ID&adv1=#ADV1&coupon_code=#CC&sub1=#S1&sub2=#S2&sub3=#S3&sub4=#S4&sub5=#S5';
+        const everFlowUrl = 'https://#DOMAIN/?nid=#NETWORK_ID&oid=#OFFER_ID&transaction_id=#TRANSACTION_ID&adv1=#ADV1&coupon_code=#CC&sub1=#S1&sub2=#S2&sub3=#S3&sub4=#S4&sub5=#S5&source_id=#SOURCE_ID';
         try {
             let isEverFlowFired = false;
             if (utils.localStorage().get('isEverFlowFired')) {
@@ -708,6 +708,7 @@
                 const sub3 = utils.getQueryParameter('S3') || '';
                 const sub4 = utils.getQueryParameter('S4') || '';
                 const sub5 = utils.getQueryParameter('S5') || '';
+				const source_id = utils.getQueryParameter('source_id') || '';
 
                 let url = everFlowUrl.replace('#ADV1', orderInfo.orderNumber);
                 url = url.replace('#NETWORK_ID', network_id);
@@ -720,6 +721,7 @@
                 url = url.replace('#S3', sub3);
                 url = url.replace('#S4', sub4);
                 url = url.replace('#S5', sub5);
+				url = url.replace('#SOURCE_ID', source_id);
 
                 const iframe = document.createElement('iframe');
                 iframe.src = url;
@@ -1393,6 +1395,9 @@
                 case 'ideal':
                     window.preventCheckoutIdeal = true;
                     break;
+                case 'gap':
+                    window.preventCheckoutGAP = true;
+                    break;
                 case 'redirectCheckout':
                     window.preventCheckoutRedirect = true;
                     break;
@@ -1439,6 +1444,15 @@
                     //Register Events
                     if (typeof registerFnc === 'function') {
                         utils.events.on('fireAfterSuccessPP', function (data) {
+                            registerFnc(data);
+                        });
+                    }
+                    break;
+                case 'gap':
+                    window.emitAfterSuccessGAP = true;
+                    //Register Events
+                    if (typeof registerFnc === 'function') {
+                        utils.events.on('fireAfterSuccessGAP', function (data) {
                             registerFnc(data);
                         });
                     }

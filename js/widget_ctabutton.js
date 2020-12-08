@@ -207,6 +207,7 @@
             installmentValue: _qById('ddl_installpayment') ? _qById('ddl_installpayment').value : '',
             installmentText: (window.widget && window.widget.installmentpayment) ? window.widget.installmentpayment.optionText : '',
             url: location.pathname,
+            //this property is very important to check use CC
             useCreditCard: orderResponse.useCreditCard ? orderResponse.useCreditCard : false
         };
         utils.localStorage().set('orderInfo', JSON.stringify(orderInfo));
@@ -481,7 +482,9 @@
             e.preventDefault();
             window.ccFlag = true;
             window.paypalFlag = false;
+            window.gapFlag = false;
 
+            _q('body').classList.remove('google-in-progress', 'apple-in-progress');
             if (!!_q('.widget_modal_upsell')) {
                 if (!isValidInfos()) {
                     return;

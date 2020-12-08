@@ -11,7 +11,7 @@
         isTest: utils.getQueryParameter('isCardTest') ? true : false
     });
 
-    let upgradeItemId, defaultProduct, additionPriceValue, currentIndex, btnParamId,
+    let upgradeItemId, defaultProduct, currentIndex, btnParamId,
         diggyPopup = _qById('diggyPopup'),
         dummyInput = _q('#product_00');
 
@@ -60,8 +60,10 @@
             console.log('Error: Double item not exist');
             return;
         }
-        additionPriceValue = upgradeItem.productPrices.DiscountedPrice.Value - productData.productPrices.DiscountedPrice.Value;
-
+        window.additionPriceValue = upgradeItem.productPrices.DiscountedPrice.Value - productData.productPrices.DiscountedPrice.Value;
+        if (!!window.isPreOrder && !!productData.productPrices.hasOwnProperty('PreSaleAmount1') && !!upgradeItem.productPrices.hasOwnProperty('PreSaleAmount1')) {
+            window.additionPriceValue = (upgradeItem.productPrices.DiscountedPrice.Value + upgradeItem.productPrices.PreSaleAmount1.Value) - (productData.productPrices.DiscountedPrice.Value + productData.productPrices.PreSaleAmount1.Value);
+        }
         if (productData.quantity > 1) {
             diggyPopup.classList.add('plural-item');
         }
@@ -100,7 +102,7 @@
         }
 
         Array.prototype.slice.call(_qAll('#diggyPopup .additionPrice')).forEach(item => {
-            item.innerHTML = utils.formatPrice(additionPriceValue.toFixed(2), window.fCurrency, productData.shippings[0].formattedPrice);
+            item.innerHTML = utils.formatPrice(window.additionPriceValue.toFixed(2), window.fCurrency, productData.shippings[0].formattedPrice);
         });
 
         Array.prototype.slice.call(_qAll('#diggyPopup .ordered-qty')).forEach(item => {
@@ -146,8 +148,8 @@
                 let op = 1;
 
                 let orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
-                orderInfo.orderTotal = Number((orderInfo.orderTotal + additionPriceValue).toFixed(2));
-                orderInfo.orderTotalFull = Number((orderInfo.orderTotalFull + additionPriceValue).toFixed(2));
+                orderInfo.orderTotal = Number((orderInfo.orderTotal + window.additionPriceValue).toFixed(2));
+                orderInfo.orderTotalFull = Number((orderInfo.orderTotalFull + window.additionPriceValue).toFixed(2));
 
                 utils.localStorage().set('orderInfo', JSON.stringify(orderInfo));
 
@@ -209,18 +211,24 @@
             renderPriceFor2ndPop(true);
         }
 
-        switch (window.paypalFlag) {
-            case true:
-                if (!!_qById('second_popup_buy_one_more')) {
-                    window.showPopup('second_popup_buy_one_more');
-                }
-                else {
-                    window.paypal.placeMainOrder();
-                }
-                break;
-            case false:
-                activateCreditCardUpgrade(orderNumber, window.urlRedirect);
-                break;
+        if (window.gapFlag) {
+            if (!!_qById('second_popup_buy_one_more')) {
+                window.showPopup('second_popup_buy_one_more');
+            }
+            else {
+                window.gap.handleAppleGoogleClick();
+            }
+        }
+        if (window.paypalFlag) {
+            if (!!_qById('second_popup_buy_one_more')) {
+                window.showPopup('second_popup_buy_one_more');
+            }
+            else {
+                window.paypal.placeMainOrder();
+            }
+        }
+        if (window.ccFlag) {
+            activateCreditCardUpgrade(orderNumber, window.urlRedirect);
         }
 
         if (!!diggyPopup) {
@@ -230,6 +238,7 @@
 
     //Event cancelling to upgrade product for Paypal & Creditcard
     function cancelUpgradeProduct() {
+        window.additionPriceValue = 0;
         if (!!_qById('second_popup_buy_one_more')) {
             renderPriceFor2ndPop(false);
         }
@@ -238,18 +247,24 @@
             window.closePopup('diggyPopup');
         }
 
-        switch (window.paypalFlag) {
-            case true:
-                if (!!_qById('second_popup_buy_one_more')) {
-                    window.showPopup('second_popup_buy_one_more');
-                }
-                else {
-                    window.paypal.placeMainOrder();
-                }
-                break;
-            case false:
-                activateCreditCardUpgrade(false, window.urlRedirect);
-                break;
+        if (window.gapFlag) {
+            if (!!_qById('second_popup_buy_one_more')) {
+                window.showPopup('second_popup_buy_one_more');
+            }
+            else {
+                window.gap.handleAppleGoogleClick();
+            }
+        }
+        if (window.paypalFlag) {
+            if (!!_qById('second_popup_buy_one_more')) {
+                window.showPopup('second_popup_buy_one_more');
+            }
+            else {
+                window.paypal.placeMainOrder();
+            }
+        }
+        if (window.ccFlag) {
+            activateCreditCardUpgrade(false, window.urlRedirect);
         }
     }
 
@@ -328,9 +343,37 @@
     //register event bindOrderPage at first load
     utils.events.on('bindOrderPage', renderPrice);
 
-    //Enable Prevent Checkout of Paypal
+    //Enable Prevent Checkout of Google Apple Pay
     let injectCustomEvents = new utils.injectCustomEventsToCTABtn;
 
+    injectCustomEvents.preventCheckout('gap', function () {
+        if (_q('#btn-google-pay')) {
+            _q('#btn-google-pay').addEventListener('click', function () {
+                if (!!diggyPopup) {
+                    window.showPopup('diggyPopup');
+                    countDownSeconds();
+                }
+            });
+        }
+        if (_q('#btn-apple-pay')) {
+            _q('#btn-apple-pay').addEventListener('click', function () {
+                if (!!diggyPopup) {
+                    window.showPopup('diggyPopup');
+                    countDownSeconds();
+                }
+            });
+        }
+    });
+
+    //Enable Emit event after purchase for Paypal
+    injectCustomEvents.emitEventAfterCheckout('gap', function () {
+        let newOrderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
+        newOrderInfo.quantity = defaultProduct.quantity;
+
+        utils.localStorage().set('orderInfo', JSON.stringify(newOrderInfo));
+    });
+
+    //Enable Prevent Checkout of Paypal
     injectCustomEvents.preventCheckout('paypal', function () {
         if (!_q('#js-paypal-oneclick-button .w_radio')) {
             return;

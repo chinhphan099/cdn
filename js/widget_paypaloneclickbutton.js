@@ -32,6 +32,8 @@
             e.preventDefault();
             window.paypalFlag = true;
             window.ccFlag = false;
+            window.gapFlag = false;
+            _q('body').classList.remove('google-in-progress', 'apple-in-progress');
             _q('body').classList.add('paypal-in-progress');
             if(!!_q('.widget_modal_upsell')) {
                 _q('.widget_modal_upsell').style.display = 'block';
