@@ -76,10 +76,10 @@
             }
         }
         else{
-            if (window.applePay){
+            if (localStorage.getItem('applePay'){
                 paymentName = 'Apple';
             }
-            else if (window.googlePay){
+            else if (localStorage.getItem('googlePay'){
                 paymentName = 'Google';
             }
         }

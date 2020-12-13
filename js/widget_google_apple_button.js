@@ -81,10 +81,10 @@
                     if (result.applePay) {
                         const btnApple = document.getElementById('btn-apple-pay');
                         if (btnApple) {
+							localStorage.setItem('applePay', true);
                             btnApple.classList.remove('hidden');
                             btnApple.addEventListener('click', e => {
                                 e.preventDefault();
-                                window.applePay = true;
                                 window.gapFlag = true;
                                 window.paypalFlag = false;
                                 window.ccFlag = false;
@@ -103,10 +103,10 @@
                     } else {
                         const btnGoogle = document.getElementById('btn-google-pay');
                         if (btnGoogle) {
+							localStorage.setItem('googlePay', true);
                             btnGoogle.classList.remove('hidden');
                             btnGoogle.addEventListener('click', e => {
                                 e.preventDefault();
-                                window.googlePay = true;
                                 window.gapFlag = true;
                                 window.paypalFlag = false;
                                 window.ccFlag = false;
@@ -192,7 +192,7 @@
         }
     }
 
-    function 1(paymentData) {
+    function getOrderData(paymentData) {
         //get couponCode
         let couponCode = '';
         const couponField = _qById('couponCode');
