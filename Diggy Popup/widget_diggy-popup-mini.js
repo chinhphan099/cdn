@@ -105,6 +105,10 @@
             item.innerHTML = utils.formatPrice(window.additionPriceValue.toFixed(2), window.fCurrency, productData.shippings[0].formattedPrice);
         });
 
+        Array.prototype.slice.call(_qAll('#diggyPopup .typeProduct')).forEach(item => {
+            item.textContent = _q('.js-list-group .active').textContent
+        });
+
         Array.prototype.slice.call(_qAll('#diggyPopup .additionDepositPrice')).forEach(item => {
             if (window.upsell.products.length > 0) {
                 const miniItem = window.upsell.products[window.upsell_productindex]
