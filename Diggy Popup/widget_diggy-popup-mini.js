@@ -61,9 +61,9 @@
             return;
         }
         window.additionPriceValue = upgradeItem.productPrices.DiscountedPrice.Value - productData.productPrices.DiscountedPrice.Value;
-        if (!!window.isPreOrder && !!productData.productPrices.hasOwnProperty('PreSaleAmount1') && !!upgradeItem.productPrices.hasOwnProperty('PreSaleAmount1')) {
+        /* if (!!window.isPreOrder && !!productData.productPrices.hasOwnProperty('PreSaleAmount1') && !!upgradeItem.productPrices.hasOwnProperty('PreSaleAmount1')) {
             window.additionPriceValue = (upgradeItem.productPrices.DiscountedPrice.Value + upgradeItem.productPrices.PreSaleAmount1.Value) - (productData.productPrices.DiscountedPrice.Value + productData.productPrices.PreSaleAmount1.Value);
-        }
+        }*/
         if (productData.quantity > 1) {
             diggyPopup.classList.add('plural-item');
         }
@@ -103,6 +103,14 @@
 
         Array.prototype.slice.call(_qAll('#diggyPopup .additionPrice')).forEach(item => {
             item.innerHTML = utils.formatPrice(window.additionPriceValue.toFixed(2), window.fCurrency, productData.shippings[0].formattedPrice);
+        });
+
+        Array.prototype.slice.call(_qAll('#diggyPopup .additionDepositPrice')).forEach(item => {
+            if (window.upsell.products.length > 0) {
+                const miniItem = window.upsell.products[window.upsell_productindex]
+                const miniDepositPrice = miniItem.productPrices.PreSaleAmount1.FormattedValue
+                item.innerHTML = miniDepositPrice;
+            }
         });
 
         Array.prototype.slice.call(_qAll('#diggyPopup .ordered-qty')).forEach(item => {
@@ -551,6 +559,7 @@
         if (_q('#btn-google-pay')) {
             _q('#btn-google-pay').addEventListener('click', function () {
                 if (!!diggyPopup) {
+                    renderPrice();
                     window.showPopup('diggyPopup');
                     countDownSeconds();
                 }
@@ -559,6 +568,7 @@
         if (_q('#btn-apple-pay')) {
             _q('#btn-apple-pay').addEventListener('click', function () {
                 if (!!diggyPopup) {
+                    renderPrice();
                     window.showPopup('diggyPopup');
                     countDownSeconds();
                 }
@@ -581,6 +591,7 @@
         }
         _q('#js-paypal-oneclick-button .w_radio').addEventListener('click', function () {
             if (!!diggyPopup) {
+                renderPrice();
                 window.showPopup('diggyPopup');
                 countDownSeconds();
             }
@@ -611,6 +622,7 @@
         //display popup
         if (!!diggyPopup) {
             implementDelayMiniUpsell();
+            renderPrice();
             window.showPopup('diggyPopup');
             countDownSeconds();
         }
