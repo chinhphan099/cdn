@@ -75,14 +75,6 @@
                     paymentName = '';
             }
         }
-        else{
-            if (localStorage.getItem('applePay'){
-                paymentName = 'Apple';
-            }
-            else if (localStorage.getItem('googlePay'){
-                paymentName = 'Google';
-            }
-        }
         const messageElemnt = _q('.js-paypal-decline-message');
         messageElemnt.innerHTML = messageElemnt.innerHTML.replace('Paypal', paymentName);
         messageElemnt.innerHTML = messageElemnt.innerHTML.replace('PayPal', paymentName);
