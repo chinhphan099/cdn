@@ -106,7 +106,9 @@
         });
 
         Array.prototype.slice.call(_qAll('#diggyPopup .typeProduct')).forEach(item => {
-            item.textContent = _q('.js-list-group .active').textContent
+            if (_q('.js-list-group .active')) {
+                item.textContent = _q('.js-list-group .active').textContent
+            }
         });
 
         Array.prototype.slice.call(_qAll('#diggyPopup .additionDepositPrice')).forEach(item => {
