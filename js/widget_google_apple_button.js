@@ -19,99 +19,130 @@
     try {
         eCRM.Order.getMidAndPrn((data) => {
             if (data) {
-                initStripeButton(data);
+                try {
+                    //init Stripe instance with default value        
+                    let countryCode, currencyCode;
+                    //override for testing at the unsupported countries
+                    const isTestGAP = utils.getQueryParameter('isTestGAP');
+                    if (isTestGAP && isTestGAP === 'true') {
+                        countryCode = 'US';
+                        currencyCode = 'usd';
+                        initStripeButton(data, countryCode, currencyCode.toLowerCase());
+                    } else {
+                        let counter = 1;
+                        const timer = setInterval(() => {
+                            countryCode = utils.localStorage().get('countryCode');
+                            currencyCode = utils.localStorage().get('currencyCode');
+                            if (countryCode && currencyCode) {
+                                clearInterval(timer);
+                                initStripeButton(data, countryCode, currencyCode.toLowerCase());
+                               
+                            } else {
+                                if (counter >= 50) {
+                                    clearInterval(timer);
+                                    console.log("can't get country code or currency code");                                    
+                                }
+                            }
+                            counter++;
+                        }, 200);
+                    }
+                } catch (err) {
+                    console.log(err);
+                }
             }
         }, 54);
     } catch (err) {
         console.log('can not get midid: ', err);
     }
 
+    function initStripeButton(resData, countryCode, currencyCode) {
+        try {
+            //store midid to be used for confirming payment
+            window.sessionStorage.setItem('midId', resData.midId);
+            const stripe = Stripe(resData.prnCode.split(';')[0], { stripeAccount: resData.prnCode.split(';')[1] });
+            window.paymentRequest = stripe.paymentRequest({
+                country: countryCode,
+                currency: currencyCode,
+                total: {
+                    label: 'Sample Product',
+                    amount: 0,
+                },
+                requestPayerName: true,
+                requestPayerEmail: true,
+                requestPayerPhone: true
+            });
 
-    function initStripeButton(resData) {
-        //store midid to be used for confirming payment
-        window.sessionStorage.setItem('midId', resData.midId);
+            // Check the availability of the Payment Request API first.
+            window.paymentRequest.canMakePayment().then(function (result) {
+                if (result) {
+                    console.log(result);
+                    _q('body').classList.remove('google-in-progress', 'apple-in-progres')
 
-        const stripe = Stripe(resData.prnCode.split(';')[0], { stripeAccount: resData.prnCode.split(';')[1] });
-
-        //init instance with default value
-        window.paymentRequest = stripe.paymentRequest({
-            country: 'US',
-            currency: 'usd',
-            total: {
-                label: 'Sample Product',
-                amount: 0,
-            },
-            requestPayerName: true,
-            requestPayerEmail: true,
-            requestPayerPhone: true
-        });
-
-        // Check the availability of the Payment Request API first.
-        window.paymentRequest.canMakePayment().then(function (result) {
-            if (result) {
-                console.log(result);
-                _q('body').classList.remove('google-in-progress', 'apple-in-progres')
-
-                if (result.applePay) {
-                    const btnApple = document.getElementById('btn-apple-pay');
-                    if(btnApple) {
-                        btnApple.classList.remove('hidden');
-                        btnApple.addEventListener('click', e => {
-                            e.preventDefault();
-                            window.gapFlag = true;
-                            window.paypalFlag = false;
-                            window.ccFlag = false;
-                            _q('body').classList.add('apple-in-progress');
-                            if(!!_q('.widget_modal_upsell')) {
-                                _q('.widget_modal_upsell').style.display = 'block';
-                            }
-                            else if(!!window.preventCheckoutGAP){
-                                return;
-                            }
-                            else {
-                                handleAppleGoogleClick();
-                            }
-                        });
+                    if (result.applePay) {
+                        const btnApple = document.getElementById('btn-apple-pay');
+                        if (btnApple) {
+                            btnApple.classList.remove('hidden');
+                            btnApple.addEventListener('click', e => {
+                                e.preventDefault();
+                                window.applePay = true;
+                                window.gapFlag = true;
+                                window.paypalFlag = false;
+                                window.ccFlag = false;
+                                _q('body').classList.add('apple-in-progress');
+                                if (!!_q('.widget_modal_upsell')) {
+                                    _q('.widget_modal_upsell').style.display = 'block';
+                                }
+                                else if (!!window.preventCheckoutGAP) {
+                                    return;
+                                }
+                                else {
+                                    handleAppleGoogleClick();
+                                }
+                            });
+                        }
+                    } else {
+                        const btnGoogle = document.getElementById('btn-google-pay');
+                        if (btnGoogle) {
+                            btnGoogle.classList.remove('hidden');
+                            btnGoogle.addEventListener('click', e => {
+                                e.preventDefault();
+                                window.googlePay = true;
+                                window.gapFlag = true;
+                                window.paypalFlag = false;
+                                window.ccFlag = false;
+                                _q('body').classList.add('google-in-progress');
+                                if (!!_q('.widget_modal_upsell')) {
+                                    _q('.widget_modal_upsell').style.display = 'block';
+                                }
+                                else if (!!window.preventCheckoutGAP) {
+                                    return;
+                                }
+                                else {
+                                    handleAppleGoogleClick();
+                                }
+                            });
+                        }
                     }
+
+                    const dividerCCLine = document.querySelector('.divider.or-cc');
+                    dividerCCLine.style.display = 'block';
                 } else {
-                    const btnGoogle = document.getElementById('btn-google-pay');
-                    if(btnGoogle) {
-                        btnGoogle.classList.remove('hidden');
-                        btnGoogle.addEventListener('click', e => {
-                            e.preventDefault();
-                            window.gapFlag = true;
-                            window.paypalFlag = false;
-                            window.ccFlag = false;
-                            _q('body').classList.add('google-in-progress');
-                            if(!!_q('.widget_modal_upsell')) {
-                                _q('.widget_modal_upsell').style.display = 'block';
-                            }
-                            else if(!!window.preventCheckoutGAP){
-                                return;
-                            }
-                            else {
-                                handleAppleGoogleClick();
-                            }
-                        });
-                    }
+                    console.log('not support');
                 }
+            });
 
-                const dividerCCLine = document.querySelector('.divider.or-cc');
-                dividerCCLine.style.display = 'block';
-            } else {
-                console.log('not support');
-            }
-        });
-
-        window.paymentRequest.on('cancel', function (event) {
-            console.log(event);
-            _q('.checked-item .js-unitDiscountRate').click();
-        });
-        window.paymentRequest.on('source', function (event) {
-            console.log(event);
-            event.complete('success');
-            placeMainOrder('google_apple_pay', event);
-        });
+            window.paymentRequest.on('cancel', function (event) {
+                console.log(event);
+                _q('.checked-item .js-unitDiscountRate').click();
+            });
+            window.paymentRequest.on('source', function (event) {
+                console.log(event);
+                event.complete('success');
+                placeMainOrder('google_apple_pay', event);
+            });
+        } catch (err) {
+            console.log("don't support in your country ", err);
+        }
     }
 
     function handleAppleGoogleClick() {
@@ -132,6 +163,8 @@
                 amount,
             }
         });
+
+        //show Google or Apple popup
         window.paymentRequest.show();
     }
 
@@ -159,7 +192,7 @@
         }
     }
 
-    function getOrderData(paymentData) {
+    function 1(paymentData) {
         //get couponCode
         let couponCode = '';
         const couponField = _qById('couponCode');
@@ -190,6 +223,9 @@
             },
             'payment': {
                 "paymentProcessorId": 54
+            },
+            'mid': {
+                'midId': !!window.sessionStorage.getItem('midId') ? parseInt(window.sessionStorage.getItem('midId')) : null
             },
             'shippingAddress': {
                 'firstName': fullName[0],
@@ -395,6 +431,7 @@
         const orderData = getOrderData(source);
         eCRM.Order.webkey = siteSetting.webKey;
 
+        console.time('placeOrder');
         eCRM.Order.placeOrder(orderData, paymenttype, function (result) {
             //make a flag is that has a order successfully, will be used in decline page
             utils.localStorage().set('mainOrderLink', location.pathname);
@@ -422,19 +459,21 @@
                     });
                 }
 
+                //don't need to wait response of confirmation payment to redirect to upsell
                 const midId = window.sessionStorage.getItem('midId');
                 eCRM.Order.confirmGoogleApplePay(result.trackingNumber, source.source.id, midId, (dataResponse) => {
-                    if (dataResponse && dataResponse.success) {
-                        if (result.upsells.length > 0 && result.upsells[0].upsellUrl !== '') {
-                            const redirectUrl = result.upsells[0].upsellUrl.substr(result.upsells[0].upsellUrl.lastIndexOf('/') + 1);
-                            location.href = redirectUrl;
-                        } else {
-                            utils.redirectPage(siteSetting.successUrl);
-                        }
-                    } else {
-                        utils.redirectPage(siteSetting.declineUrl);
-                    }
+                    console.log(dataResponse);
                 });
+
+                console.timeEnd('placeOrder');
+
+                //redirect to upsell
+                if (result.upsells.length > 0 && result.upsells[0].upsellUrl !== '') {
+                    const redirectUrl = result.upsells[0].upsellUrl.substr(result.upsells[0].upsellUrl.lastIndexOf('/') + 1);
+                    location.href = redirectUrl;
+                } else {
+                    utils.redirectPage(siteSetting.successUrl);
+                }
             } else {
                 utils.redirectPage(siteSetting.declineUrl);
             }

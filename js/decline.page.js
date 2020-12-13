@@ -52,8 +52,8 @@
 
     function displayMessage() {
         let orderInfo = utils.localStorage().get('orderInfo');
+        let paymentName = '';
         if (orderInfo && utils.localStorage().get('userPaymentType')) {
-            let paymentName = '';
             orderInfo = JSON.parse(orderInfo);
             switch (orderInfo.paymentProcessorId) {
                 case 5 || 31:
@@ -71,25 +71,23 @@
 				case 40:
                     paymentName = 'Sezzle';
                     break;
-                case 54: {
-                    if (result.applePay){
-                        paymentName = 'Apple';
-                    }
-                    else if (result.applePay){
-                        paymentName = 'Google';
-                    }
-                    break;
-                }
                 default:
                     paymentName = '';
             }
-
-            const messageElemnt = _q('.js-paypal-decline-message');
-            messageElemnt.innerHTML = messageElemnt.innerHTML.replace('Paypal', paymentName);
-            messageElemnt.innerHTML = messageElemnt.innerHTML.replace('PayPal', paymentName);
-            _q('.js-creditcard-decline-message').style.display = 'none';
-            _q('.js-paypal-decline-message').style.display = 'block';
-        }        
+        }
+        else{
+            if (window.applePay){
+                paymentName = 'Apple';
+            }
+            else if (window.googlePay){
+                paymentName = 'Google';
+            }
+        }
+        const messageElemnt = _q('.js-paypal-decline-message');
+        messageElemnt.innerHTML = messageElemnt.innerHTML.replace('Paypal', paymentName);
+        messageElemnt.innerHTML = messageElemnt.innerHTML.replace('PayPal', paymentName);
+        _q('.js-creditcard-decline-message').style.display = 'none';
+        _q('.js-paypal-decline-message').style.display = 'block';       
     }
 
     // function displayMessage() {
