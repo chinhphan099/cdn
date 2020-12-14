@@ -2,8 +2,8 @@
     if (!utils) { return; }
 
     function generateStructureData(data) {
-        const productItems = data.prices;
         try {
+            const productItems = data.prices;
             if (productItems.length > 0) {
                 const imgUrl = document.querySelector('.w_fomo_wrapper .w_thumb img').dataset.src || document.querySelector('.w_fomo_wrapper .w_thumb img').src;
                 const productArr = productItems.map(item => {
@@ -19,7 +19,7 @@
                 const jsondLD = {
                     '@context': 'http://schema.org/',
                     '@type': 'Product',
-                    'name': 'Clipper Pro',
+                    'name': js_translate.productName ? js_translate.productName : productArr[0].name || "",
                     'image': imgUrl,
                     'offers': productArr
                 };

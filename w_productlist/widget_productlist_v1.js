@@ -397,7 +397,7 @@
                         product.productPrices.UnitDiscountRate = product.productPrices.UnitDiscountRate || {};
                         if (!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                             //Detect Data returns unitDiscountRate to calculate as quantity - Tu Nguyen
-                            if(!product.productPrices.UnitDiscountRate || !product.productPrices.UnitDiscountRate.Value || (!!product.productPrices.UnitDiscountRate && product.productPrices.UnitDiscountRate.Value === 0)){
+                            if (!product.productPrices.UnitDiscountRate || !product.productPrices.UnitDiscountRate.Value || (!!product.productPrices.UnitDiscountRate && product.productPrices.UnitDiscountRate.Value === 0)) {
                                 product.productPrices.UnitDiscountRate.Value = Number((product.productPrices.DiscountedPrice.Value / quantity).toFixed(2));
                             }
                         }
@@ -577,53 +577,85 @@
             isTest: utils.getQueryParameter('isCardTest') ? true : false
         });
 
-        if (utils.checkCamp(siteSetting.webKey)) {
+        // if (utils.checkCamp(siteSetting.webKey)) {
+        //     let campProducts = localStorage.getItem('campproducts');
+        //     if (campProducts) {
+        //         campProducts = JSON.parse(campProducts);
+        //         const camps = campProducts.camps.filter(item => {
+        //             return item[siteSetting.webKey];
+        //         });
+
+        //         if (camps.length > 0) {
+        //             console.log('get prices from LS');
+        //             bindProducts(camps[0][siteSetting.webKey]);
+        //         }
+        //     }
+        // }
+        // else {
+        //     eCRM.Campaign.getProducts(function (data) {
+        //         let campProducts = localStorage.getItem('campproducts');
+        //         if (campProducts) {
+        //             campProducts = JSON.parse(campProducts);
+        //         }
+        //         else {
+        //             campProducts = {
+        //                 camps: []
+        //             };
+        //         }
+
+        //         if (typeof data.prices !== 'undefined') {
+        //             data.timestamp = new Date().toISOString();
+        //             const camps = campProducts.camps.filter(item => {
+        //                 return item[siteSetting.webKey];
+        //             });
+
+        //             let camp = {};
+        //             if (camps.length > 0) {
+        //                 camp = camps[0];
+        //                 camp[siteSetting.webKey] = data;
+        //             }
+        //             else {
+        //                 camp[siteSetting.webKey] = data;
+        //                 campProducts.camps.push(camp);
+        //             }
+
+        //             localStorage.setItem('campproducts', JSON.stringify(campProducts));
+        //         }
+        //         bindProducts(data);
+        //     });
+        // }
+
+        eCRM.Campaign.getProducts(function (data) {
             let campProducts = localStorage.getItem('campproducts');
             if (campProducts) {
                 campProducts = JSON.parse(campProducts);
+            }
+            else {
+                campProducts = {
+                    camps: []
+                };
+            }
+
+            if (typeof data.prices !== 'undefined') {
+                data.timestamp = new Date().toISOString();
                 const camps = campProducts.camps.filter(item => {
                     return item[siteSetting.webKey];
                 });
 
+                let camp = {};
                 if (camps.length > 0) {
-                    console.log('get prices from LS');
-                    bindProducts(camps[0][siteSetting.webKey]);
-                }
-            }
-        }
-        else {
-            eCRM.Campaign.getProducts(function (data) {
-                let campProducts = localStorage.getItem('campproducts');
-                if (campProducts) {
-                    campProducts = JSON.parse(campProducts);
+                    camp = camps[0];
+                    camp[siteSetting.webKey] = data;
                 }
                 else {
-                    campProducts = {
-                        camps: []
-                    };
+                    camp[siteSetting.webKey] = data;
+                    campProducts.camps.push(camp);
                 }
 
-                if (typeof data.prices !== 'undefined') {
-                    data.timestamp = new Date().toISOString();
-                    const camps = campProducts.camps.filter(item => {
-                        return item[siteSetting.webKey];
-                    });
-
-                    let camp = {};
-                    if (camps.length > 0) {
-                        camp = camps[0];
-                        camp[siteSetting.webKey] = data;
-                    }
-                    else {
-                        camp[siteSetting.webKey] = data;
-                        campProducts.camps.push(camp);
-                    }
-
-                    localStorage.setItem('campproducts', JSON.stringify(campProducts));
-                }
-                bindProducts(data);
-            });
-        }
+                localStorage.setItem('campproducts', JSON.stringify(campProducts));
+            }
+            bindProducts(data);
+        });
     }
     initWidgetProducts();
 
@@ -729,7 +761,7 @@
                 let tabIndex = Array.prototype.slice.call(tabItems).indexOf(tabItem) || 0;
                 _q('body').classList.add(`package-active-${++tabIndex}`);
             }
-            catch(e) {
+            catch (e) {
                 console.log(e);
             }
         };
