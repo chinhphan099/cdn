@@ -12,8 +12,10 @@
                         'sku': item.sku,
                         'name': item.productName,
                         'price': item.productPrices.DiscountedPrice.Value,
-                        'priceCurrency': window.localStorage.getItem('currencyCode'),
-                        'availability': 'InStock'
+                        'priceCurrency': item.productPrices.DiscountedPrice.GlobalCurrencyCode || data.location.currencyCode,
+                        'availability': 'InStock',
+                        'url': location.href,
+                        'priceValidUntil': ''
                     }
                 });
                 const jsondLD = {
@@ -24,7 +26,7 @@
                     'offers': productArr
                 };
 
-                const script = `<script style="application/ld+json">${JSON.stringify(jsondLD)}</script>`;
+                const script = `<script type="application/ld+json">${JSON.stringify(jsondLD)}</script>`;
                 document.querySelector('head').insertAdjacentHTML('beforeend', script);
             }
             else {
