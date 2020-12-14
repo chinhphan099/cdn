@@ -6,6 +6,7 @@
 
     function triggerButtons() {
         document.addEventListener('click', function(e) {
+            e.preventDefault();
             if(e.target.closest('.btn-agree')) {
                 _q('.js-btn-place-upsell-order').click();
             }
