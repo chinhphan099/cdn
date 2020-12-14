@@ -162,6 +162,7 @@
     }
 
     function initTaxByDefault(isExistingTax) {
+        window.localStorage.setItem("bindTax", true); // Chinh --- Use for always show Tax line on Confirm page
         if (utils.checkCamp(siteSetting.webKey)) {
             let campProducts = localStorage.getItem('campproducts');
             if (campProducts) {
