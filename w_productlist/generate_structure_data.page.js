@@ -23,7 +23,7 @@
                     '@type': 'Product',
                     'name': js_translate.productName ? js_translate.productName : productArr[0].name || "",
                     'image': imgUrl,
-                    'offers': productArr
+                    'offers': productArr[0]
                 };
 
                 const script = `<script type="application/ld+json">${JSON.stringify(jsondLD)}</script>`;
