@@ -6,24 +6,29 @@
             const productItems = data.prices;
             if (productItems.length > 0) {
                 const imgUrl = document.querySelector('.w_fomo_wrapper .w_thumb img').dataset.src || document.querySelector('.w_fomo_wrapper .w_thumb img').src;
-                const productArr = productItems.map(item => {
-                    return {
-                        '@type': 'Offer',
-                        'sku': item.sku,
-                        'name': item.productName,
-                        'price': item.productPrices.DiscountedPrice.Value,
-                        'priceCurrency': item.productPrices.DiscountedPrice.GlobalCurrencyCode || data.location.currencyCode,
-                        'availability': 'InStock',
-                        'url': location.href,
-                        'priceValidUntil': ''
+                const singleProductItem = productItems.find(item => {
+                    let qty = 1;
+                    if (window.isDoubleQuantity) {
+                        qty = 2;
                     }
+                    return item.quantity === qty
                 });
+                const offer = {
+                    '@type': 'Offer',
+                    'sku': singleProductItem.sku,
+                    'name': singleProductItem.productName,
+                    'price': singleProductItem.productPrices.DiscountedPrice.Value,
+                    'priceCurrency': singleProductItem.productPrices.DiscountedPrice.GlobalCurrencyCode || data.location.currencyCode,
+                    'availability': 'InStock',
+                    'url': location.href,
+                    'priceValidUntil': ''
+                };
                 const jsondLD = {
                     '@context': 'http://schema.org/',
                     '@type': 'Product',
-                    'name': js_translate.productName ? js_translate.productName : productArr[0].name || "",
+                    'name': js_translate.productName ? js_translate.productName : offer.name || "",
                     'image': imgUrl,
-                    'offers': productArr[0]
+                    'offers': offer
                 };
 
                 const script = `<script type="application/ld+json">${JSON.stringify(jsondLD)}</script>`;
