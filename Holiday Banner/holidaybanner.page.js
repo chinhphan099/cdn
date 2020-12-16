@@ -68,7 +68,14 @@
         }
 
         if (_q('.christmas-banner-holiday-2020')) {
-            getCountryCode();
+            const countrycode = window.localStorage.getItem('countryCode');
+            console.log(countrycode);
+            if (countrycode) {
+                detectCountryToShowBanner(countrycode.toLowerCase())
+            }
+            else {
+                getCountryCode();
+            }
         }
     }
 
