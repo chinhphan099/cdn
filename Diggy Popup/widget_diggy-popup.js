@@ -350,6 +350,7 @@
         if (_q('#btn-google-pay')) {
             _q('#btn-google-pay').addEventListener('click', function () {
                 if (!!diggyPopup) {
+                    renderPrice();
                     window.showPopup('diggyPopup');
                     countDownSeconds();
                 }
@@ -358,6 +359,7 @@
         if (_q('#btn-apple-pay')) {
             _q('#btn-apple-pay').addEventListener('click', function () {
                 if (!!diggyPopup) {
+                    renderPrice();
                     window.showPopup('diggyPopup');
                     countDownSeconds();
                 }

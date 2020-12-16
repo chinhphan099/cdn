@@ -397,7 +397,7 @@
                         product.productPrices.UnitDiscountRate = product.productPrices.UnitDiscountRate || {};
                         if (!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                             //Detect Data returns unitDiscountRate to calculate as quantity - Tu Nguyen
-                            if (!product.productPrices.UnitDiscountRate || !product.productPrices.UnitDiscountRate.Value || (!!product.productPrices.UnitDiscountRate && product.productPrices.UnitDiscountRate.Value === 0)) {
+                            if(!product.productPrices.UnitDiscountRate || !product.productPrices.UnitDiscountRate.Value || (!!product.productPrices.UnitDiscountRate && product.productPrices.UnitDiscountRate.Value === 0)){
                                 product.productPrices.UnitDiscountRate.Value = Number((product.productPrices.DiscountedPrice.Value / quantity).toFixed(2));
                             }
                         }
@@ -625,6 +625,7 @@
         //     });
         // }
 
+        console.log("don't cache product list at widget_productlist_v1 ...");
         eCRM.Campaign.getProducts(function (data) {
             let campProducts = localStorage.getItem('campproducts');
             if (campProducts) {
@@ -761,7 +762,7 @@
                 let tabIndex = Array.prototype.slice.call(tabItems).indexOf(tabItem) || 0;
                 _q('body').classList.add(`package-active-${++tabIndex}`);
             }
-            catch (e) {
+            catch(e) {
                 console.log(e);
             }
         };
