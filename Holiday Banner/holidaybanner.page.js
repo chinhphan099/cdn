@@ -15,7 +15,9 @@
 
         if(beginDate <= currentDate && currentDate < endDate) {
             elm.style.display = 'block';
-            _q('html').classList.add('show-holiday-banner');
+            if (!!_getClosest(elm, '.holiday-banner')) {
+                _q('html').classList.add('show-holiday-banner');
+            }
         }
 
         // Add event for Close button
@@ -25,10 +27,48 @@
         });
     }
 
+    function detectCountryToShowBanner(countryCode) {
+        if (countryCode === 'us') {
+            const banners = _qAll('.christmas-banner-holiday-2020');
+            for(const banner of banners) {
+                handleShowBanner(banner);
+            }
+        }
+    }
+
+    function getCountryCode() {
+        try {
+            var webkey = siteSetting.webKey || 'c0db2843-9e6d-4f9a-bc37-4a1d5fa2d7a2';
+            var cid = siteSetting.CID || '19AD287A-00C6-434C-97F3-03E47EAB4EEF';
+            var request = new XMLHttpRequest();
+            request.open('GET', '//sales-prod.tryemanagecrm.com/api/campaigns/' + webkey + '/customers/location');
+            request.setRequestHeader('Accept', 'application/json');
+            request.setRequestHeader('X_CID', cid);
+
+            request.onreadystatechange = function () {
+                if (this.readyState === 4) {
+                    if (this.responseText) {
+                        var res = JSON.parse(this.responseText);
+                        var countryCode = res.countryCode.toLowerCase();
+                        detectCountryToShowBanner(countryCode);
+                    }
+                }
+            };
+
+            request.send();
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     function init() {
         const banners = _qAll('.holiday-banner');
         for(const banner of banners) {
             handleShowBanner(banner);
+        }
+
+        if (_q('.christmas-banner-holiday-2020')) {
+            getCountryCode();
         }
     }
 
