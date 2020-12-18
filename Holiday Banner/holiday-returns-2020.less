@@ -1,0 +1,54 @@
+@import "//d16hdrba6dusey.cloudfront.net/sitecommon/less/components/mixin.less";
+
+.holiday-returns-2020 {
+	background: url(//d16hdrba6dusey.cloudfront.net/sitecommon/images/bg-holiday-return.jpg) no-repeat;
+	background-size: 100% 100%;
+	display: none;
+	margin-top: -10px;
+	margin-bottom: 30px;
+	.h_close {
+		display: none;
+	}
+	.h_inner {
+		margin-left: 36.5%;
+		font-family: "Montserrat";
+		padding: 20px 0;
+			font-size: 8px;
+		h3 {
+			margin-bottom: 5px;
+			font-size: 12px;
+			line-height: 15px;
+			letter-spacing: 0.5px;
+			color: #e11233;
+		}
+		h4 {
+			padding-bottom: 10px;
+			margin-bottom: 5px;
+			font-size: 8px;
+			line-height: 10px;
+			color: #e11233;
+			font-weight: 600;
+			border-bottom: 1px solid #e2a950;
+		}
+	}
+	@media (min-width: 992px) {
+		.h_inner {
+			padding: 55px 0 45px;
+			font-size: 13px;
+			h3 {
+				font-size: 17px;
+				line-height: 20px;
+				letter-spacing: 1.2px;
+			}
+			h4 {
+				font-size: 14px;
+				line-height: 20px;
+			}
+		}
+	}
+	@media (max-width: 767px) {
+		max-width: 480px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+}
