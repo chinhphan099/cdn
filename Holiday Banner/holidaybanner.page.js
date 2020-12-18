@@ -67,9 +67,9 @@
             handleShowBanner(banner);
         }
 
-        const banners = _qAll('.holiday-returns-2020');
-        for(const banner of banners) {
-            handleShowBanner(banner);
+        const bannerReturns = _qAll('.holiday-returns-2020');
+        for(const bannerReturn of bannerReturns) {
+            handleShowBanner(bannerReturn);
         }
 
         if (_q('.christmas-banner-holiday-2020')) {
