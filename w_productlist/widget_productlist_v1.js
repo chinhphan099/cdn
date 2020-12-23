@@ -397,7 +397,7 @@
                         product.productPrices.UnitDiscountRate = product.productPrices.UnitDiscountRate || {};
                         if (!window.isPreOrder || !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
                             //Detect Data returns unitDiscountRate to calculate as quantity - Tu Nguyen
-                            if(!product.productPrices.UnitDiscountRate || !product.productPrices.UnitDiscountRate.Value || (!!product.productPrices.UnitDiscountRate && product.productPrices.UnitDiscountRate.Value === 0)){
+                            if(!product.productPrices.UnitDiscountRate || !product.productPrices.UnitDiscountRate.Value || (!!product.productPrices.UnitDiscountRate && product.productPrices.UnitDiscountRate.Value === 0)) {
                                 product.productPrices.UnitDiscountRate.Value = Number((product.productPrices.DiscountedPrice.Value / quantity).toFixed(2));
                             }
                         }
@@ -439,6 +439,14 @@
                             else {
                                 elemFirstCharge.insertAdjacentText('beforeend', product.productPrices.DiscountedPrice.FormattedValue);
                             }
+                        });
+
+                        Array.prototype.slice.call(wrapElm.querySelectorAll('.spanRemainPrice')).forEach(discountedPrice => {
+                            let remainPriceValue = product.productPrices.DiscountedPrice.Value;
+                            if (!!window.isPreOrder && !!product.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                                remainPriceValue = remainPriceValue - product.productPrices.PreSaleAmount1.Value;
+                            }
+                            discountedPrice.insertAdjacentText('beforeend', utils.formatPrice(remainPriceValue.toFixed(2), window.fCurrency, product.productPrices.DiscountedPrice.FormattedValue));
                         });
 
                         Array.prototype.slice.call(wrapElm.querySelectorAll('.spanUnitDiscountRate')).forEach(unitDiscountRate => {
