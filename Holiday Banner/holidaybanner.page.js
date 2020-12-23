@@ -67,6 +67,11 @@
             handleShowBanner(banner);
         }
 
+        const bannerNoCloses = _qAll('.holiday-banner-no-close');
+        for(const bannerNoClose of bannerNoCloses) {
+            handleShowBanner(bannerNoClose);
+        }
+
         const bannerReturns = _qAll('.holiday-returns-2020');
         for(const bannerReturn of bannerReturns) {
             handleShowBanner(bannerReturn);
