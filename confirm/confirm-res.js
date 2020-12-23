@@ -12,6 +12,8 @@
 
     if(!confirm.orderInfo) return;
 
+    console.log(`used field useCreditCard ${confirm.orderInfo.useCreditCard}`);
+
     const eCRM = new EmanageCRMJS({
         webkey: confirm.mainWebKey,
         cid: confirm.CID,
@@ -19,13 +21,15 @@
         isTest: utils.getQueryParameter('isCardTest') ? true : false
     });
 
+    const orderToken = window.sessionStorage.getItem('orderToken');
     eCRM.Order.getRelatedOrders(confirm.orderInfo.orderNumber, function (result) {
         console.log(result);
         bindData(result);
-    });
+    }, orderToken);
 
     const isUpdatedUpsells = utils.localStorage().get('isUpdatedUpsells');
-    if(!isUpdatedUpsells && confirm.orderInfo.paymentProcessorId !== 31) {
+    // if(!isUpdatedUpsells && confirm.orderInfo.paymentProcessorId !== 31) {
+    if (!isUpdatedUpsells && confirm.orderInfo.useCreditCard) {    //only for credit card
         //update upsells status in CRM from NEW status to PAID
         eCRM.Order.updateUpsellsStatus(confirm.orderInfo.orderNumber, function (result) {
             utils.localStorage().set('isUpdatedUpsells', 'true');
@@ -262,7 +266,10 @@
                 }
 
                 let itemTmp = '';
-                if(data.relatedOrders[i].productName.toLowerCase().indexOf('warranty')>-1 && utils.localStorage().get('preOrderWarranty') !== 'true' && utils.localStorage().get('warrantyMonthlyCharge') !== 'true'){
+                if (
+                    data.relatedOrders[i].productName.toLowerCase().indexOf('warranty') > -1 && utils.localStorage().get('preOrderWarranty') !== 'true' &&
+                    utils.localStorage().get('warrantyMonthlyCharge') !== 'true')
+                {
                     itemTmp = productItemTmpWarranty.replace('{productName}', data.relatedOrders[i].productName)
                         .replace(/\{productPrice\}/g, data.relatedOrders[i].orderPriceFormatted)
                         .replace(/\{remainingBalancePrice\}/g, data.relatedOrders[i].orderPriceFormatted)
@@ -275,7 +282,11 @@
 
                     totalBalance = totalBalance + data.relatedOrders[i].orderPrice;
                     grandTotal += data.relatedOrders[i].orderPrice;
-                }else if(data.relatedOrders[i].productName.toLowerCase().indexOf('warranty')>-1 && utils.localStorage().get('preOrderWarranty') !== 'true' && utils.localStorage().get('warrantyMonthlyCharge') === 'true'){
+                }
+                else if (
+                    data.relatedOrders[i].productName.toLowerCase().indexOf('warranty') > -1 && utils.localStorage().get('preOrderWarranty') !== 'true' &&
+                    utils.localStorage().get('warrantyMonthlyCharge') === 'true')
+                {
                     itemTmp = productItemTmpWarrantyMonthLyCharge.replace('{productName}', data.relatedOrders[i].productName)
                         .replace(/\{productPrice\}/g, data.relatedOrders[i].receipts[0].formattedAmount)
                         .replace(/\{remainingBalancePrice\}/g, data.relatedOrders[i].receipts[0].formattedAmount)
@@ -291,20 +302,23 @@
                 }
                 else {
                     //set Total for upsells preOrder
-                    let pricePreOrder = (data.relatedOrders[i].futureEvents && data.relatedOrders[i].futureEvents.length > 0) ? Number(data.relatedOrders[i].futureEvents[0].price) : data.relatedOrders[i].orderProductPrice;
+                    let pricePreOrder = (data.relatedOrders[i].futureEvents && data.relatedOrders[i].futureEvents.length > 0) ? Number(data.relatedOrders[i].futureEvents[0].price) : data.relatedOrders[i].receipts[0].amount;
                     totalPreOrder = utils.formatPrice(((data.relatedOrders[i].orderPrice - pricePreOrder).toFixed(2)),
                         fCurrency, shippingPriceFormatted);
+
                     //grandTotal += data.relatedOrders[i].orderPrice - data.relatedOrders[i].orderProductPrice;
                     totalBalance += pricePreOrder;
                     totalProductsWhenReady += (data.relatedOrders[i].orderPrice - pricePreOrder);
+
                     let productPrice = (data.relatedOrders[i].futureEvents && data.relatedOrders[i].futureEvents.length > 0) ? data.relatedOrders[i].futureEvents[0].price : data.relatedOrders[i].orderProductPrice;
                     productPrice = utils.formatPrice(productPrice.toFixed(2), fCurrency, shippingPriceFormatted);
+
                     itemTmp = productItemTmp.replace('{productName}', data.relatedOrders[i].productName)
-                        .replace(/\{productPrice\}/g, productPrice)
-                        .replace(/\{remainingBalancePrice\}/g, data.relatedOrders[i].orderPriceFormatted)
+                        .replace(/\{productPrice\}/g, data.relatedOrders[i].receipts[0].formattedAmount) // 1
+                        .replace(/\{productTotalPreOrder\}/g, `${totalPreOrder}<em>${installmentText}</em>`)// 2
+                        .replace(/\{remainingBalancePrice\}/g, data.relatedOrders[i].orderPriceFormatted) // 3
+                        .replace(/\{productTotal\}/g, `${productPrice}<em>${installmentText}</em>`) // 4
                         .replace(/\{tax\}/g, '')
-                        .replace(/\{productTotalPreOrder\}/g, `${totalPreOrder}<em>${installmentText}</em>`)
-                        .replace(/\{productTotal\}/g, `${productPrice}<em>${installmentText}</em>`)
                         .replace('{shippingPrice}', data.relatedOrders[i].shippingPriceFormatted)
                         .replace('{midDescriptor}', data.relatedOrders[i].receipts[0].midDescriptor ? data.relatedOrders[i].receipts[0].midDescriptor : 'Paypal')
                         .replace(/\{orderNumber\}/g, data.relatedOrders[i].orderNumber);
