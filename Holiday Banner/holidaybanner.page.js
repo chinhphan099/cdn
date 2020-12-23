@@ -67,6 +67,11 @@
             handleShowBanner(banner);
         }
 
+        const bannerReturns = _qAll('.holiday-returns-2020');
+        for(const bannerReturn of bannerReturns) {
+            handleShowBanner(bannerReturn);
+        }
+
         if (_q('.christmas-banner-holiday-2020')) {
             const countrycode = window.localStorage.getItem('countryCode');
             console.log(countrycode);
