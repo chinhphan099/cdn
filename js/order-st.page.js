@@ -989,6 +989,9 @@
         else if (!!_q('.js-sale-off-heading')) {
             _q('.js-sale-off-heading').insertAdjacentHTML('afterBegin', `<div class="personalization" style="padding: 0 15px; margin-top: 20px; margin-bottom: 25px; font-size: 17px; line-height: 1.3; text-align: center; font-weight: 700;">${personalizationText}</div>`);
         }
+        else if (!!_q('.banner')) {
+            _q('.banner').insertAdjacentHTML('afterBegin', `<div class="personalization" style="padding: 0 15px; margin-top: 20px; margin-bottom: 25px; font-size: 17px; line-height: 1.3; text-align: center; font-weight: 700;">${personalizationText}</div>`);
+        }
     }
 
     function initial() {
