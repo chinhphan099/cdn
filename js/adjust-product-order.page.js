@@ -3,6 +3,27 @@
         return;
     }
 
+
+    function detectProductItems() {
+        try {
+            const proItems = _qAll('.productRadioListItem');
+            const ulist = _q('[data-packagedisplay]');
+            if (ulist) {
+                const packageLength = ulist.dataset.packagedisplay.split(',').length;
+                if (packageLength === 3) {
+                    _q('body').classList.add('three-items');
+                }
+            }
+            else if (proItems.length === 3) {
+                _q('body').classList.add('three-items');
+            }
+        }
+        catch(e) {
+            console.log(e);
+        }
+    }
+    detectProductItems();
+
     function init() {
         try {
             if (utils.getQueryParameter('temp') === 'hcvr') {
