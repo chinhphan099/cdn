@@ -9,6 +9,32 @@
         return;
     }
 
+    function setHighlightItem() {
+        try {
+            const defaultItems = _qAll('.productRadioListItem.checked-item');
+            Array.prototype.slice.call(defaultItems).forEach(item => {
+                item.classList.add('highlight-item');
+            });
+
+            const pid = _qById('hdfSelectedProduct').value;
+            const ulist = _q('[data-packagedisplay]');
+            if (ulist) {
+                let defaultPackage = ulist.dataset.packagedisplay.replace(/ /g, '').split(',');
+                const index = defaultPackage.indexOf(pid);
+                const packageList = ulist.querySelectorAll('li');
+                Array.prototype.slice.call(packageList).forEach(item => {
+                    let itemPackage = item.dataset.package.replace(/ /g, '').split(',');
+                    const itemPid = itemPackage[index];
+                    _qById(`product_${itemPid}`).closest('.productRadioListItem').classList.add('highlight-item')
+                });
+            }
+        }
+        catch(e) {
+            console.log(e);
+        }
+    }
+    setHighlightItem();
+
     function replaceUserString() {
         //Product List Widget
         if (_qById('js-widget-products')) {

@@ -20,8 +20,17 @@
     padding: 12px 15px;
     border-bottom: 1px solid #ddd;
     //Apply Golden border style - Tu Nguyen
-    &.checked-item {
+    .golden-border & {
+        &.checked-item {
+            border-width: 1px;
+            border-color: #858585;
+            box-shadow: none;
+            margin-top: 15px;
+        }
+    }
+    &.highlight-item {
         .golden-border & {
+            border-width: 3px;
             border-image: linear-gradient(to right,#bd8f2f 0,#f9f1b2 66%,#bd8f2f 100%);
             -webkit-border-image: linear-gradient(to right,#bd8f2f 0,#f9f1b2 66%,#bd8f2f 100%);
             border-image-slice: 1;
