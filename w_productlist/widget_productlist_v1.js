@@ -50,7 +50,7 @@
                 item.classList.add('highlight-item');
             });
 
-            const pid = _qById('hdfSelectedProduct').value;
+            const pid = defaultItems[0].querySelector('input').value;
             const ulist = _q('[data-packagedisplay]');
             if (ulist) {
                 let defaultPackage = ulist.dataset.packagedisplay.replace(/ /g, '').split(',');
