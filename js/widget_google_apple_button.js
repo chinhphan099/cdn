@@ -22,7 +22,7 @@
         eCRM.Order.getMidAndPrn((data) => {
             if (data) {
                 try {
-                    //init Stripe instance with default value        
+                    //init Stripe instance with default value
                     let countryCode, currencyCode;
                     //override for testing at the unsupported countries
                     const isTestGAP = utils.getQueryParameter('isTestGAP');
@@ -38,11 +38,11 @@
                             if (countryCode && currencyCode) {
                                 clearInterval(timer);
                                 initStripeButton(data, countryCode, currencyCode.toLowerCase());
-                               
+
                             } else {
                                 if (counter >= 50) {
                                     clearInterval(timer);
-                                    console.log("can't get country code or currency code");                                    
+                                    console.log("can't get country code or currency code");
                                 }
                             }
                             counter++;
@@ -343,6 +343,11 @@
             installmentText: (window.widget && window.widget.installmentpayment) ? window.widget.installmentpayment.optionText : '',
             url: location.pathname
         };
+
+        if (window.defaultProduct) {
+            orderInfo.quantity = window.defaultProduct.quantity;
+        }
+
         utils.localStorage().set('orderInfo', JSON.stringify(orderInfo));
 
         //success page will use this trackingNumber to call comfirm payment api
@@ -438,7 +443,7 @@
 
         const orderData = getOrderData(source);
         eCRM.Order.webkey = siteSetting.webKey;
-        
+
         eCRM.Order.placeOrder(orderData, paymenttype, function (result) {
             //make a flag is that has a order successfully, will be used in decline page
             utils.localStorage().set('mainOrderLink', location.pathname);
@@ -466,11 +471,11 @@
                     });
                 }
 
-                //don't need to wait response of confirmation payment to redirect to upsell            
+                //don't need to wait response of confirmation payment to redirect to upsell
                 eCRM.Order.confirmGoogleApplePay(result.trackingNumber, source.source.id, midId, (dataResponse) => {
                     console.log(dataResponse);
                 });
-                
+
                 //we have to wait 1000ms before redirect to ensure the api confirm payment reach BE
                 setTimeout(() => {
                     if (result.upsells.length > 0 && result.upsells[0].upsellUrl !== '') {
@@ -479,7 +484,7 @@
                     } else {
                         utils.redirectPage(siteSetting.successUrl);
                     }
-                }, 1000);                
+                }, 1000);
             } else {
                 utils.redirectPage(siteSetting.declineUrl);
             }
