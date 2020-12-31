@@ -16,6 +16,8 @@
         isTest: utils.getQueryParameter('isCardTest') ? true : false
     });
 
+    let midId = null;
+
     try {
         eCRM.Order.getMidAndPrn((data) => {
             if (data) {
@@ -58,7 +60,8 @@
     function initStripeButton(resData, countryCode, currencyCode) {
         try {
             //store midid to be used for confirming payment
-            window.sessionStorage.setItem('midId', resData.midId);
+            midId = resData.midId;
+
             const stripe = Stripe(resData.prnCode.split(';')[0], { stripeAccount: resData.prnCode.split(';')[1] });
             window.paymentRequest = stripe.paymentRequest({
                 country: countryCode,
@@ -225,7 +228,7 @@
                 "paymentProcessorId": 54
             },
             'mid': {
-                'midId': !!window.sessionStorage.getItem('midId') ? parseInt(window.sessionStorage.getItem('midId')) : null
+                midId
             },
             'shippingAddress': {
                 'firstName': fullName[0],
@@ -428,10 +431,14 @@
             utils.showAjaxLoading();
         }
 
+        //BE just accept 3 digitals
+        if(eCRM.isTest) {
+            midId = midId.toString().substr(0, 3);
+        }
+
         const orderData = getOrderData(source);
         eCRM.Order.webkey = siteSetting.webKey;
-
-        console.time('placeOrder');
+        
         eCRM.Order.placeOrder(orderData, paymenttype, function (result) {
             //make a flag is that has a order successfully, will be used in decline page
             utils.localStorage().set('mainOrderLink', location.pathname);
@@ -459,21 +466,20 @@
                     });
                 }
 
-                //don't need to wait response of confirmation payment to redirect to upsell
-                const midId = window.sessionStorage.getItem('midId');
+                //don't need to wait response of confirmation payment to redirect to upsell            
                 eCRM.Order.confirmGoogleApplePay(result.trackingNumber, source.source.id, midId, (dataResponse) => {
                     console.log(dataResponse);
                 });
-
-                console.timeEnd('placeOrder');
-
-                //redirect to upsell
-                if (result.upsells.length > 0 && result.upsells[0].upsellUrl !== '') {
-                    const redirectUrl = result.upsells[0].upsellUrl.substr(result.upsells[0].upsellUrl.lastIndexOf('/') + 1);
-                    location.href = redirectUrl;
-                } else {
-                    utils.redirectPage(siteSetting.successUrl);
-                }
+                
+                //we have to wait 1000ms before redirect to ensure the api confirm payment reach BE
+                setTimeout(() => {
+                    if (result.upsells.length > 0 && result.upsells[0].upsellUrl !== '') {
+                        const redirectUrl = result.upsells[0].upsellUrl.substr(result.upsells[0].upsellUrl.lastIndexOf('/') + 1);
+                        location.href = redirectUrl;
+                    } else {
+                        utils.redirectPage(siteSetting.successUrl);
+                    }
+                }, 1000);                
             } else {
                 utils.redirectPage(siteSetting.declineUrl);
             }
