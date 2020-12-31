@@ -11,7 +11,7 @@
         isTest: utils.getQueryParameter('isCardTest') ? true : false
     });
 
-    let upgradeItemId, defaultProduct, currentIndex, btnParamId,
+    let upgradeItemId, currentIndex, btnParamId,
         diggyPopup = _qById('diggyPopup'),
         dummyInput = _q('#product_00');
 
@@ -26,7 +26,7 @@
             listPidUpgrade1 = listPkgElm.dataset.pidupgrade1.split(',');
         }
         else {
-            upgradeItem0 = defaultProduct;
+            upgradeItem0 = window.defaultProduct;
             listPidUpgrade1 = listPkgElm.dataset.pidupgrade2.split(',');
         }
 
@@ -137,7 +137,7 @@
 
         //Assigne Double ID
         upgradeItemId = upgradeItem.productId;
-        defaultProduct = productData;
+        window.defaultProduct = productData;
 
         //Assigne upgradeItem Data for dummy Input
         dummyInput.value = upgradeItem.productId;
@@ -585,7 +585,7 @@
     //Enable Emit event after purchase for Paypal
     injectCustomEvents.emitEventAfterCheckout('gap', function () {
         let newOrderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
-        newOrderInfo.quantity = defaultProduct.quantity;
+        newOrderInfo.quantity = window.defaultProduct.quantity;
 
         utils.localStorage().set('orderInfo', JSON.stringify(newOrderInfo));
     });
@@ -607,7 +607,7 @@
     //Enable Emit event after purchase for Paypal
     injectCustomEvents.emitEventAfterCheckout('paypal', function () {
         let newOrderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
-        newOrderInfo.quantity = defaultProduct.quantity;
+        newOrderInfo.quantity = window.defaultProduct.quantity;
 
         utils.localStorage().set('orderInfo', JSON.stringify(newOrderInfo));
     });
