@@ -708,7 +708,7 @@
                 const sub3 = utils.getQueryParameter('S3') || '';
                 const sub4 = utils.getQueryParameter('S4') || '';
                 const sub5 = utils.getQueryParameter('S5') || '';
-				const source_id = utils.getQueryParameter('source_id') || '';
+                const source_id = utils.getQueryParameter('source_id') || '';
 
                 let url = everFlowUrl.replace('#ADV1', orderInfo.orderNumber);
                 url = url.replace('#NETWORK_ID', network_id);
@@ -721,7 +721,7 @@
                 url = url.replace('#S3', sub3);
                 url = url.replace('#S4', sub4);
                 url = url.replace('#S5', sub5);
-				url = url.replace('#SOURCE_ID', source_id);
+                url = url.replace('#SOURCE_ID', source_id);
 
                 const iframe = document.createElement('iframe');
                 iframe.src = url;
