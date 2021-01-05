@@ -11,7 +11,7 @@
         isTest: utils.getQueryParameter('isCardTest') ? true : false
     });
 
-    let upgradeItemId, upgradeItemData, defaultProduct, additionPriceValue, currentIndex, btnParamId,
+    let upgradeItemId, upgradeItemData, currentIndex, btnParamId,
         diggyPopup = _qById('diggyPopup'),
         miniUpsellWebkey = _q('#miniUpsellWebkey'),
         dummyInput = _q('#product_00');
@@ -29,7 +29,7 @@
             listPidUpgrade1 = listPkgElm.dataset.pidupgrade1.split(',');
         }
         else {
-            upgradeItem0 = defaultProduct;
+            upgradeItem0 = window.defaultProduct;
             listPidUpgrade1 = listPkgElm.dataset.pidupgrade2.split(',');
         }
 
@@ -63,7 +63,7 @@
             console.log('Error: Double item not exist');
             return;
         }
-        additionPriceValue = upgradeItem.productPrices.DiscountedPrice.Value;
+        window.additionPriceValue = upgradeItem.productPrices.DiscountedPrice.Value;
 
         //Because of sale of package (including cable)
         if ((productData.quantity)/2 > 1) {
@@ -112,7 +112,7 @@
         }
 
         Array.prototype.slice.call(_qAll('#diggyPopup .additionPrice')).forEach(item => {
-            item.innerHTML = utils.formatPrice(additionPriceValue.toFixed(2), window.fCurrency, productData.shippings[0].formattedPrice);
+            item.innerHTML = utils.formatPrice(window.additionPriceValue.toFixed(2), window.fCurrency, productData.shippings[0].formattedPrice);
         });
 
         Array.prototype.slice.call(_qAll('#diggyPopup .ordered-qty')).forEach(item => {
@@ -133,7 +133,7 @@
 
         //Assigne Double ID
         upgradeItemId = upgradeItem.productId;
-        defaultProduct = productData;
+        window.defaultProduct = productData;
 
         //Assigne upgradeItem Data for dummy Input
         upgradeItemData = upgradeItem;
@@ -159,8 +159,8 @@
                 let op = 1;
 
                 let orderInfo = orderedProductInfo;
-                orderInfo.orderTotal = Number((orderInfo.orderTotal + additionPriceValue).toFixed(2));
-                orderInfo.orderTotalFull = Number((orderInfo.orderTotalFull + additionPriceValue).toFixed(2));
+                orderInfo.orderTotal = Number((orderInfo.orderTotal + window.additionPriceValue).toFixed(2));
+                orderInfo.orderTotalFull = Number((orderInfo.orderTotalFull + window.additionPriceValue).toFixed(2));
 
                 utils.localStorage().set('orderInfo', JSON.stringify(orderInfo));
 
@@ -429,7 +429,7 @@
     //Enable Emit event after purchase for Paypal
     injectCustomEvents.emitEventAfterCheckout('paypal', function () {
         let newOrderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
-        newOrderInfo.quantity = defaultProduct.quantity;
+        newOrderInfo.quantity = window.defaultProduct.quantity;
 
         utils.localStorage().set('orderInfo', JSON.stringify(newOrderInfo));
     });
