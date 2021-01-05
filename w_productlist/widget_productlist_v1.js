@@ -55,6 +55,7 @@
             if (ulist) {
                 let defaultPackage = ulist.dataset.packagedisplay.replace(/ /g, '').split(',');
                 const index = defaultPackage.indexOf(pid);
+                if (index === -1) { return; }
                 const packageList = ulist.querySelectorAll('li');
                 Array.prototype.slice.call(packageList).forEach(item => {
                     let itemPackage = item.dataset.package.replace(/ /g, '').split(',');

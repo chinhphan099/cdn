@@ -188,9 +188,9 @@
         });
     }
 
-    function activateCreditCardUpgrade(orderNumber, redirectUrl) {
-        if (!!orderNumber) {
-            placeOrderUpsell(orderNumber, redirectUrl);
+    function activateCreditCardUpgrade(orderedProductInfo, redirectUrl) {
+        if (!!orderedProductInfo) {
+            placeOrderUpsell(orderedProductInfo, redirectUrl);
         }
         else {
             if (!!_qById('second_popup_buy_one_more')) {
@@ -218,18 +218,32 @@
             renderPriceFor2ndPop(true);
         }
 
-        switch (window.paypalFlag) {
-            case true:
-                if (!!_qById('second_popup_buy_one_more')) {
-                    window.showPopup('second_popup_buy_one_more');
-                }
-                else {
-                    paypalPlaceOrder();
-                }
-                break;
-            case false:
-                activateCreditCardUpgrade(orderedProductInfo, window.urlRedirect);
-                break;
+        if (window.gapFlag) {
+            if (!!_qById('second_popup_buy_one_more')) {
+                window.showPopup('second_popup_buy_one_more');
+            }
+            else {
+                window.multipleMiniUpsells = [{
+                    'productId': upgradeItemData.productId,
+                    'shippingMethodId': upgradeItemData.shippings[0].shippingMethodId
+                }];
+                window.gap.handleAppleGoogleClick();
+            }
+        }
+        if (window.paypalFlag) {
+            if (!!_qById('second_popup_buy_one_more')) {
+                window.showPopup('second_popup_buy_one_more');
+            }
+            else {
+                window.multipleMiniUpsells = [{
+                    'productId': upgradeItemData.productId,
+                    'shippingMethodId': upgradeItemData.shippings[0].shippingMethodId
+                }];
+                window.paypal.placeMainOrder();
+            }
+        }
+        if (window.ccFlag) {
+            activateCreditCardUpgrade(orderedProductInfo, window.urlRedirect);
         }
 
         if (!!diggyPopup) {
@@ -239,6 +253,7 @@
 
     //Event cancelling to upgrade product for Paypal & Creditcard
     function cancelUpgradeProduct() {
+        window.additionPriceValue = 0;
         if (!!_qById('second_popup_buy_one_more')) {
             renderPriceFor2ndPop(false);
         }
@@ -247,18 +262,24 @@
             window.closePopup('diggyPopup');
         }
 
-        switch (window.paypalFlag) {
-            case true:
-                if (!!_qById('second_popup_buy_one_more')) {
-                    window.showPopup('second_popup_buy_one_more');
-                }
-                else {
-                    window.paypal.placeMainOrder();
-                }
-                break;
-            case false:
-                activateCreditCardUpgrade(false, window.urlRedirect);
-                break;
+        if (window.gapFlag) {
+            if (!!_qById('second_popup_buy_one_more')) {
+                window.showPopup('second_popup_buy_one_more');
+            }
+            else {
+                window.gap.handleAppleGoogleClick();
+            }
+        }
+        if (window.paypalFlag) {
+            if (!!_qById('second_popup_buy_one_more')) {
+                window.showPopup('second_popup_buy_one_more');
+            }
+            else {
+                window.paypal.placeMainOrder();
+            }
+        }
+        if (window.ccFlag) {
+            activateCreditCardUpgrade(false, window.urlRedirect);
         }
     }
 
@@ -266,6 +287,7 @@
     function handleEventButton() {
         _q('#diggyPopup .btn-add').addEventListener('click', function (e) {
             e.preventDefault();
+            _qById('diggyPopup').classList.remove('gap-popup');
 
             appendParamIntoUrl(e.currentTarget.dataset.btnid || 'btnadd');
             upgradeProduct();
@@ -274,6 +296,7 @@
         Array.prototype.slice.call(_qAll('#diggyPopup .btn-cancel, #diggyPopup .icon-close')).forEach(closeElm => {
             closeElm.addEventListener('click', function (e) {
                 e.preventDefault();
+                _qById('diggyPopup').classList.remove('gap-popup');
 
                 appendParamIntoUrl(_q('#diggyPopup .btn-cancel').dataset.btnid || 'btncancel');
                 cancelUpgradeProduct();
@@ -286,14 +309,6 @@
                 renderPrice();
             });
         });
-    }
-
-    function paypalPlaceOrder(){
-        window.multipleMiniUpsells = [{
-            'productId': upgradeItemData.productId,
-            'shippingMethodId': upgradeItemData.shippings[0].shippingMethodId
-        }];
-        window.paypal.placeMainOrder();
     }
 
     //Clear Parameter tracking double popup id
@@ -404,15 +419,38 @@
     utils.events.on('bindOrderPage', function(){
         let timer = setInterval(function(){
             //Clear timer after received data from Miniupsells
-            if(window.miniUpsells.length > 0){
+            if(window.miniUpsells.length > 0) {
                 renderPrice();
                 clearInterval(timer);
             }
-        },1000);
+        }, 1000);
     });
 
     //Enable Prevent Checkout of Paypal
     let injectCustomEvents = new utils.injectCustomEventsToCTABtn;
+
+    injectCustomEvents.preventCheckout('gap', function () {
+        if (_q('#btn-google-pay')) {
+            _q('#btn-google-pay').addEventListener('click', function () {
+                if (!!diggyPopup) {
+                    _qById('diggyPopup').classList.add('gap-popup');
+                    renderPrice();
+                    window.showPopup('diggyPopup');
+                    countDownSeconds();
+                }
+            });
+        }
+        if (_q('#btn-apple-pay')) {
+            _q('#btn-apple-pay').addEventListener('click', function () {
+                if (!!diggyPopup) {
+                    _qById('diggyPopup').classList.add('gap-popup');
+                    renderPrice();
+                    window.showPopup('diggyPopup');
+                    countDownSeconds();
+                }
+            });
+        }
+    });
 
     injectCustomEvents.preventCheckout('paypal', function () {
         if (!_q('#js-paypal-oneclick-button .w_radio')) {
