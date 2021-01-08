@@ -272,6 +272,7 @@
     function handleEventButton() {
         _q('#diggyPopup .btn-add').addEventListener('click', function (e) {
             e.preventDefault();
+            _qById('diggyPopup').classList.remove('gap-popup');
 
             appendParamIntoUrl(e.currentTarget.dataset.btnid || 'btnadd');
             upgradeProduct();
@@ -280,6 +281,7 @@
         Array.prototype.slice.call(_qAll('#diggyPopup .btn-cancel, #diggyPopup .icon-close')).forEach(closeElm => {
             closeElm.addEventListener('click', function (e) {
                 e.preventDefault();
+                _qById('diggyPopup').classList.remove('gap-popup');
 
                 appendParamIntoUrl(_q('#diggyPopup .btn-cancel').dataset.btnid || 'btncancel');
                 cancelUpgradeProduct();
@@ -350,6 +352,7 @@
         if (_q('#btn-google-pay')) {
             _q('#btn-google-pay').addEventListener('click', function () {
                 if (!!diggyPopup) {
+                    _qById('diggyPopup').classList.add('gap-popup');
                     renderPrice();
                     window.showPopup('diggyPopup');
                     countDownSeconds();
@@ -359,6 +362,7 @@
         if (_q('#btn-apple-pay')) {
             _q('#btn-apple-pay').addEventListener('click', function () {
                 if (!!diggyPopup) {
+                    _qById('diggyPopup').classList.add('gap-popup');
                     renderPrice();
                     window.showPopup('diggyPopup');
                     countDownSeconds();
