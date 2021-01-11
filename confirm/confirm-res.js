@@ -344,7 +344,7 @@
             orderInfo = JSON.parse(utils.localStorage().get('orderInfo')),
             shippingFromOrder = orderInfo.feeShipping,
             shippingOrder = orderInfo.feeShipping;
-        shippingOrder = shippingOrder > 0 ? shippingOrder : js_translate.FREESHIP;
+        shippingOrder = shippingOrder > 0 ? shippingOrder : js_translate.FREESHIP || 'FREE';
         formatCurrency(fCurrency,shippingPriceFormatted);
 
         _q('.totalBalance').innerHTML =  utils.formatPrice(totalBalance.toFixed(2), fCurrency, shippingPriceFormatted);
