@@ -14,6 +14,10 @@
         CID: siteSetting.CID
     };
 
+    if(upsell.orderInfo) {
+        console.log(`used field useCreditCard ${upsell.orderInfo.useCreditCard}`);
+    }
+
     const eCRM = new EmanageCRMJS({
         webkey: upsell.mainWebKey,
         cid: upsell.CID,
@@ -76,7 +80,7 @@
                         upgradeDiscountPrice = upgradeDiscountPrice - Number(couponValue);
                     }
                 }
-                upgradeDiscountPrice = upgradeDiscountPrice + upgradeDiscountPrice * upsell.orderInfo.lifetimeRate;
+                upgradeDiscountPrice = upgradeDiscountPrice + upgradeDiscountPrice * (upsell.orderInfo.lifetimeRate || 0);
                 upgradeDiscountPrice = upgradeDiscountPrice - upsell.orderInfo.orderTotal;
                 spanUpsellPrice.innerHTML = utils.formatPrice(upgradeDiscountPrice.toFixed(2), fCurrency, upsell.products[0].shippings[0].formattedPrice);
             }
@@ -93,7 +97,7 @@
                         upgradeFullPrice = upgradeFullPrice - Number(couponValue);
                     }
                 }
-                upgradeFullPrice = upgradeFullPrice + upgradeFullPrice * upsell.orderInfo.lifetimeRate;
+                upgradeFullPrice = upgradeFullPrice + upgradeFullPrice * (upsell.orderInfo.lifetimeRate || 0);
                 spanFullPrice.innerHTML = utils.formatPrice(upgradeFullPrice.toFixed(2), fCurrency, upsell.products[0].shippings[0].formattedPrice);
             }
         });
@@ -209,7 +213,8 @@
             cardId: upsell.orderInfo.cardId
         };
 
-        if (upsell.orderInfo.paymentProcessorId == "5" || upsell.orderInfo.paymentProcessorId == "31") {
+        // if (upsell.orderInfo.paymentProcessorId == "5" || upsell.orderInfo.paymentProcessorId == "31") {
+        if (!upsell.orderInfo.useCreditCard && upsell.orderInfo.paymentProcessorId) {
             pay = {
                 paymentProcessorId: Number(upsell.orderInfo.paymentProcessorId)
             };
@@ -323,7 +328,8 @@
             cardId: upsell.orderInfo.cardId
         };
 
-        if (upsell.orderInfo.paymentProcessorId == "5" || upsell.orderInfo.paymentProcessorId == "31") {
+        //if (upsell.orderInfo.paymentProcessorId == "5" || upsell.orderInfo.paymentProcessorId == "31") {
+        if (!upsell.orderInfo.useCreditCard && upsell.orderInfo.paymentProcessorId) {
             pay = {
                 paymentProcessorId: Number(upsell.orderInfo.paymentProcessorId)
             };
