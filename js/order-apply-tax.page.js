@@ -35,7 +35,7 @@
         disableCheckoutBtnEvents();
 
         // Order Golden
-        if (_q('.statistical')) {
+        if (_q('.statistical') || _q('.custom-statistical')) {
             const taxElem = _q('.td-taxes-fees');
             if (!!taxElem) {
                 taxElem.innerHTML = `${imgLoading}`;
@@ -46,7 +46,9 @@
                     <td class="td-taxes-text">${siteSetting.taxAndFee || 'Estimated Tax:'}</td>
                     <td class="td-taxes-fees">${imgLoading}</td>
                 </tr>`;
-                _q('.statistical table tbody').insertAdjacentHTML('beforeend', taxRow);
+                if (_q('.statistical table tbody')) {
+                    _q('.statistical table tbody').insertAdjacentHTML('beforeend', taxRow);
+                }
             }
             taxElem.parentElement.removeAttribute('style');
         }
