@@ -7,6 +7,8 @@
     window.taxArray = [];
     let isDefaultAddress = true;
     let customerAddress = {};
+    let discountedSelectedPrice = undefined;
+    let shippingSelectedPrice = undefined;
     const imgLoading = `<span class="js-img-loading">
                             <img src="//d16hdrba6dusey.cloudfront.net/sitecommon/images/loading-price-v1.gif" width="20" height="10" class="no-lazy"  style="width: 20px;">
                         </span>`;
@@ -164,7 +166,7 @@
     }
 
     function initTaxByDefault(isExistingTax) {
-        window.localStorage.setItem("bindTax", true); // Chinh --- Use for always show Tax line on Confirm page
+        window.localStorage.setItem('bindTax', true); // Chinh --- Use for always show Tax line on Confirm page
         if (utils.checkCamp(siteSetting.webKey)) {
             let campProducts = localStorage.getItem('campproducts');
             if (campProducts) {
@@ -195,12 +197,24 @@
                      * ! Post All Product Items
                      */
                     postData.items = window.PRICES.map((item) => {
+                        let discountedPrice = item.productPrices.DiscountedPrice.Value;
+                        let shippingFee = item.shippings[0].price;
+                        if (selectedProduct.productId === item.productId) {
+                            if (!!discountedSelectedPrice) {
+                                discountedPrice = discountedSelectedPrice;
+                            }
+                            if (!!shippingSelectedPrice) {
+                                shippingFee = shippingSelectedPrice;
+                            }
+                        }
+
+                        const quantity = window.isDoubleQuantity ? item.quantity / 2 : item.quantity;
                         return {
                             'productId': item.productId,
                             'sku': item.sku,
-                            'quantity': 1,
-                            'unitPrice': item.productPrices.DiscountedPrice.Value,
-                            'totalPrice': item.productPrices.DiscountedPrice.Value + item.shippings[0].price,
+                            'quantity': quantity,
+                            'unitPrice': item.productPrices.UnitDiscountRate.Value,
+                            'totalPrice': discountedPrice + shippingFee,
                             'description': item.productName
                         }
                     });
@@ -245,12 +259,24 @@
             }
 
             postData.items = window.PRICES.map((item) => {
+                let discountedPrice = item.productPrices.DiscountedPrice.Value;
+                let shippingFee = item.shippings[0].price;
+                if (selectedProduct.productId === item.productId) {
+                    if (!!discountedSelectedPrice) {
+                        discountedPrice = discountedSelectedPrice;
+                    }
+                    if (!!shippingSelectedPrice) {
+                        shippingFee = shippingSelectedPrice;
+                    }
+                }
+
+                const quantity = window.isDoubleQuantity ? item.quantity / 2 : item.quantity;
                 return {
                     'productId': item.productId,
                     'sku': item.sku,
-                    'quantity': 1,
-                    'unitPrice': item.productPrices.DiscountedPrice.Value,
-                    'totalPrice': item.productPrices.DiscountedPrice.Value + item.shippings[0].price,
+                    'quantity': quantity,
+                    'unitPrice': item.productPrices.UnitDiscountRate.Value,
+                    'totalPrice': discountedPrice + shippingFee,
                     'description': item.productName
                 }
             });
@@ -277,11 +303,23 @@
         const productElements = _qAll('input[name="product"]');
         for (let prodElem of productElements) {
             prodElem.addEventListener('change', () => {
-                if(isDefaultAddress) {
-                    initTaxByDefault(true);
+                if (discountedSelectedPrice) {
+                    discountedSelectedPrice = undefined;
+                    shippingSelectedPrice = undefined;
+                    if(isDefaultAddress) {
+                        initTaxByDefault();
+                    }
+                    else {
+                        loadTax();
+                    }
                 }
                 else {
-                    loadTax(true);
+                    if(isDefaultAddress) {
+                        initTaxByDefault(true);
+                    }
+                    else {
+                        loadTax(true);
+                    }
                 }
             });
         }
@@ -296,6 +334,18 @@
         }
     }
     utils.events.on('onActivePopup', onActivePopup);
+
+    function afterApplyCoupon(data) {
+        discountedSelectedPrice = data.totalDiscountedPrice;
+        shippingSelectedPrice = data.totalDiscountedShippingPrice;
+        if(isDefaultAddress) {
+            initTaxByDefault();
+        }
+        else {
+            loadTax();
+        }
+    }
+    utils.events.on('afterApplyCoupon', afterApplyCoupon);
 
     document.addEventListener('DOMContentLoaded', () => {
         listener();
