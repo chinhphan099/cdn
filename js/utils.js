@@ -696,8 +696,8 @@
                 isEverFlowFired = true;
             }
 
-            let domain = utils.getQueryParameter('domain1');
-            let domain2 = utils.getQueryParameter('domain2');
+            const domain2 = utils.getQueryParameter('domain2') || '';
+            const domain = utils.getQueryParameter('domain1') || domain2;
 
             const offer_id = utils.getQueryParameter('S4') || '';
             const transaction_id = utils.getQueryParameter('S5') || '';
@@ -711,33 +711,9 @@
             const source_id = utils.getQueryParameter('source_id') || '';
 
             if (orderInfo && orderInfo.orderNumber && !isEverFlowFired && domain) {
-                let url = everFlowUrl.replace('#ADV1', orderInfo.orderNumber);
-                url = url.replace('#NETWORK_ID', network_id);
-                url = url.replace('#OFFER_ID', offer_id);
-                url = url.replace('#TRANSACTION_ID', transaction_id);
-                url = url.replace('#DOMAIN', domain);
-                url = url.replace('#CC', coupon_code);
-                url = url.replace('#S1', sub1);
-                url = url.replace('#S2', sub2);
-                url = url.replace('#S3', sub3);
-                url = url.replace('#S4', sub4);
-                url = url.replace('#S5', sub5);
-                url = url.replace('#SOURCE_ID', source_id);
-
-                const iframe = document.createElement('iframe');
-                iframe.src = url;
-                iframe.id = 'everflow';
-                iframe.setAttribute('frameborder', 0);
-                iframe.setAttribute('scrolling', 'no');
-                iframe.style = 'width: 1px; height: 1px';
-                document.body.appendChild(iframe);
-
-                utils.localStorage().set('isEverFlowFired', true);
-            }
-            else if (orderInfo && orderInfo.orderNumber && !isEverFlowFired && domain2) {
                 const scriptUrl = document.createElement('script');
                 scriptUrl.type = 'text/javascript';
-                scriptUrl.src = 'https://#DOMAIN/scripts/sdk/everflow.js'.replace('#DOMAIN', domain2);
+                scriptUrl.src = `https://${domain}/scripts/sdk/everflow.js`;
                 document.head.appendChild(scriptUrl);
 
                 scriptUrl.onload = () => {
@@ -756,6 +732,53 @@
                 }
                 utils.localStorage().set('isEverFlowFired', true);
             }
+
+            // if (orderInfo && orderInfo.orderNumber && !isEverFlowFired && domain) {
+            //     let url = everFlowUrl.replace('#ADV1', orderInfo.orderNumber);
+            //     url = url.replace('#NETWORK_ID', network_id);
+            //     url = url.replace('#OFFER_ID', offer_id);
+            //     url = url.replace('#TRANSACTION_ID', transaction_id);
+            //     url = url.replace('#DOMAIN', domain);
+            //     url = url.replace('#CC', coupon_code);
+            //     url = url.replace('#S1', sub1);
+            //     url = url.replace('#S2', sub2);
+            //     url = url.replace('#S3', sub3);
+            //     url = url.replace('#S4', sub4);
+            //     url = url.replace('#S5', sub5);
+            //     url = url.replace('#SOURCE_ID', source_id);
+
+            //     const iframe = document.createElement('iframe');
+            //     iframe.src = url;
+            //     iframe.id = 'everflow';
+            //     iframe.setAttribute('frameborder', 0);
+            //     iframe.setAttribute('scrolling', 'no');
+            //     iframe.style = 'width: 1px; height: 1px';
+            //     document.body.appendChild(iframe);
+
+            //     utils.localStorage().set('isEverFlowFired', true);
+            // }
+            // else if (orderInfo && orderInfo.orderNumber && !isEverFlowFired && domain2) {
+            //     const scriptUrl = document.createElement('script');
+            //     scriptUrl.type = 'text/javascript';
+            //     scriptUrl.src = 'https://#DOMAIN/scripts/sdk/everflow.js'.replace('#DOMAIN', domain2);
+            //     document.head.appendChild(scriptUrl);
+
+            //     scriptUrl.onload = () => {
+            //         const scriptEF = document.createElement('script');
+            //         scriptEF.type = 'text/javascript';
+            //         const scriptCode = `EF.conversion({
+            //             offer_id: '${sub4}',
+            //             transaction_id: '${sub5}',
+            //             adv1: '${orderInfo.orderNumber}',
+            //             coupon_code: '${coupon_code}',
+            //             order_id: '${orderInfo.orderNumber}',
+            //             source_id: '${source_id}'
+            //         });`;
+            //         scriptEF.innerHTML = scriptCode;
+            //         document.head.appendChild(scriptEF);
+            //     }
+            //     utils.localStorage().set('isEverFlowFired', true);
+            // }
         } catch (err) {
             console.log('error: ', err);
         }
