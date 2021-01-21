@@ -8,7 +8,9 @@
             _q('.installment-box').appendChild(_q('.btn-installment'));
             _q('.credit-checkout-title').appendChild(_q('.cc-img'));
             _q('.credit-checkout-title').appendChild(_q('.btn-next'));
-            _q('.paypal-checkout-title').appendChild(_q('#js-paypal-oneclick-button'));
+            if (_q('#js-paypal-oneclick-button')) {
+                _q('.paypal-checkout-title').appendChild(_q('#js-paypal-oneclick-button'));
+            }
         }
     }
     adjustLayout();
@@ -17,9 +19,13 @@
     window.widget = window.widget ? window.widget : {};
     function handleInstallmentValues() {
         if(isInstallment) {
+			let optionText = '4 installments of $price every two weeks no interest';
+			if(!!js_translate.installmentOptionText){
+				optionText = js_translate.installmentOptionText;
+			}
             window.widget.installmentpayment = {
                 selectedMonth: '4',
-                optionText: js_translate.installmentOptionText || '4 installments of $price every two weeks no interest'
+                optionText: optionText
             };
         }
         else {
