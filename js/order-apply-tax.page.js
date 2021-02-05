@@ -230,7 +230,7 @@
         let isValid = true;
         const inputs = _qAll('#shipping_address1, #shipping_city, #shipping_country, #shipping_province, #shipping_postal');
         for (let elem of inputs) {
-            if (elem.value.trim() === '' || elem.value.trim() === '----') {
+            if ((elem.value.trim() === '' || elem.value.trim() === '----') && elem.hasAttribute('required')) {
                 isValid = false;
                 break;
             }
