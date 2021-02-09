@@ -21,16 +21,18 @@
         isTest: utils.getQueryParameter('isCardTest') ? true : false
     });
 
+    const orderToken = window.sessionStorage.getItem('orderToken');
     eCRM.Order.getRelatedOrders(confirm.orderInfo.orderNumber, function (result) {
         //console.log(result);
         utils.events.emit('bindGtmEvents', result);
         if(result) {
             bindData(result);
+            utils.events.emit('onAfterPopulateConfirmData', result);
         }
-    });
+    }, orderToken);
 
     const isUpdatedUpsells = utils.localStorage().get('isUpdatedUpsells');
-    //if (!isUpdatedUpsells && confirm.orderInfo.paymentProcessorId !== 31 && confirm.orderInfo.paymentProcessorId !== 5) { //old code    
+    //if (!isUpdatedUpsells && confirm.orderInfo.paymentProcessorId !== 31 && confirm.orderInfo.paymentProcessorId !== 5) { //old code
     if (!isUpdatedUpsells && confirm.orderInfo.useCreditCard) {    //only for credit card
         //update upsells status in CRM from NEW status to PAID
         eCRM.Order.updateUpsellsStatus(confirm.orderInfo.orderNumber, function (result) {
