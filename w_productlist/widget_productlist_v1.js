@@ -580,6 +580,7 @@
                     utils.localStorage().set('mainWebKey', window.siteSetting.webKey);
                     if (!!window.pageType && window.pageType !== 'normal') {
                         utils.localStorage().set('pageType', window.pageType);
+                        utils.localStorage().set('isPreOrder', true); // Pre Order Full Price - Use for confirm in ctrwow
                     }
                     // Set main webkey according active Tab
                     if (!!_q('.js-list-group .active') && !!_q('.js-list-group .active').dataset.webkey) {
