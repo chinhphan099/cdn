@@ -687,6 +687,37 @@
         }
     }
 
+    function checkRunEFKa(domainKa) {
+        if (!domainKa) {
+            return
+        }
+        const coupon_codeKa = link.getParameterByName('CCka') || ''
+        const sub4Ka = link.getParameterByName('S4ka') || ''
+        const sub5Ka = link.getParameterByName('S5ka') || ''
+        const source_idKa = link.getQueryParameter('source_idka') || ''
+
+        const scriptUrlKa = document.createElement('script')
+        scriptUrlKa.type = 'text/javascript'
+        scriptUrlKa.src = `https://${domainKa}/scripts/sdk/everflow.js`
+        document.head.appendChild(scriptUrlKa)
+
+        scriptUrlKa.onload = () => {
+            const scriptEFKa = document.createElement('script')
+            scriptEFKa.type = 'text/javascript'
+            const scriptCodeKa = `EF.conversion({
+                offer_id: '${sub4Ka}',
+                transaction_id: '${sub5Ka}',
+                adv1: '${orderInfo.orderNumber}',
+                coupon_code: '${coupon_codeKa}',
+                order_id: '${orderInfo.orderNumber}',
+                source_id: '${source_idKa}'
+            });`
+            scriptEFKa.innerHTML = scriptCodeKa
+            document.head.appendChild(scriptEFKa)
+        }
+        utils.localStorage().set('isEverFlowFired', true);
+    }
+
     function fireEverFlow() {
         const orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
         const everFlowUrl = 'https://#DOMAIN/?nid=#NETWORK_ID&oid=#OFFER_ID&transaction_id=#TRANSACTION_ID&adv1=#ADV1&coupon_code=#CC&sub1=#S1&sub2=#S2&sub3=#S3&sub4=#S4&sub5=#S5&source_id=#SOURCE_ID';
@@ -698,6 +729,7 @@
 
             const domain2 = utils.getQueryParameter('domain2') || '';
             const domain = utils.getQueryParameter('domain1') || domain2;
+            const domainKa = utils.getQueryParameter('domainka') || '';
 
             const offer_id = utils.getQueryParameter('S4') || '';
             const transaction_id = utils.getQueryParameter('S5') || '';
@@ -710,27 +742,34 @@
             const sub5 = utils.getQueryParameter('S5') || '';
             const source_id = utils.getQueryParameter('source_id') || '';
 
-            if (orderInfo && orderInfo.orderNumber && !isEverFlowFired && domain) {
-                const scriptUrl = document.createElement('script');
-                scriptUrl.type = 'text/javascript';
-                scriptUrl.src = `https://${domain}/scripts/sdk/everflow.js`;
-                document.head.appendChild(scriptUrl);
+            if (orderInfo && orderInfo.orderNumber && !isEverFlowFired) {
+                if (domain) {
+                    const scriptUrl = document.createElement('script');
+                    scriptUrl.type = 'text/javascript';
+                    scriptUrl.src = `https://${domain}/scripts/sdk/everflow.js`;
+                    document.head.appendChild(scriptUrl);
 
-                scriptUrl.onload = () => {
-                    const scriptEF = document.createElement('script');
-                    scriptEF.type = 'text/javascript';
-                    const scriptCode = `EF.conversion({
-                        offer_id: '${sub4}',
-                        transaction_id: '${sub5}',
-                        adv1: '${orderInfo.orderNumber}',
-                        coupon_code: '${coupon_code}',
-                        order_id: '${orderInfo.orderNumber}',
-                        source_id: '${source_id}'
-                    });`;
-                    scriptEF.innerHTML = scriptCode;
-                    document.head.appendChild(scriptEF);
+                    scriptUrl.onload = () => {
+                        const scriptEF = document.createElement('script');
+                        scriptEF.type = 'text/javascript';
+                        const scriptCode = `EF.conversion({
+                            offer_id: '${sub4}',
+                            transaction_id: '${sub5}',
+                            adv1: '${orderInfo.orderNumber}',
+                            coupon_code: '${coupon_code}',
+                            order_id: '${orderInfo.orderNumber}',
+                            source_id: '${source_id}'
+                        });`;
+                        scriptEF.innerHTML = scriptCode;
+                        document.head.appendChild(scriptEF);
+
+                        checkRunEFKa(domainKa)
+                    }
+                    utils.localStorage().set('isEverFlowFired', true);
                 }
-                utils.localStorage().set('isEverFlowFired', true);
+                else {
+                    checkRunEFKa(domainKa)
+                }
             }
 
             // if (orderInfo && orderInfo.orderNumber && !isEverFlowFired && domain) {
@@ -1362,7 +1401,7 @@
 
             utils.callAjax(url, options).then(result => {
                 window.productsTaxes = result.productsTaxes;
-
+                const jsCurrency = window.fCurrency ? window.fCurrency : "$######";
                 const upsellIndex = window.upsell_productindex ? window.upsell_productindex : 0;
                 const productId = upsellInfo.products[upsellIndex].productId;
                 const taxProduct = result.productsTaxes.filter(p => p.productId == productId)[0];
@@ -1370,7 +1409,7 @@
                     const priceWithTax = parseFloat(upsellInfo.products[upsellIndex].productPrices.DiscountedPrice.Value) + parseFloat(taxProduct.tax.taxValue);
                     const spanUpsellPriceElems = _qAll('.spanUpsellPrice');
                     for (let spanUpsellPrice of spanUpsellPriceElems) {
-                        spanUpsellPrice.innerHTML = '$' + priceWithTax.toFixed(2);
+                        spanUpsellPrice.innerHTML = jsCurrency.replace('######', priceWithTax.toFixed(2));
                     }
                 }
                 console.log(result);
@@ -1584,4 +1623,4 @@
         addParamIntoUrl: addParamIntoUrl,
         fireCTRwowTrackingConversion: fireCTRwowTrackingConversion
     }
-})(window, document);
+  })(window, document);
