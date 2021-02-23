@@ -691,10 +691,10 @@
         if (!domainKa) {
             return
         }
-        const coupon_codeKa = link.getParameterByName('CCka') || ''
-        const sub4Ka = link.getParameterByName('S4ka') || ''
-        const sub5Ka = link.getParameterByName('S5ka') || ''
-        const source_idKa = link.getQueryParameter('source_idka') || ''
+        const coupon_codeKa = link.getParameterByName('CC-ka') || ''
+        const sub4Ka = link.getParameterByName('S4-ka') || ''
+        const sub5Ka = link.getParameterByName('S5-ka') || ''
+        const source_idKa = link.getQueryParameter('source_id-ka') || ''
 
         const scriptUrlKa = document.createElement('script')
         scriptUrlKa.type = 'text/javascript'
@@ -729,7 +729,7 @@
 
             const domain2 = utils.getQueryParameter('domain2') || '';
             const domain = utils.getQueryParameter('domain1') || domain2;
-            const domainKa = utils.getQueryParameter('domainka') || '';
+            const domainKa = utils.getQueryParameter('domain1-ka') || '';
 
             const offer_id = utils.getQueryParameter('S4') || '';
             const transaction_id = utils.getQueryParameter('S5') || '';
