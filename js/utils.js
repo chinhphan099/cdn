@@ -691,10 +691,11 @@
         if (!domainKa) {
             return
         }
-        const coupon_codeKa = link.getParameterByName('CC-ka') || ''
-        const sub4Ka = link.getParameterByName('S4-ka') || ''
-        const sub5Ka = link.getParameterByName('S5-ka') || ''
-        const source_idKa = link.getQueryParameter('source_id-ka') || ''
+        const orderInfo = JSON.parse(utils.localStorage().get('orderInfo'));
+        const coupon_codeKa = utils.getQueryParameter('CC-ka') || ''
+        const sub4Ka = utils.getQueryParameter('S4-ka') || ''
+        const sub5Ka = utils.getQueryParameter('S5-ka') || ''
+        const source_idKa = utils.getQueryParameter('source_id-ka') || ''
 
         const scriptUrlKa = document.createElement('script')
         scriptUrlKa.type = 'text/javascript'
