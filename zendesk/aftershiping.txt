@@ -1,0 +1,19 @@
+Image: https://i.gyazo.com/3d4018be44f65b98818a3496146f6ab8.png
+
+file: templates/article_page.hbs
+
+In code below:
+Line: window.location.href.indexOf('Where-is-my-order') : Check url page contains Where-is-my-order
+If not check => Will apply all article pages
+
+<div id="as-root"></div>
+<div class="as-track-button" data-domain="track.aftership.com" data-size="large"></div>
+<script>
+    if (window.location.href.indexOf('Where-is-my-order') > -1) {
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        var scriptCode = '(function(e,t,n){var r,i=e.getElementsByTagName(t)[0];if(e.getElementById(n))return;r=e.createElement(t);r.id=n;r.src="https://button.aftership.com/all.js";i.parentNode.insertBefore(r,i)})(document,"script","aftership-jssdk")';
+        script.innerHTML = scriptCode;
+        document.head.appendChild(script);
+    }
+</script>
