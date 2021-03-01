@@ -333,7 +333,7 @@
             loadTax();
         }
     }
-    utils.events.on('onActivePopup', onActivePopup);
+    utils.events.on('onActivePopup', onActivePopup); // Order st
 
     function afterApplyCoupon(data) {
         discountedSelectedPrice = data.totalDiscountedPrice;
@@ -345,7 +345,7 @@
             loadTax();
         }
     }
-    utils.events.on('afterApplyCoupon', afterApplyCoupon);
+    utils.events.on('afterApplyCoupon', afterApplyCoupon); // Order list
 
     document.addEventListener('DOMContentLoaded', () => {
         listener();
