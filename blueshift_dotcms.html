@@ -1,0 +1,87 @@
+<script type="text/javascript">
+    window._blueshiftid='fa8307145a64f9484defb6d8a18940f0';window.blueshift=window.blueshift||[];if(blueshift.constructor===Array){blueshift.load=function(){var d=function(a){return function(){blueshift.push([a].concat(Array.prototype.slice.call(arguments,0)))}},e=["identify","track","click","pageload","capture","retarget"];for(var f=0;f<e.length;f++)blueshift[e[f]]=d(e[f])};}
+    blueshift.load();
+    blueshift.pageload();
+    if(blueshift.constructor===Array){(function(){var b=document.createElement("script");b.type="text/javascript",b.async=!0,b.src=("https:"===document.location.protocol?"https:":"http:")+"//cdn.getblueshift.com/blueshift.js",b.defer=true;var c=document.getElementsByTagName("script")[0];c.parentNode.insertBefore(b,c);})()}
+
+    if (window.location.href.indexOf('order') > -1 && window._CTR_TRACKING_ID) {
+        var inputs = Array.prototype.slice.call(document.querySelectorAll('#customer_email, #customer_firstname, #customer_lastname'));
+        inputs.forEach(function(input) {
+            input.addEventListener('change', function (e) {
+                utils.validateInput(this);
+
+                if (
+                    document.querySelector('#customer_email').classList.contains('input-valid') &&
+                    document.querySelector('#customer_firstname').classList.contains('input-valid') &&
+                    document.querySelector('#customer_lastname').classList.contains('input-valid')
+                ) {
+                    blueshift.identify({
+                        fingerprintId: window._CTR_TRACKING_ID,
+                        email: document.querySelector('#customer_email').value,
+                        firstname: document.querySelector('#customer_firstname').value,
+                        lastname: document.querySelector('#customer_lastname').value,
+                        joined_at: new Date(),
+                        referrer: document.referrer
+                    });
+                }
+            });
+        });
+
+        var interval = setInterval(function() {
+            if (!window.PRICES) {
+                return;
+            }
+            clearInterval(interval);
+
+            var products = [];
+            var _location = JSON.parse(window.localStorage.getItem('location'));
+            var productElms = Array.prototype.slice.call(document.querySelectorAll('[name="product"]'));
+            productElms.forEach(function(productElm) {
+                var product = productElm.dataset.product;
+                if (product) {
+                    product = JSON.parse(product);
+                    products.push({
+                        sku: product.sku
+                    })
+                }
+            });
+
+            blueshift.track('checkout', {
+                fingerprintId: window._CTR_TRACKING_ID,
+                products: products,
+                referrer: document.referrer,
+                countryCode: _location.countryCode,
+                regionCode: _location.regionCode,
+                ip: _location.ip
+            });
+        }, 300);
+    }
+
+    var orderInfo = window.localStorage.getItem('orderInfo');
+    var isFiredBlueshift = window.localStorage.getItem('isFiredBlueshift');
+    if (orderInfo && !isFiredBlueshift) {
+        orderInfo = JSON.parse(orderInfo);
+        var _location = JSON.parse(window.localStorage.getItem('location'));
+        blueshift.track('purchase', {
+            fingerprintId: window._CTR_TRACKING_ID,
+            email: '',
+            phoneNumber: '',
+            firstName: '',
+            lastName: '',
+            order_id: orderInfo.orderNumber,
+            total: orderInfo.orderTotal,
+            referrer: document.referrer,
+            countryCode: _location.countryCode,
+            regionCode: _location.regionCode,
+            ip: _location.ip,
+            products: [
+                {
+                    productId: '',
+                    sku: '',
+                    price: 19,
+                    quantity: 1
+                }
+            ]
+        });
+    }
+</script>

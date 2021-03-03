@@ -1,0 +1,91 @@
+#if($UtilMethods.isSet($siteData.footer.facebookPixelIds))
+    #set($fbIds = $siteData.footer.facebookPixelIds)
+
+    #if($UtilMethods.isSet($siteData.footer.facebookPixelIds))
+      <script>
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','//connect.facebook.net/en_US/fbevents.js');
+
+        #if($dotPageContent.url.indexOf('/index') > -1 || $dotPageContent.url.indexOf('/order') > -1 || $dotPageContent.url.indexOf('/pre') > -1)
+            #foreach($fbId in $fbIds.split(','))
+            fbq('init', '$fbId.trim()');
+            #end
+        #end
+
+        fbq('track', 'PageView');
+
+        #if($dotPageContent.url.indexOf('/order') > -1)
+            fbq('track', 'AddToCart')
+            var isFireInitiateCheckout = false;
+            if (document.querySelector('.btn-next')) {
+                document.querySelector('.btn-next').addEventListener('click', function() {
+                    if(!isFireInitiateCheckout) {
+                        isFireInitiateCheckout = true;
+                        fbq('track', 'InitiateCheckout');
+                    }
+                });
+            }
+
+            var inputs = document.querySelectorAll('input');
+            if(!!inputs.length) {
+                for(var i = 0; i < inputs.length; i++) {
+                    inputs[i].addEventListener('keydown', function() {
+                        if(!isFireInitiateCheckout) {
+                            isFireInitiateCheckout = true;
+                            fbq('track', 'InitiateCheckout');
+                        }
+                    });
+                }
+            }
+
+            //CTA button
+            var ctaButton = document.getElementById('js-basic-cta-button');
+            if(ctaButton) {
+                ctaButton.addEventListener('click', function() {
+                    if(!isFireInitiateCheckout) {
+                        isFireInitiateCheckout = true;
+                        fbq('track', 'InitiateCheckout');
+                    }
+                });
+            }
+
+            //Paypal button
+            var ctaPaypal = document.querySelector('#js-paypal-oneclick-button .w_radio');
+            if(ctaPaypal) {
+                ctaPaypal.addEventListener('click', function() {
+                    if(!isFireInitiateCheckout) {
+                        isFireInitiateCheckout = true;
+                        fbq('track', 'InitiateCheckout');
+                    }
+                });
+            }
+        #end
+
+        // For first upsell or confirm(if no upsell)
+        var orderInfo_mini = JSON.parse(localStorage.getItem('orderInfo'));
+        var currencyCode_mini = localStorage.getItem('currencyCode');
+        var isFiredFBPurchase = localStorage.getItem('isFiredFBPurchase');
+        if (!isFiredFBPurchase && orderInfo_mini && currencyCode_mini) {
+            localStorage.setItem('isFiredFBPurchase', true);
+
+            fbq('track', 'Purchase',
+                {
+                    value: orderInfo_mini.orderTotal,
+                    currency: currencyCode_mini,
+                    contents: [
+                        {
+                            id: orderInfo_mini.orderedProducts[0].pid,
+                            quantity: orderInfo_mini.quantity
+                        }
+                    ],
+                    content_type: 'product'
+                }
+            );
+        }
+      </script>
+      <noscript>
+        #foreach($fbId in $fbIds.split(','))
+          <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=$fbId.trim()&ev=PageView&noscript=1" />
+        #end
+      </noscript>
+    #end
+#end

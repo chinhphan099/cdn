@@ -571,6 +571,7 @@
                 utils.events.emit('bindProductDiscountInfo', productInfo);
                 siteSetting.countryCode = countryCodeIndex || data.location.countryCode;
                 utils.localStorage().set('countryCode', siteSetting.countryCode);
+                utils.localStorage().set('location', JSON.stringify(data.location));
                 setTimeout(() => {
                     utils.localStorage().set('jsCurrency', window.fCurrency);
                     utils.localStorage().set('countryCode', siteSetting.countryCode);
@@ -918,6 +919,7 @@
                     init(true);
                 }, false);
             }
+            utils.events.emit('triggerEventProductListPackage');
         };
 
         init(utils.getQueryParameter('et') === '1');
