@@ -1,4 +1,4 @@
-<script type="text/javascript">
+<script>
     window._blueshiftid='fa8307145a64f9484defb6d8a18940f0';window.blueshift=window.blueshift||[];if(blueshift.constructor===Array){blueshift.load=function(){var d=function(a){return function(){blueshift.push([a].concat(Array.prototype.slice.call(arguments,0)))}},e=["identify","track","click","pageload","capture","retarget"];for(var f=0;f<e.length;f++)blueshift[e[f]]=d(e[f])};}
     blueshift.load();
     blueshift.pageload();
@@ -8,7 +8,6 @@
         var _location = JSON.parse(window.localStorage.getItem('location'));
         if (window.location.href.indexOf('order') > -1) {
             window.localStorage.removeItem('isFiredPurchaseBlueshift');
-
 
             console.log(1111, window.PRICES, window._EA_ID);
             if (!window.PRICES || !window._EA_ID) {
@@ -45,6 +44,7 @@
 
             var products = [];
             var productElms = Array.prototype.slice.call(document.querySelectorAll('[name="product"]'));
+            var checkedItem = document.querySelector('[name="product"]:checked');
             productElms.forEach(function(productElm) {
                 var product = productElm.dataset.product;
 
@@ -54,6 +54,34 @@
                         productId: product.productId,
                         sku: product.sku
                     })
+
+                    productElm.addEventListener('change', function(e) {
+                        // remove_from_cart
+                        var checkedItemData = JSON.parse(checkedItem.dataset.product);
+                        blueshift.track('remove_from_cart', {
+                            fingerprintId: window._EA_ID,
+                            productId: checkedItemData.productId,
+                            sku: checkedItemData.sku,
+                            referrer: document.referrer,
+                            countryCode: _location.countryCode,
+                            regionCode: _location.regionCode,
+                            ip: _location.ip
+                        });
+
+                        // add_to_cart
+                        var currentItem = JSON.parse(e.currentTarget.dataset.product);
+                        blueshift.track('add_to_cart', {
+                            fingerprintId: window._EA_ID,
+                            productId: currentItem.productId,
+                            sku: currentItem.sku,
+                            referrer: document.referrer,
+                            countryCode: _location.countryCode,
+                            regionCode: _location.regionCode,
+                            ip: _location.ip
+                        });
+
+                        checkedItem = document.querySelector('[name="product"]:checked');
+                    });
                 }
             });
 
