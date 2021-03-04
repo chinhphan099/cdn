@@ -6,15 +6,16 @@
 
     if (window.location.href.indexOf('order') > -1 && window._CTR_TRACKING_ID) {
         var inputs = Array.prototype.slice.call(document.querySelectorAll('#customer_email, #customer_firstname, #customer_lastname'));
+        var isFireIdentify = false;
         inputs.forEach(function(input) {
             input.addEventListener('change', function (e) {
-                utils.validateInput(this);
-
                 if (
                     document.querySelector('#customer_email').classList.contains('input-valid') &&
                     document.querySelector('#customer_firstname').classList.contains('input-valid') &&
-                    document.querySelector('#customer_lastname').classList.contains('input-valid')
+                    document.querySelector('#customer_lastname').classList.contains('input-valid') && !isFireIdentify
                 ) {
+                    console.log('BlueShift - Fire identify')
+                    isFireIdentify = true;
                     blueshift.identify({
                         fingerprintId: window._CTR_TRACKING_ID,
                         email: document.querySelector('#customer_email').value,
@@ -46,6 +47,7 @@
                 }
             });
 
+            console.log('BlueShift - Fire checkout');
             blueshift.track('checkout', {
                 fingerprintId: window._CTR_TRACKING_ID,
                 products: products,
@@ -58,30 +60,33 @@
     }
 
     var orderInfo = window.localStorage.getItem('orderInfo');
-    var isFiredBlueshift = window.localStorage.getItem('isFiredBlueshift');
-    if (orderInfo && !isFiredBlueshift) {
+    var _location = window.localStorage.getItem('location');
+    var isFiredPurchaseBlueshift = window.localStorage.getItem('isFiredPurchaseBlueshift');
+    if (orderInfo && !isFiredPurchaseBlueshift) {
         orderInfo = JSON.parse(orderInfo);
-        var _location = JSON.parse(window.localStorage.getItem('location'));
+        _location = JSON.parse(_location || '{}');
+        console.log('BlueShift - Fire Purchase');
         blueshift.track('purchase', {
             fingerprintId: window._CTR_TRACKING_ID,
-            email: '',
-            phoneNumber: '',
-            firstName: '',
-            lastName: '',
+            email: orderInfo.cusEmail,
+            phoneNumber: orderInfo.cusPhone,
+            firstName: orderInfo.cusFirstName,
+            lastName: orderInfo.cusLastName,
             order_id: orderInfo.orderNumber,
-            total: orderInfo.orderTotal,
+            total: orderInfo.orderTotalFull,
             referrer: document.referrer,
-            countryCode: _location.countryCode,
-            regionCode: _location.regionCode,
-            ip: _location.ip,
+            countryCode: orderInfo.cusCountry,
+            regionCode: orderInfo.cusState,
+            ip: _location.ip || '',
             products: [
                 {
-                    productId: '',
-                    sku: '',
-                    price: 19,
-                    quantity: 1
+                    productId: orderInfo.orderedProducts[0].pid,
+                    sku: orderInfo.orderedProducts[0].sku,
+                    price: orderInfo.orderTotal,
+                    quantity: orderInfo.quantity
                 }
             ]
         });
+        window.localStorage.setItem('isFiredPurchaseBlueshift', true);
     }
 </script>

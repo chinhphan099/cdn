@@ -71,7 +71,7 @@
         if (orderInfo && !isFiredPurchaseBlueshift && __EA_ID) {
             orderInfo = JSON.parse(orderInfo);
             _location = JSON.parse(_location || '{}');
-            console.log('BlueShift - Fire Purchase')
+            console.log('BlueShift - Fire Purchase');
             blueshift.track('purchase', {
                 fingerprintId: __EA_ID,
                 email: orderInfo.cusEmail,
@@ -86,8 +86,8 @@
                 ip: _location.ip || '',
                 products: [
                     {
-                        productId: orderInfo.orderedProducts,
-                        sku: orderInfo.orderedProducts.sku,
+                        productId: orderInfo.orderedProducts[0].pid,
+                        sku: orderInfo.orderedProducts[0].sku,
                         price: orderInfo.orderTotal,
                         quantity: orderInfo.quantity
                     }
