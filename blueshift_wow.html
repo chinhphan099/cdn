@@ -6,28 +6,35 @@
 
     function init() {
         if (window.location.href.indexOf('order') > -1) {
+            window.localStorage.removeItem('isFiredPurchaseBlueshift');
             var campaignInfo = __productListData.data.productList;
 
             console.log(1111, campaignInfo, window._EA_ID);
             if (!campaignInfo || !window._EA_ID) {
                 return;
             }
+
             var inputs = Array.prototype.slice.call(document.querySelectorAll('[name="email"], [name="firstName"], [name="lastName"]'));
             var isFireIdentify = false;
+            blueshift.identify({
+                fingerprintId: window._EA_ID,
+                email: document.querySelector('[name="email"]').value || '',
+                firstname: document.querySelector('[name="firstName"]').value || '',
+                lastname: document.querySelector('[name="lastName"]').value || '',
+                joined_at: new Date(),
+                referrer: document.referrer
+            });
+
             inputs.forEach(function(input) {
                 input.addEventListener('change', function (e) {
-                    if (
-                        document.querySelector('[name="email"]').classList.contains('valid') &&
-                        document.querySelector('[name="firstName"]').classList.contains('valid') &&
-                        document.querySelector('[name="lastName"]').classList.contains('valid') && !isFireIdentify
-                    ) {
+                    if (document.querySelector('[name="email"]').classList.contains('valid') && !isFireIdentify) {
                         console.log('BlueShift - Fire identify')
                         isFireIdentify = true;
                         blueshift.identify({
                             fingerprintId: window._EA_ID,
                             email: document.querySelector('[name="email"]').value,
-                            firstname: document.querySelector('[name="firstName"]').value,
-                            lastname: document.querySelector('[name="lastName"]').value,
+                            firstname: document.querySelector('[name="firstName"]').value || '',
+                            lastname: document.querySelector('[name="lastName"]').value || '',
                             joined_at: new Date(),
                             referrer: document.referrer
                         });
@@ -48,6 +55,7 @@
                         return pro.productId === Number(productId);
                     })
                     products.push({
+                        productId: price.productId,
                         sku: price.sku
                     })
                 }
