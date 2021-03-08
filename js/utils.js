@@ -713,10 +713,10 @@
                 order_id: '${orderInfo.orderNumber}',
                 source_id: '${source_idKa}'
             });`
-            scriptEFKa.innerHTML = scriptCodeKa
-            document.head.appendChild(scriptEFKa)
+            scriptEFKa.innerHTML = scriptCodeKa;
+            document.head.appendChild(scriptEFKa);
+            utils.localStorage().set('isEverFlowFired', true);
         }
-        utils.localStorage().set('isEverFlowFired', true);
     }
 
     function fireEverFlow() {
@@ -763,10 +763,9 @@
                         });`;
                         scriptEF.innerHTML = scriptCode;
                         document.head.appendChild(scriptEF);
-
-                        checkRunEFKa(domainKa)
+                        utils.localStorage().set('isEverFlowFired', true);
+                        checkRunEFKa(domainKa);
                     }
-                    utils.localStorage().set('isEverFlowFired', true);
                 }
                 else {
                     checkRunEFKa(domainKa)
