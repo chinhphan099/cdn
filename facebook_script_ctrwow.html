@@ -1,0 +1,76 @@
+<!-- Facebook Pixel -->
+<script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','//connect.facebook.net/en_US/fbevents.js');
+
+  fbq('init', '927712684329812');
+  fbq('track', 'PageView');
+
+  // Order
+  if (window.location.pathname.indexOf('/order') > -1) {
+    fbq('track', 'AddToCart');
+
+    var isFireInitiateCheckout = false;
+    var inputs = document.querySelectorAll('input');
+    if (!!inputs.length) {
+      for (var i = 0; i < inputs.length; i++) {
+        inputs[i].addEventListener('keydown', function() {
+          if (!isFireInitiateCheckout) {
+            isFireInitiateCheckout = true;
+            fbq('track', 'InitiateCheckout');
+          }
+        });
+      }
+    }
+    //Next Button
+    var nextBtns = Array.prototype.slice.call(document.querySelectorAll('.btn-next, .btn_display_form'));
+    nextBtns.forEach(function(nextBtn) {
+        nextBtn.addEventListener('click', function() {
+            if (!isFireInitiateCheckout) {
+                isFireInitiateCheckout = true;
+                fbq('track', 'InitiateCheckout');
+            }
+        });
+    });
+    //CTA button
+    var ctaButton = document.querySelector('[name="checkoutWithCreditCard"]');
+    if (ctaButton) {
+      ctaButton.addEventListener('click', function() {
+        if (!isFireInitiateCheckout) {
+          isFireInitiateCheckout = true;
+          fbq('track', 'InitiateCheckout');
+        }
+      });
+    }
+    //Paypal button
+    var ctaPaypal = document.querySelector('.checkoutWithPaypal');
+    if (ctaPaypal) {
+      ctaPaypal.addEventListener('click', function() {
+        if (!isFireInitiateCheckout) {
+          isFireInitiateCheckout = true;
+          fbq('track', 'InitiateCheckout');
+        }
+      });
+    }
+    // End Order
+  }
+
+  // For first upsell or confirm(if no upsell)
+  var orderInfo_mini = JSON.parse(localStorage.getItem('orderInfo'));
+  var currencyCode_mini = localStorage.getItem('currencyCode');
+  var isFiredFBPurchase = localStorage.getItem('isFiredFBPurchase');
+  if (!isFiredFBPurchase && orderInfo_mini && currencyCode_mini) {
+    localStorage.setItem('isFiredFBPurchase', true);
+    fbq('track', 'Purchase', {
+      value: orderInfo_mini.orderTotal,
+      currency: currencyCode_mini,
+      contents: [{
+        id: orderInfo_mini.orderedProducts[0].pid,
+        quantity: orderInfo_mini.quantity
+      }],
+      content_type: 'product'
+    });
+  }
+</script>
+<noscript>
+  <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=927712684329812&ev=PageView&noscript=1" />
+</noscript> <!-- /Facebook Pixel -->
