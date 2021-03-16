@@ -1362,10 +1362,10 @@
 
     function bindTaxForUpsell(upsellInfo) {
         try {
-            if (typeof window.applyTax === 'undefined') return;
+            if (window.localStorage.getItem('bindTax') !== 'true') return;
 
-            let countryCode = window.localStorage.getItem('countryCode');
-            let stateCode = window.localStorage.getItem('stateCode');
+            let countryCode = window.upsell.orderInfo.cusCountry;
+            let stateCode = window.upsell.orderInfo.cusState;
 
             const userPaymentType = window.localStorage.getItem('userPaymentType');
             if (userPaymentType && userPaymentType === 'paypal') {
@@ -1377,7 +1377,7 @@
                         return camp[mainWebKey];
                     });
 
-                    if (camp && camp.length > 0) {
+                    if (camp && camp.length > 0 && !countryCode && !stateCode) {
                         countryCode = camp[0][mainWebKey].location.countryCode;
                         stateCode = camp[0][mainWebKey].location.regionCode;
                     }
