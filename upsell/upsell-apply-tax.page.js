@@ -4,6 +4,7 @@
         console.log('utils module is not found');
         return;
     }
+    var isTaxApply = false;
     window.taxArray = [];
     const fCurrency = utils.localStorage().get('jsCurrency');
 
@@ -12,6 +13,8 @@
 
 
     function _bindPrice() {
+        if(!isTaxApply) return;
+
         const taxUpsellItem = window.taxArray[window.upsell_productindex];
         const spanUpsellPriceElems = Array.prototype.slice.call(_qAll('.spanUpsellPrice'));
         for (let spanUpsellPrice of spanUpsellPriceElems) {
@@ -19,7 +22,7 @@
         }
 
         spanUpsellPriceElems.forEach(spanUpsellPrice => {
-            const totalPrice = taxUpsellItem.totalPrice + taxUpsellItem.taxAmount;
+            const totalPrice = (taxUpsellItem.totalPrice || 0) + (taxUpsellItem.taxAmount || 0);
             spanUpsellPrice.textContent = utils.formatPrice(totalPrice.toFixed(2), fCurrency, String(totalPrice));
             spanUpsellPrice.removeAttribute('style');
         });
@@ -66,7 +69,10 @@
         const url = `${eCRM.Order.baseAPIEndpoint}/orders/CreateEstimate`;
         utils.callAjax(url, options)
             .then((result) => {
-                if (!result) { return; }
+                if (!result) {
+                    isTaxApply = false;
+                    return;
+                }
                 window.taxArray = result.items
 
                 const taxProductsJSON = JSON.parse(taxProducts);
@@ -81,10 +87,11 @@
                 }
                 // ! Save all tax to local storage
                 window.localStorage.setItem('taxProducts', JSON.stringify(taxProductsJSON));
-
+                isTaxApply = true;
                 _bindPrice();
             })
             .catch(() => {
+                isTaxApply = false;
                 _bindPrice();
                 console.log('load tax error');
             });
