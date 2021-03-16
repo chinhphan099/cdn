@@ -77,6 +77,11 @@
             let remainAmountNumber = products.prices[0].productPrices.DiscountedPrice.Value - products.prices[0].productPrices.PreSaleAmount1.Value;
             spanRemainAmount.innerHTML = utils.formatPrice(remainAmountNumber.toFixed(2), window.fCurrency, products.prices[0].productPrices.DiscountedPrice.FormattedValue);
         });
+
+        // bind tax
+        if (window.localStorage.getItem('bindTax') === 'true') {
+            utils.bindTaxForUpsell(upsell);
+        }
     }
 
     function getProduct() {
@@ -98,14 +103,6 @@
         eCRM2.Campaign.getProducts(function (products) {
             implementData(products);
         });
-
-        //bind tax
-        const timer = setInterval(() => {
-            if (upsell.products.length > 0) {
-                utils.bindTaxForUpsell(upsell);
-                clearInterval(timer);
-            }
-        }, 100);
     }
     if (!window.isNotCallApiUpsell) {
         getProduct();
