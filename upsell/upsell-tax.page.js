@@ -1,6 +1,4 @@
 (function (utils) {
-    console.log('upsell-tax.page.js');
-
     if (!utils) {
         console.log('modules is not found');
         return;
@@ -8,8 +6,7 @@
 
     window.upsell_productindex = 0;
     window.fCurrency = utils.localStorage().get('jsCurrency') || '$######';
-
-    let upsell = {
+    window.upsell = {
         orderInfo: JSON.parse(utils.localStorage().get('orderInfo')),
         products: [],
         upsellCampaignName: '',
@@ -17,6 +14,10 @@
         upsellWebKey: window.upsellWebKey,
         CID: siteSetting.CID
     };
+
+    if(upsell.orderInfo) {
+        console.log(`used field useCreditCard ${upsell.orderInfo.useCreditCard}`);
+    }
 
     const eCRM = new EmanageCRMJS({
         webkey: upsell.mainWebKey,
@@ -45,7 +46,7 @@
         console.log(products);
 
         //tax
-        if (typeof window.applyTax === 'undefined') {
+        if (window.localStorage.getItem('bindTax') !== 'true') {
             const spanUpsellPriceElems = _qAll('.spanUpsellPrice');
             for (let spanUpsellPrice of spanUpsellPriceElems) {
                 spanUpsellPrice.innerHTML = products.prices[0].productPrices.DiscountedPrice.FormattedValue;
@@ -87,7 +88,7 @@
         });
 
         //tax
-        if (typeof window.applyTax !== 'undefined') { //window.applyTax declare in html_footer.vtl
+        if (window.localStorage.getItem('bindTax') === 'true') {
             const spanUpsellPriceElems = _qAll('.spanUpsellPrice');
             for (let spanUpsellPrice of spanUpsellPriceElems) {
                 spanUpsellPrice.innerHTML = '<img height="20" src="//d16hdrba6dusey.cloudfront.net/sitecommon/images/loading-price.gif"></img>';
@@ -106,15 +107,12 @@
             }
         }, 100);
     }
-
-
     if (!window.isNotCallApiUpsell) {
         getProduct();
     }
     else {
         utils.events.on('triggerQuantity', implementData);
     }
-
 
     function handleBasicUpsellCTAButton() {
         const ctaButtons = _qAll('.js-btn-place-upsell-order');
@@ -140,7 +138,6 @@
         const upsellData = getUpsellData();
 
         utils.showAjaxLoading();
-
         eCRM.Order.placeUpsellOrder(upsellData, upsell.upsellWebKey, function (result) {
             utils.saveInfoToLocalForUpsells(result, upsell);
         });
@@ -151,21 +148,20 @@
         if (location.href.split('special-offer-', 2).length > 1) {
             upParam = 'up_' + location.href.split('special-offer-', 2)[1].split('.html', 1) + '=1';
         }
-
         return upParam;
     }
 
     function handleLastUpsellOrError() {
         let upParam = '';
         if (location.href.split('special-offer-', 2).length > 1) {
-            upParam = 'up_' + location.href.split('special-offer-', 2)[1].split('.html', 1);
+            upParam = '?up_' + location.href.split('special-offer-', 2)[1].split('.html', 1);
 
             if (upsell.orderInfo.isUpsellOrdered == 1) {
                 //store param in localStorage to fire gtm event of purchase
                 utils.localStorage().set('fireUpsellForGTMPurchase', upParam);
-                upParam = '?' + upParam + '=1';
+                upParam += '=1';
             } else {
-                upParam = '?' + upParam + '=0';
+                upParam += '=0';
             }
         }
 
@@ -178,18 +174,24 @@
             cardId: upsell.orderInfo.cardId
         };
 
-        if (upsell.orderInfo.paymentProcessorId == "5" || upsell.orderInfo.paymentProcessorId == "31") {
+        /*
+            5, 31 : paypal
+            39: afterpay
+            42: ideal,
+            41: sofort
+        */
+        //if (upsell.orderInfo.paymentProcessorId == "5" || upsell.orderInfo.paymentProcessorId == "31") { old code
+        if (!upsell.orderInfo.useCreditCard && upsell.orderInfo.paymentProcessorId) {
             pay = {
                 paymentProcessorId: Number(upsell.orderInfo.paymentProcessorId)
             };
-        } else {
-            //add installment
+        }
+        else {
+            //add installment for upsell
             if (!!upsell.orderInfo.installmentValue && upsell.orderInfo.installmentValue !== "") {
                 pay.Instalments = upsell.orderInfo.installmentValue;
             }
         }
-
-
 
         //add callback param to server to keep track
         let replacedParam = location.search.replace(/\?|\&*paymentId=[^&]*/g, '').replace(/\?|\&*token=[^&]*/g, '').replace(/\?|\&*PayerID=[^&]*/g, '');
@@ -198,7 +200,8 @@
         let antiFraud;
         try {
             antiFraud = JSON.parse(utils.localStorage().get("antiFraud"));
-        } catch (ex) {
+        }
+        catch (ex) {
             console.log(ex);
             antiFraud = null;
         }
@@ -219,6 +222,10 @@
             antiFraud: {
                 sessionId: antiFraud ? antiFraud.sessionId : ''
             }
+        }
+
+        if (!!window.multipleMiniUpsells && window.multipleMiniUpsells.length > 0) {
+            upsellData.multipleMiniUpsells = window.multipleMiniUpsells;
         }
 
         return upsellData;
@@ -270,7 +277,6 @@
     utils.checkAffAndFireEvents();
 
     /*
-    //Fire Cake Pixel
     utils.fireCakePixel();
     utils.fireEverFlow();
     utils.firePicksell();
