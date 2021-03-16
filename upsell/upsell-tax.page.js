@@ -102,7 +102,7 @@
         const timer = setInterval(() => {
             if (upsell.products.length > 0) {
                 utils.bindTaxForUpsell(upsell);
-                clearTimeout(timer);
+                clearInterval(timer);
             }
         }, 100);
     }
