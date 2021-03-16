@@ -17,14 +17,21 @@
 
         const taxUpsellItem = window.taxArray[window.upsell_productindex];
         const spanUpsellPriceElems = Array.prototype.slice.call(_qAll('.spanUpsellPrice'));
+        const formatedPrice = window.upsell.products[window.upsell_productindex].productPrices.DiscountedPrice.FormattedValue;
         for (let spanUpsellPrice of spanUpsellPriceElems) {
             spanUpsellPrice.style.display = 'none';
         }
 
+        const totalPrice = (taxUpsellItem.totalPrice || 0) + (taxUpsellItem.taxAmount || 0);
         spanUpsellPriceElems.forEach(spanUpsellPrice => {
-            const totalPrice = (taxUpsellItem.totalPrice || 0) + (taxUpsellItem.taxAmount || 0);
-            spanUpsellPrice.textContent = utils.formatPrice(totalPrice.toFixed(2), fCurrency, String(totalPrice));
+            spanUpsellPrice.textContent = utils.formatPrice(totalPrice.toFixed(2), fCurrency, formatedPrice);
             spanUpsellPrice.removeAttribute('style');
+        });
+
+        Array.prototype.slice.call(_qAll('.unit-price')).forEach((elm) => {
+            const qty = window.isDoubleQuantity ? window.upsell.products[window.upsell_productindex].quantity / 2 : window.upsell.products[window.upsell_productindex].quantity;
+            const unitPrice = totalPrice / qty;
+            elm.textContent = utils.formatPrice(unitPrice.toFixed(2), fCurrency, formatedPrice);
         });
     }
 
