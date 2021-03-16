@@ -17,21 +17,21 @@
 
         const taxUpsellItem = window.taxArray[window.upsell_productindex];
         const spanUpsellPriceElems = Array.prototype.slice.call(_qAll('.spanUpsellPrice'));
-        const formatedPrice = window.upsell.products[window.upsell_productindex].productPrices.DiscountedPrice.FormattedValue;
+        const shippingFee = window.upsell.products[window.upsell_productindex].shippings[0].formattedPrice;
         for (let spanUpsellPrice of spanUpsellPriceElems) {
             spanUpsellPrice.style.display = 'none';
         }
 
         const totalPrice = (taxUpsellItem.totalPrice || 0) + (taxUpsellItem.taxAmount || 0);
         spanUpsellPriceElems.forEach(spanUpsellPrice => {
-            spanUpsellPrice.textContent = utils.formatPrice(totalPrice.toFixed(2), fCurrency, formatedPrice);
+            spanUpsellPrice.textContent = utils.formatPrice(totalPrice.toFixed(2), fCurrency, shippingFee);
             spanUpsellPrice.removeAttribute('style');
         });
 
         Array.prototype.slice.call(_qAll('.unit-price')).forEach((elm) => {
             const qty = window.isDoubleQuantity ? window.upsell.products[window.upsell_productindex].quantity / 2 : window.upsell.products[window.upsell_productindex].quantity;
             const unitPrice = totalPrice / qty;
-            elm.textContent = utils.formatPrice(unitPrice.toFixed(2), fCurrency, formatedPrice);
+            elm.textContent = utils.formatPrice(unitPrice.toFixed(2), fCurrency, shippingFee);
         });
     }
 
