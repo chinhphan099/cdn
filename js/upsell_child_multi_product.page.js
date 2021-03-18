@@ -25,12 +25,17 @@
             spanUpsellPrice.innerHTML = data.discountPrice;
         }
 
-        const spanFullPriceElems = _qAll('.spanFullPrice');
+        const spanFullPriceElems = _qAll('.spanFullPrice, .full-price');
         for(let spanFullPrice of spanFullPriceElems) {
             spanFullPrice.innerHTML = data.fullPrice;
         }
 
-        const spanUnitPriceElems = _qAll('.spanUnitUpsellPrice');
+        const spanSavePriceElems = _qAll('.spanSavePrice, .save-price');
+        for(let spanSavePrice of spanSavePriceElems) {
+            spanSavePrice.innerHTML = data.savePrice;
+        }
+
+        const spanUnitPriceElems = _qAll('.spanUnitUpsellPrice, .unit-price');
         for(let spanUnitPriceElem of spanUnitPriceElems) {
             spanUnitPriceElem.innerHTML = data.unitDiscountPrice;
         }
@@ -92,6 +97,8 @@
             unitFullRateValue = product.productPrices.UnitFullRetailPrice.Value;
         }
 
+        const savePriceValue = (product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value).toFixed(2);
+
         result = {
             productId: product.productId,
             quantity: product.quantity,
@@ -104,6 +111,8 @@
             unitDiscountPriceValue: product.productPrices.UnitDiscountRate.Value,
             fullPrice: product.productPrices.FullRetailPrice.FormattedValue,
             fullPriceValue: product.productPrices.FullRetailPrice.Value,
+            savePrice: utils.formatPrice(savePriceValue, fCurrency, product.shippings[0].formattedPrice),
+            savePriceValue: savePriceValue,
             unitFullPrice: unitFullRateText,
             unitFullPriceValue: unitFullRateValue,
             currencyCode: product.productPrices.FullRetailPrice.GlobalCurrencyCode != null ? product.productPrices.FullRetailPrice.GlobalCurrencyCode : '',

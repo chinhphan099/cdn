@@ -1364,8 +1364,13 @@
         try {
             if (window.localStorage.getItem('bindTax') !== 'true') return;
 
-            let countryCode = window.upsell.orderInfo.cusCountry;
-            let stateCode = window.upsell.orderInfo.cusState;
+            let countryCode = window.localStorage.getItem('countryCode');
+            let stateCode = window.localStorage.getItem('stateCode');
+
+            if (window.upsell.orderInfo) {
+                countryCode = window.upsell.orderInfo.cusCountry;
+                stateCode = window.upsell.orderInfo.cusState;
+            }
 
             const userPaymentType = window.localStorage.getItem('userPaymentType');
             if (userPaymentType && userPaymentType === 'paypal') {
