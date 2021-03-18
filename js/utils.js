@@ -1412,13 +1412,23 @@
                 window.productsTaxes = result.productsTaxes;
                 const jsCurrency = window.fCurrency ? window.fCurrency : "$######";
                 const upsellIndex = window.upsell_productindex ? window.upsell_productindex : 0;
+                const productItem = upsellInfo.products[upsellIndex];
+                const shippingFee = productItem.shippings[0].formattedPrice;
                 const productId = upsellInfo.products[upsellIndex].productId;
                 const taxProduct = result.productsTaxes.filter(p => p.productId == productId)[0];
                 if (taxProduct) {
-                    const priceWithTax = parseFloat(upsellInfo.products[upsellIndex].productPrices.DiscountedPrice.Value) + parseFloat(taxProduct.tax.taxValue);
+                    const discountedPriceValue = productItem.productPrices.DiscountedPrice.Value;
+                    const priceWithTax = discountedPriceValue + parseFloat(taxProduct.tax.taxValue);
+                    const unitDiscountedPriceValue = (priceWithTax / productItem.quantity).toFixed(2);
+
                     const spanUpsellPriceElems = _qAll('.spanUpsellPrice');
                     for (let spanUpsellPrice of spanUpsellPriceElems) {
-                        spanUpsellPrice.innerHTML = jsCurrency.replace('######', priceWithTax.toFixed(2));
+                        spanUpsellPrice.innerHTML = utils.formatPrice(priceWithTax, jsCurrency, shippingFee);
+                    }
+
+                    const spanUpsellUnitPriceElems = _qAll('.spanUnitUpsellPrice, .unit-price');
+                    for (let spanUpsellUnitPrice of spanUpsellUnitPriceElems) {
+                        spanUpsellUnitPrice.innerHTML = utils.formatPrice(unitDiscountedPriceValue, jsCurrency, shippingFee);
                     }
                 }
                 // Render price for Product list

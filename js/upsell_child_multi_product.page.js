@@ -97,7 +97,20 @@
             unitFullRateValue = product.productPrices.UnitFullRetailPrice.Value;
         }
 
-        const savePriceValue = (product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value).toFixed(2);
+        let taxData;
+        if (window.productsTaxes) {
+            taxData = window.productsTaxes.find((tax) => {
+                return tax.productId === product.productId
+            });
+        }
+        let discountedPriceValue = product.productPrices.DiscountedPrice.Value;
+        const savePriceValue = (product.productPrices.FullRetailPrice.Value - discountedPriceValue).toFixed(2);
+        if (taxData) {
+            discountedPriceValue += taxData.tax.taxValue;
+        }
+
+        const unitDiscountedPriceValue = (discountedPriceValue / product.quantity).toFixed(2);
+        const fullPriceValue = product.productPrices.FullRetailPrice.Value;
 
         result = {
             productId: product.productId,
@@ -105,16 +118,22 @@
             productName: _getClosest(checkedItem, '.productRadioListItem').querySelector('.product-name p').innerHTML,
             priceShipping: priceShipping,
             shippingValue: shippingValue,
-            discountPrice: product.productPrices.DiscountedPrice.FormattedValue,
-            discountPriceValue: product.productPrices.DiscountedPrice.Value,
-            unitDiscountPrice: product.productPrices.UnitDiscountRate.FormattedValue,
-            unitDiscountPriceValue: product.productPrices.UnitDiscountRate.Value,
-            fullPrice: product.productPrices.FullRetailPrice.FormattedValue,
-            fullPriceValue: product.productPrices.FullRetailPrice.Value,
-            savePrice: utils.formatPrice(savePriceValue, fCurrency, product.shippings[0].formattedPrice),
+
+            discountPriceValue: discountedPriceValue,
+            discountPrice: utils.formatPrice(discountedPriceValue, fCurrency, product.shippings[0].formattedPrice),
+
+            unitDiscountPriceValue: unitDiscountedPriceValue,
+            unitDiscountPrice: utils.formatPrice(unitDiscountedPriceValue, fCurrency, product.shippings[0].formattedPrice),
+
+            fullPriceValue: fullPriceValue,
+            fullPrice: utils.formatPrice(fullPriceValue, fCurrency, product.shippings[0].formattedPrice),
+
             savePriceValue: savePriceValue,
+            savePrice: utils.formatPrice(savePriceValue, fCurrency, product.shippings[0].formattedPrice),
+
             unitFullPrice: unitFullRateText,
             unitFullPriceValue: unitFullRateValue,
+
             currencyCode: product.productPrices.FullRetailPrice.GlobalCurrencyCode != null ? product.productPrices.FullRetailPrice.GlobalCurrencyCode : '',
             fCurrency: fCurrency
         };
