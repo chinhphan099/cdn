@@ -11,10 +11,13 @@
                 localStorage.removeItem('currentProductTaxes');
                 _bindTax();
             } else {
-                const taxesEle = document.querySelectorAll('.taxes-fee');
+                const taxesEle = document.querySelectorAll('.taxes-fee, .td-taxes-fees');
                 const taxRowEle = document.querySelector('.tax-row');
 
-                if(!!taxRowEle) taxRowEle.classList.remove('hidden');
+                if(!!taxRowEle) {
+                    taxRowEle.classList.remove('hidden');
+                    taxRowEle.removeAttribute('style');
+                }
                 if (taxesEle.length > 0) {
                     for(let item of taxesEle) {
                         item.innerHTML = '<img height="20" src="//d16hdrba6dusey.cloudfront.net/sitecommon/images/loading-price.gif"></img>';
@@ -103,7 +106,7 @@
                 const jsonProduct = JSON.parse(selectedProduct.dataset.product);
                 const productPrice = jsonProduct.productPrices.DiscountedPrice.Value;
 
-                const taxesEle = document.querySelectorAll('.taxes-fee');
+                const taxesEle = document.querySelectorAll('.taxes-fee, .td-taxes-fees');
                 const grandTotalElem = document.querySelectorAll('.grand-total');
                 if (taxesEle.length > 0) {
                     //bind tax
