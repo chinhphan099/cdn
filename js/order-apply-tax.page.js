@@ -65,13 +65,35 @@
         }
     }
 
+    function getWarrantyPrice() {
+        let wPrice = 0;
+        if (!!_qById('txtProductWarranty') && _qById('txtProductWarranty').checked) {
+            const data = _getSelectedProduct(),
+                warrantyRate = [0.1, 0.2, 0.2, 0.2, 0.2, 0.3, 0.5, 0.15, 0.25, 0.35, 0.4, 0.45, 0.55, 0.6],
+                funnelId = _qById('txtProductWarranty').value,
+                funnelPrice = warrantyRate[parseInt(funnelId) - 1];
+            let warrantyPrice = (Math.round(100 * data.productPrices.DiscountedPrice.Value * funnelPrice) / 100).toFixed(2);
+            wPrice = Number(warrantyPrice);
+        }
+        return wPrice;
+    }
+
     function renderTaxAndGrandTotal(selectedProdduct) {
         const selectedItem = window.taxArray.find((item) => item.productId === selectedProdduct.productId);
 
         const totalTaxAmount = selectedItem.taxAmount;
         // const shippingFee = selectedProdduct.shippings[window.shippingIndex ? window.shippingIndex : 0].price;
         // const grandTotal = (selectedItem.totalPrice + shippingFee + totalTaxAmount).toFixed(2);
-        const grandTotal = (selectedItem.totalPrice + totalTaxAmount).toFixed(2);
+
+        const lifetime = _qById('txtProductWarranty');
+        let valueLifetime = 0;
+        if(lifetime) {
+            if(lifetime.checked) {
+                valueLifetime = getWarrantyPrice();
+            }
+        }
+
+        const grandTotal = (selectedItem.totalPrice + totalTaxAmount + valueLifetime).toFixed(2);
 
         Array.prototype.slice.call(_qAll('.tax_price, .td-taxes-fees')).forEach((taxElem) => {
             taxElem.textContent = utils.formatPrice(totalTaxAmount.toFixed(2), window.fCurrency, totalTaxAmount.toFixed(2));
