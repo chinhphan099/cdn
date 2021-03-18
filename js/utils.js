@@ -1419,16 +1419,16 @@
                 if (taxProduct) {
                     const discountedPriceValue = productItem.productPrices.DiscountedPrice.Value;
                     const priceWithTax = discountedPriceValue + parseFloat(taxProduct.tax.taxValue);
-                    const unitDiscountedPriceValue = (priceWithTax / productItem.quantity).toFixed(2);
+                    const unitDiscountedPriceValue = priceWithTax / productItem.quantity;
 
                     const spanUpsellPriceElems = _qAll('.spanUpsellPrice');
                     for (let spanUpsellPrice of spanUpsellPriceElems) {
-                        spanUpsellPrice.innerHTML = utils.formatPrice(priceWithTax, jsCurrency, shippingFee);
+                        spanUpsellPrice.innerHTML = utils.formatPrice(priceWithTax.toFixed(2), jsCurrency, shippingFee);
                     }
 
                     const spanUpsellUnitPriceElems = _qAll('.spanUnitUpsellPrice, .unit-price');
                     for (let spanUpsellUnitPrice of spanUpsellUnitPriceElems) {
-                        spanUpsellUnitPrice.innerHTML = utils.formatPrice(unitDiscountedPriceValue, jsCurrency, shippingFee);
+                        spanUpsellUnitPrice.innerHTML = utils.formatPrice(unitDiscountedPriceValue.toFixed(2), jsCurrency, shippingFee);
                     }
                 }
                 // Render price for Product list
