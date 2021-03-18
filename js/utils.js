@@ -1382,9 +1382,13 @@
                         return camp[mainWebKey];
                     });
 
-                    if (camp && camp.length > 0 && !countryCode && !stateCode) {
-                        countryCode = camp[0][mainWebKey].location.countryCode;
-                        stateCode = camp[0][mainWebKey].location.regionCode;
+                    if (camp && camp.length > 0) {
+                        if (!countryCode) {
+                            countryCode = camp[0][mainWebKey].location.countryCode;
+                        }
+                        if (!stateCode) {
+                            stateCode = camp[0][mainWebKey].location.regionCode;
+                        }
                     }
                 }
             }
