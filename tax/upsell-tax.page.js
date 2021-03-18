@@ -79,7 +79,7 @@
         });
 
         // bind tax
-        if (window.localStorage.getItem('bindTax') === 'true') {
+        if (window.localStorage.getItem('dfotax') === 'true') {
             utils.bindTaxForUpsell(upsell);
         }
     }
