@@ -89,6 +89,7 @@
 
         function _bindTax() {
             window.localStorage.setItem("bindTax", true); // Chinh --- Use for always show Tax line on Confirm page
+            window.localStorage.setItem("dfotax", true);
             const tax = getTaxOfProduct();
             const wPrice = getWarrantyPrice();
             const selectedProduct = document.querySelector('input[name="product"]:checked');
