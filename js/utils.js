@@ -1412,6 +1412,35 @@
                         spanUpsellPrice.innerHTML = jsCurrency.replace('######', priceWithTax.toFixed(2));
                     }
                 }
+                // Render price for Product list
+                const productItems = Array.prototype.slice.call(_qAll('.productRadioListItem'));
+                productItems.forEach((item) => {
+                    const inp = item.querySelector('input[name="product"]');
+                    const data = JSON.parse(inp.dataset.product);
+                    const productId = data.productId;
+                    const taxData = window.productsTaxes.find((tax) => {
+                        return tax.productId === productId
+                    });
+                    const shippingFee = data.shippings[0].formattedPrice;
+                    const totalDiscountPrice = taxData.tax.taxValue + data.productPrices.DiscountedPrice.Value;
+                    const totalDiscountFormatPrice = utils.formatPrice(totalDiscountPrice.toFixed(2), jsCurrency, shippingFee);
+                    const totalFullPrice = taxData.tax.taxValue + data.productPrices.FullRetailPrice.Value;
+                    const totalFullFormatPrice = utils.formatPrice(totalFullPrice.toFixed(2), jsCurrency, shippingFee);
+                    // const qty = window.isDoubleQuantity ? data.quantity / 2 : data.quantity;
+                    const qty = data.quantity;
+                    const unitPrice = totalDiscountPrice / qty;
+                    const unitFormatPrice = utils.formatPrice(unitPrice.toFixed(2), jsCurrency, shippingFee);
+
+                    Array.prototype.slice.call(item.querySelectorAll('.discountedPrice')).forEach((item) => {
+                        item.textContent = totalDiscountFormatPrice;
+                    });
+                    Array.prototype.slice.call(item.querySelectorAll('.fullPrice')).forEach((item) => {
+                        item.textContent = totalFullFormatPrice;
+                    });
+                    Array.prototype.slice.call(item.querySelectorAll('.spanUnitDiscountRate')).forEach((item) => {
+                        item.textContent = unitFormatPrice;
+                    });
+                });
                 console.log(result);
             }).catch(error => {
                 console.log('call tax error : ', error);
