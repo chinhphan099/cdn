@@ -16,7 +16,7 @@
 
                 if(!!taxRowEle) taxRowEle.classList.remove('hidden');
                 if (taxesEle.length > 0) {
-                    for(let item of taxesEle){
+                    for(let item of taxesEle) {
                         item.innerHTML = '<img height="20" src="//d16hdrba6dusey.cloudfront.net/sitecommon/images/loading-price.gif"></img>';
                     }
                 }
@@ -107,7 +107,7 @@
                 const grandTotalElem = document.querySelectorAll('.grand-total');
                 if (taxesEle.length > 0) {
                     //bind tax
-                    for(let item of taxesEle){
+                    for(let item of taxesEle) {
                         item.innerHTML = utils.formatPrice(parseFloat(tax.value + (wPrice*tax.percent)).toFixed(2), currencySymbol.fCurrency, currencySymbol.formatPrice);
                     }
 
@@ -116,7 +116,7 @@
                         const shippingIndex = window.shippingIndex || 0;
                         const totalVal = parseFloat(jsonProduct.shippings[shippingIndex].price + productPrice + parseFloat(tax.value) + (wPrice*tax.percent) + parseFloat(wPrice)).toFixed(2);
 
-                        for(let item of grandTotalElem){
+                        for(let item of grandTotalElem) {
                             item.innerHTML = utils.formatPrice(totalVal, currencySymbol.fCurrency, currencySymbol.formatPrice);
                         }
                     }
@@ -169,7 +169,7 @@
 
             //handle apply warranty
             const warrantyInput = document.getElementById('txtProductWarranty');
-            if(!!warrantyInput){
+            if(!!warrantyInput) {
                 warrantyInput.addEventListener('change', e => {
                     _bindTax();
                 });
