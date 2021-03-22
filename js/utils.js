@@ -1393,7 +1393,11 @@
                 }
             }
 
-            if (!countryCode || !stateCode) {
+            if (!stateCode) {
+                stateCode = 'a';
+            }
+
+            if (!countryCode) {
                 const spanUpsellPriceElems = _qAll('.spanUpsellPrice');
                 for (let spanUpsellPrice of spanUpsellPriceElems) {
                     spanUpsellPrice.innerHTML = upsellInfo.products[0].productPrices.DiscountedPrice.FormattedValue;

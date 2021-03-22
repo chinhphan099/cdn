@@ -7,7 +7,11 @@
 
     try {
         function loadTax(countryCode, stateCode, couponCode) {
-            if (countryCode === '' || stateCode === '') {
+            if (!stateCode) {
+                stateCode = 'a';
+            }
+
+            if (!countryCode) {
                 localStorage.removeItem('currentProductTaxes');
                 _bindTax();
             } else {
