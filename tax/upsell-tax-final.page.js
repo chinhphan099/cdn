@@ -9,6 +9,7 @@
     const imgLoading = `<span class="js-img-loading">
                             <img src="//d16hdrba6dusey.cloudfront.net/sitecommon/images/loading-price-v1.gif" width="20" height="10" class="no-lazy"  style="width: 20px;">
                         </span>`;
+
     window.upsell = {
         orderInfo: JSON.parse(utils.localStorage().get('orderInfo')),
         products: [],
