@@ -6,6 +6,9 @@
 
     window.upsell_productindex = 0;
     window.fCurrency = utils.localStorage().get('jsCurrency') || '$######';
+    const imgLoading = `<span class="js-img-loading">
+                            <img src="//d16hdrba6dusey.cloudfront.net/sitecommon/images/loading-price-v1.gif" width="20" height="10" class="no-lazy"  style="width: 20px;">
+                        </span>`;
     window.upsell = {
         orderInfo: JSON.parse(utils.localStorage().get('orderInfo')),
         products: [],
@@ -40,10 +43,80 @@
     }
     replaceBracketsStrings();
 
+    function implementTax(selectedProduct) {
+        const taxUpsellItem = window.taxArray.find((item) => item.productId === selectedProduct.productId);
+        const shippingFee = selectedProduct.shippings[0].price;
+        const shippingFeeFormatted = selectedProduct.shippings[0].formattedPrice;
+        const totalPrice = taxUpsellItem.totalPrice + taxUpsellItem.taxAmount + shippingFee;
+
+        Array.prototype.slice.call(_qAll('.spanUpsellPrice')).forEach(spanUpsellPrice => {
+            spanUpsellPrice.textContent = utils.formatPrice(totalPrice.toFixed(2), fCurrency, shippingFeeFormatted);
+        });
+
+        Array.prototype.slice.call(_qAll('.unit-price, .spanUnitUpsellPrice')).forEach((elm) => {
+            const qty = selectedProduct.quantity;
+            const unitPrice = totalPrice / qty;
+            elm.textContent = utils.formatPrice(unitPrice.toFixed(2), fCurrency, shippingFeeFormatted);
+        });
+    }
+
+    function callTaxAjax(postData, selectedProduct) {
+        const url = `${eCRM.Order.baseAPIEndpoint}/orders/CreateEstimate/${siteSetting.webKey}`;
+
+        const options = {
+            method: 'POST',
+            headers: {
+                'X_CID': siteSetting.CID
+            },
+            data: postData
+        };
+
+        renderTaxRow();
+        utils.callAjax(url, options)
+            .then((result) => {
+                let items = [];
+                if (!result) {
+                    items = postData.items.map((item) => {
+                        item.taxAmount = 0;
+                        item.taxRate = 0;
+                        return item
+                    });
+                }
+                else {
+                    items = result.items;
+                }
+                utils.events.emit('bindTax');
+                window.taxArray = items;
+                implementTax(selectedProduct);
+            })
+            .catch(() => {
+                let items = postData.items.map((item) => {
+                    item.taxAmount = 0;
+                    item.taxRate = 0;
+                    return item
+                });
+                utils.events.emit('bindTax');
+                window.taxArray = items;
+                implementTax(selectedProduct);
+            });
+    }
+
+    function convertCurrency() {
+        let jsCurrencyCode = window.fCurrency;
+        if (!jsCurrencyCode) return;
+
+        let currencyElms = Array.prototype.slice.call(_qAll('.jsCurrency, .jsCurrencyNumber'));
+        currencyElms.forEach((currencyElm) => {
+            currencyElm.textContent = jsCurrencyCode.replace("######", item.textContent);
+        });
+    }
+
     function implementData(products) {
         upsell.products = products.prices;
         upsell.upsellCampaignName = typeof products.campaignName !== 'undefined' ? products.campaignName : '';
         console.log(products);
+
+        convertCurrency();
 
         Array.prototype.slice.call(_qAll('.spanUpsellPrice')).forEach((spanUpsellPrice) => {
             spanUpsellPrice.innerHTML = products.prices[0].productPrices.DiscountedPrice.FormattedValue;
@@ -73,6 +146,36 @@
             let remainAmountNumber = products.prices[0].productPrices.DiscountedPrice.Value - products.prices[0].productPrices.PreSaleAmount1.Value;
             spanRemainAmount.innerHTML = utils.formatPrice(remainAmountNumber.toFixed(2), window.fCurrency, products.prices[0].productPrices.DiscountedPrice.FormattedValue);
         });
+
+        // bind tax
+        if (window.localStorage.getItem('bindTax') === 'true') {
+            const selectedProduct = window.upsell.products[window.upsell_productindex];
+            const postData = {
+                items: [],
+                customerAddress: JSON.parse(window.localStorage.getItem('customerAddress'))
+            };
+
+            /**
+             * ! Post All Product Items
+             */
+            postData.items = window.upsell.products.map((item) => {
+                const quantity = window.isDoubleQuantity ? item.quantity / 2 : item.quantity;
+                return {
+                    'productId': item.productId,
+                    'sku': item.sku,
+                    'quantity': quantity,
+                    'unitPrice': item.productPrices.UnitDiscountRate.Value,
+                    'totalPrice': item.productPrices.DiscountedPrice.Value,
+                    'description': item.productName
+                }
+            });
+
+            Array.prototype.slice.call(_qAll('.spanUpsellPrice')).forEach(spanUpsellPrice => {
+                spanUpsellPrice.innerHTML = imgLoading;
+            });
+
+            callTaxAjax(postData, selectedProduct);
+        }
     }
 
     function getProduct() {
@@ -234,25 +337,6 @@
             handleLastUpsellOrError();
         }
     }
-
-    //--------------Start--convertCurrency - Tu Nguyen
-    function convertCurrency() {
-        let jsCurrencyCode = window.fCurrency;
-
-        if (!jsCurrencyCode) return;
-
-        let currencyElm = _qAll('.jsCurrency');
-
-        try {
-            for (let item of currencyElm) {
-                item.innerText = jsCurrencyCode.replace("######", item.textContent)
-            }
-        } catch (err) {
-            console.log(err);
-        }
-    }
-    convertCurrency();
-    //--------------End--convertCurrency
 
     utils.checkAffAndFireEvents();
 
