@@ -93,7 +93,7 @@
             }
         }
 
-        const grandTotal = (selectedItem.totalPrice + totalTaxAmount + valueLifetime).toFixed(2);
+        const grandTotal = (selectedItem.totalPrice + totalTaxAmount + valueLifetime * Number(selectedItem.taxRate)).toFixed(2);
 
         Array.prototype.slice.call(_qAll('.tax_price, .td-taxes-fees')).forEach((taxElem) => {
             taxElem.textContent = utils.formatPrice(totalTaxAmount.toFixed(2), window.fCurrency, totalTaxAmount.toFixed(2));
