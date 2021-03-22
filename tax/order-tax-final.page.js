@@ -8,7 +8,6 @@
     let isDefaultAddress = true;
     let customerAddress = {};
     let discountedSelectedPrice = undefined;
-    let shippingSelectedPrice = undefined;
     const imgLoading = `<span class="js-img-loading">
                             <img src="//d16hdrba6dusey.cloudfront.net/sitecommon/images/loading-price-v1.gif" width="20" height="10" class="no-lazy"  style="width: 20px;">
                         </span>`;
@@ -65,6 +64,20 @@
         }
     }
 
+    function _getSelectedProduct() {
+        if (!_q('input[name="product"]:checked')) {
+            return null;
+        }
+
+        const product = _q('input[name="product"]:checked').dataset.product;
+        if (product) {
+            return JSON.parse(product);
+        }
+        else {
+            return null;
+        }
+    }
+
     function getWarrantyPrice() {
         let wPrice = 0;
         if (!!_qById('txtProductWarranty') && _qById('txtProductWarranty').checked) {
@@ -78,40 +91,23 @@
         return wPrice;
     }
 
-    function renderTaxAndGrandTotal(selectedProdduct) {
-        const selectedItem = window.taxArray.find((item) => item.productId === selectedProdduct.productId);
-
-        const totalTaxAmount = selectedItem.taxAmount;
-        // const shippingFee = selectedProdduct.shippings[window.shippingIndex ? window.shippingIndex : 0].price;
-        // const grandTotal = (selectedItem.totalPrice + shippingFee + totalTaxAmount).toFixed(2);
-
-        const lifetime = _qById('txtProductWarranty');
-        let valueLifetime = 0;
-        if(lifetime) {
-            if(lifetime.checked) {
-                valueLifetime = getWarrantyPrice();
-            }
-        }
-
-        const grandTotal = (selectedItem.totalPrice + totalTaxAmount + valueLifetime * Number(selectedItem.taxRate)).toFixed(2);
+    function renderTaxAndGrandTotal(selectedProduct) {
+        const selectedItem = window.taxArray.find((item) => item.productId === selectedProduct.productId);
+        const taxPercent = selectedItem.taxRate / 100;
+        const shippingFee = selectedProduct.shippings[window.shippingIndex || 0].price;
+        const formattedShippingFee = selectedProduct.shippings[0].formattedPrice;
+        const lifetime = getWarrantyPrice();
+        const totalTaxAmount = selectedItem.taxAmount + lifetime * taxPercent + shippingFee * taxPercent;
+        const grandTotal = selectedItem.totalPrice + lifetime + shippingFee + totalTaxAmount;
 
         Array.prototype.slice.call(_qAll('.tax_price, .td-taxes-fees')).forEach((taxElem) => {
-            taxElem.textContent = utils.formatPrice(totalTaxAmount.toFixed(2), window.fCurrency, totalTaxAmount.toFixed(2));
+            taxElem.textContent = utils.formatPrice(totalTaxAmount.toFixed(2), window.fCurrency, formattedShippingFee);
             taxElem.parentElement.removeAttribute('style');
         });
 
-        //bind grand total
         Array.prototype.slice.call(_qAll('.grand-total, .total_price')).forEach((grandTotalElem) => {
-            grandTotalElem.textContent = utils.formatPrice(grandTotal, window.fCurrency, grandTotal);
+            grandTotalElem.textContent = utils.formatPrice(grandTotal.toFixed(2), window.fCurrency, formattedShippingFee);
         });
-
-        const taxProducts = {
-            productId: selectedProdduct.productId,
-            sku: selectedProdduct.sku,
-            taxAmount: totalTaxAmount,
-            upsells: []
-        };
-        window.localStorage.setItem('taxProducts', JSON.stringify(taxProducts));
     }
 
     function implementTax(selectedProduct) {
@@ -133,7 +129,7 @@
             isTest: utils.getQueryParameter('isCardTest') ? true : false
         });
 
-        const url = `${eCRM.Order.baseAPIEndpoint}/orders/CreateEstimate`;
+        const url = `${eCRM.Order.baseAPIEndpoint}/orders/CreateEstimate/${siteSetting.webKey}`;
 
         const options = {
             method: 'POST',
@@ -173,23 +169,8 @@
             });
     }
 
-    function _getSelectedProduct() {
-        if (!_q('input[name="product"]:checked')) {
-            return null;
-        }
-
-        const product = _q('input[name="product"]:checked').dataset.product;
-        if (product) {
-            return JSON.parse(product);
-        }
-        else {
-            return null;
-        }
-    }
-
     function initTaxByDefault(isExistingTax) {
         window.localStorage.setItem('bindTax', true); // Chinh --- Use for always show Tax line on Confirm page
-        window.localStorage.setItem('avalaratax', true);
         if (utils.checkCamp(siteSetting.webKey)) {
             let campProducts = localStorage.getItem('campproducts');
             if (campProducts) {
@@ -221,13 +202,9 @@
                      */
                     postData.items = window.PRICES.map((item) => {
                         let discountedPrice = item.productPrices.DiscountedPrice.Value;
-                        let shippingFee = item.shippings[0].price;
                         if (selectedProduct.productId === item.productId) {
                             if (!!discountedSelectedPrice) {
                                 discountedPrice = discountedSelectedPrice;
-                            }
-                            if (!!shippingSelectedPrice) {
-                                shippingFee = shippingSelectedPrice;
                             }
                         }
 
@@ -237,7 +214,7 @@
                             'sku': item.sku,
                             'quantity': quantity,
                             'unitPrice': item.productPrices.UnitDiscountRate.Value,
-                            'totalPrice': discountedPrice + shippingFee,
+                            'totalPrice': discountedPrice,
                             'description': item.productName
                         }
                     });
@@ -283,13 +260,9 @@
 
             postData.items = window.PRICES.map((item) => {
                 let discountedPrice = item.productPrices.DiscountedPrice.Value;
-                let shippingFee = item.shippings[0].price;
                 if (selectedProduct.productId === item.productId) {
                     if (!!discountedSelectedPrice) {
                         discountedPrice = discountedSelectedPrice;
-                    }
-                    if (!!shippingSelectedPrice) {
-                        shippingFee = shippingSelectedPrice;
                     }
                 }
 
@@ -299,7 +272,7 @@
                     'sku': item.sku,
                     'quantity': quantity,
                     'unitPrice': item.productPrices.UnitDiscountRate.Value,
-                    'totalPrice': discountedPrice + shippingFee,
+                    'totalPrice': discountedPrice,
                     'description': item.productName
                 }
             });
@@ -328,7 +301,6 @@
             prodElem.addEventListener('change', () => {
                 if (discountedSelectedPrice) {
                     discountedSelectedPrice = undefined;
-                    shippingSelectedPrice = undefined;
                     if(isDefaultAddress) {
                         initTaxByDefault();
                     }
@@ -360,7 +332,6 @@
 
     function afterApplyCoupon(data) {
         discountedSelectedPrice = data.totalDiscountedPrice;
-        shippingSelectedPrice = data.totalDiscountedShippingPrice;
         if(isDefaultAddress) {
             initTaxByDefault();
         }
