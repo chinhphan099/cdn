@@ -25,6 +25,9 @@
         const spanUpsellPriceElems = _qAll('.spanUpsellPrice');
         for(let spanUpsellPrice of spanUpsellPriceElems) {
             spanUpsellPrice.innerHTML = data.discountPrice;
+            if (window.taxArray || window.productsTaxes) {
+                spanUpsellPrice.innerHTML = data.totalPrice;
+            }
         }
 
         const spanFullPriceElems = _qAll('.spanFullPrice, .full-price');
@@ -132,6 +135,7 @@
             });
         }
         let discountedPriceValue = product.productPrices.DiscountedPrice.Value;
+        let shippingWithTax = shippingValue;
         const savePriceValue = (product.productPrices.FullRetailPrice.Value - discountedPriceValue).toFixed(2);
         if (taxData) {
             if (taxData.tax) {
@@ -139,8 +143,10 @@
             }
             else {
                 discountedPriceValue += taxData.taxAmount;
+                shippingWithTax += shippingValue * taxData.taxRate / 100;
             }
         }
+        const totalPriceValue = (discountedPriceValue + shippingWithTax).toFixed(2);
         discountedPriceValue = discountedPriceValue.toFixed(2);
 
         const unitDiscountedPriceValue = (discountedPriceValue / product.quantity).toFixed(2);
@@ -155,6 +161,9 @@
 
             discountPriceValue: discountedPriceValue,
             discountPrice: utils.formatPrice(discountedPriceValue, fCurrency, product.shippings[0].formattedPrice),
+
+            totalPriceValue: totalPriceValue,
+            totalPrice: utils.formatPrice(totalPriceValue, fCurrency, product.shippings[0].formattedPrice),
 
             unitDiscountPriceValue: unitDiscountedPriceValue,
             unitDiscountPrice: utils.formatPrice(unitDiscountedPriceValue, fCurrency, product.shippings[0].formattedPrice),
