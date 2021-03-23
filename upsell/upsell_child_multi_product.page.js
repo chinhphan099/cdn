@@ -134,8 +134,14 @@
         let discountedPriceValue = product.productPrices.DiscountedPrice.Value;
         const savePriceValue = (product.productPrices.FullRetailPrice.Value - discountedPriceValue).toFixed(2);
         if (taxData) {
-            discountedPriceValue += taxData.tax.taxValue;
+            if (taxData.tax) {
+                discountedPriceValue += taxData.tax.taxValue;
+            }
+            else {
+                discountedPriceValue += taxData.taxAmount;
+            }
         }
+        discountedPriceValue = discountedPriceValue.toFixed(2);
 
         const unitDiscountedPriceValue = (discountedPriceValue / product.quantity).toFixed(2);
         const fullPriceValue = product.productPrices.FullRetailPrice.Value;
