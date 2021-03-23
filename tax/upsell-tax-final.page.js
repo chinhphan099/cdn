@@ -48,7 +48,7 @@
         const taxUpsellItem = window.taxArray.find((item) => item.productId === selectedProduct.productId);
         const shippingFee = selectedProduct.shippings[0].price;
         const shippingFeeFormatted = selectedProduct.shippings[0].formattedPrice;
-        const totalPrice = taxUpsellItem.totalPrice + taxUpsellItem.taxAmount + shippingFee;
+        const totalPrice = taxUpsellItem.totalPrice + taxUpsellItem.taxAmount + shippingFee + shippingFee * taxUpsellItem.taxRate / 100;
 
         Array.prototype.slice.call(_qAll('.spanUpsellPrice')).forEach(spanUpsellPrice => {
             spanUpsellPrice.textContent = utils.formatPrice(totalPrice.toFixed(2), fCurrency, shippingFeeFormatted);
@@ -72,7 +72,6 @@
             data: postData
         };
 
-        renderTaxRow();
         utils.callAjax(url, options)
             .then((result) => {
                 let items = [];
@@ -88,6 +87,7 @@
                 }
                 utils.events.emit('bindTax');
                 window.taxArray = items;
+                window.productsTaxes = items;
                 implementTax(selectedProduct);
             })
             .catch(() => {
@@ -98,6 +98,7 @@
                 });
                 utils.events.emit('bindTax');
                 window.taxArray = items;
+                window.productsTaxes = items;
                 implementTax(selectedProduct);
             });
     }
@@ -111,13 +112,12 @@
             currencyElm.textContent = jsCurrencyCode.replace("######", item.textContent);
         });
     }
+    convertCurrency();
 
     function implementData(products) {
         upsell.products = products.prices;
         upsell.upsellCampaignName = typeof products.campaignName !== 'undefined' ? products.campaignName : '';
         console.log(products);
-
-        convertCurrency();
 
         Array.prototype.slice.call(_qAll('.spanUpsellPrice')).forEach((spanUpsellPrice) => {
             spanUpsellPrice.innerHTML = products.prices[0].productPrices.DiscountedPrice.FormattedValue;
