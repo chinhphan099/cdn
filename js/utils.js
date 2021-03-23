@@ -1414,6 +1414,7 @@
 
             utils.callAjax(url, options).then(result => {
                 window.productsTaxes = result.productsTaxes;
+                window.taxArray = result.productsTaxes;
                 const jsCurrency = window.fCurrency ? window.fCurrency : "$######";
                 const upsellIndex = window.upsell_productindex ? window.upsell_productindex : 0;
                 const productItem = upsellInfo.products[upsellIndex];
