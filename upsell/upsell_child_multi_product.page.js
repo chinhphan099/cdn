@@ -121,6 +121,11 @@
         }
 
         let taxData;
+        if (window.taxArray) {
+            taxData = window.taxArray.find((tax) => {
+                return tax.productId === product.productId
+            });
+        }
         if (window.productsTaxes) {
             taxData = window.productsTaxes.find((tax) => {
                 return tax.productId === product.productId
