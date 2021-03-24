@@ -257,7 +257,7 @@
             }
         }
     }
-    clearParameter('10pop', '15pop', 'clickid', 'banner');
+    clearParameter('10pop', '15pop', 'clickid', 'banner', 'shippro');
 
     /*--------start : run common order------------*/
     const CommonOrder = utils.CommonOrder;
