@@ -59,6 +59,36 @@
             const unitPrice = totalPrice / qty;
             elm.textContent = utils.formatPrice(unitPrice.toFixed(2), fCurrency, shippingFeeFormatted);
         });
+
+        // Render price for Product list
+        const productItems = Array.prototype.slice.call(_qAll('.productRadioListItem'));
+        productItems.forEach((item) => {
+            const inp = item.querySelector('input[name="product"]');
+            const data = JSON.parse(inp.dataset.product);
+            const productId = data.productId;
+            const taxData = window.taxArray.find((tax) => tax.productId === productId);
+            const shippingFee = data.shippings[0].formattedPrice;
+
+            const totalDiscountPrice = taxData.taxAmount + data.productPrices.DiscountedPrice.Value;
+            const totalDiscountFormatPrice = utils.formatPrice(totalDiscountPrice.toFixed(2), window.fCurrency, shippingFee);
+
+            const totalFullPrice = taxData.taxAmount + data.productPrices.FullRetailPrice.Value;
+            const totalFullFormatPrice = utils.formatPrice(totalFullPrice.toFixed(2), window.fCurrency, shippingFee);
+
+            const qty = data.quantity;
+            const unitPrice = totalDiscountPrice / qty;
+            const unitFormatPrice = utils.formatPrice(unitPrice.toFixed(2), window.fCurrency, shippingFee);
+
+            Array.prototype.slice.call(item.querySelectorAll('.discountedPrice')).forEach((item) => {
+                item.textContent = totalDiscountFormatPrice;
+            });
+            Array.prototype.slice.call(item.querySelectorAll('.fullPrice')).forEach((item) => {
+                item.textContent = totalFullFormatPrice;
+            });
+            Array.prototype.slice.call(item.querySelectorAll('.spanUnitDiscountRate')).forEach((item) => {
+                item.textContent = unitFormatPrice;
+            });
+        });
     }
 
     function callTaxAjax(postData, selectedProduct) {
