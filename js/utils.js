@@ -168,7 +168,7 @@
                 result += ((b < 16) ? 0 : '') + b.toString(16);
             }
         }
-        return result;
+        return `'${result}'`
     }
 
     async function callAjax(url, options = {}) {
@@ -709,6 +709,10 @@
                 offer_id: '${sub4Ka}',
                 transaction_id: '${sub5Ka}',
                 adv1: '${orderInfo.orderNumber}',
+                adv2: ${orderInfo.cusFirstName ? sha256(orderInfo.cusFirstName) : ''},
+                adv3: ${orderInfo.cusLastName ? sha256(orderInfo.cusLastName) : ''},
+                adv4: ${sha256(orderInfo.cusEmailPP || orderInfo.cusEmail)},
+                adv5: ${orderInfo.cusPhone ? sha256(`${Number(orderInfo.cusPhone.match(/\d/g).join(''))}`) : ''},
                 coupon_code: '${coupon_codeKa}',
                 order_id: '${orderInfo.orderNumber}',
                 source_id: '${source_idKa}'
@@ -757,6 +761,10 @@
                             offer_id: '${sub4}',
                             transaction_id: '${sub5}',
                             adv1: '${orderInfo.orderNumber}',
+                            adv2: ${orderInfo.cusFirstName ? sha256(orderInfo.cusFirstName) : ''},
+                            adv3: ${orderInfo.cusLastName ? sha256(orderInfo.cusLastName) : ''},
+                            adv4: ${sha256(orderInfo.cusEmailPP || orderInfo.cusEmail)},
+                            adv5: ${orderInfo.cusPhone ? sha256(`${Number(orderInfo.cusPhone.match(/\d/g).join(''))}`) : ''},
                             coupon_code: '${coupon_code}',
                             order_id: '${orderInfo.orderNumber}',
                             source_id: '${source_id}'
