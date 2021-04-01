@@ -1,146 +1,341 @@
-window._blueshiftid='fa8307145a64f9484defb6d8a18940f0';window.blueshift=window.blueshift||[];if(blueshift.constructor===Array){blueshift.load=function(){var d=function(a){return function(){blueshift.push([a].concat(Array.prototype.slice.call(arguments,0)))}},e=["identify","track","click","pageload","capture","retarget"];for(var f=0;f<e.length;f++)blueshift[e[f]]=d(e[f])};}
-blueshift.load();
-blueshift.pageload();
-if(blueshift.constructor===Array){(function(){var b=document.createElement("script");b.type="text/javascript",b.async=!0,b.src=("https:"===document.location.protocol?"https:":"http:")+"//cdn.getblueshift.com/blueshift.js",b.defer=true;var c=document.getElementsByTagName("script")[0];c.parentNode.insertBefore(b,c);})()}
+(() => {
+    window._blueshiftid='fa8307145a64f9484defb6d8a18940f0';window.blueshift=window.blueshift||[];if(blueshift.constructor===Array){blueshift.load=function(){var d=function(a){return function(){blueshift.push([a].concat(Array.prototype.slice.call(arguments,0)))}},e=["identify","track","click","pageload","capture","retarget","presale_load","interstitial_load", "upsell_load"];for(var f=0;f<e.length;f++)blueshift[e[f]]=d(e[f])};}
+    blueshift.load();
+    blueshift.pageload();
 
-function init() {
-    try {
-        if (window.location.href.indexOf('order') > -1) {
-            window.localStorage.removeItem('isFiredPurchaseBlueshift');
-            var campaignInfo = __productListData.data.productList;
+    const urlPath = window.location.pathname;
+    if (urlPath.indexOf('/pre') > -1) {
+        blueshift.presale_load();
+    }
+    if (urlPath.indexOf('/index') > -1) {
+        blueshift.interstitial_load();
+    }
+    if (urlPath.indexOf('/special-offer-') > -1) {
+        blueshift.upsell_load();
+    }
 
-            console.log(1111, campaignInfo, window._EA_ID);
-            if (!campaignInfo || !window._EA_ID) {
-                return;
-            }
+    if(blueshift.constructor===Array){(function(){var b=document.createElement("script");b.type="text/javascript",b.async=!0,b.src=("https:"===document.location.protocol?"https:":"http:")+"//cdn.getblueshift.com/blueshift.js",b.defer=true;var c=document.getElementsByTagName("script")[0];c.parentNode.insertBefore(b,c);})()}
 
-            var inputs = Array.prototype.slice.call(document.querySelectorAll('[name="email"], [name="firstName"], [name="lastName"]'));
-            var isFireIdentify = false;
-            blueshift.identify({
-                fingerprintId: window._EA_ID,
-                email: document.querySelector('[name="email"]').value || '',
+    let campaignName = JSON.parse(window.__CTR_FP_TRACKING_SETTINGS.FP_TRACKING_CUSTOM_DATA).campaignName;
+    let campaignInfo;
+    let orderFired = false;
+    function getCurrentDate() {
+        const date = new Date();
+        return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`
+    }
+    function getDeviceType() {
+        const ua = navigator.userAgent;
+        if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+            return 'tablet';
+        }
+        if (/Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) {
+            return 'mobile';
+        }
+        return 'desktop';
+    }
+    function orderPageEvents() {
+        window.localStorage.removeItem('isFiredMainOrderBlueshift');
+        campaignInfo = __productListData.data.productList;
+
+        console.log(1111, campaignInfo, window._EA_ID);
+        if (!campaignInfo || !window._EA_ID || orderFired) {
+            return;
+        }
+        orderFired = true;
+
+        function getIdentifyData() {
+            return {
+                // customer_id: '',
+                email: document.querySelector('[name="email"]').value,
                 firstname: document.querySelector('[name="firstName"]').value || '',
                 lastname: document.querySelector('[name="lastName"]').value || '',
-                joined_at: new Date(),
+                // ers: '',
+                // email_verified: '',
+                // widget: false,
+                phone_number: document.querySelector('[name="phoneNumber"]').value,
+                // phone_valid: false,
+                // phone_linetype: '',
+                // phone_carrier: '',
+                // orig_affid: '',
+                ship_city: document.querySelector('[name="city"]').value,
+                ship_address: document.querySelector('[name="address1"]').value,
+                ship_state: document.querySelector('[name="state"]').value,
+                ship_zip: document.querySelector('[name="zipCode"]').value,
+                ship_country: document.querySelector('[name="countryCode"]').value,
+                joined_at: getCurrentDate(),
+                fingerprint_id: window._EA_ID,
                 referrer: document.referrer
-            });
+            }
+        }
 
-            inputs.forEach(function(input) {
-                input.addEventListener('change', function (e) {
-                    if (document.querySelector('[name="email"]').classList.contains('valid') && !isFireIdentify) {
-                        console.log('BlueShift - Fire identify')
-                        isFireIdentify = true;
-                        blueshift.identify({
-                            fingerprintId: window._EA_ID,
-                            email: document.querySelector('[name="email"]').value,
-                            firstname: document.querySelector('[name="firstName"]').value || '',
-                            lastname: document.querySelector('[name="lastName"]').value || '',
-                            joined_at: new Date(),
-                            referrer: document.referrer
-                        });
-                    }
-                });
-            });
+        // var inputs = Array.prototype.slice.call(document.querySelectorAll('[name="email"], [name="firstName"], [name="lastName"], [name="phoneNumber"]'));
+        var inputs = Array.prototype.slice.call(document.querySelectorAll('[name="email"], [name="firstName"], [name="lastName"]'));
+        // var isFireIdentify = false;
+        let identifyData = getIdentifyData();
+        blueshift.identify(identifyData);
 
-            var productList = campaignInfo.prices;
-            window.localStorage.setItem('location', JSON.stringify(campaignInfo.location)); // Save for Upsell
+        inputs.forEach(function(input) {
+            input.addEventListener('change', function (e) {
+                identifyData = getIdentifyData();
 
-            var products = [];
-            var productElms = Array.prototype.slice.call(document.querySelectorAll('.js-list-item'));
-            productElms.forEach(function(productElm) {
-                var productId = productElm.dataset.id;
-
-                if (productId) {
-                    var price = productList.find((pro) => {
-                        return pro.productId === Number(productId);
-                    })
-                    products.push({
-                        productId: price.productId,
-                        sku: price.sku
-                    })
-                }
-            });
-
-            var checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
-            window.ctrwowCheckout.checkoutData.onProductChange(function() {
-                var currentItem = window.ctrwowCheckout.checkoutData.getProduct();
-
-                if (currentItem.productId === checkedItemData.productId) {
-                    return;
+                if (document.querySelector('[name="email"]').classList.contains('valid')) {
+                    console.log('BlueShift - Fire identify')
+                    // isFireIdentify = true;
+                    blueshift.identify(identifyData);
                 }
 
-                // remove_from_cart
-                blueshift.track('remove_from_cart', {
-                    fingerprintId: window._EA_ID,
-                    productId: checkedItemData.productId,
-                    sku: checkedItemData.sku,
-                    referrer: document.referrer,
-                    countryCode: campaignInfo.location.countryCode,
-                    regionCode: campaignInfo.location.regionCode,
-                    ip: campaignInfo.location.ip
-                });
-
-                // add_to_cart
-                blueshift.track('add_to_cart', {
-                    fingerprintId: window._EA_ID,
-                    productId: currentItem.productId,
-                    sku: currentItem.sku,
-                    referrer: document.referrer,
-                    countryCode: campaignInfo.location.countryCode,
-                    regionCode: campaignInfo.location.regionCode,
-                    ip: campaignInfo.location.ip
-                });
-
-                checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
+                // if (e.currentTarget.getAttribute('name') === 'phoneNumber') {
+                //     // All API
+                //     // Then set
+                //     identifyData.phone_valid = true;
+                //     identifyData.phone_linetype = '';
+                //     identifyData.phone_carrier = '';
+                // }
             });
+        });
+
+        // var productElms = Array.prototype.slice.call(document.querySelectorAll('.js-list-item'));
+        // var productList = campaignInfo.prices;
+        // var products = [];
+        // productElms.forEach(function(productElm) {
+        //     var productId = productElm.dataset.id;
+
+        //     if (productId) {
+        //         var price = productList.find((pro) => {
+        //             return pro.productId === Number(productId);
+        //         })
+        //         products.push({
+        //             productId: price.productId,
+        //             sku: price.sku,
+        //             total_usd: (price.productPrices.DiscountedPrice.Value + price.shippings[window.shippingIndex || 0].price).toFixed(2),
+        //             quantity: price.quantity
+        //         })
+        //     }
+        // });
+
+        window.ctrwowUtils.events.on('beforeSubmitOrder', function() {
+            identifyData = getIdentifyData();
+            blueshift.identify(identifyData);
+
+            const curItem = window.ctrwowCheckout.checkoutData.getProduct();
+            curItem.campaignName = campaignName;
+            window.localStorage.setItem('prevItem', JSON.stringify(curItem));
 
             console.log('BlueShift - Fire checkout');
+            function getProductsInCart() {
+                const currentItem = window.ctrwowCheckout.checkoutData.getProduct();
+                const quantity = window.localStorage.getItem('doubleQuantity') ? currentItem.quantity / 2 : currentItem.quantity;
+                const products = [
+                    {
+                        productId: currentItem.productId,
+                        sku: currentItem.sku,
+                        total_usd: (currentItem.productPrices.DiscountedPrice.Value + currentItem.shippings[window.shippingIndex || 0].price).toFixed(2),
+                        quantity: quantity
+                    }
+                ];
+                return products;
+            }
             blueshift.track('checkout', {
                 fingerprintId: window._EA_ID,
-                products: products,
                 referrer: document.referrer,
-                countryCode: campaignInfo.location.countryCode,
-                regionCode: campaignInfo.location.regionCode,
-                ip: campaignInfo.location.ip
+                countryCode: identifyData.ship_country,
+                regionCode: identifyData.ship_state,
+                ip: campaignInfo.location.ip,
+                product_ids: getProductsInCart(),
+                // sku
+                // total_usd
+                currency: window.localStorage.getItem('currencyCode')
+                // quantity
             });
-        }
+        });
 
-        var orderInfo = window.localStorage.getItem('orderInfo');
-        var _location = window.localStorage.getItem('location');
-        var isFiredPurchaseBlueshift = window.localStorage.getItem('isFiredPurchaseBlueshift');
-        var __EA_ID = window._EA_ID || window.localStorage.getItem('_vid');
-        if (orderInfo && !isFiredPurchaseBlueshift && __EA_ID) {
-            orderInfo = JSON.parse(orderInfo);
-            _location = JSON.parse(_location || '{}');
-            console.log('BlueShift - Fire Purchase');
-            blueshift.track('purchase', {
-                fingerprintId: __EA_ID,
-                email: orderInfo.cusEmail,
-                phoneNumber: orderInfo.cusPhone,
-                firstName: orderInfo.cusFirstName,
-                lastName: orderInfo.cusLastName,
-                order_id: orderInfo.orderNumber,
-                total: orderInfo.orderTotalFull,
-                referrer: document.referrer,
-                countryCode: orderInfo.cusCountry,
-                regionCode: orderInfo.cusState,
-                ip: _location.ip || '',
-                products: [
+        window.localStorage.setItem('location', JSON.stringify(campaignInfo.location)); // Save for Upsell
+
+        var checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
+        function getItemDataForCart(checkedItem) {
+            const quantity = window.localStorage.getItem('doubleQuantity') ? checkedItem.quantity / 2 : checkedItem.quantity;
+            return {
+                // fingerprintId: window._EA_ID,
+                product_ids: [
                     {
-                        productId: orderInfo.orderedProducts[0].pid,
-                        sku: orderInfo.orderedProducts[0].sku,
-                        price: orderInfo.orderTotal,
-                        quantity: orderInfo.quantity
+                        productId: checkedItem.productId,
+                        sku: checkedItem.sku,
+                        total_usd: (checkedItem.productPrices.DiscountedPrice.Value + checkedItem.shippings[window.shippingIndex || 0].price).toFixed(2),
+                        quantity: quantity
                     }
-                ]
-            });
-            window.localStorage.setItem('isFiredPurchaseBlueshift', true);
+                ],
+                currency: window.localStorage.getItem('currencyCode'),
+                // referrer: document.referrer,
+                // countryCode: campaignInfo.location.countryCode,
+                // regionCode: campaignInfo.location.regionCode,
+                // ip: campaignInfo.location.ip
+            }
         }
-    } catch(e) {
-        console.log(e)
-    }
-}
 
-window.addEventListener('load', function() {
-    init();
-});
+        // add_to_cart first time
+        blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
+
+        window.ctrwowCheckout.checkoutData.onProductChange(function() {
+            var currentItem = window.ctrwowCheckout.checkoutData.getProduct();
+
+            if (currentItem.productId === checkedItemData.productId) { return;}
+
+            // remove_from_cart
+            blueshift.track('remove_from_cart', getItemDataForCart(checkedItemData));
+            // add_to_cart
+            blueshift.track('add_to_cart', getItemDataForCart(currentItem));
+
+            checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
+        });
+    }
+
+    function init() {
+        try {
+            if (window.location.href.indexOf('order') > -1) {
+                orderPageEvents();
+                window.ctrwowCheckout.productListData.onProductListChange((productList) => {
+                    orderPageEvents();
+                });
+            }
+
+            var orderInfo = window.localStorage.getItem('orderInfo');
+            var _location = window.localStorage.getItem('location');
+            var isFiredMainOrderBlueshift = window.localStorage.getItem('isFiredMainOrderBlueshift');
+            var __EA_ID = window._EA_ID || window.localStorage.getItem('_vid');
+            if (!window.localStorage.getItem('landing')) {
+                window.localStorage.setItem('landing', document.referrer);
+            }
+            function getPurchasedData(orderInfo, upsellInfo) {
+                let orderNumber = orderInfo.orderNumber,
+                    quantity = window.localStorage.getItem('doubleQuantity') ? orderInfo.quantity / 2 : orderInfo.quantity;
+                    product_ids = [
+                        {
+                            productId: orderInfo.orderedProducts[0].pid,
+                            sku: orderInfo.orderedProducts[0].sku,
+                            total_usd: orderInfo.orderTotalFull,
+                            quantity: quantity
+                        }
+                    ];
+
+                if (upsellInfo) {
+                    orderNumber = orderInfo.orderNumber;
+                    campaignName = upsellInfo.campaignName;
+                    product_ids = [
+                        {
+                            productId: upsellInfo.orderedProducts[0].pid,
+                            sku: upsellInfo.orderedProducts[0].sku,
+                            total_usd: upsellInfo.price,
+                            quantity: upsellInfo.orderedProducts[0].quantity
+                        }
+                    ];
+                }
+                const data = {
+                    order_id: orderNumber,
+                    customer_id: orderInfo.customerId,
+                    order_create_date: getCurrentDate(),
+                    ip_address: _location.ip || '',
+                    customer_language: orderInfo.cusCountry,
+                    // affid
+                    // device
+                    // internal_campaignname
+                    // device_timezone
+                    device_type: getDeviceType(),
+                    device_vendor: window.navigator.vendor,
+                    campaignname: campaignName,
+                    landingurl: window.localStorage.getItem('landing') || '',
+                    referringurl: document.referrer,
+                    parentcampaign: window.localStorage.getItem('mainCampaignName'),
+                    // external_payment_url
+                    // one_click_purchase_reference
+                    product_ids: product_ids,
+                    // revenue
+                    currency: window.localStorage.getItem('currencyCode'),
+                    // order_status
+                    // landing_base_url
+                }
+                return data;
+            }
+            if (orderInfo && __EA_ID) {
+                orderInfo = JSON.parse(orderInfo);
+                _location = JSON.parse(_location || '{}');
+                if (!isFiredMainOrderBlueshift) {
+                    console.log('BlueShift - Fire Purchase');
+                    if (orderInfo.upsellUrls && orderInfo.upsellUrls.length > 0) {
+                        orderInfo.upsellUrls[0].isFired = 'noFired';
+                    }
+                    blueshift.track('purchase', getPurchasedData(orderInfo));
+                    window.localStorage.setItem('isFiredMainOrderBlueshift', true);
+                }
+                else if (orderInfo.upsellUrls && orderInfo.upsellUrls.length > 0) {
+                    const latestUpsellIndex = orderInfo.upsellUrls.length - 1;
+                    const upsellInfo = orderInfo.upsellUrls[latestUpsellIndex];
+                    if (!orderInfo.upsellUrls[latestUpsellIndex].isFired) {
+                        blueshift.track('purchase', getPurchasedData(orderInfo, upsellInfo));
+                        orderInfo.upsellUrls[latestUpsellIndex].isFired = 'fired';
+                    }
+                }
+                window.localStorage.setItem('orderInfo', JSON.stringify(orderInfo));
+            }
+
+            window.ctrwowUtils.events.on('onBeforePlaceUpsellOrder', function() {
+                const upsellItem = window.ctrwowUpsell.productListData.getProductList().prices[window.upsell_productindex];
+                upsellItem.campaignName = campaignName;
+                window.localStorage.setItem('prevItem', JSON.stringify(upsellItem));
+            });
+
+            if (urlPath.indexOf('decline') > -1) {
+                let prevItem = JSON.parse(window.localStorage.getItem('prevItem'));
+                if (prevItem) {
+                    const quantity = window.localStorage.getItem('doubleQuantity') ? prevItem.quantity / 2 : prevItem.quantity;
+                    const failProducts = [
+                        {
+                            productId: prevItem.productId,
+                            sku: prevItem.sku,
+                            total_usd: (prevItem.productPrices.DiscountedPrice.Value + prevItem.shippings[window.shippingIndex || 0].price).toFixed(2),
+                            quantity: quantity
+                        }
+                    ];
+                    let declineData = {
+                        order_create_date: getCurrentDate(),
+                        ip_address: _location.ip || '',
+                        // affid: '',
+                        // device: '',
+                        // internal_campaignname: '',
+                        // device_timezone: '',
+                        device_type: getDeviceType(),
+                        device_vendor: window.navigator.vendor,
+                        campaignname: prevItem.campaignName,
+                        landingurl: window.localStorage.getItem('landing') || '',
+                        referringurl: document.referrer,
+                        parentcampaign: window.localStorage.getItem('mainCampaignName'),
+                        // external_payment_url: '',
+                        // one_click_purchase_reference: '',
+                        // product_ids: '',
+                        // sku: '',
+                        // total_usd: '',
+                        // quantity: '',
+                        product_ids: failProducts
+                        // order_status: '',
+                        // landing_base_url: '',
+                        // tracking_number: ''
+                    }
+                    if (orderInfo) {
+                        declineData = {
+                            ...declineData,
+                            order_id: orderInfo.orderNumber,
+                            customer_id: orderInfo.customerId,
+                            customer_language: orderInfo.cusCountry
+                        }
+                    }
+                    blueshift.track('decline', declineData);
+                }
+            }
+        } catch(e) {
+            console.log(e)
+        }
+    }
+
+    window.addEventListener('load', function() {
+        init();
+    });
+})();
