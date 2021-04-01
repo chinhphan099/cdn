@@ -252,7 +252,10 @@
                         pars.splice(i, 1);
                     }
                 }
-                url = urlBase + '?' + pars.join('&');
+                url = urlBase;
+                if (pars.length > 0) {
+                    url += '?' + pars.join('&');
+                }
                 window.history.pushState('', document.title, url);
             }
         }
