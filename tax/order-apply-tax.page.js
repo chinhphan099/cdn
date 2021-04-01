@@ -3,6 +3,9 @@
         console.log('utils module is not found');
         return;
     }
+    if (window.location.host.indexOf('beautystatcosmetics') > -1) {
+        return;
+    }
 
     window.taxArray = [];
     let isDefaultAddress = true;

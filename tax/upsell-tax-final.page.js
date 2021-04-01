@@ -3,6 +3,9 @@
         console.log('modules is not found');
         return;
     }
+    if (window.location.host.indexOf('beautystatcosmetics') > -1) {
+        return;
+    }
 
     window.upsell_productindex = 0;
     window.fCurrency = utils.localStorage().get('jsCurrency') || '$######';
