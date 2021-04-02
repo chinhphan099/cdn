@@ -135,13 +135,19 @@
                 ];
                 return products;
             }
+            const items = getProductsInCart();
+            const product_ids = [];
+            for (let i = 0, n = items.length; i < n; i++) {
+                product_ids.push(items[i].productId);
+            }
             blueshift.track('checkout', {
                 fingerprintId: window._EA_ID,
                 referrer: document.referrer,
                 countryCode: identifyData.ship_country,
                 regionCode: identifyData.ship_state,
                 ip: campaignInfo.location.ip,
-                product_ids: getProductsInCart(),
+                product_ids: product_ids,
+                items: items,
                 // sku
                 // total_usd
                 currency: window.localStorage.getItem('currencyCode')
@@ -156,7 +162,8 @@
             const quantity = window.localStorage.getItem('doubleQuantity') ? checkedItem.quantity / 2 : checkedItem.quantity;
             return {
                 // fingerprintId: window._EA_ID,
-                product_ids: [
+                product_ids: [checkedItem.productId],
+                items: [
                     {
                         productId: checkedItem.productId,
                         sku: checkedItem.sku,
@@ -208,7 +215,7 @@
             function getPurchasedData(orderInfo, upsellInfo) {
                 let orderNumber = orderInfo.orderNumber,
                     quantity = window.localStorage.getItem('doubleQuantity') ? orderInfo.quantity / 2 : orderInfo.quantity;
-                    product_ids = [
+                    items = [
                         {
                             productId: orderInfo.orderedProducts[0].pid,
                             sku: orderInfo.orderedProducts[0].sku,
@@ -220,7 +227,7 @@
                 if (upsellInfo) {
                     orderNumber = orderInfo.orderNumber;
                     campaignName = upsellInfo.campaignName;
-                    product_ids = [
+                    items = [
                         {
                             productId: upsellInfo.orderedProducts[0].pid,
                             sku: upsellInfo.orderedProducts[0].sku,
@@ -228,6 +235,10 @@
                             quantity: upsellInfo.orderedProducts[0].quantity
                         }
                     ];
+                }
+                const product_ids = [];
+                for (let i = 0, n = items.length; i < n; i++) {
+                    product_ids.push(items[i].productId);
                 }
                 const data = {
                     order_id: orderNumber,
@@ -248,6 +259,7 @@
                     // external_payment_url
                     // one_click_purchase_reference
                     product_ids: product_ids,
+                    items: items,
                     // revenue
                     currency: window.localStorage.getItem('currencyCode'),
                     // order_status
@@ -295,6 +307,10 @@
                             quantity: quantity
                         }
                     ];
+                    const product_ids = [];
+                    for (let i = 0, n = failProducts.length; i < n; i++) {
+                        product_ids.push(failProducts[i].productId);
+                    }
                     let declineData = {
                         order_create_date: getCurrentDate(),
                         ip_address: _location.ip || '',
@@ -310,11 +326,11 @@
                         parentcampaign: window.localStorage.getItem('mainCampaignName'),
                         // external_payment_url: '',
                         // one_click_purchase_reference: '',
-                        // product_ids: '',
                         // sku: '',
                         // total_usd: '',
                         // quantity: '',
-                        product_ids: failProducts
+                        product_ids: product_ids,
+                        items: failProducts,
                         // order_status: '',
                         // landing_base_url: '',
                         // tracking_number: ''
