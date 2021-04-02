@@ -43,6 +43,7 @@
         }
         orderFired = true;
 
+        let phone_valid = '', phone_linetype = '', phone_carrier = '';
         function getIdentifyData() {
             return {
                 // customer_id: '',
@@ -53,9 +54,9 @@
                 // email_verified: '',
                 // widget: false,
                 phone_number: document.querySelector('[name="phoneNumber"]').value,
-                // phone_valid: false,
-                // phone_linetype: '',
-                // phone_carrier: '',
+                phone_valid: phone_valid,
+                phone_linetype: phone_linetype,
+                phone_carrier: phone_carrier,
                 // orig_affid: '',
                 ship_city: document.querySelector('[name="city"]').value,
                 ship_address: document.querySelector('[name="address1"]').value,
@@ -65,12 +66,10 @@
                 joined_at: getCurrentDate(),
                 fingerprint_id: window._EA_ID,
                 referrer: document.referrer
-            }
+            };
         }
 
-        // var inputs = Array.prototype.slice.call(document.querySelectorAll('[name="email"], [name="firstName"], [name="lastName"], [name="phoneNumber"]'));
-        var inputs = Array.prototype.slice.call(document.querySelectorAll('[name="email"], [name="firstName"], [name="lastName"]'));
-        // var isFireIdentify = false;
+        var inputs = Array.prototype.slice.call(document.querySelectorAll('[name="email"], [name="firstName"], [name="lastName"], [name="phoneNumber"]'));
         let identifyData = getIdentifyData();
         blueshift.identify(identifyData);
 
@@ -80,38 +79,25 @@
 
                 if (document.querySelector('[name="email"]').classList.contains('valid')) {
                     console.log('BlueShift - Fire identify')
-                    // isFireIdentify = true;
                     blueshift.identify(identifyData);
                 }
 
-                // if (e.currentTarget.getAttribute('name') === 'phoneNumber') {
-                //     // All API
-                //     // Then set
-                //     identifyData.phone_valid = true;
-                //     identifyData.phone_linetype = '';
-                //     identifyData.phone_carrier = '';
-                // }
+                if (e.currentTarget.getAttribute('name') === 'phoneNumber' && e.currentTarget.value !== '') {
+                    const phoneNumber = e.currentTarget.value.match(/\d/g).join('');
+                    const checkPhoneAPI = `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneNumber}`
+                    window.ctrwowUtils
+                        .callAjax(checkPhoneAPI)
+                        .then((result) => {
+                            phone_valid = result.valid;
+                            phone_linetype = result.line_type;
+                            phone_carrier = result.carrier;
+                        })
+                        .catch((e) => {
+                            console.log(e);
+                        })
+                }
             });
         });
-
-        // var productElms = Array.prototype.slice.call(document.querySelectorAll('.js-list-item'));
-        // var productList = campaignInfo.prices;
-        // var products = [];
-        // productElms.forEach(function(productElm) {
-        //     var productId = productElm.dataset.id;
-
-        //     if (productId) {
-        //         var price = productList.find((pro) => {
-        //             return pro.productId === Number(productId);
-        //         })
-        //         products.push({
-        //             productId: price.productId,
-        //             sku: price.sku,
-        //             total_usd: (price.productPrices.DiscountedPrice.Value + price.shippings[window.shippingIndex || 0].price).toFixed(2),
-        //             quantity: price.quantity
-        //         })
-        //     }
-        // });
 
         window.ctrwowUtils.events.on('beforeSubmitOrder', function() {
             identifyData = getIdentifyData();
