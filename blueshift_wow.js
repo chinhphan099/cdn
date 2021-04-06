@@ -184,7 +184,7 @@
 
     function init() {
         try {
-            if (window.location.href.indexOf('order') > -1) {
+            if (window.location.href.indexOf('/order') > -1) {
                 orderPageEvents();
                 window.ctrwowCheckout.productListData.onProductListChange((productList) => {
                     orderPageEvents();
