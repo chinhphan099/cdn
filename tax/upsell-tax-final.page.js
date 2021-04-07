@@ -47,8 +47,9 @@
     function implementTax(selectedProduct) {
         const taxUpsellItem = window.taxArray.find((item) => item.productId === selectedProduct.productId);
         const shippingFee = selectedProduct.shippings[0].price;
+        const taxPercent = taxUpsellItem.taxRate / 100;
         const shippingFeeFormatted = selectedProduct.shippings[0].formattedPrice;
-        const totalPrice = taxUpsellItem.totalPrice + taxUpsellItem.taxAmount + shippingFee + shippingFee * taxUpsellItem.taxRate / 100;
+        const totalPrice = taxUpsellItem.discountedPrice + taxUpsellItem.taxAmount + shippingFee + shippingFee * taxPercent;
 
         Array.prototype.slice.call(_qAll('.spanUpsellPrice')).forEach(spanUpsellPrice => {
             spanUpsellPrice.textContent = utils.formatPrice(totalPrice.toFixed(2), fCurrency, shippingFeeFormatted);
@@ -67,17 +68,18 @@
             const data = JSON.parse(inp.dataset.product);
             const productId = data.productId;
             const taxData = window.taxArray.find((tax) => tax.productId === productId);
-            const shippingFee = data.shippings[0].formattedPrice;
+            const shippingFee = data.shippings[0].price;
+            const shippingFeeFormated = data.shippings[0].formattedPrice;
 
-            const totalDiscountPrice = taxData.taxAmount + data.productPrices.DiscountedPrice.Value;
-            const totalDiscountFormatPrice = utils.formatPrice(totalDiscountPrice.toFixed(2), window.fCurrency, shippingFee);
+            const totalDiscountPrice = taxData.taxAmount + data.productPrices.DiscountedPrice.Value + shippingFee * taxPercent;
+            const totalDiscountFormatPrice = utils.formatPrice(totalDiscountPrice.toFixed(2), window.fCurrency, shippingFeeFormated);
 
             const totalFullPrice = taxData.taxAmount + data.productPrices.FullRetailPrice.Value;
-            const totalFullFormatPrice = utils.formatPrice(totalFullPrice.toFixed(2), window.fCurrency, shippingFee);
+            const totalFullFormatPrice = utils.formatPrice(totalFullPrice.toFixed(2), window.fCurrency, shippingFeeFormated);
 
             const qty = data.quantity;
             const unitPrice = totalDiscountPrice / qty;
-            const unitFormatPrice = utils.formatPrice(unitPrice.toFixed(2), window.fCurrency, shippingFee);
+            const unitFormatPrice = utils.formatPrice(unitPrice.toFixed(2), window.fCurrency, shippingFeeFormated);
 
             Array.prototype.slice.call(item.querySelectorAll('.discountedPrice')).forEach((item) => {
                 item.textContent = totalDiscountFormatPrice;
@@ -91,6 +93,21 @@
         });
     }
 
+    function includeDiscountedPriceIntoTaxArray(items, data) {
+        const rtn = items.map((item) => {
+            const findItem = data.find((it) => item.productId === it.productId);
+
+            if (findItem) {
+                return {
+                    ...item,
+                    discountedPrice: findItem.discountedPrice
+                }
+            }
+            return item;
+        });
+        return rtn;
+    }
+
     function callTaxAjax(postData, selectedProduct) {
         const url = `${eCRM.Order.baseAPIEndpoint}/orders/CreateEstimate/${siteSetting.webKey}`;
 
@@ -102,19 +119,23 @@
             data: postData
         };
 
+        Array.prototype.slice.call(_qAll('.discountedPrice, .fullPrice, .spanUnitDiscountRate, .unit-price, .spanUnitUpsellPrice, .spanUpsellPrice')).forEach(item => {
+            item.innerHTML = imgLoading;
+        });
         utils.callAjax(url, options)
             .then((result) => {
                 let items = [];
-                if (!result) {
+                if (result && result.items && result.items.length > 0) {
+                    items = result.items;
+                }
+                else {
                     items = postData.items.map((item) => {
                         item.taxAmount = 0;
                         item.taxRate = 0;
                         return item
                     });
                 }
-                else {
-                    items = result.items;
-                }
+                items = includeDiscountedPriceIntoTaxArray(items, postData.items);
                 utils.events.emit('bindTax');
                 window.taxArray = items;
                 window.productsTaxes = items;
@@ -126,6 +147,7 @@
                     item.taxRate = 0;
                     return item
                 });
+                items = includeDiscountedPriceIntoTaxArray(items, postData.items);
                 utils.events.emit('bindTax');
                 window.taxArray = items;
                 window.productsTaxes = items;
@@ -196,6 +218,7 @@
                     'sku': item.sku,
                     'quantity': quantity,
                     'unitPrice': item.productPrices.UnitDiscountRate.Value,
+                    'discountedPrice': item.productPrices.DiscountedPrice.Value,
                     'totalPrice': item.productPrices.DiscountedPrice.Value,
                     'description': item.productName
                 }
