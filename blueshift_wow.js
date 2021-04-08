@@ -41,6 +41,7 @@
         if (!campaignInfo || !window._EA_ID || orderFired) {
             return;
         }
+        console.log('orderPageEvents pass');
         orderFired = true;
 
         let phone_valid = '', phone_linetype = '', phone_carrier = '';
@@ -186,6 +187,12 @@
         try {
             if (window.location.href.indexOf('/order') > -1) {
                 orderPageEvents();
+                const orderPage = setInterval(() => {
+                    if (__productListData.data.productList && window._EA_ID) {
+                        orderPageEvents();
+                        clearInterval(orderPage);
+                    }
+                }, 300);
                 window.ctrwowCheckout.productListData.onProductListChange((productList) => {
                     orderPageEvents();
                 });
@@ -229,6 +236,7 @@
                 const data = {
                     order_id: orderNumber,
                     customer_id: orderInfo.customerId,
+                    email: orderInfo.cusEmail,
                     order_create_date: getCurrentDate(),
                     ip_address: _location.ip || '',
                     customer_language: orderInfo.cusCountry,
