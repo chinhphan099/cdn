@@ -21,7 +21,8 @@
     let orderFired = false;
     function getCurrentDate() {
         const date = new Date();
-        return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`
+        return date.toISOString();
+        // return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`
     }
     function getDeviceType() {
         const ua = navigator.userAgent;
