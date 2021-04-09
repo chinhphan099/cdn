@@ -44,7 +44,7 @@
         console.log('orderPageEvents pass');
         orderFired = true;
 
-        let phone_valid = '', phone_linetype = '', phone_carrier = '';
+        let phone_valid = '', phone_linetype = '', phone_carrier = '', international_format = '';
         function getIdentifyData() {
             return {
                 // customer_id: '',
@@ -54,7 +54,7 @@
                 // ers: '',
                 // email_verified: '',
                 // widget: false,
-                phone_number: document.querySelector('[name="phoneNumber"]').value,
+                phone_number: international_format || document.querySelector('[name="phoneNumber"]').value,
                 phone_valid: phone_valid,
                 phone_linetype: phone_linetype,
                 phone_carrier: phone_carrier,
@@ -78,7 +78,7 @@
             input.addEventListener('change', function (e) {
                 identifyData = getIdentifyData();
 
-                if (document.querySelector('[name="email"]').classList.contains('valid')) {
+                if (e.currentTarget.getAttribute('name') === 'email' && document.querySelector('[name="email"]').classList.contains('valid')) {
                     console.log('BlueShift - Fire identify')
                     blueshift.identify(identifyData);
                 }
@@ -92,6 +92,11 @@
                             phone_valid = result.valid;
                             phone_linetype = result.line_type;
                             phone_carrier = result.carrier;
+                            if (phone_valid) {
+                                international_format = result.international_format;
+                                identifyData = getIdentifyData();
+                                blueshift.identify(identifyData);
+                            }
                         })
                         .catch((e) => {
                             console.log(e);
@@ -103,6 +108,7 @@
         window.ctrwowUtils.events.on('beforeSubmitOrder', function() {
             identifyData = getIdentifyData();
             blueshift.identify(identifyData);
+            window.localStorage.setItem('identifyData', JSON.stringify(identifyData));
 
             const curItem = window.ctrwowCheckout.checkoutData.getProduct();
             curItem.campaignName = campaignName;
@@ -262,6 +268,12 @@
                 return data;
             }
             if (orderInfo && __EA_ID) {
+                let identifyData = window.localStorage.getItem('identifyData');
+                if (identifyData) {
+                    identifyData = JSON.parse(identifyData);
+                    blueshift.identify(identifyData);
+                }
+
                 orderInfo = JSON.parse(orderInfo);
                 _location = JSON.parse(_location || '{}');
                 if (!isFiredMainOrderBlueshift) {
