@@ -242,9 +242,11 @@
                         }
                     ];
 
-                for (let i = 0, n = orderInfo.upsellUrls.length; i < n; i++) {
-                    if (orderInfo.upsellUrls[i].isFired === 'fired') {
-                        revenue += orderInfo.upsellUrls[i].price;
+                if (orderInfo.upsellUrls && orderInfo.upsellUrls.length > 0) {
+                    for (let i = 0, n = orderInfo.upsellUrls.length; i < n; i++) {
+                        if (orderInfo.upsellUrls[i].isFired === 'fired') {
+                            revenue += orderInfo.upsellUrls[i].price;
+                        }
                     }
                 }
 
@@ -278,11 +280,11 @@
                     customer_language: orderInfo.cusCountry,
                     // affid
                     // device
-                    internal_campaignname: window.localStorage.getItem('mainCampaignName'),
                     // device_timezone
                     device_type: getDeviceType(),
                     device_vendor: window.navigator.vendor,
                     campaignname: campaignName,
+                    internal_campaignname: campaignName,
                     landingurl: landingurl,
                     landing_base_url: landingBaseUrl,
                     referringurl: document.referrer,
@@ -365,7 +367,7 @@
                         ip_address: _location.ip || '',
                         // affid: '',
                         // device: '',
-                        internal_campaignname: window.localStorage.getItem('mainCampaignName'),
+                        internal_campaignname: prevItem.campaignName,
                         // device_timezone: '',
                         device_type: getDeviceType(),
                         device_vendor: window.navigator.vendor,
