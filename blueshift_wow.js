@@ -19,6 +19,17 @@
     let campaignName = JSON.parse(window.__CTR_FP_TRACKING_SETTINGS.FP_TRACKING_CUSTOM_DATA).campaignName;
     let campaignInfo;
     let orderFired = false;
+    let countryCode = '';
+    const accessKey = getQueryParameter('isCardTest') === '1' ? '755a648d3837cf3adb128f29d322879a' : '13c25a652e2a0c05cb06a3b1dba09a85';
+    function getQueryParameter(param) {
+        let href = '';
+        if (location.href.indexOf('?')) {
+            href = location.href.substr(location.href.indexOf('?'));
+        }
+
+        const value = href.match(new RegExp('[\?\&]' + param + '=([^\&]*)(\&?)', 'i'));
+        return value ? value[1] : null;
+    }
     function getCurrentDate() {
         const date = new Date();
         return date.toISOString();
@@ -42,6 +53,8 @@
         if (!campaignInfo || !window._EA_ID || orderFired) {
             return;
         }
+        countryCode = campaignInfo.location.countryCode;
+        var checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
         console.log('orderPageEvents pass');
         orderFired = true;
 
@@ -70,6 +83,27 @@
                 referrer: document.referrer
             };
         }
+        function getItemDataForCart(checkedItem) {
+            const quantity = window.localStorage.getItem('doubleQuantity') ? checkedItem.quantity / 2 : checkedItem.quantity;
+            return {
+                // fingerprintId: window._EA_ID,
+                email: document.querySelector('[name="email"]').value || '',
+                product_ids: [checkedItem.productId],
+                items: [
+                    {
+                        productId: checkedItem.productId,
+                        sku: checkedItem.sku,
+                        total_usd: (checkedItem.productPrices.DiscountedPrice.Value + checkedItem.shippings[window.shippingIndex || 0].price).toFixed(2),
+                        quantity: quantity
+                    }
+                ],
+                currency: window.localStorage.getItem('currencyCode'),
+                // referrer: document.referrer,
+                // countryCode: campaignInfo.location.countryCode,
+                // regionCode: campaignInfo.location.regionCode,
+                // ip: campaignInfo.location.ip
+            }
+        }
 
         var inputs = Array.prototype.slice.call(document.querySelectorAll('[name="email"], [name="firstName"], [name="lastName"], [name="phoneNumber"]'));
         let identifyData = getIdentifyData();
@@ -86,7 +120,10 @@
 
                 if (e.currentTarget.getAttribute('name') === 'phoneNumber' && e.currentTarget.value !== '') {
                     const phoneNumber = e.currentTarget.value.match(/\d/g).join('');
-                    const checkPhoneAPI = `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneNumber}`
+                    let checkPhoneAPI = `//apilayer.net/api/validate?access_key=${accessKey}&number=${phoneNumber}`;
+                    if (countryCode) {
+                        checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
+                    }
                     window.ctrwowUtils
                         .callAjax(checkPhoneAPI)
                         .then((result) => {
@@ -97,6 +134,7 @@
                                 international_format = result.international_format;
                                 identifyData = getIdentifyData();
                                 blueshift.identify(identifyData);
+                                blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
                             }
                         })
                         .catch((e) => {
@@ -151,28 +189,6 @@
 
         window.localStorage.setItem('location', JSON.stringify(campaignInfo.location)); // Save for Upsell
 
-        var checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
-        function getItemDataForCart(checkedItem) {
-            const quantity = window.localStorage.getItem('doubleQuantity') ? checkedItem.quantity / 2 : checkedItem.quantity;
-            return {
-                // fingerprintId: window._EA_ID,
-                product_ids: [checkedItem.productId],
-                items: [
-                    {
-                        productId: checkedItem.productId,
-                        sku: checkedItem.sku,
-                        total_usd: (checkedItem.productPrices.DiscountedPrice.Value + checkedItem.shippings[window.shippingIndex || 0].price).toFixed(2),
-                        quantity: quantity
-                    }
-                ],
-                currency: window.localStorage.getItem('currencyCode'),
-                // referrer: document.referrer,
-                // countryCode: campaignInfo.location.countryCode,
-                // regionCode: campaignInfo.location.regionCode,
-                // ip: campaignInfo.location.ip
-            }
-        }
-
         // add_to_cart first time
         blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
 
@@ -203,6 +219,7 @@
                 window.ctrwowCheckout.productListData.onProductListChange((productList) => {
                     orderPageEvents();
                 });
+                return;
             }
 
             var orderInfo = window.localStorage.getItem('orderInfo');
@@ -214,7 +231,8 @@
             }
             function getPurchasedData(orderInfo, upsellInfo) {
                 let orderNumber = orderInfo.orderNumber,
-                    quantity = window.localStorage.getItem('doubleQuantity') ? orderInfo.quantity / 2 : orderInfo.quantity;
+                    quantity = window.localStorage.getItem('doubleQuantity') ? orderInfo.quantity / 2 : orderInfo.quantity,
+                    revenue = Number(orderInfo.orderTotalFull),
                     items = [
                         {
                             productId: orderInfo.orderedProducts[0].pid,
@@ -223,6 +241,12 @@
                             quantity: quantity
                         }
                     ];
+
+                for (let i = 0, n = orderInfo.upsellUrls.length; i < n; i++) {
+                    if (orderInfo.upsellUrls[i].isFired === 'fired') {
+                        revenue += orderInfo.upsellUrls[i].price;
+                    }
+                }
 
                 if (upsellInfo) {
                     orderNumber = orderInfo.orderNumber;
@@ -240,6 +264,11 @@
                 for (let i = 0, n = items.length; i < n; i++) {
                     product_ids.push(items[i].productId);
                 }
+                const landingurl = window.localStorage.getItem('landing') || '';
+                let landingBaseUrl = '';
+                if (landingurl) {
+                    landingBaseUrl = landingurl.split('?')[0];
+                }
                 const data = {
                     order_id: orderNumber,
                     customer_id: orderInfo.customerId,
@@ -249,22 +278,22 @@
                     customer_language: orderInfo.cusCountry,
                     // affid
                     // device
-                    // internal_campaignname
+                    internal_campaignname: window.localStorage.getItem('mainCampaignName'),
                     // device_timezone
                     device_type: getDeviceType(),
                     device_vendor: window.navigator.vendor,
                     campaignname: campaignName,
-                    landingurl: window.localStorage.getItem('landing') || '',
+                    landingurl: landingurl,
+                    landing_base_url: landingBaseUrl,
                     referringurl: document.referrer,
                     parentcampaign: window.localStorage.getItem('mainCampaignName'),
                     // external_payment_url
                     // one_click_purchase_reference
                     product_ids: product_ids,
                     items: items,
-                    // revenue
+                    revenue: revenue.toFixed(2),
                     currency: window.localStorage.getItem('currencyCode'),
                     // order_status
-                    // landing_base_url
                 }
                 return data;
             }
@@ -285,7 +314,8 @@
                 if (!isFiredMainOrderBlueshift) {
                     console.log('BlueShift - Fire Purchase');
                     if (orderInfo.upsellUrls && orderInfo.upsellUrls.length > 0) {
-                        orderInfo.upsellUrls[0].isFired = 'noFired';
+                        localStorage.setItem('subOrderNumber', orderInfo.upsellUrls[0].orderNumber);
+                        // orderInfo.upsellUrls[0].isFired = 'noFired';
                     }
                     blueshift.track('purchase', getPurchasedData(orderInfo));
                     window.localStorage.setItem('isFiredMainOrderBlueshift', true);
@@ -293,9 +323,11 @@
                 else if (orderInfo.upsellUrls && orderInfo.upsellUrls.length > 0) {
                     const latestUpsellIndex = orderInfo.upsellUrls.length - 1;
                     const upsellInfo = orderInfo.upsellUrls[latestUpsellIndex];
-                    if (!orderInfo.upsellUrls[latestUpsellIndex].isFired) {
-                        blueshift.track('purchase', getPurchasedData(orderInfo, upsellInfo));
+                    const subOrderNumber = localStorage.getItem('subOrderNumber');
+                    if (!orderInfo.upsellUrls[latestUpsellIndex].isFired && orderInfo.upsellUrls[latestUpsellIndex].orderNumber !== subOrderNumber) {
                         orderInfo.upsellUrls[latestUpsellIndex].isFired = 'fired';
+                        console.log('BlueShift - Fire Purchase');
+                        blueshift.track('purchase', getPurchasedData(orderInfo, upsellInfo));
                     }
                 }
                 window.localStorage.setItem('orderInfo', JSON.stringify(orderInfo));
@@ -323,17 +355,23 @@
                     for (let i = 0, n = failProducts.length; i < n; i++) {
                         product_ids.push(failProducts[i].productId);
                     }
+                    const landingurl = window.localStorage.getItem('landing') || '';
+                    let landingBaseUrl = '';
+                    if (landingurl) {
+                        landingBaseUrl = landingurl.split('?')[0];
+                    }
                     let declineData = {
                         order_create_date: getCurrentDate(),
                         ip_address: _location.ip || '',
                         // affid: '',
                         // device: '',
-                        // internal_campaignname: '',
+                        internal_campaignname: window.localStorage.getItem('mainCampaignName'),
                         // device_timezone: '',
                         device_type: getDeviceType(),
                         device_vendor: window.navigator.vendor,
                         campaignname: prevItem.campaignName,
-                        landingurl: window.localStorage.getItem('landing') || '',
+                        landingurl: landingurl,
+                        landing_base_url: landingBaseUrl,
                         referringurl: document.referrer,
                         parentcampaign: window.localStorage.getItem('mainCampaignName'),
                         // external_payment_url: '',
@@ -344,7 +382,6 @@
                         product_ids: product_ids,
                         items: failProducts,
                         // order_status: '',
-                        // landing_base_url: '',
                         // tracking_number: ''
                     }
                     if (orderInfo) {
