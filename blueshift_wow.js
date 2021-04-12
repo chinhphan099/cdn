@@ -1,5 +1,15 @@
 (() => {
-    window._blueshiftid='fa8307145a64f9484defb6d8a18940f0';window.blueshift=window.blueshift||[];if(blueshift.constructor===Array){blueshift.load=function(){var d=function(a){return function(){blueshift.push([a].concat(Array.prototype.slice.call(arguments,0)))}},e=["identify","track","click","pageload","capture","retarget","presale_load","interstitial_load", "upsell_load"];for(var f=0;f<e.length;f++)blueshift[e[f]]=d(e[f])};}
+    function getQueryParameter(param) {
+        let href = '';
+        if (location.href.indexOf('?')) {
+            href = location.href.substr(location.href.indexOf('?'));
+        }
+
+        const value = href.match(new RegExp('[\?\&]' + param + '=([^\&]*)(\&?)', 'i'));
+        return value ? value[1] : null;
+    }
+    const blueshiftID = getQueryParameter('isCardTest') === '1' ? 'fa8307145a64f9484defb6d8a18940f0' : '13c25a652e2a0c05cb06a3b1dba09a85';
+    window._blueshiftid=blueshiftID;window.blueshift=window.blueshift||[];if(blueshift.constructor===Array){blueshift.load=function(){var d=function(a){return function(){blueshift.push([a].concat(Array.prototype.slice.call(arguments,0)))}},e=["identify","track","click","pageload","capture","retarget","presale_load","interstitial_load", "upsell_load"];for(var f=0;f<e.length;f++)blueshift[e[f]]=d(e[f])};}
     blueshift.load();
     blueshift.pageload();
 
@@ -20,16 +30,6 @@
     let campaignInfo;
     let orderFired = false;
     let countryCode = '';
-    const accessKey = getQueryParameter('isCardTest') === '1' ? '755a648d3837cf3adb128f29d322879a' : '13c25a652e2a0c05cb06a3b1dba09a85';
-    function getQueryParameter(param) {
-        let href = '';
-        if (location.href.indexOf('?')) {
-            href = location.href.substr(location.href.indexOf('?'));
-        }
-
-        const value = href.match(new RegExp('[\?\&]' + param + '=([^\&]*)(\&?)', 'i'));
-        return value ? value[1] : null;
-    }
     function getCurrentDate() {
         const date = new Date();
         return date.toISOString();
@@ -120,7 +120,7 @@
 
                 if (e.currentTarget.getAttribute('name') === 'phoneNumber' && e.currentTarget.value !== '') {
                     const phoneNumber = e.currentTarget.value.match(/\d/g).join('');
-                    let checkPhoneAPI = `//apilayer.net/api/validate?access_key=${accessKey}&number=${phoneNumber}`;
+                    let checkPhoneAPI = `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneNumber}`;
                     if (countryCode) {
                         checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
                     }
@@ -243,6 +243,12 @@
                     ];
 
                 if (orderInfo.upsellUrls && orderInfo.upsellUrls.length > 0) {
+                    // items.push({
+                    //     productId: orderInfo.upsellUrls[0].orderedProducts[0].pid,
+                    //     sku: orderInfo.upsellUrls[0].orderedProducts[0].sku,
+                    //     total_usd: orderInfo.upsellUrls[0].price,
+                    //     quantity: orderInfo.upsellUrls[0].orderedProducts[0].quantity
+                    // });
                     for (let i = 0, n = orderInfo.upsellUrls.length; i < n; i++) {
                         if (orderInfo.upsellUrls[i].isFired === 'fired') {
                             revenue += orderInfo.upsellUrls[i].price;
