@@ -269,14 +269,19 @@
                 return data;
             }
             if (orderInfo && __EA_ID) {
+                orderInfo = JSON.parse(orderInfo);
+                _location = JSON.parse(_location || '{}');
+
                 let identifyData = window.localStorage.getItem('identifyData');
                 if (identifyData) {
                     identifyData = JSON.parse(identifyData);
+                    if (!identifyData.customer_id) {
+                        identifyData.customer_id = orderInfo.customerId;
+                    }
+                    window.localStorage.setItem('identifyData', JSON.stringify(identifyData));
                     blueshift.identify(identifyData);
                 }
 
-                orderInfo = JSON.parse(orderInfo);
-                _location = JSON.parse(_location || '{}');
                 if (!isFiredMainOrderBlueshift) {
                     console.log('BlueShift - Fire Purchase');
                     if (orderInfo.upsellUrls && orderInfo.upsellUrls.length > 0) {
