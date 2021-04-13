@@ -3,7 +3,14 @@
         console.log('utils module is not found');
         return;
     }
-    if (window.location.host.indexOf('beautystatcosmetics') > -1 || window.location.host.indexOf('getshinearmor') > -1) {
+    if (
+        window.location.host.indexOf('beautystatcosmetics') > -1 ||
+        (
+            window.location.host.indexOf('getshinearmor') > -1 &&
+            window.location.pathname.indexOf('/de/order-scratch.html') === -1 &&
+            window.location.pathname.indexOf('/fr/order-scratch.html') === -1
+        )
+    ) {
         return;
     }
 
