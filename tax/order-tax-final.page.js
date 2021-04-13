@@ -3,7 +3,7 @@
         console.log('utils module is not found');
         return;
     }
-    if (window.location.host.indexOf('beautystatcosmetics') > -1) {
+    if (window.location.host.indexOf('beautystatcosmetics') > -1 || window.location.host.indexOf('getshinearmor') > -1) {
         return;
     }
 
@@ -43,7 +43,6 @@
             const taxElem = _q('.td-taxes-fees');
             if (!!taxElem) {
                 taxElem.innerHTML = `${imgLoading}`;
-                _q('.grand-total').innerHTML = `${imgLoading}`;
             }
             else {
                 const taxRow = `<tr class="tax-row">
@@ -57,14 +56,9 @@
             taxElem.parentElement.removeAttribute('style');
         }
 
-        if (!!_q('.tax_price')) {
-            _q('.tax_price').innerHTML = `${imgLoading}`;
-        }
-        if (!!_q('.total_price')) {
-            Array.prototype.slice.call(_qAll('.total_price')).forEach((totalPriceElm) => {
-                totalPriceElm.innerHTML = `${imgLoading}`;
-            });
-        }
+        Array.prototype.slice.call(_qAll('.grand-total, .total_price, .total-price, .tax_price, .td-taxes-fees')).forEach((grandTotalElem) => {
+            grandTotalElem.innerHTML = `${imgLoading}`;
+        });
     }
 
     function _getSelectedProduct() {
@@ -109,7 +103,7 @@
             taxElem.parentElement.removeAttribute('style');
         });
 
-        Array.prototype.slice.call(_qAll('.grand-total, .total_price')).forEach((grandTotalElem) => {
+        Array.prototype.slice.call(_qAll('.grand-total, .total_price, .total-price')).forEach((grandTotalElem) => {
             grandTotalElem.textContent = utils.formatPrice(grandTotal.toFixed(2), window.fCurrency, formattedShippingFee);
         });
     }
