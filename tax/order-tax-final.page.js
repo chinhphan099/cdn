@@ -10,7 +10,7 @@
     window.taxArray = [];
     let isDefaultAddress = true;
     let customerAddress = {};
-    let discountedSelectedPrice = undefined;
+    window.discountedSelectedPrice = undefined;
     const imgLoading = `<span class="js-img-loading">
                             <img src="//d16hdrba6dusey.cloudfront.net/sitecommon/images/loading-price-v1.gif" width="20" height="10" class="no-lazy"  style="width: 20px;">
                         </span>`;
@@ -218,8 +218,8 @@
                     postData.items = window.PRICES.map((item) => {
                         let discountedPrice = item.productPrices.DiscountedPrice.Value;
                         if (selectedProduct.productId === item.productId) {
-                            if (!!discountedSelectedPrice) {
-                                discountedPrice = discountedSelectedPrice;
+                            if (!!window.discountedSelectedPrice) {
+                                discountedPrice = window.discountedSelectedPrice;
                             }
                         }
 
@@ -277,8 +277,8 @@
             postData.items = window.PRICES.map((item) => {
                 let discountedPrice = item.productPrices.DiscountedPrice.Value;
                 if (selectedProduct.productId === item.productId) {
-                    if (!!discountedSelectedPrice) {
-                        discountedPrice = discountedSelectedPrice;
+                    if (!!window.discountedSelectedPrice) {
+                        discountedPrice = window.discountedSelectedPrice;
                     }
                 }
 
@@ -316,8 +316,8 @@
         const productElements = _qAll('input[name="product"], #txtProductWarranty');
         for (let prodElem of productElements) {
             prodElem.addEventListener('change', () => {
-                if (discountedSelectedPrice) {
-                    discountedSelectedPrice = undefined;
+                if (window.discountedSelectedPrice) {
+                    window.discountedSelectedPrice = undefined;
                     if(isDefaultAddress) {
                         initTaxByDefault();
                     }
@@ -348,7 +348,7 @@
     utils.events.on('onActivePopup', onActivePopup); // Order st
 
     function afterApplyCoupon(data) {
-        discountedSelectedPrice = data.totalDiscountedPrice;
+        window.discountedSelectedPrice = data.totalDiscountedPrice;
         if(isDefaultAddress) {
             initTaxByDefault();
         }
