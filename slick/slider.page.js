@@ -196,12 +196,12 @@
       }
 
       // Disabled adaptiveHeight
-      if(this.options.type === TypeSliders.SYNCING) {
-        this.element.removeClass('adaptive-slider');
-        option = $.extend(option, {
-          adaptiveHeight: false
-        });
-      }
+      // if(this.options.type === TypeSliders.SYNCING) {
+      //   this.element.removeClass('adaptive-slider');
+      //   option = $.extend(option, {
+      //     adaptiveHeight: false
+      //   });
+      // }
 
       // Run
       this.handle.slick(option);
