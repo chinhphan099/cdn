@@ -97,6 +97,7 @@
                         quantity: quantity
                     }
                 ],
+                sku: checkedItem.sku,
                 currency: window.localStorage.getItem('currencyCode'),
                 // referrer: document.referrer,
                 // countryCode: campaignInfo.location.countryCode,
@@ -116,6 +117,7 @@
                 if (e.currentTarget.getAttribute('name') === 'email' && document.querySelector('[name="email"]').classList.contains('valid')) {
                     console.log('BlueShift - Fire identify')
                     blueshift.identify(identifyData);
+                    blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
                 }
 
                 if (e.currentTarget.getAttribute('name') === 'phoneNumber' && e.currentTarget.value !== '') {
@@ -134,7 +136,7 @@
                                 international_format = result.international_format;
                                 identifyData = getIdentifyData();
                                 blueshift.identify(identifyData);
-                                blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
+                                // blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
                             }
                         })
                         .catch((e) => {
@@ -165,9 +167,13 @@
                         quantity: quantity
                     }
                 ];
-                return products;
+                return {
+                    products: products,
+                    sku: currentItem.sku
+                }
             }
-            const items = getProductsInCart();
+            const productsInCart = getProductsInCart();
+            const items = productsInCart.products;
             const product_ids = [];
             for (let i = 0, n = items.length; i < n; i++) {
                 product_ids.push(items[i].productId);
@@ -180,7 +186,7 @@
                 ip: campaignInfo.location.ip,
                 product_ids: product_ids,
                 items: items,
-                // sku
+                sku: productsInCart.sku,
                 // total_usd
                 currency: window.localStorage.getItem('currencyCode')
                 // quantity
@@ -190,7 +196,7 @@
         window.localStorage.setItem('location', JSON.stringify(campaignInfo.location)); // Save for Upsell
 
         // add_to_cart first time
-        blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
+        // blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
 
         window.ctrwowCheckout.checkoutData.onProductChange(function() {
             var currentItem = window.ctrwowCheckout.checkoutData.getProduct();
@@ -240,7 +246,8 @@
                             total_usd: orderInfo.orderTotalFull,
                             quantity: quantity
                         }
-                    ];
+                    ],
+                    sku = orderInfo.orderedProducts[0].sku;
 
                 if (orderInfo.upsellUrls && orderInfo.upsellUrls.length > 0) {
                     // items.push({
@@ -266,7 +273,8 @@
                             total_usd: upsellInfo.price,
                             quantity: upsellInfo.orderedProducts[0].quantity
                         }
-                    ];
+                    ],
+                    sku = upsellInfo.orderedProducts[0].sku;
                 }
                 const product_ids = [];
                 for (let i = 0, n = items.length; i < n; i++) {
@@ -299,6 +307,7 @@
                     // one_click_purchase_reference
                     product_ids: product_ids,
                     items: items,
+                    sku: sku,
                     revenue: revenue.toFixed(2),
                     currency: window.localStorage.getItem('currencyCode'),
                     // order_status
@@ -358,7 +367,8 @@
                             total_usd: (prevItem.productPrices.DiscountedPrice.Value + prevItem.shippings[window.shippingIndex || 0].price).toFixed(2),
                             quantity: quantity
                         }
-                    ];
+                    ],
+                    sku = prevItem.sku;
                     const product_ids = [];
                     for (let i = 0, n = failProducts.length; i < n; i++) {
                         product_ids.push(failProducts[i].productId);
@@ -384,11 +394,11 @@
                         parentcampaign: window.localStorage.getItem('mainCampaignName'),
                         // external_payment_url: '',
                         // one_click_purchase_reference: '',
-                        // sku: '',
                         // total_usd: '',
                         // quantity: '',
                         product_ids: product_ids,
                         items: failProducts,
+                        sku: sku
                         // order_status: '',
                         // tracking_number: ''
                     }
