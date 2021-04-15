@@ -112,36 +112,41 @@
 
         inputs.forEach(function(input) {
             input.addEventListener('change', function (e) {
-                identifyData = getIdentifyData();
+                try {
+                    identifyData = getIdentifyData();
 
-                if (e.currentTarget.getAttribute('name') === 'email' && document.querySelector('[name="email"]').classList.contains('valid')) {
-                    console.log('BlueShift - Fire identify')
-                    blueshift.identify(identifyData);
-                    blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
-                }
-
-                if (e.currentTarget.getAttribute('name') === 'phoneNumber' && e.currentTarget.value !== '') {
-                    const phoneNumber = e.currentTarget.value.match(/\d/g).join('');
-                    let checkPhoneAPI = `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneNumber}`;
-                    if (countryCode) {
-                        checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
+                    if (e.currentTarget.getAttribute('name') === 'email' && document.querySelector('[name="email"]').classList.contains('valid')) {
+                        console.log('BlueShift - Fire identify')
+                        blueshift.identify(identifyData);
+                        checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
+                        blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
                     }
-                    window.ctrwowUtils
-                        .callAjax(checkPhoneAPI)
-                        .then((result) => {
-                            phone_valid = result.valid;
-                            phone_linetype = result.line_type;
-                            phone_carrier = result.carrier;
-                            if (phone_valid) {
-                                international_format = result.international_format;
-                                identifyData = getIdentifyData();
-                                blueshift.identify(identifyData);
-                                // blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
-                            }
-                        })
-                        .catch((e) => {
-                            console.log(e);
-                        })
+
+                    if (e.currentTarget.getAttribute('name') === 'phoneNumber' && e.currentTarget.value !== '') {
+                        const phoneNumber = e.currentTarget.value.match(/\d/g).join('');
+                        let checkPhoneAPI = `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneNumber}`;
+                        if (countryCode) {
+                            checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
+                        }
+                        window.ctrwowUtils
+                            .callAjax(checkPhoneAPI)
+                            .then((result) => {
+                                phone_valid = result.valid;
+                                phone_linetype = result.line_type;
+                                phone_carrier = result.carrier;
+                                if (phone_valid) {
+                                    international_format = result.international_format;
+                                    identifyData = getIdentifyData();
+                                    blueshift.identify(identifyData);
+                                    // blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
+                                }
+                            })
+                            .catch((e) => {
+                                console.log(e);
+                            })
+                    }
+                } catch(e) {
+                    console.log(e);
                 }
             });
         });
