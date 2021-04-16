@@ -224,10 +224,6 @@
                 }
             });
 
-            Array.prototype.slice.call(_qAll('.spanUpsellPrice')).forEach(spanUpsellPrice => {
-                spanUpsellPrice.innerHTML = imgLoading;
-            });
-
             callTaxAjax(postData, selectedProduct);
         }
     }
