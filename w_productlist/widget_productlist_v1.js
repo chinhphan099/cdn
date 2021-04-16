@@ -401,6 +401,7 @@
         console.log(data);
         const countryCodeIndex = utils.localStorage().get('countryCodeIndex');
         if (!(data instanceof Error) && data.prices.length > 0) {
+            window.campaignInfo = data;
             window.PRICES = data.prices;
             checkDoubleQuantity();
             Array.prototype.slice.call(data.prices).forEach(product => {
