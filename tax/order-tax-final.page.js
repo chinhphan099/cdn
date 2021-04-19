@@ -3,14 +3,7 @@
         console.log('utils module is not found');
         return;
     }
-    if (
-        window.location.host.indexOf('beautystatcosmetics') > -1 ||
-        (
-            window.location.origin.indexOf('https://www.getshinearmor.com') > -1 &&
-            window.location.pathname.indexOf('/de/order-scratch.html') === -1 &&
-            window.location.pathname.indexOf('/fr/order-scratch.html') === -1
-        )
-    ) {
+    if (window.location.host.indexOf('beautystatcosmetics') > -1) {
         return;
     }
 
