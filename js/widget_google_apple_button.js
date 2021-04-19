@@ -460,6 +460,7 @@
         const orderData = getOrderData(source);
         eCRM.Order.webkey = siteSetting.webKey;
 
+        utils.events.emit('beforeSubmitOrder');
         eCRM.Order.placeOrder(orderData, paymenttype, function (result) {
             //make a flag is that has a order successfully, will be used in decline page
             utils.localStorage().set('mainOrderLink', location.pathname);
