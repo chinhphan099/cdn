@@ -208,10 +208,15 @@
 
             if (currentItem.productId === checkedItemData.productId) { return;}
 
-            // remove_from_cart
-            blueshift.track('remove_from_cart', getItemDataForCart(checkedItemData));
-            // add_to_cart
-            blueshift.track('add_to_cart', getItemDataForCart(currentItem));
+            if (
+                document.querySelector('[name="email"]') &&
+                document.querySelector('[name="email"]').classList.contains('valid')
+            ) {
+                // remove_from_cart
+                blueshift.track('remove_from_cart', getItemDataForCart(checkedItemData));
+                // add_to_cart
+                blueshift.track('add_to_cart', getItemDataForCart(currentItem));
+            }
 
             checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
         });
