@@ -302,6 +302,11 @@
             utils.localStorage().set('mainOrderLink', location.pathname);
 
             if (result && result.success) {
+                //store order Toket to use for calling relatedOrders at confirm page
+                if(result.token) {
+                    window.sessionStorage.setItem('orderToken', result.token);
+                }
+
                 utils.localStorage().set('user_firstname', orderData.customer.firstName);
                 utils.localStorage().set('user_lastname', orderData.customer.lastName);
                 utils.localStorage().set('customerId', result.customerResult.customerId);
