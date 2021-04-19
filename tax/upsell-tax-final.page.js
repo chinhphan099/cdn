@@ -271,6 +271,7 @@
         const upsellData = getUpsellData();
 
         utils.showAjaxLoading();
+        utils.events.emit('onBeforePlaceUpsellOrder');
         eCRM.Order.placeUpsellOrder(upsellData, upsell.upsellWebKey, function (result) {
             utils.saveInfoToLocalForUpsells(result, upsell);
         });
