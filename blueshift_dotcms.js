@@ -46,12 +46,16 @@
         return 'desktop';
     }
     function getCheckedProduct() {
-        const product = _q('input[name="product"]:checked').dataset.product;
-        if (product) {
-            return JSON.parse(product);
-        }
-        else {
-            return null;
+        try {
+            const product = _q('input[name="product"]:checked').dataset.product;
+            if (product) {
+                return JSON.parse(product);
+            }
+            else {
+                return null;
+            }
+        } catch(e) {
+            console.log(e)
         }
     }
     function orderPageEvents() {
@@ -167,50 +171,54 @@
         });
 
         utils.events.on('beforeSubmitOrder', function() {
-            identifyData = getIdentifyData();
-            blueshift.identify(identifyData);
-            window.localStorage.setItem('identifyData', JSON.stringify(identifyData));
+            try {
+                identifyData = getIdentifyData();
+                blueshift.identify(identifyData);
+                window.localStorage.setItem('identifyData', JSON.stringify(identifyData));
 
-            const curItem = getCheckedProduct();
-            curItem.campaignName = campaignName;
-            window.localStorage.setItem('prevItem', JSON.stringify(curItem));
+                const curItem = getCheckedProduct();
+                curItem.campaignName = campaignName;
+                window.localStorage.setItem('prevItem', JSON.stringify(curItem));
 
-            console.log('BlueShift - Fire checkout');
-            function getProductsInCart() {
-                const currentItem = getCheckedProduct();
-                const quantity = window.localStorage.getItem('doubleQuantity') ? currentItem.quantity / 2 : currentItem.quantity;
-                const products = [
-                    {
-                        productId: currentItem.productId,
-                        sku: currentItem.sku,
-                        total_usd: (currentItem.productPrices.DiscountedPrice.Value + currentItem.shippings[window.shippingIndex || 0].price).toFixed(2),
-                        quantity: quantity
+                console.log('BlueShift - Fire checkout');
+                function getProductsInCart() {
+                    const currentItem = getCheckedProduct();
+                    const quantity = window.localStorage.getItem('doubleQuantity') ? currentItem.quantity / 2 : currentItem.quantity;
+                    const products = [
+                        {
+                            productId: currentItem.productId,
+                            sku: currentItem.sku,
+                            total_usd: (currentItem.productPrices.DiscountedPrice.Value + currentItem.shippings[window.shippingIndex || 0].price).toFixed(2),
+                            quantity: quantity
+                        }
+                    ];
+                    return {
+                        products: products,
+                        sku: currentItem.sku
                     }
-                ];
-                return {
-                    products: products,
-                    sku: currentItem.sku
                 }
+                const productsInCart = getProductsInCart();
+                const items = productsInCart.products;
+                const product_ids = [];
+                for (let i = 0, n = items.length; i < n; i++) {
+                    product_ids.push(items[i].productId);
+                }
+                blueshift.track('checkout', {
+                    fingerprintId: window._EA_ID,
+                    referrer: document.referrer,
+                    countryCode: identifyData.ship_country,
+                    regionCode: identifyData.ship_state,
+                    ip: _campaignInfo.location.ip,
+                    product_ids: product_ids,
+                    items: items,
+                    sku: productsInCart.sku,
+                    // total_usd
+                    currency: window.localStorage.getItem('currencyCode')
+                    // quantity
+                });
+            } catch(e) {
+                console.log(e)
             }
-            const productsInCart = getProductsInCart();
-            const items = productsInCart.products;
-            const product_ids = [];
-            for (let i = 0, n = items.length; i < n; i++) {
-                product_ids.push(items[i].productId);
-            }
-            blueshift.track('checkout', {
-                fingerprintId: window._EA_ID,
-                referrer: document.referrer,
-                countryCode: identifyData.ship_country,
-                regionCode: identifyData.ship_state,
-                ip: _campaignInfo.location.ip,
-                product_ids: product_ids,
-                items: items,
-                sku: productsInCart.sku,
-                // total_usd
-                currency: window.localStorage.getItem('currencyCode')
-                // quantity
-            });
         });
 
         window.localStorage.setItem('location', JSON.stringify(_campaignInfo.location)); // Save for Upsell
@@ -220,21 +228,25 @@
 
         Array.prototype.slice.call(_qAll('input[name="product"]')).forEach(input => {
             input.addEventListener('change', () => {
-                var currentItem = getCheckedProduct();
+                try {
+                    var currentItem = getCheckedProduct();
 
-                if (currentItem.productId === checkedItemData.productId) { return;}
+                    if (currentItem.productId === checkedItemData.productId) { return;}
 
-                if (
-                    document.querySelector('#customer_email') &&
-                    document.querySelector('#customer_email').classList.contains('input-valid')
-                ) {
-                    // remove_from_cart
-                    blueshift.track('remove_from_cart', getItemDataForCart(checkedItemData));
-                    // add_to_cart
-                    blueshift.track('add_to_cart', getItemDataForCart(currentItem));
+                    if (
+                        document.querySelector('#customer_email') &&
+                        document.querySelector('#customer_email').classList.contains('input-valid')
+                    ) {
+                        // remove_from_cart
+                        blueshift.track('remove_from_cart', getItemDataForCart(checkedItemData));
+                        // add_to_cart
+                        blueshift.track('add_to_cart', getItemDataForCart(currentItem));
+                    }
+
+                    checkedItemData = getCheckedProduct();
+                } catch(e) {
+                    console.log(e)
                 }
-
-                checkedItemData = getCheckedProduct();
             });
         });
     }
