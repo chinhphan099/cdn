@@ -137,9 +137,13 @@
                         if (countryCode) {
                             checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
                         }
+
                         utils
                             .callAjax(checkPhoneAPI, {
-                                method: 'GET'
+                                method: 'GET',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                }
                             })
                             .then((result) => {
                                 phone_valid = result.valid;
