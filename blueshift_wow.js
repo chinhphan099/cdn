@@ -78,6 +78,7 @@
                 ship_state: document.querySelector('[name="state"]').value,
                 ship_zip: document.querySelector('[name="zipCode"]').value,
                 ship_country: document.querySelector('[name="countryCode"]').value,
+                customer_language: document.querySelector('html').getAttribute('lang') || '',
                 joined_at: getCurrentDate(),
                 fingerprint_id: window._EA_ID,
                 referrer: document.referrer
@@ -301,7 +302,8 @@
                     email: orderInfo.cusEmail,
                     order_create_date: getCurrentDate(),
                     ip_address: _location.ip || '',
-                    customer_language: orderInfo.cusCountry,
+                    // customer_language: orderInfo.cusCountry,
+                    customer_language: document.querySelector('html').getAttribute('lang') || '',
                     // affid
                     // device
                     // device_timezone
@@ -417,7 +419,8 @@
                             ...declineData,
                             order_id: orderInfo.orderNumber,
                             customer_id: orderInfo.customerId,
-                            customer_language: orderInfo.cusCountry
+                            customer_language: document.querySelector('html').getAttribute('lang') || ''
+                            // customer_language: orderInfo.cusCountry
                         }
                     }
                     blueshift.track('decline', declineData);

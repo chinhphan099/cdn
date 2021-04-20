@@ -91,6 +91,7 @@
                 ship_state: _qById('shipping_province').value,
                 ship_zip: _qById('shipping_postal').value,
                 ship_country: _qById('shipping_country').value,
+                customer_language: document.querySelector('html').getAttribute('lang') || '',
                 joined_at: getCurrentDate(),
                 fingerprint_id: window._EA_ID,
                 referrer: document.referrer
@@ -112,6 +113,7 @@
                 ],
                 sku: checkedItem.sku,
                 currency: window.localStorage.getItem('currencyCode'),
+                customer_language: document.querySelector('html').getAttribute('lang') || ''
                 // referrer: document.referrer,
                 // countryCode: _campaignInfo.location.countryCode,
                 // regionCode: _campaignInfo.location.regionCode,
@@ -327,7 +329,8 @@
                     email: orderInfo.cusEmail,
                     order_create_date: getCurrentDate(),
                     ip_address: _location.ip || '',
-                    customer_language: orderInfo.cusCountry,
+                    // customer_language: orderInfo.cusCountry,
+                    customer_language: document.querySelector('html').getAttribute('lang') || '',
                     // affid
                     // device
                     // device_timezone
@@ -443,7 +446,8 @@
                             ...declineData,
                             order_id: orderInfo.orderNumber,
                             customer_id: orderInfo.customerId,
-                            customer_language: orderInfo.cusCountry
+                            customer_language: document.querySelector('html').getAttribute('lang') || ''
+                            // customer_language: orderInfo.cusCountry
                         }
                     }
                     blueshift.track('decline', declineData);
