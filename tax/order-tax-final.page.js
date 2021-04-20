@@ -91,11 +91,11 @@
     function renderTaxAndGrandTotal(selectedProduct) {
         if (window.taxArray.length === 0) return;
         const selectedItem = window.taxArray.find((item) => item.productId === selectedProduct.productId);
-        const taxPercent = selectedItem.taxRate / 100;
+        window.taxPercent = selectedItem.taxRate / 100;
         const shippingFee = selectedProduct.shippings[window.shippingIndex || 0].price;
         const formattedShippingFee = selectedProduct.shippings[0].formattedPrice;
         const lifetime = getWarrantyPrice();
-        const totalTaxAmount = selectedItem.taxAmount + lifetime * taxPercent + shippingFee * taxPercent;
+        const totalTaxAmount = selectedItem.taxAmount + lifetime * window.taxPercent + shippingFee * window.taxPercent;
         const grandTotal = selectedItem.discountedPrice + lifetime + shippingFee + totalTaxAmount;
 
         Array.prototype.slice.call(_qAll('.tax_price, .td-taxes-fees')).forEach((taxElem) => {
