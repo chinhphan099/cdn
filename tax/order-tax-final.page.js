@@ -39,19 +39,23 @@
         disableCheckoutBtnEvents();
 
         // Order Golden
-        if (_q('.statistical') || _q('.custom-statistical')) {
-            const taxElem = _q('.td-taxes-fees');
+        if (_q('.statistical') || _q('.custom-statistical') || _q('.cart-info')) {
+            let taxElem = _q('.td-taxes-fees');
             if (!!taxElem) {
                 taxElem.innerHTML = `${imgLoading}`;
             }
             else {
                 const taxRow = `<tr class="tax-row">
                     <td class="td-taxes-text">${siteSetting.taxAndFee || 'Estimated Tax:'}</td>
-                    <td class="td-taxes-fees">${imgLoading}</td>
+                    <td class="td-taxes-fees text-right">${imgLoading}</td>
                 </tr>`;
                 if (_q('.statistical table tbody')) {
                     _q('.statistical table tbody').insertAdjacentHTML('beforeend', taxRow);
                 }
+                if (_q('.cart-info table tbody')) {
+                    _q('.cart-info table tbody').insertAdjacentHTML('beforeend', taxRow);
+                }
+                taxElem = _q('.td-taxes-fees');
             }
             taxElem.parentElement.removeAttribute('style');
         }
