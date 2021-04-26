@@ -47,9 +47,9 @@
     function implementTax(selectedProduct) {
         const taxUpsellItem = window.taxArray.find((item) => item.productId === selectedProduct.productId);
         const shippingFee = selectedProduct.shippings[0].price;
-        const taxPercent = taxUpsellItem.taxRate / 100;
+        window.taxPercent = taxUpsellItem.taxRate / 100;
         const shippingFeeFormatted = selectedProduct.shippings[0].formattedPrice;
-        const totalPrice = taxUpsellItem.discountedPrice + taxUpsellItem.taxAmount + shippingFee + shippingFee * taxPercent;
+        const totalPrice = taxUpsellItem.discountedPrice + taxUpsellItem.taxAmount + shippingFee + shippingFee * window.taxPercent;
 
         Array.prototype.slice.call(_qAll('.spanUpsellPrice')).forEach(spanUpsellPrice => {
             spanUpsellPrice.textContent = utils.formatPrice(totalPrice.toFixed(2), fCurrency, shippingFeeFormatted);
@@ -71,7 +71,7 @@
             const shippingFee = data.shippings[0].price;
             const shippingFeeFormated = data.shippings[0].formattedPrice;
 
-            const totalDiscountPrice = taxData.taxAmount + data.productPrices.DiscountedPrice.Value + shippingFee * taxPercent;
+            const totalDiscountPrice = taxData.taxAmount + data.productPrices.DiscountedPrice.Value + shippingFee * window.taxPercent;
             const totalDiscountFormatPrice = utils.formatPrice(totalDiscountPrice.toFixed(2), window.fCurrency, shippingFeeFormated);
 
             const totalFullPrice = taxData.taxAmount + data.productPrices.FullRetailPrice.Value;
@@ -224,10 +224,6 @@
                 }
             });
 
-            Array.prototype.slice.call(_qAll('.spanUpsellPrice')).forEach(spanUpsellPrice => {
-                spanUpsellPrice.innerHTML = imgLoading;
-            });
-
             callTaxAjax(postData, selectedProduct);
         }
     }
@@ -275,6 +271,7 @@
         const upsellData = getUpsellData();
 
         utils.showAjaxLoading();
+        utils.events.emit('onBeforePlaceUpsellOrder');
         eCRM.Order.placeUpsellOrder(upsellData, upsell.upsellWebKey, function (result) {
             utils.saveInfoToLocalForUpsells(result, upsell);
         });

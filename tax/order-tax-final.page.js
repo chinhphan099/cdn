@@ -3,14 +3,7 @@
         console.log('utils module is not found');
         return;
     }
-    if (
-        window.location.host.indexOf('beautystatcosmetics') > -1 ||
-        (
-            window.location.host.indexOf('getshinearmor') > -1 &&
-            window.location.pathname.indexOf('/de/order-scratch.html') === -1 &&
-            window.location.pathname.indexOf('/fr/order-scratch.html') === -1
-        )
-    ) {
+    if (window.location.host.indexOf('beautystatcosmetics') > -1) {
         return;
     }
 
@@ -46,19 +39,23 @@
         disableCheckoutBtnEvents();
 
         // Order Golden
-        if (_q('.statistical') || _q('.custom-statistical')) {
-            const taxElem = _q('.td-taxes-fees');
+        if (_q('.statistical') || _q('.custom-statistical') || _q('.cart-info')) {
+            let taxElem = _q('.td-taxes-fees');
             if (!!taxElem) {
                 taxElem.innerHTML = `${imgLoading}`;
             }
             else {
                 const taxRow = `<tr class="tax-row">
                     <td class="td-taxes-text">${siteSetting.taxAndFee || 'Estimated Tax:'}</td>
-                    <td class="td-taxes-fees">${imgLoading}</td>
+                    <td class="td-taxes-fees text-right">${imgLoading}</td>
                 </tr>`;
                 if (_q('.statistical table tbody')) {
                     _q('.statistical table tbody').insertAdjacentHTML('beforeend', taxRow);
                 }
+                if (_q('.cart-info table tbody')) {
+                    _q('.cart-info table tbody').insertAdjacentHTML('beforeend', taxRow);
+                }
+                taxElem = _q('.td-taxes-fees');
             }
             taxElem.parentElement.removeAttribute('style');
         }
@@ -98,11 +95,11 @@
     function renderTaxAndGrandTotal(selectedProduct) {
         if (window.taxArray.length === 0) return;
         const selectedItem = window.taxArray.find((item) => item.productId === selectedProduct.productId);
-        const taxPercent = selectedItem.taxRate / 100;
+        window.taxPercent = selectedItem.taxRate / 100;
         const shippingFee = selectedProduct.shippings[window.shippingIndex || 0].price;
         const formattedShippingFee = selectedProduct.shippings[0].formattedPrice;
         const lifetime = getWarrantyPrice();
-        const totalTaxAmount = selectedItem.taxAmount + lifetime * taxPercent + shippingFee * taxPercent;
+        const totalTaxAmount = selectedItem.taxAmount + lifetime * window.taxPercent + shippingFee * window.taxPercent;
         const grandTotal = selectedItem.discountedPrice + lifetime + shippingFee + totalTaxAmount;
 
         Array.prototype.slice.call(_qAll('.tax_price, .td-taxes-fees')).forEach((taxElem) => {

@@ -18,9 +18,16 @@
 
     let midId = null;
 
+    function handleFormAndButtonCreditWrapper() {
+        const wrapperCredit = document.querySelector('.orderst-form');
+          wrapperCredit && (wrapperCredit.classList.add('show'));
+          const buttonCreditCard = document.querySelector('.btn-order-now.btn-next button');
+          buttonCreditCard && (buttonCreditCard.classList.add('show'));
+    }
+
     try {
         eCRM.Order.getMidAndPrn((data) => {
-            if (data) {
+            if (data != undefined) {
                 try {
                     //init Stripe instance with default value
                     let countryCode, currencyCode;
@@ -50,7 +57,11 @@
                     }
                 } catch (err) {
                     console.log(err);
+                    handleFormAndButtonCreditWrapper();
                 }
+            }
+            else{
+                handleFormAndButtonCreditWrapper();
             }
         }, 54);
     } catch (err) {
@@ -79,15 +90,18 @@
             window.paymentRequest.canMakePayment().then(function (result) {
                 if (result) {
                     console.log(result);
-                    _q('body').classList.remove('google-in-progress', 'apple-in-progres')
+                    _q('body').classList.remove('google-in-progress', 'apple-in-progres');
+
+                    const secureLogo = document.querySelector('.secure-logo-step2');
+                    secureLogo && (secureLogo.style.display = 'none');
 
                     if (result.applePay) {
                         const btnApple = document.getElementById('btn-apple-pay');
                         if (btnApple) {
-							localStorage.setItem('applePay', true);
                             btnApple.classList.remove('hidden');
                             btnApple.addEventListener('click', e => {
                                 e.preventDefault();
+                                localStorage.setItem('applePay', true);
                                 window.gapFlag = true;
                                 window.paypalFlag = false;
                                 window.ccFlag = false;
@@ -106,10 +120,10 @@
                     } else {
                         const btnGoogle = document.getElementById('btn-google-pay');
                         if (btnGoogle) {
-							localStorage.setItem('googlePay', true);
                             btnGoogle.classList.remove('hidden');
                             btnGoogle.addEventListener('click', e => {
                                 e.preventDefault();
+                                localStorage.setItem('googlePay', true);
                                 window.gapFlag = true;
                                 window.paypalFlag = false;
                                 window.ccFlag = false;
@@ -130,6 +144,7 @@
                     const dividerCCLine = document.querySelector('.divider.or-cc');
                     dividerCCLine.style.display = 'block';
                 } else {
+                    handleFormAndButtonCreditWrapper();
                     console.log('not support');
                 }
             });
@@ -145,6 +160,7 @@
             });
         } catch (err) {
             console.log("don't support in your country ", err);
+            handleFormAndButtonCreditWrapper();
         }
     }
 
@@ -444,6 +460,7 @@
         const orderData = getOrderData(source);
         eCRM.Order.webkey = siteSetting.webKey;
 
+        utils.events.emit('beforeSubmitOrder');
         eCRM.Order.placeOrder(orderData, paymenttype, function (result) {
             //make a flag is that has a order successfully, will be used in decline page
             utils.localStorage().set('mainOrderLink', location.pathname);

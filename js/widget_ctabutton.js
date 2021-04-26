@@ -297,11 +297,17 @@
         const orderData = getOrderData(paymenttype);
         eCRM.Order.webkey = siteSetting.webKey;
 
+        utils.events.emit('beforeSubmitOrder');
         eCRM.Order.placeOrder(orderData, paymenttype, function (result) {
             //make a flag is that has a order successfully, will be used in decline page
             utils.localStorage().set('mainOrderLink', location.pathname);
 
             if (result && result.success) {
+                //store order Toket to use for calling relatedOrders at confirm page
+                if(result.token) {
+                    window.sessionStorage.setItem('orderToken', result.token);
+                }
+
                 utils.localStorage().set('user_firstname', orderData.customer.firstName);
                 utils.localStorage().set('user_lastname', orderData.customer.lastName);
                 utils.localStorage().set('customerId', result.customerResult.customerId);

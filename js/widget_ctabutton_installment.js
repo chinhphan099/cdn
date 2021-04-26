@@ -157,6 +157,10 @@
             lifetimeRate = 0,
             productWarranty = 0;
 
+        const fValue = product.productPrices.DiscountedPrice.FormattedValue.replace(/[,|.]/g, '');
+        const pValue = product.productPrices.DiscountedPrice.Value.toString().replace(/\./, '');
+        const fCurrency = fValue.replace(pValue, '######').replace(/\d/g, '');
+
         if(product.shippings != null && product.shippings.length > 0) {
             shippingFee = product.shippings[0].price;
         }
@@ -191,6 +195,8 @@
             'orderTotalFull': product.productPrices.DiscountedPrice.Value + shippingFee + lifetimePrice + productWarranty,
             'savedTotal': product.productPrices.FullRetailPrice.Value - product.productPrices.DiscountedPrice.Value,
             'quantity': product.quantity,
+            'feeShipping': shippingFee,
+            'fCurrency': fCurrency,
             'orderedProducts': [
                 {
                     type: 'main',
@@ -200,7 +206,9 @@
                 }
             ],
             installmentValue: installmentVal,
-            installmentText: (window.widget && window.widget.installmentpayment) ? window.widget.installmentpayment.optionText : ''
+            installmentText: (window.widget && window.widget.installmentpayment) ? window.widget.installmentpayment.optionText : '',
+            //this property is very important to check use CC
+            useCreditCard: orderResponse.useCreditCard ? orderResponse.useCreditCard : false
         };
 
         utils.localStorage().set('orderInfo', JSON.stringify(orderInfo));
@@ -236,6 +244,7 @@
 
         const orderData = getOrderData(paymenttype);
 
+        utils.events.emit('beforeSubmitOrder');
         eCRM.Order.placeOrder(orderData, paymenttype, function (result) {
             //make a flag is that has a order successfully, will be used in decline page
             utils.localStorage().set('mainOrderLink', location.pathname);
@@ -244,6 +253,8 @@
                 utils.localStorage().set('user_firstname', orderData.customer.firstName);
                 utils.localStorage().set('user_lastname', orderData.customer.lastName);
                 saveInforForUpsellPage(result);
+
+                //utils.fireMainOrderToGTMConversionV2();
 
                 if (result.callBackUrl) {
                     document.location = result.callBackUrl;
