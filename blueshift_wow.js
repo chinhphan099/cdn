@@ -1,4 +1,5 @@
 (() => {
+    console.log('BlueShift');
     function getQueryParameter(param) {
         let href = '';
         if (location.href.indexOf('?')) {
