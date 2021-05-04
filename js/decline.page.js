@@ -68,18 +68,34 @@
                 case 39:
                     paymentName = 'Afterpay';
                     break;
-				case 40:
+                case 40:
                     paymentName = 'Sezzle';
+                    break;
+                case 54:
+                    if (localStorage.getItem('applePay')){
+                        paymentName = 'Apple';
+                    }
+                    else if (localStorage.getItem('googlePay')){
+                        paymentName = 'Google';
+                    }
                     break;
                 default:
                     paymentName = '';
+            }
+        }
+        else{
+            if (window.paymentProcessorId === 54 && localStorage.getItem('applePay')){
+                paymentName = 'Apple';
+            }
+            else if (window.paymentProcessorId === 54 && localStorage.getItem('googlePay')){
+                paymentName = 'Google';
             }
         }
         const messageElemnt = _q('.js-paypal-decline-message');
         messageElemnt.innerHTML = messageElemnt.innerHTML.replace('Paypal', paymentName);
         messageElemnt.innerHTML = messageElemnt.innerHTML.replace('PayPal', paymentName);
         _q('.js-creditcard-decline-message').style.display = 'none';
-        _q('.js-paypal-decline-message').style.display = 'block';       
+        _q('.js-paypal-decline-message').style.display = 'block';
     }
 
     // function displayMessage() {
@@ -100,7 +116,7 @@
     //         const messageElemnt =  _q('.js-paypal-decline-message');
     //         messageElemnt.innerHTML = messageElemnt.innerHTML.replace('{paymentName}', paymentName);
     //         _q('.js-creditcard-decline-message').style.display = 'none';
-    //         messageElemnt.style.display = 'block';            
+    //         messageElemnt.style.display = 'block';
     //     }
     // }
 
