@@ -87,6 +87,11 @@
         }
         function getItemDataForCart(checkedItem) {
             const quantity = window.localStorage.getItem('doubleQuantity') ? checkedItem.quantity / 2 : checkedItem.quantity;
+            const landingurl = window.localStorage.getItem('landing') || '';
+            let landingBaseUrl = '';
+            if (landingurl) {
+                landingBaseUrl = landingurl.split('?')[0];
+            }
             return {
                 // fingerprintId: window._EA_ID,
                 email: document.querySelector('[name="email"]').value || '',
@@ -101,6 +106,8 @@
                 ],
                 sku: checkedItem.sku,
                 currency: window.localStorage.getItem('currencyCode'),
+                landing_base_url: landingBaseUrl,
+                customer_language: document.querySelector('html').getAttribute('lang') || ''
                 // referrer: document.referrer,
                 // countryCode: campaignInfo.location.countryCode,
                 // regionCode: campaignInfo.location.regionCode,
