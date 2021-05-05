@@ -99,32 +99,36 @@
             };
         }
         function getItemDataForCart(checkedItem) {
-            const quantity = window.localStorage.getItem('doubleQuantity') ? checkedItem.quantity / 2 : checkedItem.quantity;
-            const landingurl = window.localStorage.getItem('landing') || '';
-            let landingBaseUrl = '';
-            if (landingurl) {
-                landingBaseUrl = landingurl.split('?')[0];
-            }
-            return {
-                // fingerprintId: window._EA_ID,
-                email: _qById('customer_email').value || '',
-                product_ids: [checkedItem.productId],
-                items: [
-                    {
-                        productId: checkedItem.productId,
-                        sku: checkedItem.sku,
-                        total_usd: (checkedItem.productPrices.DiscountedPrice.Value + checkedItem.shippings[window.shippingIndex || 0].price).toFixed(2),
-                        quantity: quantity
-                    }
-                ],
-                sku: checkedItem.sku,
-                currency: window.localStorage.getItem('currencyCode'),
-                landing_base_url: landingBaseUrl,
-                customer_language: document.querySelector('html').getAttribute('lang') || ''
-                // referrer: document.referrer,
-                // countryCode: _campaignInfo.location.countryCode,
-                // regionCode: _campaignInfo.location.regionCode,
-                // ip: _campaignInfo.location.ip
+            try {
+                const quantity = window.localStorage.getItem('doubleQuantity') ? checkedItem.quantity / 2 : checkedItem.quantity;
+                const landingurl = window.localStorage.getItem('landing') || '';
+                let landingBaseUrl = '';
+                if (landingurl) {
+                    landingBaseUrl = landingurl.split('?')[0];
+                }
+                return {
+                    // fingerprintId: window._EA_ID,
+                    email: _qById('customer_email').value || '',
+                    product_ids: [checkedItem.productId],
+                    items: [
+                        {
+                            productId: checkedItem.productId,
+                            sku: checkedItem.sku,
+                            total_usd: (checkedItem.productPrices.DiscountedPrice.Value + checkedItem.shippings[window.shippingIndex || 0].price).toFixed(2),
+                            quantity: quantity
+                        }
+                    ],
+                    sku: checkedItem.sku,
+                    currency: window.localStorage.getItem('currencyCode'),
+                    landing_base_url: landingBaseUrl,
+                    customer_language: document.querySelector('html').getAttribute('lang') || ''
+                    // referrer: document.referrer,
+                    // countryCode: _campaignInfo.location.countryCode,
+                    // regionCode: _campaignInfo.location.regionCode,
+                    // ip: _campaignInfo.location.ip
+                }
+            } catch (e) {
+                console.log(e);
             }
         }
 
