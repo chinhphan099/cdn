@@ -88,7 +88,7 @@
         function getItemDataForCart(checkedItem) {
             try {
                 const quantity = window.localStorage.getItem('doubleQuantity') ? checkedItem.quantity / 2 : checkedItem.quantity;
-                const landingurl = window.localStorage.getItem('landing') || '';
+                const landingurl = window.localStorage.getItem('referrerUrl') || '';
                 let landingBaseUrl = '';
                 if (landingurl) {
                     landingBaseUrl = landingurl.split('?')[0];
@@ -255,8 +255,8 @@
             var _location = window.localStorage.getItem('location');
             var isFiredMainOrderBlueshift = window.localStorage.getItem('isFiredMainOrderBlueshift');
             var __EA_ID = window._EA_ID || window.localStorage.getItem('_vid');
-            if (!window.localStorage.getItem('landing')) {
-                window.localStorage.setItem('landing', document.referrer);
+            if (!window.localStorage.getItem('referrerUrl')) {
+                window.localStorage.setItem('referrerUrl', document.referrer);
             }
             function getPurchasedData(orderInfo, upsellInfo) {
                 let orderNumber = orderInfo.orderNumber,
@@ -303,7 +303,7 @@
                 for (let i = 0, n = items.length; i < n; i++) {
                     product_ids.push(items[i].productId);
                 }
-                const landingurl = window.localStorage.getItem('landing') || '';
+                const landingurl = window.localStorage.getItem('referrerUrl') || '';
                 let landingBaseUrl = '';
                 if (landingurl) {
                     landingBaseUrl = landingurl.split('?')[0];
@@ -397,7 +397,7 @@
                     for (let i = 0, n = failProducts.length; i < n; i++) {
                         product_ids.push(failProducts[i].productId);
                     }
-                    const landingurl = window.localStorage.getItem('landing') || '';
+                    const landingurl = window.localStorage.getItem('referrerUrl') || '';
                     let landingBaseUrl = '';
                     if (landingurl) {
                         landingBaseUrl = landingurl.split('?')[0];
