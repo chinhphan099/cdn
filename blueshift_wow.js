@@ -217,21 +217,25 @@
         // blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
 
         window.ctrwowCheckout.checkoutData.onProductChange(function() {
-            var currentItem = window.ctrwowCheckout.checkoutData.getProduct();
+            try {
+                var currentItem = window.ctrwowCheckout.checkoutData.getProduct();
 
-            if (currentItem.productId === checkedItemData.productId) { return;}
+                if (currentItem.productId === checkedItemData.productId) { return; }
 
-            if (
-                document.querySelector('[name="email"]') &&
-                document.querySelector('[name="email"]').classList.contains('valid')
-            ) {
-                // remove_from_cart
-                blueshift.track('remove_from_cart', getItemDataForCart(checkedItemData));
-                // add_to_cart
-                blueshift.track('add_to_cart', getItemDataForCart(currentItem));
+                if (
+                    document.querySelector('[name="email"]') &&
+                    document.querySelector('[name="email"]').classList.contains('valid')
+                ) {
+                    // remove_from_cart
+                    blueshift.track('remove_from_cart', getItemDataForCart(checkedItemData));
+                    // add_to_cart
+                    blueshift.track('add_to_cart', getItemDataForCart(currentItem));
+                }
+
+                checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
+            } catch (e) {
+                console.log(e);
             }
-
-            checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
         });
     }
 
