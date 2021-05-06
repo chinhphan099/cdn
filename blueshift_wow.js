@@ -165,50 +165,54 @@
         });
 
         window.ctrwowUtils.events.on('beforeSubmitOrder', function() {
-            identifyData = getIdentifyData();
-            blueshift.identify(identifyData);
-            window.localStorage.setItem('identifyData', JSON.stringify(identifyData));
+            try {
+                identifyData = getIdentifyData();
+                blueshift.identify(identifyData);
+                window.localStorage.setItem('identifyData', JSON.stringify(identifyData));
 
-            const curItem = window.ctrwowCheckout.checkoutData.getProduct();
-            curItem.campaignName = campaignName;
-            window.localStorage.setItem('prevItem', JSON.stringify(curItem));
+                const curItem = window.ctrwowCheckout.checkoutData.getProduct();
+                curItem.campaignName = campaignName;
+                window.localStorage.setItem('prevItem', JSON.stringify(curItem));
 
-            console.log('BlueShift - Fire checkout');
-            function getProductsInCart() {
-                const currentItem = window.ctrwowCheckout.checkoutData.getProduct();
-                const quantity = window.localStorage.getItem('doubleQuantity') ? currentItem.quantity / 2 : currentItem.quantity;
-                const products = [
-                    {
-                        productId: currentItem.productId,
-                        sku: currentItem.sku,
-                        total_usd: (currentItem.productPrices.DiscountedPrice.Value + currentItem.shippings[window.shippingIndex || 0].price).toFixed(2),
-                        quantity: quantity
+                console.log('BlueShift - Fire checkout');
+                function getProductsInCart() {
+                    const currentItem = window.ctrwowCheckout.checkoutData.getProduct();
+                    const quantity = window.localStorage.getItem('doubleQuantity') ? currentItem.quantity / 2 : currentItem.quantity;
+                    const products = [
+                        {
+                            productId: currentItem.productId,
+                            sku: currentItem.sku,
+                            total_usd: (currentItem.productPrices.DiscountedPrice.Value + currentItem.shippings[window.shippingIndex || 0].price).toFixed(2),
+                            quantity: quantity
+                        }
+                    ];
+                    return {
+                        products: products,
+                        sku: currentItem.sku
                     }
-                ];
-                return {
-                    products: products,
-                    sku: currentItem.sku
                 }
+                const productsInCart = getProductsInCart();
+                const items = productsInCart.products;
+                const product_ids = [];
+                for (let i = 0, n = items.length; i < n; i++) {
+                    product_ids.push(items[i].productId);
+                }
+                blueshift.track('checkout', {
+                    fingerprintId: window._EA_ID,
+                    referrer: document.referrer,
+                    countryCode: identifyData.ship_country,
+                    regionCode: identifyData.ship_state,
+                    ip: campaignInfo.location.ip,
+                    product_ids: product_ids,
+                    items: items,
+                    sku: productsInCart.sku,
+                    // total_usd
+                    currency: window.localStorage.getItem('currencyCode')
+                    // quantity
+                });
+            } catch (e) {
+                console.log(e);
             }
-            const productsInCart = getProductsInCart();
-            const items = productsInCart.products;
-            const product_ids = [];
-            for (let i = 0, n = items.length; i < n; i++) {
-                product_ids.push(items[i].productId);
-            }
-            blueshift.track('checkout', {
-                fingerprintId: window._EA_ID,
-                referrer: document.referrer,
-                countryCode: identifyData.ship_country,
-                regionCode: identifyData.ship_state,
-                ip: campaignInfo.location.ip,
-                product_ids: product_ids,
-                items: items,
-                sku: productsInCart.sku,
-                // total_usd
-                currency: window.localStorage.getItem('currencyCode')
-                // quantity
-            });
         });
 
         window.localStorage.setItem('location', JSON.stringify(campaignInfo.location)); // Save for Upsell
