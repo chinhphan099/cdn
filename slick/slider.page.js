@@ -202,6 +202,20 @@
       //     adaptiveHeight: false
       //   });
       // }
+      window._wq = window._wq || []
+      this.handle.on('init', () => {
+        if ($('.slick-current', this.element).find('.responsive-embed').length) {
+          window._wq.push({
+            id: $('.slick-current', this.element).find('.responsive-embed').data('videoid'),
+            onReady: (video) => {
+              $(window).resize()
+              this.setPositionArrows()
+            }
+          })
+        } else {
+          this.setPositionArrows()
+        }
+      })
 
       // Run
       this.handle.slick(option);
