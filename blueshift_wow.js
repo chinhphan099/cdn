@@ -1,4 +1,5 @@
 (() => {
+    console.log('BlueShift');
     function getQueryParameter(param) {
         let href = '';
         if (location.href.indexOf('?')) {
@@ -85,25 +86,36 @@
             };
         }
         function getItemDataForCart(checkedItem) {
-            const quantity = window.localStorage.getItem('doubleQuantity') ? checkedItem.quantity / 2 : checkedItem.quantity;
-            return {
-                // fingerprintId: window._EA_ID,
-                email: document.querySelector('[name="email"]').value || '',
-                product_ids: [checkedItem.productId],
-                items: [
-                    {
-                        productId: checkedItem.productId,
-                        sku: checkedItem.sku,
-                        total_usd: (checkedItem.productPrices.DiscountedPrice.Value + checkedItem.shippings[window.shippingIndex || 0].price).toFixed(2),
-                        quantity: quantity
-                    }
-                ],
-                sku: checkedItem.sku,
-                currency: window.localStorage.getItem('currencyCode'),
-                // referrer: document.referrer,
-                // countryCode: campaignInfo.location.countryCode,
-                // regionCode: campaignInfo.location.regionCode,
-                // ip: campaignInfo.location.ip
+            try {
+                const quantity = window.localStorage.getItem('doubleQuantity') ? checkedItem.quantity / 2 : checkedItem.quantity;
+                const landingurl = window.localStorage.getItem('referrerUrl') || '';
+                let landingBaseUrl = '';
+                if (landingurl) {
+                    landingBaseUrl = landingurl.split('?')[0];
+                }
+                return {
+                    // fingerprintId: window._EA_ID,
+                    email: document.querySelector('[name="email"]').value || '',
+                    product_ids: [checkedItem.productId],
+                    items: [
+                        {
+                            productId: checkedItem.productId,
+                            sku: checkedItem.sku,
+                            total_usd: (checkedItem.productPrices.DiscountedPrice.Value + checkedItem.shippings[window.shippingIndex || 0].price).toFixed(2),
+                            quantity: quantity
+                        }
+                    ],
+                    sku: checkedItem.sku,
+                    currency: window.localStorage.getItem('currencyCode'),
+                    landing_base_url: landingBaseUrl,
+                    customer_language: document.querySelector('html').getAttribute('lang') || ''
+                    // referrer: document.referrer,
+                    // countryCode: campaignInfo.location.countryCode,
+                    // regionCode: campaignInfo.location.regionCode,
+                    // ip: campaignInfo.location.ip
+                }
+            } catch (e) {
+                console.log(e)
             }
         }
 
@@ -153,50 +165,54 @@
         });
 
         window.ctrwowUtils.events.on('beforeSubmitOrder', function() {
-            identifyData = getIdentifyData();
-            blueshift.identify(identifyData);
-            window.localStorage.setItem('identifyData', JSON.stringify(identifyData));
+            try {
+                identifyData = getIdentifyData();
+                blueshift.identify(identifyData);
+                window.localStorage.setItem('identifyData', JSON.stringify(identifyData));
 
-            const curItem = window.ctrwowCheckout.checkoutData.getProduct();
-            curItem.campaignName = campaignName;
-            window.localStorage.setItem('prevItem', JSON.stringify(curItem));
+                const curItem = window.ctrwowCheckout.checkoutData.getProduct();
+                curItem.campaignName = campaignName;
+                window.localStorage.setItem('prevItem', JSON.stringify(curItem));
 
-            console.log('BlueShift - Fire checkout');
-            function getProductsInCart() {
-                const currentItem = window.ctrwowCheckout.checkoutData.getProduct();
-                const quantity = window.localStorage.getItem('doubleQuantity') ? currentItem.quantity / 2 : currentItem.quantity;
-                const products = [
-                    {
-                        productId: currentItem.productId,
-                        sku: currentItem.sku,
-                        total_usd: (currentItem.productPrices.DiscountedPrice.Value + currentItem.shippings[window.shippingIndex || 0].price).toFixed(2),
-                        quantity: quantity
+                console.log('BlueShift - Fire checkout');
+                function getProductsInCart() {
+                    const currentItem = window.ctrwowCheckout.checkoutData.getProduct();
+                    const quantity = window.localStorage.getItem('doubleQuantity') ? currentItem.quantity / 2 : currentItem.quantity;
+                    const products = [
+                        {
+                            productId: currentItem.productId,
+                            sku: currentItem.sku,
+                            total_usd: (currentItem.productPrices.DiscountedPrice.Value + currentItem.shippings[window.shippingIndex || 0].price).toFixed(2),
+                            quantity: quantity
+                        }
+                    ];
+                    return {
+                        products: products,
+                        sku: currentItem.sku
                     }
-                ];
-                return {
-                    products: products,
-                    sku: currentItem.sku
                 }
+                const productsInCart = getProductsInCart();
+                const items = productsInCart.products;
+                const product_ids = [];
+                for (let i = 0, n = items.length; i < n; i++) {
+                    product_ids.push(items[i].productId);
+                }
+                blueshift.track('checkout', {
+                    fingerprintId: window._EA_ID,
+                    referrer: document.referrer,
+                    countryCode: identifyData.ship_country,
+                    regionCode: identifyData.ship_state,
+                    ip: campaignInfo.location.ip,
+                    product_ids: product_ids,
+                    items: items,
+                    sku: productsInCart.sku,
+                    // total_usd
+                    currency: window.localStorage.getItem('currencyCode')
+                    // quantity
+                });
+            } catch (e) {
+                console.log(e);
             }
-            const productsInCart = getProductsInCart();
-            const items = productsInCart.products;
-            const product_ids = [];
-            for (let i = 0, n = items.length; i < n; i++) {
-                product_ids.push(items[i].productId);
-            }
-            blueshift.track('checkout', {
-                fingerprintId: window._EA_ID,
-                referrer: document.referrer,
-                countryCode: identifyData.ship_country,
-                regionCode: identifyData.ship_state,
-                ip: campaignInfo.location.ip,
-                product_ids: product_ids,
-                items: items,
-                sku: productsInCart.sku,
-                // total_usd
-                currency: window.localStorage.getItem('currencyCode')
-                // quantity
-            });
         });
 
         window.localStorage.setItem('location', JSON.stringify(campaignInfo.location)); // Save for Upsell
@@ -205,21 +221,25 @@
         // blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
 
         window.ctrwowCheckout.checkoutData.onProductChange(function() {
-            var currentItem = window.ctrwowCheckout.checkoutData.getProduct();
+            try {
+                var currentItem = window.ctrwowCheckout.checkoutData.getProduct();
 
-            if (currentItem.productId === checkedItemData.productId) { return;}
+                if (currentItem.productId === checkedItemData.productId) { return; }
 
-            if (
-                document.querySelector('[name="email"]') &&
-                document.querySelector('[name="email"]').classList.contains('valid')
-            ) {
-                // remove_from_cart
-                blueshift.track('remove_from_cart', getItemDataForCart(checkedItemData));
-                // add_to_cart
-                blueshift.track('add_to_cart', getItemDataForCart(currentItem));
+                if (
+                    document.querySelector('[name="email"]') &&
+                    document.querySelector('[name="email"]').classList.contains('valid')
+                ) {
+                    // remove_from_cart
+                    blueshift.track('remove_from_cart', getItemDataForCart(checkedItemData));
+                    // add_to_cart
+                    blueshift.track('add_to_cart', getItemDataForCart(currentItem));
+                }
+
+                checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
+            } catch (e) {
+                console.log(e);
             }
-
-            checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
         });
     }
 
@@ -243,8 +263,8 @@
             var _location = window.localStorage.getItem('location');
             var isFiredMainOrderBlueshift = window.localStorage.getItem('isFiredMainOrderBlueshift');
             var __EA_ID = window._EA_ID || window.localStorage.getItem('_vid');
-            if (!window.localStorage.getItem('landing')) {
-                window.localStorage.setItem('landing', document.referrer);
+            if (!window.localStorage.getItem('referrerUrl')) {
+                window.localStorage.setItem('referrerUrl', document.referrer);
             }
             function getPurchasedData(orderInfo, upsellInfo) {
                 let orderNumber = orderInfo.orderNumber,
@@ -291,7 +311,7 @@
                 for (let i = 0, n = items.length; i < n; i++) {
                     product_ids.push(items[i].productId);
                 }
-                const landingurl = window.localStorage.getItem('landing') || '';
+                const landingurl = window.localStorage.getItem('referrerUrl') || '';
                 let landingBaseUrl = '';
                 if (landingurl) {
                     landingBaseUrl = landingurl.split('?')[0];
@@ -385,7 +405,7 @@
                     for (let i = 0, n = failProducts.length; i < n; i++) {
                         product_ids.push(failProducts[i].productId);
                     }
-                    const landingurl = window.localStorage.getItem('landing') || '';
+                    const landingurl = window.localStorage.getItem('referrerUrl') || '';
                     let landingBaseUrl = '';
                     if (landingurl) {
                         landingBaseUrl = landingurl.split('?')[0];
