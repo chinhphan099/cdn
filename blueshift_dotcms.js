@@ -74,29 +74,41 @@
 
         let phone_valid = '', phone_linetype = '', phone_carrier = '', international_format = '';
         function getIdentifyData() {
-            return {
-                // customer_id: '',
-                email: _qById('customer_email').value,
-                firstname: _qById('customer_firstname').value || '',
-                lastname: _qById('customer_lastname').value || '',
-                // ers: '',
-                // email_verified: '',
-                // widget: false,
-                phone_number: international_format || _qById('customer_phone').value,
-                phone_valid: phone_valid,
-                phone_linetype: phone_linetype,
-                phone_carrier: phone_carrier,
-                // orig_affid: '',
-                ship_city: _qById('shipping_city').value,
-                ship_address: _qById('shipping_address1').value,
-                ship_state: _qById('shipping_province').value,
-                ship_zip: _qById('shipping_postal').value,
-                ship_country: _qById('shipping_country').value,
-                customer_language: document.querySelector('html').getAttribute('lang') || '',
-                joined_at: getCurrentDate(),
-                fingerprint_id: window._EA_ID,
-                referrer: document.referrer
-            };
+            try {
+                let firstName = _qById('customer_firstname') ? _qById('customer_firstname').value : '';
+                let lastName = _qById('customer_lastname') ? _qById('customer_lastname').value : '';
+                if (!firstName) {
+                    firstName = _qById('shipping_firstname') ? _qById('shipping_firstname').value : '';
+                }
+                if (!lastName) {
+                    lastName = _qById('shipping_lastname') ? _qById('shipping_lastname').value : '';
+                }
+                return {
+                    // customer_id: '',
+                    email: _qById('customer_email').value,
+                    firstname: firstName,
+                    lastname: lastName,
+                    // ers: '',
+                    // email_verified: '',
+                    // widget: false,
+                    phone_number: international_format || _qById('customer_phone').value,
+                    phone_valid: phone_valid,
+                    phone_linetype: phone_linetype,
+                    phone_carrier: phone_carrier,
+                    // orig_affid: '',
+                    ship_city: _qById('shipping_city').value,
+                    ship_address: _qById('shipping_address1').value,
+                    ship_state: _qById('shipping_province').value,
+                    ship_zip: _qById('shipping_postal').value,
+                    ship_country: _qById('shipping_country').value,
+                    customer_language: document.querySelector('html').getAttribute('lang') || '',
+                    joined_at: getCurrentDate(),
+                    fingerprint_id: window._EA_ID,
+                    referrer: document.referrer
+                };
+            } catch (e) {
+                console.log(e);
+            }
         }
         function getItemDataForCart(checkedItem) {
             try {
