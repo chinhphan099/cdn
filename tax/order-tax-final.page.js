@@ -99,8 +99,8 @@
         const shippingFee = selectedProduct.shippings[window.shippingIndex || 0].price;
         const formattedShippingFee = selectedProduct.shippings[0].formattedPrice;
         const lifetime = getWarrantyPrice();
-        const totalTaxAmount = selectedItem.taxAmount + lifetime * window.taxPercent + shippingFee * window.taxPercent;
-        const grandTotal = selectedItem.discountedPrice + lifetime + shippingFee + totalTaxAmount;
+        const totalTaxAmount = selectedProduct.productPrices.DiscountedPrice.Value * window.taxPercent + lifetime * window.taxPercent + shippingFee * window.taxPercent;
+        const grandTotal = selectedProduct.productPrices.DiscountedPrice.Value + lifetime + shippingFee + totalTaxAmount;
 
         Array.prototype.slice.call(_qAll('.tax_price, .td-taxes-fees')).forEach((taxElem) => {
             taxElem.textContent = utils.formatPrice(totalTaxAmount.toFixed(2), window.fCurrency, formattedShippingFee);
