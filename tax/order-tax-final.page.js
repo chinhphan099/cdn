@@ -206,6 +206,7 @@
                         'postalCode': camp.location.zipCode
                     };
                     const postData = {
+                        isTest: utils.getQueryParameter('isCardTest') ? true : false,
                         items: [],
                         customerAddress: customerAddress
                     };

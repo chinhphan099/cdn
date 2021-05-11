@@ -204,6 +204,7 @@
         if (window.localStorage.getItem('bindTax') === 'true') {
             const selectedProduct = window.upsell.products[window.upsell_productindex];
             const postData = {
+                isTest: utils.getQueryParameter('isCardTest') ? true : false,
                 items: [],
                 customerAddress: JSON.parse(window.localStorage.getItem('customerAddress'))
             };
