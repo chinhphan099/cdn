@@ -495,7 +495,7 @@ export default class Utils {
         try {
             const VALUE_PLACEHOLDER = 'XXXX'
             let separator = '.'
-            let formatNumber = number.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+            let formatNumber = Number(number).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 
             const pattern = formattedValue.replace(/(\d+.*,*)(.|,)(\d{2})/, (match, p1, p2) => {
                 separator = p2
@@ -503,7 +503,7 @@ export default class Utils {
             });
 
             if (separator === ',') {
-                formatNumber = number
+                formatNumber = Number(number)
                     .toFixed(2)
                     .replace('.', ',')
                     .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
