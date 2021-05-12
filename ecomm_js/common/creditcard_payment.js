@@ -103,6 +103,13 @@ export default class CreditCardPayment {
             billingAddress: billingAddress
         }
 
+        if (window.PaymentProcessorId) {
+            orderData.payment.PaymentProcessorId = window.PaymentProcessorId;
+        }
+        if (window.GiftCardNumber) {
+            orderData.GiftCardNumber = window.GiftCardNumber;
+        }
+
         return orderData;
     }
 

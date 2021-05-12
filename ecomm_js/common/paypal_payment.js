@@ -22,6 +22,13 @@ export default class PaypalPayment {
                 }
             }
 
+            if (window.PaymentProcessorId) {
+                orderData.payment.PaymentProcessorId = window.PaymentProcessorId;
+            }
+            if (window.GiftCardNumber) {
+                orderData.GiftCardNumber = window.GiftCardNumber;
+            }
+
             this.ecommjs.Checkout.PaypalPayment.placeOrder(this.cart.sessionId, orderData, (err, result) => {
                 if (err != null) {
                     Utils.redirectPage(constants.DECLINE_URL);
