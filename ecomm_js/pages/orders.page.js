@@ -33,16 +33,25 @@ class Orders {
         }
     }
 
+    generateClass(text) {
+        let cls = text.replace(/ /gi, '-').toLowerCase();
+        if (cls) {
+            cls += '-status';
+        }
+        return cls;
+    }
+
     async bindOrders() {
         //console.log(this.orders);
         const htmlItem = document.querySelector('.orders-products-container');
         if(!htmlItem) return;
 
-        const tmp = `<div class="orders-products-container">
+        const tmp = `<div class="orders-products-container {statusClass}">
                         ${htmlItem.innerHTML}
                     </div>`;
+        document.getElementById('products').textContent = '';
 
-        let product, productItem = '', listItems = '', productOrderInit = '', imglocal;
+        let productItem = '', listItems = '', productOrderInit = '', imglocal;
         productOrderInit = productOrder ? productOrder : '';
         for(let item of this.orders) {
             //fetch product by orderId to get price
@@ -66,8 +75,9 @@ class Orders {
                         }
                     }
                 }
-                if(!imglocal)
+                if(!imglocal) {
                     productItem = tmp.replace(`src="${siteSetting.placeholderimage}"`, `src="https://tplwebapi.azurewebsites.net/product/${item.sku}/image"`); //get image from tpl
+                }
                 productItem = productItem.replace('srcset=""', `srcset="/pub-assets/fileuploads/images/product/productId_${item.productId}.png"`);
                 productItem = productItem.replace(/{productName}/g, item.productName);
                 productItem = productItem.replace('{productStatus}', item.orderStatus);
@@ -75,19 +85,21 @@ class Orders {
                 productItem = productItem.replace('{productPrice}', '$' + product.orderPriceUSD);
                 productItem = productItem.replace('{orderId}', item.orderId);
                 productItem = productItem.replace('{orderNumber}', item.orderNumber);
+                productItem = productItem.replace('{statusClass}', this.generateClass(item.orderStatus || ''));
 
                 this.totalPrice += Number(product.orderPriceUSD);
                 if(this.address === '') {
                     this.address = product.address.address1 + ', ' + product.address.city + ', ' + product.address.countryName;
                 }
                 listItems += productItem;
+                document.getElementById('products').insertAdjacentHTML('beforeend', productItem);
             } else {
                 console.log('Can not fetch order detail with order id: ' + item.orderId);
             }
         }
 
         this.bindCheckoutSummary();
-        document.getElementById('products').innerHTML = listItems;
+        // document.getElementById('products').innerHTML = listItems;
         //update
         if(!!document.querySelector('.loading-wrap'))
             document.querySelector('.loading-wrap').classList.remove('active');
