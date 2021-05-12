@@ -37,7 +37,7 @@ export default class PaypalPayment {
 
                 if (result && result.success) {
                     localStorage.removeItem(constants.CART);
-					localStorage.removeItem('isFiredConfirmTotal')
+                    localStorage.removeItem('isFiredConfirmTotal')
                     //save params for success page when redirect to confirm page
                     if (location.href.indexOf('?') > 0) {
                         localStorage.setItem('paramsForConfirmPage', location.href.split('?')[1]);
@@ -58,8 +58,8 @@ export default class PaypalPayment {
                         return;
                     }
 
-					Utils.redirectPage(constants.DECLINE_URL);
-				}
+                    Utils.redirectPage(constants.DECLINE_URL);
+                }
             });
     }
 
