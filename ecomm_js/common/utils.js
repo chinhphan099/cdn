@@ -490,4 +490,29 @@ export default class Utils {
             });
         }
     }
+
+    static formatPrice(number, formattedValue) {
+        try {
+            const VALUE_PLACEHOLDER = 'XXXX'
+            let separator = '.'
+            let formatNumber = number.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+
+            const pattern = formattedValue.replace(/(\d+.*,*)(.|,)(\d{2})/, (match, p1, p2) => {
+                separator = p2
+                return VALUE_PLACEHOLDER
+            });
+
+            if (separator === ',') {
+                formatNumber = number
+                    .toFixed(2)
+                    .replace('.', ',')
+                    .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
+            }
+
+            return pattern.replace(VALUE_PLACEHOLDER, formatNumber)
+        }
+        catch (e) {
+            return number
+        }
+    }
 }
