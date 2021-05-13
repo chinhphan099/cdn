@@ -46,7 +46,7 @@
             }
             else {
                 const taxRow = `<tr class="tax-row">
-                    <td class="td-taxes-text">${siteSetting.taxAndFee || 'Estimated Tax:'}</td>
+                    <td class="td-taxes-text">${js_translate.taxAndFee || 'Estimated Tax:'}</td>
                     <td class="td-taxes-fees text-right">${imgLoading}</td>
                 </tr>`;
                 if (_q('.statistical table tbody')) {
@@ -112,7 +112,7 @@
         });
     }
 
-    function implementTax(selectedProduct) {
+    window.implementTax = function(selectedProduct) {
         renderTaxAndGrandTotal(selectedProduct);
         enableCheckoutBtnEvents();
 
@@ -173,7 +173,7 @@
                 items = includeDiscountedPriceIntoTaxArray(items, postData.items);
                 utils.events.emit('bindTax');
                 window.taxArray = items;
-                implementTax(selectedProduct);
+                window.implementTax(selectedProduct);
             })
             .catch(() => {
                 let items = postData.items.map((item) => {
@@ -184,7 +184,7 @@
                 items = includeDiscountedPriceIntoTaxArray(items, postData.items);
                 utils.events.emit('bindTax');
                 window.taxArray = items;
-                implementTax(selectedProduct);
+                window.implementTax(selectedProduct);
             });
     }
 
@@ -213,7 +213,7 @@
 
                     const selectedProduct = _getSelectedProduct();
                     if (!!isExistingTax && window.taxArray.length > 0) {
-                        implementTax(selectedProduct);
+                        window.implementTax(selectedProduct);
                         return;
                     }
 
@@ -275,7 +275,7 @@
             postData.customerAddress = customerAddress;
 
             if (!!isExistingTax && window.taxArray.length > 0) {
-                implementTax(selectedProduct);
+                window.implementTax(selectedProduct);
                 return;
             }
 
@@ -304,7 +304,7 @@
             callTaxAjax(postData, selectedProduct);
         }
         else if (!!isExistingTax && window.taxArray.length > 0) {
-            implementTax(selectedProduct);
+            window.implementTax(selectedProduct);
             return;
         }
     }
