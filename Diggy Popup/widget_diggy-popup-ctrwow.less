@@ -1,0 +1,376 @@
+@import "//d16hdrba6dusey.cloudfront.net/sitecommon/less/components/mixin.less";
+//? Mixin
+.keyframes(@name, @arguments) {
+  @-webkit-keyframes @name {@arguments();}
+  @-moz-keyframes @name {@arguments();}
+  @-o-keyframes @name {@arguments();}
+  @keyframes @name {@arguments();}
+}
+.paypal-in-progress .paypal-loading-overlay {
+    display: block;
+}
+.keyframes(showPopup, {
+    0% {
+        display: block;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-100px);
+    }
+    100% {
+        display: block;
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+});
+.extra-popup {
+    opacity: 0;
+    font-family: Helvetica,Arial,sans-serif;
+    background-color: transparent;
+    &.gap-popup {
+        background-color: white;
+    }
+    &.popup_widget--opened {
+        .animation(showPopup 0.3s 1s forwards);
+    }
+    body & {
+        z-index: 99991;
+    }
+    .edit_mode & {
+        .animation(showPopup 0.3s 1s forwards);
+    }
+    .paypal-in-progress & {
+        background-color: transparent;
+    }
+    .popup_widget_header {
+        background-color: #FAE500;
+        text-align: center;
+        h2 {
+            margin-bottom: 15px;
+            font-weight: 800;
+            font-size: 24px;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+        p {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.35em;
+            margin-bottom: 0;
+            letter-spacing: -0.5px;
+        }
+        .paypal-logo {
+            position: relative;
+            top: 5px;
+            display: none;
+            vertical-align: baseline;
+            .paypal-in-progress & {
+                display: inline;
+            }
+        }
+        .visa-logo {
+            position: relative;
+            top: 5px;
+            vertical-align: baseline;
+            .google-in-progress &,
+            .apple-in-progress &,
+            .paypal-in-progress & {
+                display: none;
+            }
+        }
+        .google-logo {
+            display: none;
+            .google-in-progress & {
+                display: inline;
+            }
+        }
+        .apple-logo {
+            display: none;
+            .apple-in-progress & {
+                display: inline;
+            }
+        }
+        @media (min-width: 768px) {
+            h2 {
+                font-size: 40px;
+            }
+            p {
+                font-size: 22px;
+            }
+        }
+    }
+
+    .popup_widget_main {
+        padding-top: 0;
+        @media (min-width: 768px) {
+            padding-top: 15px;
+        }
+    }
+
+    .current-item {
+        padding: 20px 0;
+        .google-in-progress &,
+        .apple-in-progress &,
+        .paypal-in-progress & {
+            display: none;
+        }
+        h3 {
+            font-size: 16px;
+            line-height: 1.2em;
+            margin-bottom: 15px;
+            position: relative;
+            text-align: center;
+            overflow: hidden;
+            span {
+                position: relative;
+                padding: 0 4px;
+                &:before, &:after {
+                    position: absolute;
+                    content: "";
+                    top: 50%;
+                    height: 1px;
+                    width: 500px;
+                    background-color: #BABABA;
+                }
+                &:before {
+                    right: 100%;
+                }
+                &:after {
+                    left: 100%;
+                }
+            }
+        }
+        .wrap-item {
+            .flex-display();
+            .align-items(center);
+            .flex-wrap(wrap);
+            text-align: left;
+            width: 100%;
+            margin: 0 auto;
+            .thumbnail {
+                position: relative;
+                .size(70px);
+                padding: 5px;
+                line-height: 58px;
+                border-radius: 4px;
+                border: 1px solid #BFBFBF;
+                text-align: center;
+                &:before {
+                    content: "";
+                    background: url(//d16hdrba6dusey.cloudfront.net/sitecommon/images/check-mark.png) no-repeat;
+                    background-size: cover;
+                    width: 20px;
+                    height: 20px;
+                    position: absolute;
+                    right: -10px;
+                    top: -10px;
+                    display: block;
+                }
+                img {
+                    max-height: 100%;
+                }
+            }
+            .item-details {
+                padding-left: 15px;
+                .flex(1 0 0%);
+                .name-item {
+                    margin-bottom: 10px;
+                    font-size: 16px;
+                    line-height: 1.25em;
+                    .plural {
+                        display: none;
+                        .plural-item& {
+                            display: inline;
+                        }
+                    }
+                }
+                .price-item {
+                    .ordered-full-price {
+                        color: #D20000;
+                        text-decoration: line-through;
+                        display: block;
+                        font-size: 16px;
+                    }
+                    .ordered-price-span {
+                        font-size: 18px;
+                        font-weight: 700;
+                        white-space: nowrap;
+                    }
+                }
+            }
+        }
+        @media (min-width: 375px) {
+            h3 {
+                span {
+                    padding: 0 10px;
+                }
+            }
+            .wrap-item {
+                .justify-content(center);
+                max-width: 420px;
+                .thumbnail {
+                    .size(82px);
+                    line-height: 70px;
+                }
+            }
+        }
+        @media (min-width: 768px) {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            .wrap-item {
+                max-width: 100%;
+                padding: 0;
+                .thumbnail {
+                    .size(90px);
+                    line-height: 78px;
+                }
+                .item-details {
+                    .flex(1 0 0%);
+                    .flex-display();
+                    .align-items(center);
+                    .justify-content(space-between);
+                    .name-item {
+                        font-size: 18px;
+                        margin-bottom: 0;
+                    }
+                    .price-item {
+                        text-align: right;
+                    }
+                }
+            }
+        }
+    }
+
+    .extra-item {
+        margin: 0 -15px;
+        padding: 20px 15px;
+        background-color: #DFE5EB;
+        h3 {
+            font-size: 21px;
+            line-height: 1.2;
+            margin-bottom: 15px;
+            position: relative;
+            text-align: center;
+            overflow: hidden;
+            span {
+                position: relative;
+                display: inline-block;
+                padding: 0 4px;
+                &:before, &:after {
+                    position: absolute;
+                    content: "";
+                    top: 50%;
+                    height: 1px;
+                    width: 500px;
+                    background-color: #BABABA;
+                }
+                &:before {
+                    right: 100%;
+                }
+                &:after {
+                    left: 100%;
+                }
+            }
+        }
+        .wrap-item {
+            .flex-display();
+            text-align: left;
+            .align-items(center);
+            .flex-wrap(wrap);
+            .thumbnail {
+                .size(70px);
+                padding: 5px;
+                line-height: 58px;
+                border-radius: 4px;
+                border: 1px solid #BFBFBF;
+                background-color: #fff;
+                text-align: center;
+                img {
+                    max-height: 100%;
+                }
+            }
+            .item-details {
+                padding-left: 15px;
+                font-size: 16px;
+                .flex(1 0 0%);
+                p {
+                    margin-bottom: 0;
+                    line-height: 1.25;
+                }
+                .dynamic-desc {
+                    font-weight: bold;
+                }
+                .name-item {
+                    .extra-qty {
+                        font-size: 30px;
+                    }
+                }
+            }
+        }
+        @media (min-width: 375px) {
+            h3 {
+                span {
+                    padding: 0 10px;
+                }
+            }
+            .wrap-item {
+                .thumbnail {
+                    .size(114px);
+                    line-height: 102px;
+                }
+            }
+        }
+        @media (min-width: 768px) {
+            margin: 0;
+            border-radius: 5px;
+            padding: 20px 35px;
+            h3 {
+                font-size: 26px;
+            }
+            .wrap-item {
+                .item-details {
+                    font-size: 18px;
+                }
+            }
+        }
+        @media (min-width: 992px) {
+            .wrap-item {
+                .thumbnail {
+                    .size(135px);
+                    line-height: 123px;
+                }
+            }
+        }
+    }
+
+    .popup_widget_footer {
+        padding-bottom: 25px;
+        text-align: center;
+        .btn-add {
+            width: 100%;
+            max-width: 500px;
+            padding: 14px 5px 13px;
+            margin-bottom: 22px;
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 1.2;
+            color: white;
+            background-color: #11AD52;
+            .box-shadow(0 3px 0 #0F6A28);
+            .border-radius(3px);
+        }
+        .btn-cancel {
+            font-size: 14px;
+            line-height: 1.25;
+            color: #808080;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        @media (min-width: 768px) {
+            .btn-add {
+                font-size: 20px;
+            }
+        }
+    }
+}
