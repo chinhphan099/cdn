@@ -57,7 +57,7 @@
   overflow-y: auto;
   background-color: rgba(0, 0, 0, .5);
   outline: 0;
-  .edit_mode & {
+  .builder_mode & {
     display: block !important;
     position: static;
     height: 400px;
@@ -215,11 +215,12 @@
       border: 2px solid white;
       cursor: pointer;
       font-style: normal;
+      font-size: 25px;
       -webkit-align-items: center;
-        -ms-align-items: center;
-        align-items: center;
-        -ms-flex-pack: center;
-        justify-content: center;
+      -ms-align-items: center;
+      align-items: center;
+      -ms-flex-pack: center;
+      justify-content: center;
     }
   }
   &_content {
@@ -324,7 +325,7 @@ _:-ms-fullscreen, :root .popup_widget--theme_1 .popup_widget_outer--scrollable.p
     body & {
         z-index: 99991;
     }
-    .edit_mode & {
+    .builder_mode & {
         animation: showPopup 0.3s 1s forwards;
     }
     .paypal-in-progress & {
@@ -333,6 +334,9 @@ _:-ms-fullscreen, :root .popup_widget--theme_1 .popup_widget_outer--scrollable.p
     .popup_widget_header {
         background-color: #FAE500;
         text-align: center;
+        h2 {
+            margin: 0;
+        }
         .title {
             display: block;
             margin-bottom: 15px;
@@ -349,36 +353,14 @@ _:-ms-fullscreen, :root .popup_widget--theme_1 .popup_widget_outer--scrollable.p
             margin-bottom: 0;
             letter-spacing: -0.5px;
         }
-        .paypal-logo {
+        .payment-logo {
+            display: none;
             position: relative;
             top: 5px;
-            display: none;
             vertical-align: baseline;
-            .paypal-in-progress & {
-                display: inline;
-            }
         }
         .visa-logo {
-            position: relative;
-            top: 5px;
-            vertical-align: baseline;
-            .google-in-progress &,
-            .apple-in-progress &,
-            .paypal-in-progress & {
-                display: none;
-            }
-        }
-        .google-logo {
-            display: none;
-            .google-in-progress & {
-                display: inline;
-            }
-        }
-        .apple-logo {
-            display: none;
-            .apple-in-progress & {
-                display: inline;
-            }
+            display: inline;
         }
         @media (min-width: 768px) {
             .title {
@@ -478,13 +460,13 @@ _:-ms-fullscreen, :root .popup_widget--theme_1 .popup_widget_outer--scrollable.p
                 }
                 .price-item {
                     line-height: 1.467;
-                    .unitFullPrice {
+                    .ordered-full-price {
                         color: #D20000;
                         text-decoration: line-through;
                         display: block;
                         font-size: 16px;
                     }
-                    .unitPrice {
+                    .ordered-price-span {
                         font-size: 18px;
                         font-weight: 700;
                         white-space: nowrap;
