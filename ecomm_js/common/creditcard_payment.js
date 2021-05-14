@@ -104,7 +104,9 @@ export default class CreditCardPayment {
         }
 
         if (window.PaymentProcessorId) {
-            orderData.payment.PaymentProcessorId = window.PaymentProcessorId;
+            orderData.payment = {
+                PaymentProcessorId: window.PaymentProcessorId
+            }
         }
         if (window.GiftCardNumber) {
             orderData.GiftCardNumber = window.GiftCardNumber;
