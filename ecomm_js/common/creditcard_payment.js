@@ -104,7 +104,7 @@ export default class CreditCardPayment {
             billingAddress: billingAddress
         }
 
-        if (window.PaymentProcessorId) {
+        if (window.PaymentProcessorId === 62) {
             orderData.payment = {
                 PaymentProcessorId: window.PaymentProcessorId
             }
