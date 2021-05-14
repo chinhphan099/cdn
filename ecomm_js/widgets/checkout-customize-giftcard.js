@@ -111,11 +111,12 @@ class Checkout {
         let canDiscountedPrice = originTotalPrice;
         let totalResumPrice = 0;
         if (window.GiftCardBalance >= originTotalPrice) {
-            canDiscountedPrice = originTotalPrice
+            canDiscountedPrice = originTotalPrice;
+            window.PaymentProcessorId = 62;
         }
         else {
             canDiscountedPrice = window.GiftCardBalance;
-            totalResumPrice = originTotalPrice - canDiscountedPrice
+            totalResumPrice = originTotalPrice - canDiscountedPrice;
         }
         return {
             canDiscountedPrice: '-' + Utils.formatPrice(canDiscountedPrice, this.formatedPrice),
@@ -157,6 +158,7 @@ class Checkout {
     getGiftCardInfo(giftCardValue) {
         // A11B-YE1692Z-5D8A // 60
         // A11B-4I477ZO-I2Y1 // 30
+        // A11B-7BM155K-ST34 // 20
         const url = `https://sales-api.tryemanagecrm.com/api/giftcards/balance/${giftCardValue}`;
         const options = {
             method: 'GET',
@@ -171,7 +173,6 @@ class Checkout {
             window.CanPayShipping = result.canPayShipping
             window.GiftCardBalance = result.balance;
             window.GiftCardNumber = giftCardValue;
-            window.PaymentProcessorId = 62;
             document.querySelector('.giftcard-box .success-message-giftcard').classList.remove('hidden');
             this.bindTotalPrice();
         }).catch(error => console.log(error));
