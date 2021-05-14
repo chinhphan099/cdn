@@ -46,7 +46,8 @@ export default class CreditCardPayment {
                     localStorage.removeItem('isFiredConfirmTotal');
                     this.saveLocalStorage(result, 'creditcart');
                     Utils.redirectPage(constants.CONFIRM_URL);
-                }else{
+                }
+                else {
                     //update
                     if(!!document.querySelector('.btn-order-popup')) {
                         document.querySelector('.loading-wrap').classList.remove('active');
