@@ -280,9 +280,14 @@
         try {
             if (window.location.href.indexOf('/order') > -1) {
                 orderPageEvents();
+                let count = 0;
                 const orderPage = setInterval(() => {
+                    count++;
                     if (window.PRICES && window._EA_ID) {
                         orderPageEvents();
+                        clearInterval(orderPage);
+                    }
+                    if (count === 50) {
                         clearInterval(orderPage);
                     }
                 }, 300);
