@@ -3,6 +3,7 @@
   window._CTR_FINGERPRINTJS_TOKEN = window._CTR_FINGERPRINTJS_TOKEN || "1xDWTKZNrjpwZjuWUjub";
 
   window.addEventListener('load', function() {
+    try {
     (function(w, d, s, l, i) {
       if (!i) return;
       w[l] = w[l] || [];
@@ -16,7 +17,7 @@
       f.parentNode.insertBefore(j, f);
     })(window, document, 'script', 'dataLayer', window.gtmId);
 
-    (function(w, d, s, t) {
+    (function(w, d, b, s, t) {
       try {
         if (!w._CTR_TRACKING_ID) return;
         w._CTR_CUSTOM_DATA = {
@@ -29,10 +30,13 @@
         var j = d.createElement(s);
         j.src = '//d16hdrba6dusey.cloudfront.net/sitecommon/js/commons/ctrwow_analytics.v3.pro.min.js'
         j.defer = true;
-        d.querySelector('body').appendChild(j);
+        d.querySelector(b).appendChild(j);
       } catch(err) {
         console.log('Bind fingerprint error: ', err);
       }
-    })(window, document, 'script', 'title');
+    })(window, document, 'body', 'script', 'title');
+    } catch (e) {
+      console.log(e)
+    }
   });
 })();
