@@ -23,9 +23,7 @@
           w._CTR_CUSTOM_DATA = {
             siteName: w.location.hostname,
             pageName: d.querySelector(t).textContent || '',
-            pageType: '',
-            campaignName: '',
-            campaignWebKey: ''
+            pageType: 'Zendesk Support'
           };
           var j = d.createElement(s);
           j.src = '//d16hdrba6dusey.cloudfront.net/sitecommon/js/commons/ctrwow_analytics.v3.pro.min.js'
@@ -36,7 +34,7 @@
         }
       })(window, document, 'body', 'script', 'title');
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
   });
 })();
