@@ -16,24 +16,23 @@
       f.parentNode.insertBefore(j, f);
     })(window, document, 'script', 'dataLayer', window.gtmId);
 
-    (function() {
+    (function(w, d, s, t) {
       try {
-        if (!window._CTR_TRACKING_ID) return;
-        window._CTR_CUSTOM_DATA = {
-          siteName: window.location.hostname,
-          pageName: document.querySelector('title').textContent || '',
+        if (!w._CTR_TRACKING_ID) return;
+        w._CTR_CUSTOM_DATA = {
+          siteName: w.location.hostname,
+          pageName: d.querySelector(t).textContent || '',
           pageType: '',
           campaignName: '',
           campaignWebKey: ''
         };
-
-        const script = document.createElement('script');
-        script.src = '//d16hdrba6dusey.cloudfront.net/sitecommon/js/commons/ctrwow_analytics.v3.pro.min.js'
-        script.defer = true;
-        document.querySelector('body').appendChild(script);
+        var j = d.createElement(s);
+        j.src = '//d16hdrba6dusey.cloudfront.net/sitecommon/js/commons/ctrwow_analytics.v3.pro.min.js'
+        j.defer = true;
+        d.querySelector('body').appendChild(j);
       } catch(err) {
         console.log('Bind fingerprint error: ', err);
       }
-    })();
+    })(window, document, 'script', 'title');
   });
 })();
