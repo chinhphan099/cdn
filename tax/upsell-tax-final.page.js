@@ -49,7 +49,7 @@
         const shippingFee = selectedProduct.shippings[0].price;
         window.taxPercent = taxUpsellItem.taxRate / 100;
         const shippingFeeFormatted = selectedProduct.shippings[0].formattedPrice;
-        const totalPrice = taxUpsellItem.discountedPrice + taxUpsellItem.taxAmount + shippingFee + shippingFee * window.taxPercent;
+        const totalPrice = selectedProduct.productPrices.DiscountedPrice.Value * (1 + window.taxPercent) + shippingFee * (1 + window.taxPercent);
 
         Array.prototype.slice.call(_qAll('.spanUpsellPrice')).forEach(spanUpsellPrice => {
             spanUpsellPrice.textContent = utils.formatPrice(totalPrice.toFixed(2), fCurrency, shippingFeeFormatted);
