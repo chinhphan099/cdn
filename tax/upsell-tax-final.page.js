@@ -35,6 +35,7 @@
         for (let elem of allElements) {
             if (elem.children.length === 0 || elem.tagName.toLowerCase() === 'span') {
                 elem.innerHTML = elem.innerHTML.replace(/{price}/g, '<span class="spanUpsellPrice"></span>');
+                elem.innerHTML = elem.innerHTML.replace(/{taxAmount}/g, '<span class="spanTaxAmount"></span>');
                 elem.innerHTML = elem.innerHTML.replace(/{FirstCharge}/g, '<span class="spanFirstCharge"></span>');
                 elem.innerHTML = elem.innerHTML.replace(/{RemainAmount}/g, '<span class="spanRemainAmount"></span>');
                 elem.innerHTML = elem.innerHTML.replace(/{fullprice}/g, '<span class="spanFullPrice"></span>');
@@ -49,10 +50,15 @@
         const shippingFee = selectedProduct.shippings[0].price;
         window.taxPercent = taxUpsellItem.taxRate / 100;
         const shippingFeeFormatted = selectedProduct.shippings[0].formattedPrice;
+        const taxAmount = selectedProduct.productPrices.DiscountedPrice.Value * window.taxPercent;
         const totalPrice = selectedProduct.productPrices.DiscountedPrice.Value * (1 + window.taxPercent) + shippingFee * (1 + window.taxPercent);
 
         Array.prototype.slice.call(_qAll('.spanUpsellPrice')).forEach(spanUpsellPrice => {
             spanUpsellPrice.textContent = utils.formatPrice(totalPrice.toFixed(2), fCurrency, shippingFeeFormatted);
+        });
+
+        Array.prototype.slice.call(_qAll('.spanTaxAmount')).forEach(spanUpsellPrice => {
+            spanUpsellPrice.textContent = utils.formatPrice(taxAmount.toFixed(2), fCurrency, shippingFeeFormatted);
         });
 
         Array.prototype.slice.call(_qAll('.unit-price, .spanUnitUpsellPrice')).forEach((elm) => {
