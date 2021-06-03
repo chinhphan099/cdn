@@ -113,7 +113,7 @@
         function getItemDataForCart(checkedItem) {
             try {
                 const quantity = window.localStorage.getItem('doubleQuantity') ? checkedItem.quantity / 2 : checkedItem.quantity;
-                const landingurl = window.localStorage.getItem('referrerUrl') || '';
+                const landingurl = window.location.href;
                 let landingBaseUrl = '';
                 if (landingurl) {
                     landingBaseUrl = landingurl.split('?')[0];
@@ -346,7 +346,7 @@
                 for (let i = 0, n = items.length; i < n; i++) {
                     product_ids.push(items[i].productId);
                 }
-                const landingurl = window.localStorage.getItem('referrerUrl') || '';
+                const landingurl = window.location.href;
                 let landingBaseUrl = '';
                 if (landingurl) {
                     landingBaseUrl = landingurl.split('?')[0];
@@ -440,7 +440,7 @@
                     for (let i = 0, n = failProducts.length; i < n; i++) {
                         product_ids.push(failProducts[i].productId);
                     }
-                    const landingurl = window.localStorage.getItem('referrerUrl') || '';
+                    const landingurl = window.location.href;
                     let landingBaseUrl = '';
                     if (landingurl) {
                         landingBaseUrl = landingurl.split('?')[0];
