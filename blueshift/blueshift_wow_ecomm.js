@@ -236,9 +236,6 @@
         $('button.checkoutWithPaypal').on('click', function() {
             submitCheckoutOrder();
         });
-        document.querySelector('#i16clo').addEventListener('click', function() {
-            submitCheckoutOrder();
-        })
         window.ctrwowUtils.events.on('ctr_form_checkoutWithCreditCard', function(orderInfo) {
             submitCheckoutOrder();
         });
