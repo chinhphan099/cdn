@@ -1,5 +1,5 @@
 (() => {
-    console.log('BlueShift2');
+    console.log('BlueShift');
     function getQueryParameter(param) {
         let href = '';
         if (location.href.indexOf('?')) {
@@ -92,20 +92,20 @@
         try {
             let cartItems = {};
             if (isConfirmPage) {
-                cartItems.items = JSON.parse(localStorage.getItem('ctr__ecom_order_info')).products
+                cartItems.items = JSON.parse(localStorage.getItem('checkoutSuccess')).products
             }
             else {
-                cartItems = window.ctrwowEcom.helpers.getCartData();
+                cartItems = JSON.parse(localStorage.getItem('cart'));
             }
-            cartItems.items = cartItems.items.map((cartItem) => {
-                var sku = campaignInfo.prices.find(price => price.productId === cartItem.productId).sku;
-                return {
-                    ...cartItem,
-                    sku: sku
-                }
-            });
+            // cartItems.items = cartItems.items.map((cartItem) => {
+            //     var sku = campaignInfo.prices.find(price => price.productId === Number(cartItem.productId)).sku;
+            //     return {
+            //         ...cartItem,
+            //         sku: sku
+            //     }
+            // });
             if (!isConfirmPage) {
-                window.localStorage.setItem('ctr__ecom_cart', JSON.stringify(cartItems));
+                window.localStorage.setItem('cart', JSON.stringify(cartItems));
             }
             return cartItems;
         } catch(e) {
@@ -116,11 +116,11 @@
         try {
             const cartItems = addSkuIntoCartItems(isConfirmPage);
             const products = cartItems.items.map((item) => {
-                var quantity = item.quantity;
-                var total = item.price + item.shippingPriceValue;
-                var isPlusQty = isPlusQuantity(item.productId, quantity);
+                var quantity = Number(item.quantity);
+                var total = Number(item.discountedPrice) + Number(item.shippingValue);
+                var isPlusQty = isPlusQuantity(Number(item.productId), quantity);
                 if (isPlusQty) {
-                    total = item.price * quantity + item.shippingPriceValue;
+                    total = Number(item.discountedPrice) * quantity + Number(item.shippingValue);
                 }
                 return {
                     productId: item.productId,
@@ -151,18 +151,18 @@
             function getIdentifyData() {
                 try {
                     return {
-                        email: document.querySelector('[name="email"]').value,
-                        firstname: document.querySelector('[name="firstName"]').value || '',
-                        lastname: document.querySelector('[name="lastName"]').value || '',
-                        phone_number: international_format || document.querySelector('[name="phoneNumber"]').value,
+                        email: document.querySelector('#customer_email').value,
+                        firstname: document.querySelector('#shipping_firstname').value || '',
+                        lastname: document.querySelector('#shipping_lastname').value || '',
+                        phone_number: international_format || document.querySelector('#customer_phone').value,
                         phone_valid: phone_valid,
                         phone_linetype: phone_linetype,
                         phone_carrier: phone_carrier,
-                        ship_city: document.querySelector('[name="city"]').value,
-                        ship_address: document.querySelector('[name="address1"]').value,
-                        ship_state: document.querySelector('[name="state"]').value,
-                        ship_zip: document.querySelector('[name="zipCode"]').value,
-                        ship_country: document.querySelector('[name="countryCode"]').value,
+                        ship_city: document.querySelector('#shipping_city').value,
+                        ship_address: document.querySelector('#shipping_address1').value,
+                        ship_state: document.querySelector('#shipping_state').value,
+                        ship_zip: document.querySelector('#shipping_postcode').value,
+                        ship_country: document.querySelector('#shipping_country').value,
                         customer_language: document.querySelector('html').getAttribute('lang') || '',
                         joined_at: getCurrentDate(),
                         fingerprint_id: window._EA_ID,
@@ -173,7 +173,7 @@
                 }
             }
 
-            var inputs = Array.prototype.slice.call(document.querySelectorAll('[name="email"], [name="firstName"], [name="lastName"], [name="phoneNumber"]'));
+            var inputs = Array.prototype.slice.call(document.querySelectorAll('#customer_email, #shipping_firstname, #shipping_lastname, #customer_phone'));
             let identifyData = getIdentifyData();
             blueshift.identify(identifyData);
 
@@ -182,11 +182,11 @@
                     try {
                         identifyData = getIdentifyData();
 
-                        if (e.currentTarget.getAttribute('name') === 'email' && document.querySelector('[name="email"]').classList.contains('valid')) {
+                        if (e.currentTarget.getAttribute('id') === 'customer_email' && document.querySelector('#customer_email').classList.contains('valid')) {
                             blueshift.identify(identifyData);
                         }
 
-                        if (e.currentTarget.getAttribute('name') === 'phoneNumber' && e.currentTarget.value !== '') {
+                        if (e.currentTarget.getAttribute('id') === 'customer_phone' && e.currentTarget.value !== '') {
                             const phoneNumber = e.currentTarget.value.match(/\d/g).join('');
                             let checkPhoneAPI = `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneNumber}`;
                             if (countryCode) checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
@@ -226,8 +226,8 @@
                     for (let i = 0, n = items.length; i < n; i++) {
                         product_ids.push(items[i].productId);
                         skus.push(items[i].sku);
-                        totalQty += items[i].quantity
-                        totalPrice += Number(items[i].total_usd)
+                        totalQty += items[i].quantity;
+                        totalPrice += Number(items[i].total_usd);
                     }
                     blueshift.track('checkout', {
                         fingerprintId: window._EA_ID,
@@ -250,7 +250,7 @@
             $('button.checkoutWithPaypal').on('click', function() {
                 submitCheckoutOrder();
             });
-            window.ctrwowUtils.events.on('ctr_form_checkoutWithCreditCard', function(orderInfo) {
+            $('button#btn-submit-cc').on('click', function() {
                 submitCheckoutOrder();
             });
         } catch(e) {
@@ -268,7 +268,7 @@
                     count++;
                     campaignInfo = window.localStorage.getItem('ctr__ecom_campaigns');
                     if (campaignInfo && window._EA_ID) {
-                        campaignInfo = JSON.parse(campaignInfo)
+                        campaignInfo = JSON.parse(campaignInfo);
                         checkoutPageEvents();
                         clearInterval(checkoutPage);
                     }
@@ -282,7 +282,7 @@
             function getPurchasedData(orderInfo, isConfirmPage) {
                 try {
                     campaignInfo = JSON.parse(window.localStorage.getItem('ctr__ecom_campaigns'));
-                    const cartNumber = orderInfo.cartNumber
+                    const cartNumber = orderInfo.cartNumber;
                     const productsInCart = getProductsInCart(isConfirmPage);
                     const items = productsInCart.products;
                     const product_ids = [];
@@ -292,15 +292,15 @@
                     for (let i = 0, n = items.length; i < n; i++) {
                         product_ids.push(items[i].productId);
                         skus.push(items[i].sku);
-                        totalQty += items[i].quantity
-                        totalPrice += Number(items[i].total_usd)
+                        totalQty += items[i].quantity;
+                        totalPrice += Number(items[i].total_usd);
                     }
 
                     const landingurl = window.location.href;
                     const landingBaseUrl = landingurl.split('?')[0];
                     const data = {
                         order_id: cartNumber,
-                        customer_id: orderInfo.customerId,
+                        customer_id: orderInfo.customerId || '',
                         email: orderInfo.email,
                         order_create_date: getCurrentDate(),
                         ip_address: campaignInfo.location.ip,
@@ -327,14 +327,14 @@
 
             // ! Confirm
             var isFiredMainOrderBlueshift = window.localStorage.getItem('isFiredMainOrderBlueshift');
-            let orderInfo = window.localStorage.getItem('ctr__ecom_order_info');
-            if (urlPath.indexOf('confirm') > -1 && orderInfo && window._EA_ID) {
+            let orderInfo = window.localStorage.getItem('checkoutSuccess');
+            if (urlPath.indexOf('confirm') > -1 && orderInfo) {
                 orderInfo = JSON.parse(orderInfo);
 
                 let identifyData = window.localStorage.getItem('identifyData');
                 if (identifyData) {
                     identifyData = JSON.parse(identifyData);
-                    if (!identifyData.customer_id) {
+                    if (!identifyData.customer_id && orderInfo.customerId) {
                         identifyData.customer_id = orderInfo.customerId;
                     }
                     window.localStorage.setItem('identifyData', JSON.stringify(identifyData));
@@ -345,7 +345,7 @@
                     blueshift.track('purchase', getPurchasedData(orderInfo, true));
                     window.localStorage.setItem('isFiredMainOrderBlueshift', true);
                 }
-                window.localStorage.setItem('ctr__ecom_order_info', JSON.stringify(orderInfo));
+                window.localStorage.setItem('checkoutSuccess', JSON.stringify(orderInfo));
             }
 
             // ! Decline
@@ -360,8 +360,8 @@
                 for (let i = 0, n = items.length; i < n; i++) {
                     product_ids.push(items[i].productId);
                     skus.push(items[i].sku);
-                    totalQty += items[i].quantity
-                    totalPrice += Number(items[i].total_usd)
+                    totalQty += items[i].quantity;
+                    totalPrice += Number(items[i].total_usd);
                 }
 
                 const landingurl = window.location.href;

@@ -300,7 +300,7 @@
                     const landingBaseUrl = landingurl.split('?')[0];
                     const data = {
                         order_id: cartNumber,
-                        customer_id: orderInfo.customerId,
+                        customer_id: orderInfo.customerId || '',
                         email: orderInfo.email,
                         order_create_date: getCurrentDate(),
                         ip_address: campaignInfo.location.ip,
@@ -328,13 +328,13 @@
             // ! Confirm
             var isFiredMainOrderBlueshift = window.localStorage.getItem('isFiredMainOrderBlueshift');
             let orderInfo = window.localStorage.getItem('ctr__ecom_order_info');
-            if (urlPath.indexOf('confirm') > -1 && orderInfo && window._EA_ID) {
+            if (urlPath.indexOf('confirm') > -1 && orderInfo) {
                 orderInfo = JSON.parse(orderInfo);
 
                 let identifyData = window.localStorage.getItem('identifyData');
                 if (identifyData) {
                     identifyData = JSON.parse(identifyData);
-                    if (!identifyData.customer_id) {
+                    if (!identifyData.customer_id && orderInfo.customerId) {
                         identifyData.customer_id = orderInfo.customerId;
                     }
                     window.localStorage.setItem('identifyData', JSON.stringify(identifyData));
