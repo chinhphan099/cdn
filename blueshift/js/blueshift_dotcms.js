@@ -72,10 +72,9 @@
         if (!_campaignInfo || !window._EA_ID || orderFired) {
             return;
         }
-        console.log(1111, _campaignInfo, window._EA_ID);
+        console.log('BlueShift', _campaignInfo, window._EA_ID);
         countryCode = _campaignInfo.location.countryCode;
         var checkedItemData = getCheckedProduct();
-        console.log('orderPageEvents pass');
         orderFired = true;
 
         let phone_valid = '', phone_linetype = '', phone_carrier = '', international_format = '';
