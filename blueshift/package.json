@@ -1,0 +1,34 @@
+{
+  "name": "PugLessJsTemplate",
+  "version": "1.0.0",
+  "keywords": "gulp, less, pug, node",
+  "author": {
+    "name": "Chinh Phan",
+    "email": "chinhphan099@gmail.com",
+    "url": "http://facebook.com/chinhphan099"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chinhphan099/frontend.git"
+  },
+  "bus": {
+    "url": "https://github.com/chinhphan099/frontend/issues",
+    "email": "chinhphan099@gmail.com"
+  },
+  "dependencies": {
+    "gulp": "4.0.2",
+    "gulp-jshint": "^2.0.4",
+    "gulp-rename": "~1.2",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-uglify": "~2.1",
+    "gulp-webserver": "^0.9.1",
+    "jshint": "^2.11.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "gulp-babel": "^8.0.0",
+    "gulp-clean": "^0.4.0",
+    "ip": "^1.1.5"
+  }
+}

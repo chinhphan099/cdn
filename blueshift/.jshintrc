@@ -1,0 +1,33 @@
+{
+  "curly": true,
+  "eqeqeq": true,
+  "latedef": true,
+  "newcap": true,
+  "noarg": true,
+  "sub": true,
+  "undef": true,
+  "unused": true,
+  "boss": true,
+  "eqnull": true,
+  "evil": true,
+  "loopfunc": true,
+  "browser": true,
+  "devel": true,
+  "expr": true,
+  "quotmark": "single",
+  "esversion": 8,
+  "globals": {
+    "Modernizr": true,
+    "Detectizr": true,
+    "jQuery": true,
+    "Handlebars": true,
+    "L10n": true,
+    "Site": true,
+    "Guide": true,
+    "google": true,
+    "locations": true,
+    "FB": true,
+    "YT": true,
+    "onYouTubeIframeAPIReady": true
+  }
+}
