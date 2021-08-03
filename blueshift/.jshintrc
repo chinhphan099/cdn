@@ -15,8 +15,10 @@
   "devel": true,
   "expr": true,
   "quotmark": "single",
-  "esversion": 8,
+  "esversion": 9,
   "globals": {
+    "$": true,
+    "blueshift": true,
     "Modernizr": true,
     "Detectizr": true,
     "jQuery": true,

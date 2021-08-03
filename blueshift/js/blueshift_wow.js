@@ -10,22 +10,28 @@
         return value ? value[1] : null;
     }
     const blueshiftID = getQueryParameter('isCardTest') === '1' ? 'fa8307145a64f9484defb6d8a18940f0' : '13c25a652e2a0c05cb06a3b1dba09a85';
-    window._blueshiftid=blueshiftID;window.blueshift=window.blueshift||[];if(blueshift.constructor===Array){blueshift.load=function(){var d=function(a){return function(){blueshift.push([a].concat(Array.prototype.slice.call(arguments,0)))}},e=["identify","track","click","pageload","capture","retarget","presale_load","interstitial_load", "upsell_load"];for(var f=0;f<e.length;f++)blueshift[e[f]]=d(e[f])};}
+    window._blueshiftid = blueshiftID;
+    window.blueshift = window.blueshift || [];
+    if(blueshift.constructor === Array) {
+        blueshift.load = function() {
+            var d = function(a) {
+                return function() { blueshift.push([a].concat(Array.prototype.slice.call(arguments,0))); };
+            },
+            e = ['identify', 'track', 'click', 'pageload', 'capture', 'retarget', 'presale_load', 'interstitial_load',  'upsell_load'];
+            for(var f = 0; f < e.length; f++) {
+                blueshift[e[f]] = d(e[f]);
+            }
+        };
+    }
     blueshift.load();
     blueshift.pageload();
 
     const urlPath = window.location.pathname;
-    if (urlPath.indexOf('/pre') > -1) {
-        blueshift.presale_load();
-    }
-    if (urlPath.indexOf('/index') > -1) {
-        blueshift.interstitial_load();
-    }
-    if (urlPath.indexOf('/special-offer-') > -1) {
-        blueshift.upsell_load();
-    }
+    if (urlPath.indexOf('/pre') > -1) { blueshift.presale_load(); }
+    if (urlPath.indexOf('/index') > -1) { blueshift.interstitial_load(); }
+    if (urlPath.indexOf('/special-offer-') > -1) { blueshift.upsell_load(); }
 
-    if(blueshift.constructor===Array){(function(){var b=document.createElement("script");b.type="text/javascript",b.async=!0,b.src=("https:"===document.location.protocol?"https:":"http:")+"//cdn.getblueshift.com/blueshift.js",b.defer=true;var c=document.getElementsByTagName("script")[0];c.parentNode.insertBefore(b,c);})()}
+    if(blueshift.constructor===Array){(function(){var b=document.createElement('script');b.type='text/javascript',b.async=!0,b.src=('https:'===document.location.protocol?'https:':'http:')+'//cdn.getblueshift.com/blueshift.js',b.defer=true;var c=document.getElementsByTagName('script')[0];c.parentNode.insertBefore(b,c);})();}
 
     let campaignName = JSON.parse(window.__CTR_FP_TRACKING_SETTINGS.FP_TRACKING_CUSTOM_DATA).campaignName;
     let campaignInfo;
@@ -48,12 +54,12 @@
     }
     function orderPageEvents() {
         window.localStorage.removeItem('isFiredMainOrderBlueshift');
-        campaignInfo = __productListData.data.productList;
+        campaignInfo = window.__productListData.data.productList;
 
-        console.log(1111, campaignInfo, window._EA_ID);
         if (!campaignInfo || !window._EA_ID || orderFired) {
             return;
         }
+        console.log(1111, campaignInfo, window._EA_ID);
         countryCode = campaignInfo.location.countryCode;
         var checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
         console.log('orderPageEvents pass');
@@ -113,9 +119,9 @@
                     // countryCode: campaignInfo.location.countryCode,
                     // regionCode: campaignInfo.location.regionCode,
                     // ip: campaignInfo.location.ip
-                }
+                };
             } catch (e) {
-                console.log(e)
+                console.log(e);
             }
         }
 
@@ -129,7 +135,7 @@
                     identifyData = getIdentifyData();
 
                     if (e.currentTarget.getAttribute('name') === 'email' && document.querySelector('[name="email"]').classList.contains('valid')) {
-                        console.log('BlueShift - Fire identify')
+                        console.log('BlueShift - Fire identify');
                         blueshift.identify(identifyData);
                         checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
                         blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
@@ -156,10 +162,10 @@
                             })
                             .catch((e) => {
                                 console.log(e);
-                            })
+                            });
                     }
-                } catch(e) {
-                    console.log(e);
+                } catch(x) {
+                    console.log(x);
                 }
             });
         });
@@ -175,7 +181,7 @@
                 window.localStorage.setItem('prevItem', JSON.stringify(curItem));
 
                 console.log('BlueShift - Fire checkout');
-                function getProductsInCart() {
+                const getProductsInCart = function() {
                     const currentItem = window.ctrwowCheckout.checkoutData.getProduct();
                     const quantity = window.localStorage.getItem('doubleQuantity') ? currentItem.quantity / 2 : currentItem.quantity;
                     const products = [
@@ -189,8 +195,8 @@
                     return {
                         products: products,
                         sku: currentItem.sku
-                    }
-                }
+                    };
+                };
                 const productsInCart = getProductsInCart();
                 const items = productsInCart.products;
                 const product_ids = [];
@@ -250,7 +256,7 @@
                 let count = 0;
                 const orderPage = setInterval(() => {
                     count++;
-                    if (__productListData.data.productList && window._EA_ID) {
+                    if (window.__productListData.data.productList && window._EA_ID) {
                         orderPageEvents();
                         clearInterval(orderPage);
                     }
@@ -258,7 +264,7 @@
                         clearInterval(orderPage);
                     }
                 }, 300);
-                window.ctrwowCheckout.productListData.onProductListChange((productList) => {
+                window.ctrwowCheckout.productListData.onProductListChange(() => {
                     orderPageEvents();
                 });
                 return;
@@ -271,7 +277,7 @@
             if (!window.localStorage.getItem('referrerUrl')) {
                 window.localStorage.setItem('referrerUrl', document.referrer);
             }
-            function getPurchasedData(orderInfo, upsellInfo) {
+            const getPurchasedData = function(orderInfo, upsellInfo) {
                 let orderNumber = orderInfo.orderNumber,
                     quantity = window.localStorage.getItem('doubleQuantity') ? orderInfo.quantity / 2 : orderInfo.quantity,
                     revenue = Number(orderInfo.orderTotalFull),
@@ -348,9 +354,9 @@
                     revenue: revenue.toFixed(2),
                     currency: window.localStorage.getItem('currencyCode'),
                     // order_status
-                }
+                };
                 return data;
-            }
+            };
             if (orderInfo && __EA_ID) {
                 orderInfo = JSON.parse(orderInfo);
                 _location = JSON.parse(_location || '{}');
@@ -438,7 +444,7 @@
                         sku: sku
                         // order_status: '',
                         // tracking_number: ''
-                    }
+                    };
                     if (orderInfo) {
                         declineData = {
                             ...declineData,
@@ -446,13 +452,13 @@
                             customer_id: orderInfo.customerId,
                             customer_language: document.querySelector('html').getAttribute('lang') || ''
                             // customer_language: orderInfo.cusCountry
-                        }
+                        };
                     }
                     blueshift.track('decline', declineData);
                 }
             }
         } catch(e) {
-            console.log(e)
+            console.log(e);
         }
     }
 
