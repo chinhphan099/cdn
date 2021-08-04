@@ -29,6 +29,17 @@ task('scripts', () =>
       gutil.log(displayErr);
       this.emit('end');
     })
+    .pipe(dest(PUB.js))
+);
+task('releaseScripts', () =>
+  src([SRC.js])
+    .pipe(jshint('.jshintrc'))
+    .pipe(jshint.reporter('default'))
+    .on('error', function (err) {
+      let displayErr = gutil.colors.red(err.message);
+      gutil.log(displayErr);
+      this.emit('end');
+    })
     .pipe(babel({
       "presets": ["@babel/preset-env"]
     }))
@@ -66,4 +77,7 @@ task('build',
 );
 task('default',
   series('clean', 'build', 'webserver')
+);
+task('release',
+  series('clean', 'releaseScripts')
 );
