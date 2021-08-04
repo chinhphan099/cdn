@@ -88,7 +88,7 @@
                 if (!lastName) {
                     lastName = window._qById('shipping_lastname') ? window._qById('shipping_lastname').value : '';
                 }
-                return {
+                const data = {
                     // customer_id: '',
                     email: window._qById('customer_email').value,
                     firstname: firstName,
@@ -111,6 +111,10 @@
                     fingerprint_id: window._EA_ID,
                     referrer: document.referrer
                 };
+                if (window.CC_Code) {
+                    data.coupon = window.CC_Code;
+                }
+                return data;
             } catch (e) {
                 console.log(e);
             }
@@ -198,6 +202,12 @@
                     console.log(x);
                 }
             });
+        });
+
+        window.utils.events.on('onActivePopup', function() {
+            window.CC_Code = window.nextPurchaseCoupon || window.couponCodeId || true;
+            identifyData = getIdentifyData();
+            blueshift.identify(identifyData);
         });
 
         window.utils.events.on('beforeSubmitOrder', function() {
