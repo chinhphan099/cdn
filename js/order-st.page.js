@@ -327,6 +327,20 @@
         Array.prototype.slice.call(_qAll('.grand-total')).forEach(grandTotalElm => {
             grandTotalElm.innerText = utils.formatPrice(grandTotal.toFixed(2), fCurrency, taxes);
         });
+		
+		Array.prototype.slice.call(_qAll('.discount-warranty-price')).forEach(totalFullPriceElm => {
+            if (!!window.isPreOrder) {
+                if (!!data.productPrices.hasOwnProperty('PreSaleAmount1')) {
+                    totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.DiscountedPrice.Value + warranty.wPrice - data.productPrices.PreSaleAmount1.Value).toFixed(2), fCurrency, taxes);
+                }
+                else {
+                    totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.FullRetailPrice.Value + warranty.wPrice).toFixed(2), fCurrency, taxes);
+                }
+            }
+            else {
+                totalFullPriceElm.innerText = utils.formatPrice((data.productPrices.DiscountedPrice.Value + warranty.wPrice).toFixed(2), fCurrency, taxes);
+            }
+        });
 
         Array.prototype.slice.call(_qAll('.jsFullPrice, .depositFullPrice')).forEach(jsFullPrice => {
             if (!window.isPreOrder || !!data.productPrices.hasOwnProperty('PreSaleAmount1')) {

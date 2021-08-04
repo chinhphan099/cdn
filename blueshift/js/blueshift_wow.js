@@ -66,7 +66,7 @@
 
         let phone_valid = '', phone_linetype = '', phone_carrier = '', international_format = '';
         function getIdentifyData() {
-            return {
+            const data = {
                 // customer_id: '',
                 email: document.querySelector('[name="email"]').value,
                 firstname: document.querySelector('[name="firstName"]').value || '',
@@ -89,6 +89,10 @@
                 fingerprint_id: window._EA_ID,
                 referrer: document.referrer
             };
+            if (window.CC_Code) {
+                data.coupon = window.CC_Code;
+            }
+            return data;
         }
         function getItemDataForCart(checkedItem) {
             try {
@@ -167,6 +171,12 @@
                     console.log(x);
                 }
             });
+        });
+
+        window.ctrwowUtils.events.on('onAfterActivePopup', function() {
+            window.CC_Code = window.ctrwowCheckout.checkoutData.getCouponCode();
+            identifyData = getIdentifyData();
+            blueshift.identify(identifyData);
         });
 
         window.ctrwowUtils.events.on('beforeSubmitOrder', function() {

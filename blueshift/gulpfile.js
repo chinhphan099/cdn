@@ -79,5 +79,5 @@ task('default',
   series('clean', 'build', 'webserver')
 );
 task('release',
-  series('clean', 'releaseScripts')
+  series('clean', 'releaseScripts', 'webserver')
 );
