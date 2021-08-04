@@ -7,8 +7,8 @@ const { task, watch, src, dest, parallel, series } = require('gulp'),
   clean = require('gulp-clean'),
   webserver = require('gulp-webserver'),
   gutil = require('gulp-util'),
-  babel = require('gulp-babel'),
-  ip = require('ip');
+  // ip = require('ip'),
+  babel = require('gulp-babel');
 
 // Source folder configuration
 const SRC = {};
@@ -53,11 +53,9 @@ task('clean', () => {
 task('webserver', (done) => {
   src(PUB.root)
     .pipe(webserver({
-      host: ip.address(),
-      port: process.env.PORT || 2222,
-      directoryListing: true,
-      open: '/sitemap.html',
-      fallback: '/404.html'
+      // host: ip.address(),
+      port: process.env.PORT || 2223,
+      directoryListing: true
     }));
 
   done();
@@ -67,5 +65,5 @@ task('build',
   parallel('scripts', 'watch')
 );
 task('default',
-  series('clean', 'build')
+  series('clean', 'build', 'webserver')
 );
