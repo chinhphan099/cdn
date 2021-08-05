@@ -53,6 +53,11 @@
         return 'desktop';
     }
     function orderPageEvents() {
+        var regexInternationNumbers = new RegExp(/^(93|355|213|684|376|244|809|268|54|374|297|247|61|672|43|994|242|246|973|880|375|32|501|229|975|284|591|387|267|55|673|359|226|257|855|237|238|345|236|235|56|86|886|57|269|682|506|385|53|357|420|45|767|253|593|20|503|240|291|372|251|500|298|679|358|33|596|594|241|220|995|49|233|350|30|299|473|671|502|224|245|592|509|504|852|36|354|91|62|98|964|353|972|39|225|876|81|962|7|254|686|82|850|965|996|371|856|961|266|231|370|218|423|352|853|389|261|265|60|960|223|356|692|222|230|52|691|373|976|212|258|95|264|674|977|31|599|869|687|64|505|227|234|683|1670|47|968|92|680|507|675|595|51|63|48|351|1787|974|262|40|250|670|378|239|966|221|381|248|232|65|421|386|677|252|27|34|94|290|508|249|597|46|41|963|689|255|66|228|690|676|1868|216|90|993|688|256|380|971|44|598|1|678|58|84|1340|681|685|967|243|260|263)\d+/);
+        const isInternationalNumbers = function(number) {
+            return regexInternationNumbers.test(number);
+        };
+
         window.localStorage.removeItem('isFiredMainOrderBlueshift');
         campaignInfo = window.__productListData.data.productList;
 
@@ -147,8 +152,15 @@
                     if (e.currentTarget.getAttribute('name') === 'phoneNumber' && e.currentTarget.value !== '') {
                         const phoneNumber = e.currentTarget.value.match(/\d/g).join('');
                         let checkPhoneAPI = `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneNumber}`;
-                        if (countryCode) {
+                        const countryDdl = document.querySelector('[name="shippingAddress"] [name="countryCode"]');
+                        if (countryDdl && countryDdl.value) {
+                            countryCode = countryDdl.value;
+                        }
+                        if (countryCode && !isInternationalNumbers(phoneNumber)) {
                             checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
+                        }
+                        if (window.ctrwowUtils.link.getParameterByName('validPhone') === '1') {
+                            $('input[name="phoneNumber"]').rules('remove', 'cphone');
                         }
                         window.ctrwowUtils
                             .callAjax(checkPhoneAPI)
@@ -157,10 +169,22 @@
                                 phone_linetype = result.line_type;
                                 phone_carrier = result.carrier;
                                 if (phone_valid) {
+                                    e.target.classList.add('correct-phone');
                                     international_format = result.international_format;
                                     identifyData = getIdentifyData();
                                     blueshift.identify(identifyData);
                                     // blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
+                                } else if (window.ctrwowUtils.link.getParameterByName('validPhone') === '1') {
+                                    alert(window.phoneMsg);
+                                    e.target.classList.remove('correct-phone');
+                                }
+
+                                if (window.ctrwowUtils.link.getParameterByName('validPhone') === '1') {
+                                    $('input[name="phoneNumber"]').rules('add', {
+                                        cphone: true
+                                    });
+                                    const validator = $('form[name="customer"]').validate();
+                                    validator.element('input[name="phoneNumber"]');
                                 }
                             })
                             .catch((e) => {
@@ -471,7 +495,36 @@
         }
     }
 
+    function extendValidation() {
+        const invalidPhoneNumberMsg = {
+            en: 'Please enter a valid phone number.',
+            de: 'Bitte geben Sie eine gültige Telefonnummer ein.',
+            fr: 'Veuillez saisir un numéro de téléphone valide.',
+            jp: '有効な電話番号を入力してください。',
+            cn: '请输入有效电话号码。',
+            br: 'Por favor insira um telefone válido.',
+            es: 'Por favor introduzca un número de teléfono válido.',
+            pt: 'Por favor insira um número de telefone válido.'
+        };
+        window.phoneMsg = invalidPhoneNumberMsg.en;
+        const path = window.location.pathname;
+        if (path.indexOf('/de/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.de; }
+        if (path.indexOf('/fr/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.fr; }
+        if (path.indexOf('/jp/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.jp; }
+        if (path.indexOf('/cn/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.cn; }
+        if (path.indexOf('/br/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.br; }
+        if (path.indexOf('/es/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.es; }
+        if (path.indexOf('/pt/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.pt; }
+
+        $.validator.addMethod('cphone', function(value, element) {
+            return $(element).hasClass('correct-phone');
+        }, window.phoneMsg);
+    }
+
     window.addEventListener('load', function() {
         init();
+        if (window.ctrwowUtils.link.getParameterByName('validPhone') === '1') {
+            extendValidation();
+        }
     });
 })();
