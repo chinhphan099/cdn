@@ -35,7 +35,7 @@
 
     let campaignName = JSON.parse(window.__CTR_FP_TRACKING_SETTINGS.FP_TRACKING_CUSTOM_DATA).campaignName;
     let campaignInfo;
-    let orderFired = false;
+    window.orderFired = false;
     let countryCode = '';
     function getCurrentDate() {
         const date = new Date();
@@ -56,13 +56,13 @@
         window.localStorage.removeItem('isFiredMainOrderBlueshift');
         campaignInfo = window.__productListData.data.productList;
 
-        if (!campaignInfo || !window._EA_ID || orderFired) {
+        if (!campaignInfo || !window._EA_ID || window.orderFired) {
             return;
         }
         console.log('BlueShift', campaignInfo, window._EA_ID);
         countryCode = campaignInfo.location.countryCode;
         var checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
-        orderFired = true;
+        window.orderFired = true;
 
         let phone_valid = '', phone_linetype = '', phone_carrier = '', international_format = '';
         function getIdentifyData() {
