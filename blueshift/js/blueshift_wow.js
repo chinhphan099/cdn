@@ -148,10 +148,9 @@
 
         function callAPICheckPhone(isFromCountryDdl) {
             let phoneNumber = phoneNumberElm.val().match(/\d/g);
-            if (phoneNumber) { phoneNumber = phoneNumber.join(''); }
-            else { return; }
-            // if (!phoneNumber) return
+            if (!phoneNumber) { return; }
 
+            phoneNumber = phoneNumber.join('');
             let checkPhoneAPI = `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneNumber}`;
             const isInternationalNumber = isInternationalNumbers(phoneNumber);
             if (countryDdl && countryDdl.value) {
@@ -183,7 +182,8 @@
                         identifyData = getIdentifyData();
                         blueshift.identify(identifyData);
                         // blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
-                    } else if (getQueryParameter('validPhone') === '1') {
+                    }
+                    else if (getQueryParameter('validPhone') === '1') {
                         phoneNumberElm.removeClass('correct-phone');
                     }
 
@@ -201,9 +201,8 @@
                             const shippingAddressFrm = $('form[name="shippingAddress"]').validate();
                             shippingAddressFrm.element(countryDdl);
                         }
-                        phoneNumberElm.rules('add', {
-                            cphone: true
-                        });
+
+                        phoneNumberElm.rules('add', { cphone: true });
                         const validator = $('form[name="customer"]').validate();
                         validator.element(phoneNumberElm);
 
@@ -340,9 +339,7 @@
                         orderPageEvents();
                         clearInterval(orderPage);
                     }
-                    if (count === 50) {
-                        clearInterval(orderPage);
-                    }
+                    if (count === 50) { clearInterval(orderPage); }
                 }, 300);
                 window.ctrwowCheckout.productListData.onProductListChange(() => {
                     orderPageEvents();
