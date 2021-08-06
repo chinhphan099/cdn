@@ -114,10 +114,7 @@
                     try {
                         const quantity = window.localStorage.getItem('doubleQuantity') ? checkedItem.quantity / 2 : checkedItem.quantity;
                         const landingurl = window.location.href;
-                        let landingBaseUrl = '';
-                        if (landingurl) {
-                            landingBaseUrl = landingurl.split('?')[0];
-                        }
+                        const landingBaseUrl = landingurl.split('?')[0];
                         return {
                             // fingerprintId: window._EA_ID,
                             email: document.querySelector('[name="email"]').value || '',
@@ -386,12 +383,6 @@
                             sku = orderInfo.orderedProducts[0].sku;
 
                         if (orderInfo.upsellUrls && orderInfo.upsellUrls.length > 0) {
-                            // items.push({
-                            //     productId: orderInfo.upsellUrls[0].orderedProducts[0].pid,
-                            //     sku: orderInfo.upsellUrls[0].orderedProducts[0].sku,
-                            //     total_usd: orderInfo.upsellUrls[0].price,
-                            //     quantity: orderInfo.upsellUrls[0].orderedProducts[0].quantity
-                            // });
                             for (let i = 0, n = orderInfo.upsellUrls.length; i < n; i++) {
                                 if (orderInfo.upsellUrls[i].isFired === 'fired') {
                                     revenue += orderInfo.upsellUrls[i].price;
@@ -409,7 +400,7 @@
                                     total_usd: upsellInfo.price,
                                     quantity: upsellInfo.orderedProducts[0].quantity
                                 }
-                            ],
+                            ];
                             sku = upsellInfo.orderedProducts[0].sku;
                         }
                         const product_ids = [];
@@ -417,10 +408,7 @@
                             product_ids.push(items[i].productId);
                         }
                         const landingurl = window.location.href;
-                        let landingBaseUrl = '';
-                        if (landingurl) {
-                            landingBaseUrl = landingurl.split('?')[0];
-                        }
+                        const landingBaseUrl = landingurl.split('?')[0];
                         const data = {
                             order_id: orderNumber,
                             customer_id: orderInfo.customerId,
@@ -452,6 +440,7 @@
                         return data;
                     } catch (e) {
                         console.log(e);
+                        return {};
                     }
                 };
 
@@ -515,10 +504,7 @@
                             product_ids.push(failProducts[i].productId);
                         }
                         const landingurl = window.location.href;
-                        let landingBaseUrl = '';
-                        if (landingurl) {
-                            landingBaseUrl = landingurl.split('?')[0];
-                        }
+                        const landingBaseUrl = landingurl.split('?')[0];
                         let declineData = {
                             order_create_date: getCurrentDate(),
                             ip_address: _location.ip || '',
