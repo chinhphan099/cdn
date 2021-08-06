@@ -64,15 +64,15 @@
                     if (find) { return find[1]; }
                     return false;
                 };
-
                 window.localStorage.removeItem('isFiredMainOrderBlueshift');
                 campaignInfo = window.__productListData.data.productList;
 
-                if (!campaignInfo || !window._EA_ID || window.orderFired) { return; }
+                var checkedItemData = window.__checkoutData.data.product;
+
+                if (!campaignInfo || !window._EA_ID || window.orderFired || !checkedItemData) { return; }
                 console.log('BlueShift', campaignInfo, window._EA_ID);
 
                 // countryCode = campaignInfo.location.countryCode;
-                var checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
                 window.orderFired = true;
 
                 let phone_valid = '', phone_linetype = '', phone_carrier = '', international_format = '';
@@ -207,6 +207,14 @@
                                         const shippingAddressFrm = $('form[name="shippingAddress"]').validate();
                                         shippingAddressFrm.element(countryDdl);
                                     }
+                                    if (
+                                        result.country_code &&
+                                        countryDdl.value.toLowerCase() !== result.country_code.toLowerCase() &&
+                                        !countryDdl.querySelector(`option[value="${result.country_code}"]`) &&
+                                        !isFromCountryDdl
+                                    ) {
+                                        phoneNumberElm.removeClass('correct-phone');
+                                    }
 
                                     phoneNumberElm.rules('add', { cphone: true });
                                     const validator = $('form[name="customer"]').validate();
@@ -337,7 +345,7 @@
                     }
                 });
             } catch(e) {
-                console.log(e);
+                console.log('Warning: orderPageEvents');
             }
         };
 
@@ -354,9 +362,9 @@
                         }
                         if (count === 50) { clearInterval(orderPage); }
                     }, 300);
-                    window.ctrwowCheckout.productListData.onProductListChange(() => {
-                        orderPageEvents();
-                    });
+                    // window.ctrwowCheckout.productListData.onProductListChange(() => {
+                    //     orderPageEvents();
+                    // });
                     return;
                 }
 
