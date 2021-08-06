@@ -144,17 +144,29 @@
 
         const phoneNumberElm = $('input[name="phoneNumber"]');
         const countryDdl = document.querySelector('[name="shippingAddress"] [name="countryCode"]');
-        function callAPICheckPhone() {
+        let isTriggerCountryDDl = false;
+
+        function callAPICheckPhone(isFromCountryDdl) {
             let phoneNumber = phoneNumberElm.val().match(/\d/g);
-            if (phoneNumber) phoneNumber = phoneNumber.join('');
+            if (phoneNumber) { phoneNumber = phoneNumber.join(''); }
+            else { return; }
             // if (!phoneNumber) return
 
             let checkPhoneAPI = `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneNumber}`;
+            const isInternationalNumber = isInternationalNumbers(phoneNumber);
             if (countryDdl && countryDdl.value) {
                 countryCode = countryDdl.value;
             }
-            if (countryCode && !isInternationalNumbers(phoneNumber)) {
-                checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
+            if (countryCode) {
+                if (!isInternationalNumber) {
+                    checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
+                } else if (isFromCountryDdl) {
+                    if (isInternationalNumber) {
+                        const dialNumber = getInternationalDialNumber(phoneNumber);
+                        checkPhoneAPI = checkPhoneAPI.replace(dialNumber, '');
+                    }
+                    checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
+                }
             }
             if (getQueryParameter('validPhone') === '1') {
                 phoneNumberElm.rules('remove', 'cphone');
@@ -172,7 +184,6 @@
                         blueshift.identify(identifyData);
                         // blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
                     } else if (getQueryParameter('validPhone') === '1') {
-                        alert(window.phoneMsg);
                         phoneNumberElm.removeClass('correct-phone');
                     }
 
@@ -180,8 +191,10 @@
                         if (
                             result.country_code &&
                             countryDdl.value.toLowerCase() !== result.country_code.toLowerCase() &&
-                            countryDdl.querySelector(`option[value="${result.country_code}"]`))
-                        {
+                            countryDdl.querySelector(`option[value="${result.country_code}"]`) &&
+                            !isFromCountryDdl
+                        ) {
+                            isTriggerCountryDDl = true;
                             countryDdl.value = result.country_code;
                             countryDdl.dispatchEvent(new Event('change'));
 
@@ -193,11 +206,21 @@
                         });
                         const validator = $('form[name="customer"]').validate();
                         validator.element(phoneNumberElm);
+
+                        isTriggerCountryDDl = false;
                     }
                 })
                 .catch((e) => {
                     console.log(e);
                 });
+        }
+
+        if (getQueryParameter('validPhone') === '1') {
+            countryDdl.addEventListener('change', () => {
+                if (!isTriggerCountryDDl) {
+                    callAPICheckPhone(true);
+                }
+            });
         }
 
         inputs.forEach(function(input) {
