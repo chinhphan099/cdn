@@ -142,7 +142,64 @@
         let identifyData = getIdentifyData();
         blueshift.identify(identifyData);
 
+        const phoneNumberElm = $('input[name="phoneNumber"]');
         const countryDdl = document.querySelector('[name="shippingAddress"] [name="countryCode"]');
+        function callAPICheckPhone() {
+            let phoneNumber = phoneNumberElm.val().match(/\d/g);
+            if (phoneNumber) phoneNumber = phoneNumber.join('');
+            // if (!phoneNumber) return
+
+            let checkPhoneAPI = `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneNumber}`;
+            if (countryDdl && countryDdl.value) {
+                countryCode = countryDdl.value;
+            }
+            if (countryCode && !isInternationalNumbers(phoneNumber)) {
+                checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
+            }
+            if (getQueryParameter('validPhone') === '1') {
+                phoneNumberElm.rules('remove', 'cphone');
+            }
+            window.ctrwowUtils
+                .callAjax(checkPhoneAPI)
+                .then((result) => {
+                    phone_valid = result.valid;
+                    phone_linetype = result.line_type;
+                    phone_carrier = result.carrier;
+                    if (phone_valid) {
+                        phoneNumberElm.addClass('correct-phone');
+                        international_format = result.international_format;
+                        identifyData = getIdentifyData();
+                        blueshift.identify(identifyData);
+                        // blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
+                    } else if (getQueryParameter('validPhone') === '1') {
+                        alert(window.phoneMsg);
+                        phoneNumberElm.removeClass('correct-phone');
+                    }
+
+                    if (getQueryParameter('validPhone') === '1') {
+                        if (
+                            result.country_code &&
+                            countryDdl.value.toLowerCase() !== result.country_code.toLowerCase() &&
+                            countryDdl.querySelector(`option[value="${result.country_code}"]`))
+                        {
+                            countryDdl.value = result.country_code;
+                            countryDdl.dispatchEvent(new Event('change'));
+
+                            const shippingAddressFrm = $('form[name="shippingAddress"]').validate();
+                            shippingAddressFrm.element(countryDdl);
+                        }
+                        phoneNumberElm.rules('add', {
+                            cphone: true
+                        });
+                        const validator = $('form[name="customer"]').validate();
+                        validator.element(phoneNumberElm);
+                    }
+                })
+                .catch((e) => {
+                    console.log(e);
+                });
+        }
+
         inputs.forEach(function(input) {
             input.addEventListener('change', function (e) {
                 try {
@@ -155,56 +212,8 @@
                         blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
                     }
 
-                    if (e.currentTarget.getAttribute('name') === 'phoneNumber' && e.currentTarget.value !== '') {
-                        const phoneNumber = e.currentTarget.value.match(/\d/g).join('');
-                        let checkPhoneAPI = `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneNumber}`;
-                        if (countryDdl && countryDdl.value) {
-                            countryCode = countryDdl.value;
-                        }
-                        if (countryCode && !isInternationalNumbers(phoneNumber)) {
-                            checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
-                        }
-                        if (getQueryParameter('validPhone') === '1') {
-                            $('input[name="phoneNumber"]').rules('remove', 'cphone');
-                        }
-                        window.ctrwowUtils
-                            .callAjax(checkPhoneAPI)
-                            .then((result) => {
-                                phone_valid = result.valid;
-                                phone_linetype = result.line_type;
-                                phone_carrier = result.carrier;
-                                if (phone_valid) {
-                                    e.target.classList.add('correct-phone');
-                                    international_format = result.international_format;
-                                    identifyData = getIdentifyData();
-                                    blueshift.identify(identifyData);
-                                    // blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
-                                } else if (getQueryParameter('validPhone') === '1') {
-                                    alert(window.phoneMsg);
-                                    e.target.classList.remove('correct-phone');
-                                }
-
-                                if (getQueryParameter('validPhone') === '1') {
-                                    if (
-                                        result.country_code &&
-                                        countryDdl.value.toLowerCase() !== result.country_code.toLowerCase() &&
-                                        countryDdl.querySelector(`option[value="${result.country_code}"]`))
-                                    {
-                                        countryDdl.value = result.country_code;
-                                        countryDdl.dispatchEvent(new Event('change'));
-                                        const shippingAddressFrm = $('form[name="shippingAddress"]').validate();
-                                        shippingAddressFrm.element(countryDdl);
-                                    }
-                                    $('input[name="phoneNumber"]').rules('add', {
-                                        cphone: true
-                                    });
-                                    const validator = $('form[name="customer"]').validate();
-                                    validator.element('input[name="phoneNumber"]');
-                                }
-                            })
-                            .catch((e) => {
-                                console.log(e);
-                            });
+                    if (e.currentTarget.getAttribute('name') === 'phoneNumber') {
+                        callAPICheckPhone();
                     }
                 } catch(x) {
                     console.log(x);
