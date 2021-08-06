@@ -59,11 +59,11 @@
                 const isInternationalNumbers = function(number) {
                     return regexInternationNumbers.test(number);
                 };
-                const getInternationalDialNumber = function(number) {
-                    const find = number.match(regexInternationNumbers);
-                    if (find) { return find[1]; }
-                    return false;
-                };
+                // const getInternationalDialNumber = function(number) {
+                //     const find = number.match(regexInternationNumbers);
+                //     if (find) { return find[1]; }
+                //     return false;
+                // };
                 window.localStorage.removeItem('isFiredMainOrderBlueshift');
                 campaignInfo = window.__productListData.data.productList;
 
@@ -165,13 +165,13 @@
                             if (!isInternationalNumber) {
                                 checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
                             }
-                            else if (isFromCountryDdl) {
-                                if (isInternationalNumber) {
-                                    const dialNumber = getInternationalDialNumber(phoneNumber);
-                                    checkPhoneAPI = checkPhoneAPI.replace(dialNumber, '');
-                                }
-                                checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
-                            }
+                            // else if (isFromCountryDdl) {
+                            //     if (isInternationalNumber) {
+                            //         const dialNumber = getInternationalDialNumber(phoneNumber);
+                            //         checkPhoneAPI = checkPhoneAPI.replace(dialNumber, '');
+                            //     }
+                            //     checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
+                            // }
                         }
                         if (getQueryParameter('validPhone') === '1') {
                             phoneNumberElm.rules('remove', 'cphone');
@@ -207,14 +207,14 @@
                                         const shippingAddressFrm = $('form[name="shippingAddress"]').validate();
                                         shippingAddressFrm.element(countryDdl);
                                     }
-                                    if (
-                                        result.country_code &&
-                                        countryDdl.value.toLowerCase() !== result.country_code.toLowerCase() &&
-                                        !countryDdl.querySelector(`option[value="${result.country_code}"]`) &&
-                                        !isFromCountryDdl
-                                    ) {
-                                        phoneNumberElm.removeClass('correct-phone');
-                                    }
+                                    // if (
+                                    //     result.country_code &&
+                                    //     countryDdl.value.toLowerCase() !== result.country_code.toLowerCase() &&
+                                    //     !countryDdl.querySelector(`option[value="${result.country_code}"]`) &&
+                                    //     !isFromCountryDdl
+                                    // ) {
+                                    //     phoneNumberElm.removeClass('correct-phone');
+                                    // }
 
                                     phoneNumberElm.rules('add', { cphone: true });
                                     const validator = $('form[name="customer"]').validate();
