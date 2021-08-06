@@ -67,7 +67,7 @@
                 window.localStorage.removeItem('isFiredMainOrderBlueshift');
                 campaignInfo = window.__productListData.data.productList;
 
-                var checkedItemData = window.__checkoutData.data.product;
+                let checkedItemData = window.__checkoutData.data.product;
 
                 if (!campaignInfo || !window._EA_ID || window.orderFired || !checkedItemData) { return; }
                 console.log('BlueShift', campaignInfo, window._EA_ID);
