@@ -137,6 +137,7 @@
         let identifyData = getIdentifyData();
         blueshift.identify(identifyData);
 
+        const countryDdl = document.querySelector('[name="shippingAddress"] [name="countryCode"]');
         inputs.forEach(function(input) {
             input.addEventListener('change', function (e) {
                 try {
@@ -152,14 +153,13 @@
                     if (e.currentTarget.getAttribute('name') === 'phoneNumber' && e.currentTarget.value !== '') {
                         const phoneNumber = e.currentTarget.value.match(/\d/g).join('');
                         let checkPhoneAPI = `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneNumber}`;
-                        const countryDdl = document.querySelector('[name="shippingAddress"] [name="countryCode"]');
                         if (countryDdl && countryDdl.value) {
                             countryCode = countryDdl.value;
                         }
                         if (countryCode && !isInternationalNumbers(phoneNumber)) {
                             checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
                         }
-                        if (window.ctrwowUtils.link.getParameterByName('validPhone') === '1') {
+                        if (getQueryParameter('validPhone') === '1') {
                             $('input[name="phoneNumber"]').rules('remove', 'cphone');
                         }
                         window.ctrwowUtils
@@ -174,7 +174,7 @@
                                     identifyData = getIdentifyData();
                                     blueshift.identify(identifyData);
                                     // blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
-                                } else if (window.ctrwowUtils.link.getParameterByName('validPhone') === '1') {
+                                } else if (getQueryParameter('validPhone') === '1') {
                                     alert(window.phoneMsg);
                                     e.target.classList.remove('correct-phone');
                                 }
@@ -531,7 +531,7 @@
 
     window.addEventListener('load', function() {
         init();
-        if (window.ctrwowUtils.link.getParameterByName('validPhone') === '1') {
+        if (getQueryParameter('validPhone') === '1') {
             extendValidation();
         }
     });
