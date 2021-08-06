@@ -66,43 +66,47 @@
         window.localStorage.removeItem('isFiredMainOrderBlueshift');
         campaignInfo = window.__productListData.data.productList;
 
-        if (!campaignInfo || !window._EA_ID || window.orderFired) {
-            return;
-        }
+        if (!campaignInfo || !window._EA_ID || window.orderFired) { return; }
         console.log('BlueShift', campaignInfo, window._EA_ID);
+
         // countryCode = campaignInfo.location.countryCode;
         var checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
         window.orderFired = true;
 
         let phone_valid = '', phone_linetype = '', phone_carrier = '', international_format = '';
         function getIdentifyData() {
-            const data = {
-                // customer_id: '',
-                email: document.querySelector('[name="email"]').value,
-                firstname: document.querySelector('[name="firstName"]').value || '',
-                lastname: document.querySelector('[name="lastName"]').value || '',
-                // ers: '',
-                // email_verified: '',
-                // widget: false,
-                phone_number: international_format || document.querySelector('[name="phoneNumber"]').value,
-                phone_valid: phone_valid,
-                phone_linetype: phone_linetype,
-                phone_carrier: phone_carrier,
-                // orig_affid: '',
-                ship_city: document.querySelector('[name="city"]').value,
-                ship_address: document.querySelector('[name="address1"]').value,
-                ship_state: document.querySelector('[name="state"]').value,
-                ship_zip: document.querySelector('[name="zipCode"]').value,
-                ship_country: document.querySelector('[name="countryCode"]').value,
-                customer_language: document.querySelector('html').getAttribute('lang') || '',
-                joined_at: getCurrentDate(),
-                fingerprint_id: window._EA_ID,
-                referrer: document.referrer
-            };
-            if (window.CC_Code) {
-                data.coupon = window.CC_Code;
+            try {
+                const data = {
+                    // customer_id: '',
+                    email: document.querySelector('[name="email"]').value,
+                    firstname: document.querySelector('[name="firstName"]').value || '',
+                    lastname: document.querySelector('[name="lastName"]').value || '',
+                    // ers: '',
+                    // email_verified: '',
+                    // widget: false,
+                    phone_number: international_format || document.querySelector('[name="phoneNumber"]').value,
+                    phone_valid: phone_valid,
+                    phone_linetype: phone_linetype,
+                    phone_carrier: phone_carrier,
+                    // orig_affid: '',
+                    ship_city: document.querySelector('[name="city"]').value,
+                    ship_address: document.querySelector('[name="address1"]').value,
+                    ship_state: document.querySelector('[name="state"]').value,
+                    ship_zip: document.querySelector('[name="zipCode"]').value,
+                    ship_country: document.querySelector('[name="countryCode"]').value,
+                    customer_language: document.querySelector('html').getAttribute('lang') || '',
+                    joined_at: getCurrentDate(),
+                    fingerprint_id: window._EA_ID,
+                    referrer: document.referrer
+                };
+                if (window.CC_Code) {
+                    data.coupon = window.CC_Code;
+                }
+                return data;
+            } catch (e) {
+                console.log(e);
+                return {};
             }
-            return data;
         }
         function getItemDataForCart(checkedItem) {
             try {
@@ -135,6 +139,7 @@
                 };
             } catch (e) {
                 console.log(e);
+                return {};
             }
         }
 
@@ -220,7 +225,7 @@
         }
 
         if (getQueryParameter('validPhone') === '1') {
-            countryDdl.addEventListener('change', () => {
+            countryDdl && countryDdl.addEventListener('change', () => {
                 if (!isTriggerCountryDDl) {
                     callAPICheckPhone(true);
                 }
@@ -249,9 +254,13 @@
         });
 
         window.ctrwowUtils.events.on('onAfterActivePopup', function() {
-            window.CC_Code = window.ctrwowCheckout.checkoutData.getCouponCode();
-            identifyData = getIdentifyData();
-            blueshift.identify(identifyData);
+            try {
+                window.CC_Code = window.ctrwowCheckout.checkoutData.getCouponCode();
+                identifyData = getIdentifyData();
+                blueshift.identify(identifyData);
+            } catch (e) {
+                console.log(e);
+            }
         });
 
         window.ctrwowUtils.events.on('beforeSubmitOrder', function() {
@@ -360,85 +369,90 @@
                 window.localStorage.setItem('referrerUrl', document.referrer);
             }
             const getPurchasedData = function(orderInfo, upsellInfo) {
-                let orderNumber = orderInfo.orderNumber,
-                    quantity = window.localStorage.getItem('doubleQuantity') ? orderInfo.quantity / 2 : orderInfo.quantity,
-                    revenue = Number(orderInfo.orderTotalFull),
-                    items = [
-                        {
-                            productId: orderInfo.orderedProducts[0].pid,
-                            sku: orderInfo.orderedProducts[0].sku,
-                            total_usd: orderInfo.orderTotalFull,
-                            quantity: quantity
-                        }
-                    ],
-                    sku = orderInfo.orderedProducts[0].sku;
+                try {
+                    let orderNumber = orderInfo.orderNumber,
+                        quantity = window.localStorage.getItem('doubleQuantity') ? Math.ceil(orderInfo.quantity / 2) : orderInfo.quantity,
+                        revenue = Number(orderInfo.orderTotalFull),
+                        items = [
+                            {
+                                productId: orderInfo.orderedProducts[0].pid,
+                                sku: orderInfo.orderedProducts[0].sku,
+                                total_usd: orderInfo.orderTotalFull,
+                                quantity: quantity
+                            }
+                        ],
+                        sku = orderInfo.orderedProducts[0].sku;
 
-                if (orderInfo.upsellUrls && orderInfo.upsellUrls.length > 0) {
-                    // items.push({
-                    //     productId: orderInfo.upsellUrls[0].orderedProducts[0].pid,
-                    //     sku: orderInfo.upsellUrls[0].orderedProducts[0].sku,
-                    //     total_usd: orderInfo.upsellUrls[0].price,
-                    //     quantity: orderInfo.upsellUrls[0].orderedProducts[0].quantity
-                    // });
-                    for (let i = 0, n = orderInfo.upsellUrls.length; i < n; i++) {
-                        if (orderInfo.upsellUrls[i].isFired === 'fired') {
-                            revenue += orderInfo.upsellUrls[i].price;
+                    if (orderInfo.upsellUrls && orderInfo.upsellUrls.length > 0) {
+                        // items.push({
+                        //     productId: orderInfo.upsellUrls[0].orderedProducts[0].pid,
+                        //     sku: orderInfo.upsellUrls[0].orderedProducts[0].sku,
+                        //     total_usd: orderInfo.upsellUrls[0].price,
+                        //     quantity: orderInfo.upsellUrls[0].orderedProducts[0].quantity
+                        // });
+                        for (let i = 0, n = orderInfo.upsellUrls.length; i < n; i++) {
+                            if (orderInfo.upsellUrls[i].isFired === 'fired') {
+                                revenue += orderInfo.upsellUrls[i].price;
+                            }
                         }
                     }
-                }
 
-                if (upsellInfo) {
-                    orderNumber = orderInfo.orderNumber;
-                    campaignName = upsellInfo.campaignName;
-                    items = [
-                        {
-                            productId: upsellInfo.orderedProducts[0].pid,
-                            sku: upsellInfo.orderedProducts[0].sku,
-                            total_usd: upsellInfo.price,
-                            quantity: upsellInfo.orderedProducts[0].quantity
-                        }
-                    ],
-                    sku = upsellInfo.orderedProducts[0].sku;
+                    if (upsellInfo) {
+                        orderNumber = orderInfo.orderNumber;
+                        campaignName = upsellInfo.campaignName;
+                        items = [
+                            {
+                                productId: upsellInfo.orderedProducts[0].pid,
+                                sku: upsellInfo.orderedProducts[0].sku,
+                                total_usd: upsellInfo.price,
+                                quantity: upsellInfo.orderedProducts[0].quantity
+                            }
+                        ],
+                        sku = upsellInfo.orderedProducts[0].sku;
+                    }
+                    const product_ids = [];
+                    for (let i = 0, n = items.length; i < n; i++) {
+                        product_ids.push(items[i].productId);
+                    }
+                    const landingurl = window.location.href;
+                    let landingBaseUrl = '';
+                    if (landingurl) {
+                        landingBaseUrl = landingurl.split('?')[0];
+                    }
+                    const data = {
+                        order_id: orderNumber,
+                        customer_id: orderInfo.customerId,
+                        email: orderInfo.cusEmail,
+                        order_create_date: getCurrentDate(),
+                        ip_address: _location.ip || '',
+                        // customer_language: orderInfo.cusCountry,
+                        customer_language: document.querySelector('html').getAttribute('lang') || '',
+                        // affid
+                        // device
+                        // device_timezone
+                        device_type: getDeviceType(),
+                        device_vendor: window.navigator.vendor,
+                        campaignname: campaignName,
+                        internal_campaignname: campaignName,
+                        landingurl: landingurl,
+                        landing_base_url: landingBaseUrl,
+                        referringurl: document.referrer,
+                        parentcampaign: window.localStorage.getItem('mainCampaignName'),
+                        // external_payment_url
+                        // one_click_purchase_reference
+                        product_ids: product_ids,
+                        items: items,
+                        sku: sku,
+                        revenue: revenue.toFixed(2),
+                        currency: window.localStorage.getItem('currencyCode'),
+                        // order_status
+                    };
+                    return data;
+                } catch (e) {
+                    console.log(e);
                 }
-                const product_ids = [];
-                for (let i = 0, n = items.length; i < n; i++) {
-                    product_ids.push(items[i].productId);
-                }
-                const landingurl = window.location.href;
-                let landingBaseUrl = '';
-                if (landingurl) {
-                    landingBaseUrl = landingurl.split('?')[0];
-                }
-                const data = {
-                    order_id: orderNumber,
-                    customer_id: orderInfo.customerId,
-                    email: orderInfo.cusEmail,
-                    order_create_date: getCurrentDate(),
-                    ip_address: _location.ip || '',
-                    // customer_language: orderInfo.cusCountry,
-                    customer_language: document.querySelector('html').getAttribute('lang') || '',
-                    // affid
-                    // device
-                    // device_timezone
-                    device_type: getDeviceType(),
-                    device_vendor: window.navigator.vendor,
-                    campaignname: campaignName,
-                    internal_campaignname: campaignName,
-                    landingurl: landingurl,
-                    landing_base_url: landingBaseUrl,
-                    referringurl: document.referrer,
-                    parentcampaign: window.localStorage.getItem('mainCampaignName'),
-                    // external_payment_url
-                    // one_click_purchase_reference
-                    product_ids: product_ids,
-                    items: items,
-                    sku: sku,
-                    revenue: revenue.toFixed(2),
-                    currency: window.localStorage.getItem('currencyCode'),
-                    // order_status
-                };
-                return data;
             };
+
             if (orderInfo && __EA_ID) {
                 orderInfo = JSON.parse(orderInfo);
                 _location = JSON.parse(_location || '{}');
