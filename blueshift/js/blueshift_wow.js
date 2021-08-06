@@ -57,6 +57,11 @@
         const isInternationalNumbers = function(number) {
             return regexInternationNumbers.test(number);
         };
+        const getInternationalDialNumber = function(number) {
+            const find = number.match(regexInternationNumbers);
+            if (find) { return find[1] }
+            return false;
+        };
 
         window.localStorage.removeItem('isFiredMainOrderBlueshift');
         campaignInfo = window.__productListData.data.productList;
