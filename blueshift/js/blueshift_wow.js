@@ -549,7 +549,7 @@
         const extendValidation = function() {
             try {
                 const invalidPhoneNumberMsg = {
-                    en: 'Please enter a valid phone number.',
+                    en: 'Please enter a international phone number or update your country.',
                     de: 'Bitte geben Sie eine gültige Telefonnummer ein.',
                     fr: 'Veuillez saisir un numéro de téléphone valide.',
                     jp: '有効な電話番号を入力してください。',
