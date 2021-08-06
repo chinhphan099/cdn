@@ -65,7 +65,7 @@
             return;
         }
         console.log('BlueShift', campaignInfo, window._EA_ID);
-        countryCode = campaignInfo.location.countryCode;
+        // countryCode = campaignInfo.location.countryCode;
         var checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
         window.orderFired = true;
 
@@ -180,6 +180,14 @@
                                 }
 
                                 if (window.ctrwowUtils.link.getParameterByName('validPhone') === '1') {
+                                    if (countryDdl.querySelector(`option[value="${result.country_code}"]`)) {
+                                        countryDdl.value = result.country_code
+                                        countryDdl.dispatchEvent(new Event('change'))
+                                        if (countryDdl.value) {
+                                            const shippingAddressFrm = $('form[name="shippingAddress"]').validate();
+                                            shippingAddressFrm.element(countryDdl);
+                                        }
+                                    }
                                     $('input[name="phoneNumber"]').rules('add', {
                                         cphone: true
                                     });
