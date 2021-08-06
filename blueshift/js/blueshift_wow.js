@@ -59,7 +59,7 @@
         };
         const getInternationalDialNumber = function(number) {
             const find = number.match(regexInternationNumbers);
-            if (find) { return find[1] }
+            if (find) { return find[1]; }
             return false;
         };
 
@@ -147,71 +147,76 @@
         let isTriggerCountryDDl = false;
 
         function callAPICheckPhone(isFromCountryDdl) {
-            let phoneNumber = phoneNumberElm.val().match(/\d/g);
-            if (!phoneNumber) { return; }
+            try {
+                let phoneNumber = phoneNumberElm.val().match(/\d/g);
+                if (!phoneNumber) { return; }
 
-            phoneNumber = phoneNumber.join('');
-            let checkPhoneAPI = `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneNumber}`;
-            const isInternationalNumber = isInternationalNumbers(phoneNumber);
-            if (countryDdl && countryDdl.value) {
-                countryCode = countryDdl.value;
-            }
-            if (countryCode) {
-                if (!isInternationalNumber) {
-                    checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
-                } else if (isFromCountryDdl) {
-                    if (isInternationalNumber) {
-                        const dialNumber = getInternationalDialNumber(phoneNumber);
-                        checkPhoneAPI = checkPhoneAPI.replace(dialNumber, '');
-                    }
-                    checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
+                phoneNumber = phoneNumber.join('');
+                let checkPhoneAPI = `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneNumber}`;
+                const isInternationalNumber = isInternationalNumbers(phoneNumber);
+                if (countryDdl && countryDdl.value) {
+                    countryCode = countryDdl.value;
                 }
-            }
-            if (getQueryParameter('validPhone') === '1') {
-                phoneNumberElm.rules('remove', 'cphone');
-            }
-            window.ctrwowUtils
-                .callAjax(checkPhoneAPI)
-                .then((result) => {
-                    phone_valid = result.valid;
-                    phone_linetype = result.line_type;
-                    phone_carrier = result.carrier;
-                    if (phone_valid) {
-                        phoneNumberElm.addClass('correct-phone');
-                        international_format = result.international_format;
-                        identifyData = getIdentifyData();
-                        blueshift.identify(identifyData);
-                        // blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
+                if (countryCode) {
+                    if (!isInternationalNumber) {
+                        checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
                     }
-                    else if (getQueryParameter('validPhone') === '1') {
-                        phoneNumberElm.removeClass('correct-phone');
+                    else if (isFromCountryDdl) {
+                        if (isInternationalNumber) {
+                            const dialNumber = getInternationalDialNumber(phoneNumber);
+                            checkPhoneAPI = checkPhoneAPI.replace(dialNumber, '');
+                        }
+                        checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
                     }
-
-                    if (getQueryParameter('validPhone') === '1') {
-                        if (
-                            result.country_code &&
-                            countryDdl.value.toLowerCase() !== result.country_code.toLowerCase() &&
-                            countryDdl.querySelector(`option[value="${result.country_code}"]`) &&
-                            !isFromCountryDdl
-                        ) {
-                            isTriggerCountryDDl = true;
-                            countryDdl.value = result.country_code;
-                            countryDdl.dispatchEvent(new Event('change'));
-
-                            const shippingAddressFrm = $('form[name="shippingAddress"]').validate();
-                            shippingAddressFrm.element(countryDdl);
+                }
+                if (getQueryParameter('validPhone') === '1') {
+                    phoneNumberElm.rules('remove', 'cphone');
+                }
+                window.ctrwowUtils
+                    .callAjax(checkPhoneAPI)
+                    .then((result) => {
+                        phone_valid = result.valid;
+                        phone_linetype = result.line_type;
+                        phone_carrier = result.carrier;
+                        if (phone_valid) {
+                            phoneNumberElm.addClass('correct-phone');
+                            international_format = result.international_format;
+                            identifyData = getIdentifyData();
+                            blueshift.identify(identifyData);
+                            // blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
+                        }
+                        else if (getQueryParameter('validPhone') === '1') {
+                            phoneNumberElm.removeClass('correct-phone');
                         }
 
-                        phoneNumberElm.rules('add', { cphone: true });
-                        const validator = $('form[name="customer"]').validate();
-                        validator.element(phoneNumberElm);
+                        if (getQueryParameter('validPhone') === '1') {
+                            if (
+                                result.country_code &&
+                                countryDdl.value.toLowerCase() !== result.country_code.toLowerCase() &&
+                                countryDdl.querySelector(`option[value="${result.country_code}"]`) &&
+                                !isFromCountryDdl
+                            ) {
+                                isTriggerCountryDDl = true;
+                                countryDdl.value = result.country_code;
+                                countryDdl.dispatchEvent(new Event('change'));
 
-                        isTriggerCountryDDl = false;
-                    }
-                })
-                .catch((e) => {
-                    console.log(e);
-                });
+                                const shippingAddressFrm = $('form[name="shippingAddress"]').validate();
+                                shippingAddressFrm.element(countryDdl);
+                            }
+
+                            phoneNumberElm.rules('add', { cphone: true });
+                            const validator = $('form[name="customer"]').validate();
+                            validator.element(phoneNumberElm);
+
+                            isTriggerCountryDDl = false;
+                        }
+                    })
+                    .catch((e) => {
+                        console.log(e);
+                    });
+            } catch (e) {
+                console.log(e);
+            }
         }
 
         if (getQueryParameter('validPhone') === '1') {
