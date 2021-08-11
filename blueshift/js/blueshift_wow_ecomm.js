@@ -102,7 +102,7 @@
             console.log(e);
         }
     }
-    function addSkuIntoCartItems(isConfirmPage) {
+    function getCartItems(isConfirmPage) {
         try {
             let cartItems = {};
             if (isConfirmPage) {
@@ -128,7 +128,7 @@
     }
     function getProductsInCart(isConfirmPage) {
         try {
-            const cartItems = addSkuIntoCartItems(isConfirmPage);
+            const cartItems = getCartItems(isConfirmPage);
             const products = cartItems.items.map((item) => {
                 var quantity = item.quantity;
                 var total = item.price + item.shippingPriceValue;
