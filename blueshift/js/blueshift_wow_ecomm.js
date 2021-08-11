@@ -172,6 +172,7 @@
             let removedItems;
             if (isRemove) {
                 removedItems = getRemovedItem(productsInCart);
+            } else {
                 productArr = productsInCart;
             }
             const items = removedItems || productsInCart.products;
