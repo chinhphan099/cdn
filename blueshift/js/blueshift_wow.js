@@ -59,11 +59,6 @@
                 const isInternationalNumbers = function(number) {
                     return regexInternationNumbers.test(number);
                 };
-                // const getInternationalDialNumber = function(number) {
-                //     const find = number.match(regexInternationNumbers);
-                //     if (find) { return find[1]; }
-                //     return false;
-                // };
                 window.localStorage.removeItem('isFiredMainOrderBlueshift');
                 campaignInfo = window.__productListData.data.productList;
 
@@ -72,25 +67,19 @@
                 if (!campaignInfo || !window._EA_ID || window.orderFired || !checkedItemData) { return; }
                 console.log('BlueShift', campaignInfo, window._EA_ID);
 
-                // countryCode = campaignInfo.location.countryCode;
                 window.orderFired = true;
 
                 let phone_valid = '', phone_linetype = '', phone_carrier = '', international_format = '';
                 const getIdentifyData = function() {
                     try {
                         const data = {
-                            // customer_id: '',
                             email: document.querySelector('[name="email"]').value,
                             firstname: document.querySelector('[name="firstName"]').value || '',
                             lastname: document.querySelector('[name="lastName"]').value || '',
-                            // ers: '',
-                            // email_verified: '',
-                            // widget: false,
                             phone_number: international_format || document.querySelector('[name="phoneNumber"]').value,
                             phone_valid: phone_valid,
                             phone_linetype: phone_linetype,
                             phone_carrier: phone_carrier,
-                            // orig_affid: '',
                             ship_city: document.querySelector('[name="city"]').value,
                             ship_address: document.querySelector('[name="address1"]').value,
                             ship_state: document.querySelector('[name="state"]').value,
@@ -116,7 +105,6 @@
                         const landingurl = window.location.href;
                         const landingBaseUrl = landingurl.split('?')[0];
                         return {
-                            // fingerprintId: window._EA_ID,
                             email: document.querySelector('[name="email"]').value || '',
                             product_ids: [checkedItem.productId],
                             items: [
@@ -131,10 +119,6 @@
                             currency: window.localStorage.getItem('currencyCode'),
                             landing_base_url: landingBaseUrl,
                             customer_language: document.querySelector('html').getAttribute('lang') || ''
-                            // referrer: document.referrer,
-                            // countryCode: campaignInfo.location.countryCode,
-                            // regionCode: campaignInfo.location.regionCode,
-                            // ip: campaignInfo.location.ip
                         };
                     } catch (e) {
                         console.log(e);
@@ -165,13 +149,6 @@
                             if (!isInternationalNumber) {
                                 checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
                             }
-                            // else if (isFromCountryDdl) {
-                            //     if (isInternationalNumber) {
-                            //         const dialNumber = getInternationalDialNumber(phoneNumber);
-                            //         checkPhoneAPI = checkPhoneAPI.replace(dialNumber, '');
-                            //     }
-                            //     checkPhoneAPI += `&country_code=${countryCode.toLowerCase()}`;
-                            // }
                         }
                         if (getQueryParameter('validPhone') === '1') {
                             phoneNumberElm.rules('remove', 'cphone');
@@ -187,7 +164,6 @@
                                     international_format = result.international_format;
                                     identifyData = getIdentifyData();
                                     blueshift.identify(identifyData);
-                                    // blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
                                 }
                                 else if (getQueryParameter('validPhone') === '1') {
                                     phoneNumberElm.removeClass('correct-phone');
@@ -207,14 +183,6 @@
                                         const shippingAddressFrm = $('form[name="shippingAddress"]').validate();
                                         shippingAddressFrm.element(countryDdl);
                                     }
-                                    // if (
-                                    //     result.country_code &&
-                                    //     countryDdl.value.toLowerCase() !== result.country_code.toLowerCase() &&
-                                    //     !countryDdl.querySelector(`option[value="${result.country_code}"]`) &&
-                                    //     !isFromCountryDdl
-                                    // ) {
-                                    //     phoneNumberElm.removeClass('correct-phone');
-                                    // }
 
                                     phoneNumberElm.rules('add', { cphone: true });
                                     const validator = $('form[name="customer"]').validate();
@@ -312,9 +280,7 @@
                             product_ids: product_ids,
                             items: items,
                             sku: productsInCart.sku,
-                            // total_usd
                             currency: window.localStorage.getItem('currencyCode')
-                            // quantity
                         });
                     } catch (e) {
                         console.log(e);
@@ -333,9 +299,7 @@
                             document.querySelector('[name="email"]') &&
                             document.querySelector('[name="email"]').classList.contains('valid')
                         ) {
-                            // remove_from_cart
                             blueshift.track('remove_from_cart', getItemDataForCart(checkedItemData));
-                            // add_to_cart
                             blueshift.track('add_to_cart', getItemDataForCart(currentItem));
                         }
 
@@ -362,9 +326,6 @@
                         }
                         if (count === 50) { clearInterval(orderPage); }
                     }, 300);
-                    // window.ctrwowCheckout.productListData.onProductListChange(() => {
-                    //     orderPageEvents();
-                    // });
                     return;
                 }
 
@@ -423,11 +384,7 @@
                             email: orderInfo.cusEmail,
                             order_create_date: getCurrentDate(),
                             ip_address: _location.ip || '',
-                            // customer_language: orderInfo.cusCountry,
                             customer_language: document.querySelector('html').getAttribute('lang') || '',
-                            // affid
-                            // device
-                            // device_timezone
                             device_type: getDeviceType(),
                             device_vendor: window.navigator.vendor,
                             campaignname: campaignName,
@@ -436,14 +393,11 @@
                             landing_base_url: landingBaseUrl,
                             referringurl: document.referrer,
                             parentcampaign: window.localStorage.getItem('mainCampaignName'),
-                            // external_payment_url
-                            // one_click_purchase_reference
                             product_ids: product_ids,
                             items: items,
                             sku: sku,
                             revenue: revenue.toFixed(2),
-                            currency: window.localStorage.getItem('currencyCode'),
-                            // order_status
+                            currency: window.localStorage.getItem('currencyCode')
                         };
                         return data;
                     } catch (e) {
@@ -470,7 +424,6 @@
                         console.log('BlueShift - Fire Purchase');
                         if (orderInfo.upsellUrls && orderInfo.upsellUrls.length > 0) {
                             localStorage.setItem('subOrderNumber', orderInfo.upsellUrls[0].orderNumber);
-                            // orderInfo.upsellUrls[0].isFired = 'noFired';
                         }
                         blueshift.track('purchase', getPurchasedData(orderInfo));
                         window.localStorage.setItem('isFiredMainOrderBlueshift', true);
@@ -516,10 +469,7 @@
                         let declineData = {
                             order_create_date: getCurrentDate(),
                             ip_address: _location.ip || '',
-                            // affid: '',
-                            // device: '',
                             internal_campaignname: prevItem.campaignName,
-                            // device_timezone: '',
                             device_type: getDeviceType(),
                             device_vendor: window.navigator.vendor,
                             campaignname: prevItem.campaignName,
@@ -527,15 +477,9 @@
                             landing_base_url: landingBaseUrl,
                             referringurl: document.referrer,
                             parentcampaign: window.localStorage.getItem('mainCampaignName'),
-                            // external_payment_url: '',
-                            // one_click_purchase_reference: '',
-                            // total_usd: '',
-                            // quantity: '',
                             product_ids: product_ids,
                             items: failProducts,
                             sku: sku
-                            // order_status: '',
-                            // tracking_number: ''
                         };
                         if (orderInfo) {
                             declineData = {
@@ -543,7 +487,6 @@
                                 order_id: orderInfo.orderNumber,
                                 customer_id: orderInfo.customerId,
                                 customer_language: document.querySelector('html').getAttribute('lang') || ''
-                                // customer_language: orderInfo.cusCountry
                             };
                         }
                         blueshift.track('decline', declineData);
