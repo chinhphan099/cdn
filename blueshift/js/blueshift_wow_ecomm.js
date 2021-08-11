@@ -289,8 +289,8 @@
             const productsInCart = getProductsInCart();
             let removedItems;
             if (isRemove) {
-                removedItems = getRemovedItem(productsInCart)
-                productArr = productsInCart
+                removedItems = getRemovedItem(productsInCart);
+                productArr = productsInCart;
             }
             const items = removedItems || productsInCart.products;
             const product_ids = [];
