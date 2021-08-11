@@ -260,12 +260,8 @@
                 }
             };
 
-            $('button.checkoutWithPaypal').on('click', function() {
-                submitCheckoutOrder();
-            });
-            window.ctrwowUtils.events.on('ctr_form_checkoutWithCreditCard', function() {
-                submitCheckoutOrder();
-            });
+            document.querySelector('button.checkoutWithPaypal').addEventListener('click', submitCheckoutOrder)
+            window.ctrwowUtils.events.on('ctr_form_checkoutWithCreditCard', submitCheckoutOrder);
         } catch(e) {
             console.log(e);
         }
