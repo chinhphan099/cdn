@@ -152,6 +152,61 @@
             console.log(e);
         }
     }
+    let productArr;
+    if (window.localStorage.getItem('ctr__ecom_campaigns')) {
+        campaignInfo = JSON.parse(window.localStorage.getItem('ctr__ecom_campaigns'));
+        productArr = getProductsInCart();
+    }
+    function getRemovedItem(productsInCart) {
+        try {
+            const results = productArr.products.filter(({ productId: id1 }) => !productsInCart.products.some(({ productId: id2 }) => id2 === id1));
+            return results;
+        } catch (e) {
+            console.log(e);
+        }
+    }
+    function getDataForAddOrRemoveEvent(isRemove) {
+        try {
+            campaignInfo = JSON.parse(window.localStorage.getItem('ctr__ecom_campaigns'));
+            const productsInCart = getProductsInCart();
+            let removedItems;
+            if (isRemove) {
+                removedItems = getRemovedItem(productsInCart);
+                productArr = productsInCart;
+            }
+            const items = removedItems || productsInCart.products;
+            const product_ids = [];
+            const skus = [];
+            let totalQty = 0;
+            let totalPrice = 0;
+            for (let i = 0, n = items.length; i < n; i++) {
+                product_ids.push(items[i].productId);
+                skus.push(items[i].sku);
+                totalQty += items[i].quantity;
+                totalPrice += Number(items[i].total_usd);
+            }
+            const landingurl = window.location.href;
+            const landingBaseUrl = landingurl.split('?')[0];
+            const data = {
+                fingerprintId: window._EA_ID,
+                referrer: document.referrer,
+                // countryCode: identifyData.ship_country,
+                // regionCode: identifyData.ship_state,
+                ip: campaignInfo.location.ip,
+                email: document.querySelector('[name="email"]') ? document.querySelector('[name="email"]').value : '',
+                product_ids: product_ids,
+                items: items,
+                sku: skus,
+                currency: campaignInfo.location.currencyCode,
+                landing_base_url: landingBaseUrl,
+                customer_language: document.querySelector('html').getAttribute('lang') || ''
+            };
+
+            return data;
+        } catch (e) {
+            console.log(e);
+        }
+    }
     function checkoutPageEvents() {
         try {
             window.localStorage.removeItem('isFiredMainOrderBlueshift');
@@ -265,61 +320,6 @@
             document.querySelector('button.checkoutWithPaypal').addEventListener('click', submitCheckoutOrder);
             window.ctrwowUtils.events.on('ctr_form_checkoutWithCreditCard', submitCheckoutOrder);
         } catch(e) {
-            console.log(e);
-        }
-    }
-    let productArr;
-    if (window.localStorage.getItem('ctr__ecom_campaigns')) {
-        campaignInfo = JSON.parse(window.localStorage.getItem('ctr__ecom_campaigns'));
-        productArr = getProductsInCart();
-    }
-    function getRemovedItem(productsInCart) {
-        try {
-            const results = productArr.products.filter(({ productId: id1 }) => !productsInCart.products.some(({ productId: id2 }) => id2 === id1));
-            return results;
-        } catch (e) {
-            console.log(e);
-        }
-    }
-    function getDataForAddOrRemoveEvent(isRemove) {
-        try {
-            campaignInfo = JSON.parse(window.localStorage.getItem('ctr__ecom_campaigns'));
-            const productsInCart = getProductsInCart();
-            let removedItems;
-            if (isRemove) {
-                removedItems = getRemovedItem(productsInCart);
-                productArr = productsInCart;
-            }
-            const items = removedItems || productsInCart.products;
-            const product_ids = [];
-            const skus = [];
-            let totalQty = 0;
-            let totalPrice = 0;
-            for (let i = 0, n = items.length; i < n; i++) {
-                product_ids.push(items[i].productId);
-                skus.push(items[i].sku);
-                totalQty += items[i].quantity;
-                totalPrice += Number(items[i].total_usd);
-            }
-            const landingurl = window.location.href;
-            const landingBaseUrl = landingurl.split('?')[0];
-            const data = {
-                fingerprintId: window._EA_ID,
-                referrer: document.referrer,
-                // countryCode: identifyData.ship_country,
-                // regionCode: identifyData.ship_state,
-                ip: campaignInfo.location.ip,
-                email: document.querySelector('[name="email"]') ? document.querySelector('[name="email"]').value : '',
-                product_ids: product_ids,
-                items: items,
-                sku: skus,
-                currency: campaignInfo.location.currencyCode,
-                landing_base_url: landingBaseUrl,
-                customer_language: document.querySelector('html').getAttribute('lang') || ''
-            };
-
-            return data;
-        } catch (e) {
             console.log(e);
         }
     }
