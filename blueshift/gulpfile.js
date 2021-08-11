@@ -56,6 +56,10 @@ task('watch', (done) => {
   watch([SRC.js], series('scripts'));
   done();
 });
+task('watchrl', (done) => {
+  watch([SRC.js], series('releaseScripts'));
+  done();
+});
 
 task('clean', () => {
   return src('./public', { read: false, allowEmpty: true }).pipe(clean());
@@ -79,5 +83,5 @@ task('default',
   series('clean', 'build', 'webserver')
 );
 task('release',
-  series('clean', 'releaseScripts', 'watch', 'webserver')
+  series('clean', 'releaseScripts', 'watchrl', 'webserver')
 );

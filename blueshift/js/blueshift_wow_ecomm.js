@@ -199,6 +199,8 @@
 
                         if (e.currentTarget.getAttribute('name') === 'email' && document.querySelector('[name="email"]').classList.contains('valid')) {
                             blueshift.identify(identifyData);
+                            const data = getDataForAddOrRemoveEvent();
+                            blueshift.track('add_to_cart', data);
                         }
 
                         if (e.currentTarget.getAttribute('name') === 'phoneNumber' && e.currentTarget.value !== '') {
@@ -260,7 +262,7 @@
                 }
             };
 
-            document.querySelector('button.checkoutWithPaypal').addEventListener('click', submitCheckoutOrder)
+            document.querySelector('button.checkoutWithPaypal').addEventListener('click', submitCheckoutOrder);
             window.ctrwowUtils.events.on('ctr_form_checkoutWithCreditCard', submitCheckoutOrder);
         } catch(e) {
             console.log(e);
