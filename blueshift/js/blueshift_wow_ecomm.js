@@ -155,7 +155,8 @@
     let productArr;
     if (window.localStorage.getItem('ctr__ecom_campaigns')) {
         campaignInfo = JSON.parse(window.localStorage.getItem('ctr__ecom_campaigns'));
-        productArr = getProductsInCart();
+        const isConfirm = urlPath.indexOf('confirm') > -1;
+        productArr = getProductsInCart(isConfirm);
     }
     function getRemovedItem(productsInCart) {
         try {
