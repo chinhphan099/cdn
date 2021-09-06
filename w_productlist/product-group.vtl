@@ -128,6 +128,9 @@
                 obj.pidPackages = li.querySelector('input.pidPackages').value;
                 obj.webkey = li.querySelector('input.webkey').value;
                 obj.pidUpgrade = li.querySelector('input.pidUpgrade').value;
+                obj.pidUpgrade1 = li.querySelector('input.pidUpgrade1').value;
+                obj.pidUpgrade2 = li.querySelector('input.pidUpgrade2').value;
+                obj.maropostId = li.querySelector('input.maropostId').value;
             } else {
                 obj = {
                     id: li.id,
@@ -135,7 +138,10 @@
                     selectedText: li.querySelector('input.selectedText').value,
                     pidPackages: li.querySelector('input.pidPackages').value,
                     webkey: li.querySelector('input.webkey').value,
-                    pidUpgrade: li.querySelector('input.pidUpgrade').value
+                    pidUpgrade: li.querySelector('input.pidUpgrade').value,
+                    pidUpgrade1: li.querySelector('input.pidUpgrade1').value,
+                    pidUpgrade2: li.querySelector('input.pidUpgrade2').value,
+                    maropostId: li.querySelector('input.maropostId').value
                 };
                 productGroup.data.push(obj);
             }
@@ -155,7 +161,10 @@
             selectedText: '',
             pidPackages: '',
             webkey: '',
-            pidUpgrade: ''
+            pidUpgrade: '',
+            pidUpgrade1: '',
+            pidUpgrade2: '',
+            maropostId: ''
         }
 
         productGroup.data.push(item);
@@ -198,6 +207,24 @@
         var input5 = createInputPackage('webkey', item.webkey, 'text');
         var row5 = createRowPackage(label5, input5);
         li.appendChild(row5);
+
+        //row 6 : pidUpgrade1
+        var label6 = createLabelPackage('PID Upgrade 1');
+        var input6 = createInputPackage('pidUpgrade1', item.pidUpgrade1, 'text');
+        var row6 = createRowPackage(label6, input6);
+        li.appendChild(row6);
+
+        //row 7 : pidUpgrade2
+        var label7 = createLabelPackage('PID Upgrade 2');
+        var input7 = createInputPackage('pidUpgrade2', item.pidUpgrade2, 'text');
+        var row7 = createRowPackage(label7, input7);
+        li.appendChild(row7);
+
+        //row 8 : Maropost ID
+        var label8 = createLabelPackage('Maropost ID');
+        var input8 = createInputPackage('maropostId', item.maropostId, 'text');
+        var row8 = createRowPackage(label8, input8);
+        li.appendChild(row8);
 
         //remove link
         var a = document.createElement('a');

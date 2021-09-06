@@ -39,7 +39,19 @@
                 #if($group.has("pidUpgrade") && $group.pidUpgrade.trim() != '')
                     #set($pidUpgrade = $group.pidUpgrade)
                 #end
-                <li data-webkey="$webkey" data-pidupgrade="$pidUpgrade" data-package="$!{group.pidPackages}" data-replacetext="$!{group.selectedText}"><p>$group.tabName</p></li>
+                #set($pidUpgrade1 = '')
+                #if($group.has("pidUpgrade1") && $group.pidUpgrade1.trim() != '')
+                    #set($pidUpgrade1 = $group.pidUpgrade1)
+                #end
+                #set($pidUpgrade2 = '')
+                #if($group.has("pidUpgrade2") && $group.pidUpgrade2.trim() != '')
+                    #set($pidUpgrade2 = $group.pidUpgrade2)
+                #end
+                #set($maropostId = '')
+                #if($group.has("maropostId") && $group.maropostId.trim() != '')
+                    #set($maropostId = $group.maropostId)
+                #end
+                <li data-webkey="$webkey" data-maropostid="$maropostId" data-package="$!{group.pidPackages}" data-pidupgrade="$pidUpgrade" data-pidupgrade1="$pidUpgrade1" data-pidupgrade2="$pidUpgrade2" data-replacetext="$!{group.selectedText}"><p>$group.tabName</p></li>
             #end
         </ul>
         #if($UtilMethods.isSet($con.productListErrorMsg))
@@ -110,6 +122,7 @@
                         #set($savePriceElm = '<span class="savePrice">' + $loadingImg + '</span>')
                         #set($savePriceDepositElm = '<span class="savePriceDeposit">' + $loadingImg + '</span>')
                         #set($firstCharge = '<span class="spanFirstCharge">' + $loadingImg + '</span>')
+                        #set($remainPrice = '<span class="spanRemainPrice">' + $loadingImg + '</span>')
                         #set($discountedPriceElm = '<span class="discountedPrice">' + $loadingImg + '</span>')
                         #set($unitFullRateElm = '<span class="spanUnitFullRate">' + $loadingImg + '</span>')
                         #set($unitDiscountRateElm = '<span class="spanUnitDiscountRate">' + $loadingImg + '</span>')
@@ -117,9 +130,10 @@
                         #set($totalDiscountPriceElm = '<span class="spanTotalDiscountPriceElm">' + $loadingImg + '</span>')
                         #set($installmentPriceElm = '<span class="spanInstallmentPriceElm">' + $loadingImg + '</span>')
                         <div class="product-name">
-                            $prod.productName.replaceAll('xaaax', '"').replaceAll('src="/pub-assets/', $replaceSrc).replaceAll('\{FullPrice\}', $fullPriceElm).replaceAll('\{fullPrice\}', $fullPriceElm).replaceAll('\{ShippingFee\}', $shippingFeeElm).replaceAll('\{SavePrice\}', $savePriceElm).replaceAll('\{SavePriceDeposit\}', $savePriceDepositElm).replaceAll('\{FirstCharge\}', $firstCharge).replaceAll('\{DiscountedPrice\}', $discountedPriceElm).replaceAll('\{discountedPrice\}', $discountedPriceElm).replaceAll('\{UnitFullRate\}', $unitFullRateElm).replaceAll('\{UnitDiscountRate\}', $unitDiscountRateElm).replaceAll('\{UnitDiscountRateWithQty\}', $unitDiscountRateWithQty).replaceAll('\{totalDiscountPrice\}', $totalDiscountPriceElm).replaceAll('\{installmentprice\}', $installmentPriceElm)
+                            $prod.productName.replaceAll('xaaax', '"').replaceAll('src="/pub-assets/', $replaceSrc).replaceAll('\{FullPrice\}', $fullPriceElm).replaceAll('\{fullPrice\}', $fullPriceElm).replaceAll('\{ShippingFee\}', $shippingFeeElm).replaceAll('\{SavePrice\}', $savePriceElm).replaceAll('\{SavePriceDeposit\}', $savePriceDepositElm).replaceAll('\{FirstCharge\}', $firstCharge).replaceAll('\{DiscountedPrice\}', $discountedPriceElm).replaceAll('\{discountedPrice\}', $discountedPriceElm).replaceAll('\{UnitFullRate\}', $unitFullRateElm).replaceAll('\{UnitDiscountRate\}', $unitDiscountRateElm).replaceAll('\{UnitDiscountRateWithQty\}', $unitDiscountRateWithQty).replaceAll('\{totalDiscountPrice\}', $totalDiscountPriceElm).replaceAll('\{installmentprice\}', $installmentPriceElm).replaceAll('\{RemainPrice\}', $remainPrice)
                         </div>
                     </label>
+                    #if ($hideProductPriceDefault != 'true')
                     <label class="productPrice" for="product_$!{prod.productId}">
                         #if($!{showInstallmentPrice} == true)
                             <ins class="discountedPrice_installmentpayment">
@@ -131,6 +145,7 @@
                             <del class="fullPrice" style="display: none;">$loadingImg</del>
                         #end
                     </label>
+                    #end
                     #if($prod.buttonTxt != '')
                         <div class="order-btn">
                             <button type="button" class="button btn-order-now">$!{prod.buttonTxt}</button>
