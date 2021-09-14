@@ -320,7 +320,7 @@
                     let count = 0;
                     const orderPage = setInterval(() => {
                         count++;
-                        if (window.__productListData.data.productList && window._EA_ID) {
+                        if (window.__productListData && window.__productListData.data && window.__productListData.data.productList && window._EA_ID) {
                             orderPageEvents();
                             clearInterval(orderPage);
                         }
