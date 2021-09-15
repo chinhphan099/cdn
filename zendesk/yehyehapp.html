@@ -1,0 +1,91 @@
+<html lang="en-US">
+
+<div class="browse-products">
+  <div class="inner"></div>
+</div>
+
+<script>
+  function removeLoader(parentElm) {
+    const loaders = parentElm.querySelectorAll('.js-loader');
+    Array.prototype.slice.call(loaders).forEach((loader) => loader.remove());
+  }
+  async function getAjax(url) {
+    try {
+      const res = await fetch(url, { method: 'GET' });
+      if (res.ok) {
+        try {
+          const jsonData = await res.json();
+          return jsonData;
+        } catch (err) {
+          return Promise.resolve('Get ajax successfully');
+        }
+      } else {
+        return Promise.reject(`Error code : ${res.status} - ${res.statusText}`);
+      }
+    } catch (err) {
+      return err;
+    }
+  }
+  async function fetchUrlsParallel(objs) {
+    const results = await Promise.all(
+      objs.map((obj) => {
+        return getAjax(obj.url);
+      })
+    );
+    const validResults = results.filter((result) => !(result instanceof Error));
+    return validResults;
+  }
+  function loadBrowseProducts() {
+    var lang = document.querySelector("html").getAttribute("lang").toLowerCase();
+    var productSectionId = 360004766400;
+    var categoryId = 360002797060;
+    var childProductSectionIds = [4406252763154, 4406268557458, 4406276179602];
+    var browseProducts = document.querySelector('.browse-products .inner');
+    var sectionId = document.querySelector('[data-sectionid]');
+    if (sectionId) {
+      sectionId = Number(sectionId.getAttribute('data-sectionid'));
+    }
+
+    if (browseProducts) {
+      fetchUrlsParallel([
+        { url: 'https://support.yehyehapp.com/api/v2/help_center/' + lang + '/articles?page[size]=100' },
+        { url: 'https://support.yehyehapp.com/api/v2/help_center/' + lang + '/categories/' + categoryId + '/sections' }
+      ])
+        .then((response) => {
+          browseProducts.classList.add('loaded');
+          const sections = response.find((res) => res && res.sections).sections;
+          const articles = response.find((res) => res && res.articles).articles;
+          var data = sections.filter(function (item) {
+            if(item.parent_section_id === productSectionId && childProductSectionIds.includes(item.id)) {
+              return true;
+            }
+          });
+          for (var i = 0, n = data.length; i < n; i++) {
+            var className = data[i].name.toLowerCase().replace(/ /gi, '');
+            var articleItem = articles.find((arc) => {
+              // Get first Article
+              return arc.section_id === data[i].id
+            });
+            var temp = `<div class="item ${className}">
+                          <div class="thumb">
+                            <a class="tmb-img" href="${data[i].html_url}"></a>
+                          </div>
+                          <div class="product-content">
+                              <a class="product-name" href="${data[i].html_url}">${data[i].name}</a>
+                              <div class="article-content">${articleItem && articleItem.body}</div>
+                          </div>
+                        </div>`;
+            if (data[i].description && data[i].id !== sectionId) {
+              document.querySelector('.browse-products .inner').insertAdjacentHTML('beforeend', temp);
+            }
+            removeLoader(document.querySelector('.browse-products .inner'));
+          }
+        })
+        .catch(function (err) { console.log(err); });
+    }
+  }
+  loadBrowseProducts();
+</script>
+
+
+</html>

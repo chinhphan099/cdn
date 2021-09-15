@@ -1,0 +1,28 @@
+<script>
+  // Trigger Plus, minus button and update quantity
+  function updateQuantity(isPlus, elm) {
+    const selectElm = elm.closest('.product-quantity').querySelector('select');
+    let selecVal = Number(selectElm.value);
+    selecVal = isPlus ? ++selecVal : --selecVal;
+    if (selectElm.querySelector(`option[value="${selecVal}"]`)) {
+      selectElm.value = selecVal;
+      selectElm.dispatchEvent(new Event('change'));
+    }
+  }
+  function handleQuantityEvent() {
+    const plusItems = _qAll('.product-quantity .qty-plus, .product-quantity .qty-minus');
+    Array.prototype.slice.call(plusItems).forEach(elm => {
+      elm.addEventListener('click', (e) => {
+        if (e.target.classList.contains('qty-plus')) {
+          updateQuantity(true, e.target);
+        }
+        else {
+          updateQuantity(false, e.target);
+        }
+      });
+    });
+  }
+  window.ctrwowUtils.events.on('bindingDataCart', () => {
+    handleQuantityEvent()
+  });
+</script>

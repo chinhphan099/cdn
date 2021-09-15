@@ -1,0 +1,141 @@
+<script>
+  // Trigger Plus, minus button and update Product ID
+  function plusQuantity() {
+    const plusItem = _qAll('.qty-plus');
+    const loading = document.querySelector('.loading-wrapper');
+    const ecomHelpers = window.ctrwowEcom ? window.ctrwowEcom.helpers : null
+    for(const plus of plusItem) {
+        plus.addEventListener("click", function(e) {
+          const target = e.currentTarget;
+          const parent = target.closest('.cart-item');
+          if(Number(parent.querySelector('select').value) > 4) return;
+          loading.classList.add('open')
+          const productId = Number(parent.dataset.id);
+          const quantity = Number(parent.querySelector('select').value) + 1;
+
+          window.cartItem = window.ctrwowEcom.helpers.getCartData()
+          let productSelected = null
+          if (window.cartItem) {
+              productSelected = window.cartItem.items.filter(function (product) {
+                  return product.productId === productId
+              })
+              if(productSelected.length > 0) {
+                  productSelected = productSelected[0];
+              }
+          }
+          parent.querySelector('select').value = quantity;
+          // const itemUpdate = parent.cloneNode(true);
+          // parent.insertAdjacentHTML('afterend', itemUpdate);
+          window.ctrwowEcom.helpers.removeCartItem(productId, (error, results) => {
+              if (error) {
+                  console.log(error, results)
+              }
+              const productID = Number(parent.dataset.listproduct.split(',')[Number(quantity)-1])
+              const listProduct = parent.dataset.listproduct;
+              ecomHelpers.addCartItem(
+              {
+                  productId: productID,
+                  quantity: 1,
+                  imageUrl: productSelected.productImageUrl,
+                  productName: productSelected.productName,
+                  productSubTitle: productSelected.productSubTitle
+              },
+              function (result) {
+                  // update quantity for cart
+                  const product = {
+                      productID: productID,
+                      listProduct: listProduct,
+                  }
+                  updateQuantityForCart(product);
+                  // end update quantity for cart
+
+                  window.ctrwowEcom.trackings.addToCart()
+                  loading.classList.remove('open');
+                  console.log('Update item quantity successfully!')
+              }
+              )
+        })
+      });
+    }
+  }
+
+  function minusQuantity() {
+    const minusItem = _qAll('.qty-minus');
+    const loading = document.querySelector('.loading-wrapper');
+    const ecomHelpers = window.ctrwowEcom ? window.ctrwowEcom.helpers : null;
+    for(const minus of minusItem) {
+      minus.addEventListener("click", function(e) {
+        const target = e.currentTarget;
+        const parent = target.closest('.cart-item');
+        if(Number(parent.querySelector('select').value) < 2) return;
+        loading.classList.add('open');
+        const productId = Number(parent.dataset.id);
+        const quantity = Number(parent.querySelector('select').value) - 1;
+
+        window.cartItem = window.ctrwowEcom.helpers.getCartData()
+          let productSelected = null
+          if (window.cartItem) {
+              productSelected = window.cartItem.items.filter(function (product) {
+                  return product.productId === productId
+              })
+              if(productSelected.length > 0) {
+                  productSelected = productSelected[0];
+              }
+          }
+          parent.querySelector('select').value = quantity;
+          // const itemUpdate = parent.cloneNode(true);
+          // parent.insertAdjacentHTML('afterend', itemUpdate);
+          window.ctrwowEcom.helpers.removeCartItem(productId, (error, results) => {
+              if (error) {
+                  console.log(error, results)
+              }
+              const productID = Number(parent.dataset.listproduct.split(',')[Number(quantity)-1])
+              const listProduct = parent.dataset.listproduct;
+              ecomHelpers.addCartItem(
+              {
+                  productId: productID,
+                  quantity: 1,
+                  imageUrl: productSelected.productImageUrl,
+                  productName: productSelected.productName,
+                  productSubTitle: productSelected.productSubTitle
+              },
+              function (result) {
+                  // update quantity for cart
+                  const product = {
+                      productID: productID,
+                      listProduct: listProduct,
+                  }
+                  updateQuantityForCart(product);
+                  // end update quantity for cart
+
+                  window.ctrwowEcom.trackings.addToCart()
+                  loading.classList.remove('open');
+                  console.log('Update item quantity successfully!')
+              }
+              )
+        })
+      });
+    }
+  }
+
+  function updateQuantityForCart(productUpdate) {
+    if (!productUpdate) return
+    window.cartItem = window.ctrwowEcom.helpers.getCartData()
+    for (const item of window.cartItem.items) {
+      if (item.productId === productUpdate.productID) {
+        if (!window.prices) {
+          window.prices = JSON.parse(window.localStorage.getItem('ctr__ecom_campaigns')).prices
+        }
+        const productSelected = window.prices.filter(function (product) {
+          return product.productId === item.productId
+        })
+        item.quantity = productSelected[0].quantity
+        item.listProduct = productUpdate.listProduct
+        // update cart for local
+        window.localStorage.setItem('ctr__ecom_cart', JSON.stringify(window.cartItem))
+      }
+    }
+  }
+  window.ctrwowUtils.events.on('bindingDataCart', plusQuantity);
+  window.ctrwowUtils.events.on('bindingDataCart', minusQuantity);
+</script>
