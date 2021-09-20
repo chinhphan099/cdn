@@ -216,6 +216,8 @@
   function renderData(response) {
     const sections = response.find((res) => res && res.sections).sections;
     const articles = response.find((res) => res && res.articles).articles;
+    console.log(sections);
+    // console.log(articles);
     getChildSection(data, sections, articles)
   }
   function removeLoader(parentElm) {
@@ -378,7 +380,7 @@
 
   fetchUrlsParallel([
     { url: host + '/api/v2/help_center/' + lang + '/articles?page[size]=100' },
-    { url: host + '/api/v2/help_center/' + lang + '/sections' }
+    { url: host + '/api/v2/help_center/' + lang + '/sections?page[size]=100' }
   ])
     .then((response) => {
       renderData(response);
