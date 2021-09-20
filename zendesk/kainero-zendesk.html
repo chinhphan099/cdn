@@ -154,22 +154,27 @@
   const data = [
     { id: startSection },
     { id: shopSection },
-    { id: earnSection },
+    { id: earnSection }
   ];
   function getParents(elem, cls) {
     var parents = [];
-    while (elem.parentNode && elem.parentNode.nodeName.toLowerCase() !== 'body') {
-      elem = elem.parentNode;
-      if (elem.classList.contains(cls)) {
-        parents.push(elem);
+    try {
+      while (elem.parentNode && elem.parentNode.nodeName.toLowerCase() !== 'body') {
+        elem = elem.parentNode;
+        if (elem.classList.contains(cls)) {
+          parents.push(elem);
+        }
       }
+      return parents;
+    } catch(e) {
+      return parents;
     }
-    return parents;
   }
   function getChildSection(objs, sections, articles) {
     objs.forEach(obj => {
       const sectionItem = sections.find((sec) => sec.id === obj.id);
       obj.name = sectionItem.name;
+      obj.html_url = sectionItem.html_url;
       const childSectionObjs = sections.filter((section) => section.parent_section_id === obj.id);
       if (childSectionObjs.length > 0) {
         obj.childSections = childSectionObjs.map((sec) => {
@@ -210,25 +215,38 @@
 
   const asideArticleItem = '<li><a href="{url}" class="{activeArticle}">{title}</a></li>';
 
+  function checkToBindChild(secId) {
+    const sectionGadgetAndOutdoor = 4405671829394
+    const sectionHousehold = 4406639139346
+    const sectionWellness = 4406645250066
+    return ![sectionGadgetAndOutdoor, sectionHousehold, sectionWellness].includes(secId);
+  }
   function renderInsideAside(objs, stepObj) {
     var $html = '';
 
     objs.forEach((obj) => {
       let step = stepObj;
+      const isBindChild = checkToBindChild(obj.id)
       if (step === 0) {
         $html += `<div class="group"><h2 class="section-title-1" role="${obj.id}"><span>${obj.name}</span></h2>`;
       }
       else if (step === 1) {
-        $html += `<div class="accordion-item"><h3 class="sidenav-item accordion-title" role="${obj.id}"><span>${obj.name}</span><i class="icon-down"></i></h3>`;
+        $html += `<div class="accordion-item"><h3 class="sidenav-item accordion-title" role="${obj.id}"><a href="${obj.html_url}"><span>${obj.name}</span><i class="icon-down"></i></a></h3>`;
       }
       else {
-        $html += `<div class="accordion-body"><div class="accordion-item"><h3 class="sidenav-item accordion-title" role="${obj.id}"><span>${obj.name}</span><i class="icon-down"></i></h3>`;
+        if (isBindChild) {
+          $html += `<div class="accordion-body"><div class="accordion-item"><h3 class="sidenav-item accordion-title" role="${obj.id}"><a href="${obj.html_url}"><span>${obj.name}</span><i class="icon-down"></i></a></h3>`;
+        } else {
+          $html += `<div class="accordion-body"><div class="accordion-item"><a href="${obj.html_url}"><span>${obj.name}</span></a>`;
+        }
       }
 
       if (obj.childSections) {
-        $html += renderInsideAside(obj.childSections, step + 1);
+        if (isBindChild) {
+          $html += renderInsideAside(obj.childSections, step + 1);
+        }
       }
-      else {
+      else if (obj && obj.articles) {
         $html += '<div class="accordion-body"><ul class="article-list">'
         obj.articles.forEach((article) => {
           const activeArticleCls = article.id === currentArticleId ? 'current-article' : '';
@@ -250,11 +268,25 @@
     return $html
   }
   function setActiveSections() {
-    const currentArticle = document.querySelector('.current-article');
-    const parrentElms = getParents(currentArticle, 'accordion-item');
-    Array.prototype.slice.call(parrentElms).forEach((elm) => {
-      elm.classList.add('active');
-    });
+    try {
+      const url = document.querySelector('.articles-nav a[href*="{{section.id}}"]');
+      if (url) {
+        const parentElm = getParents(url, 'sidenav-item')
+        if (parentElm.length === 0) {
+          url.classList.add('current-article');
+        }
+      }
+
+      const currentArticle = document.querySelector('.current-article');
+      const parrentElms = getParents(currentArticle, 'accordion-item');
+      if (parrentElms.length > 0) {
+        Array.prototype.slice.call(parrentElms).forEach((elm) => {
+          elm.classList.add('active');
+        });
+      }
+    } catch(e) {
+      console.log(e);
+    }
   }
   function renderAside() {
     var html = renderInsideAside(data, 0);
@@ -299,18 +331,20 @@
 
     Array.prototype.slice.call(accordionItems).forEach((elm) => {
       const title = elm.querySelector('.accordion-title');
-      title.addEventListener('click', (e) => {
-        e.preventDefault();
-        closeAllActiveAccordionsNotParent(elm);
+      title && title.addEventListener('click', (e) => {
+        if (e.currentTarget.closest('.accordion-item').querySelector('.accordion-body')) {
+          e.preventDefault();
+          closeAllActiveAccordionsNotParent(elm);
 
-        if (!elm.classList.contains('active')) {
-          elm.classList.add('active');
-        } else {
-          elm.classList.remove('active');
-          const activeElms = elm.querySelectorAll('.active');
-          Array.prototype.slice.call(activeElms).forEach((elm) => {
-            elm.classList.remove('active')
-          });
+          if (!elm.classList.contains('active')) {
+            elm.classList.add('active');
+          } else {
+            elm.classList.remove('active');
+            const activeElms = elm.querySelectorAll('.active');
+            Array.prototype.slice.call(activeElms).forEach((elm) => {
+              elm.classList.remove('active')
+            });
+          }
         }
       });
     });
