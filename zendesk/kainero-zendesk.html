@@ -17,6 +17,23 @@
   </div>
 </section>
 <div class="container">
+  <ol class="breadcrumbs">
+    <li title="Kainero">
+      <a href="/hc/en-us">Kainero</a>
+    </li>
+    <li title="Shop">
+      <a href="/hc/en-us/sections/4405250697106-Shop">Shop</a>
+    </li>
+    <li title="Products">
+      <a href="/hc/en-us/sections/4405663990162-Products">Products</a>
+    </li>
+    <li title="Gadgets &amp; Outdoor">
+      <a href="/hc/en-us/sections/4405671829394-Gadgets-Outdoor">Gadgets &amp; Outdoor</a>
+    </li>
+    <li title="Ion Clean Car Air Purifier">
+      <a href="/hc/en-us/sections/4406645115410-Ion-Clean-Car-Air-Purifier">Ion Clean Car Air Purifier</a>
+    </li>
+  </ol>
   <nav class="sub-nav">
     {{breadcrumbs}}
     <div class="search-container">
@@ -267,15 +284,34 @@
 
     return $html
   }
-  function setActiveSections() {
-    try {
-      const url = document.querySelector('.articles-nav a[href*="{{section.id}}"]');
-      if (url) {
-        const parentElm = getParents(url, 'sidenav-item')
-        if (parentElm.length === 0) {
-          url.classList.add('current-article');
+  function setActiveAsideItemBaseOnBreadCrumbs() {
+    const breadcrumbs = document.querySelector('.breadcrumbs');
+    if (breadcrumbs) {
+      const links = breadcrumbs.querySelectorAll('a');
+      const sectionIds = [];
+      Array.prototype.slice.call(links).forEach((link) => {
+        const nums = link.getAttribute('href').match(/\d/g);
+        if (nums) {
+          sectionIds.push(nums.join(''));
+        }
+      });
+      sectionIds.reverse();
+
+      for (let i = 0; i < sectionIds.length; i++) {
+        const url = document.querySelector('.articles-nav a[href*="' + sectionIds[i] + '"]');
+        if (url) {
+          const parentElm = getParents(url, 'sidenav-item')
+          if (parentElm.length === 0) {
+            url.classList.add('current-article');
+            break;
+          }
         }
       }
+    }
+  }
+  function setActiveSections() {
+    try {
+      setActiveAsideItemBaseOnBreadCrumbs();
 
       const currentArticle = document.querySelector('.current-article');
       const parrentElms = getParents(currentArticle, 'accordion-item');
