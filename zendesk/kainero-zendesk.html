@@ -102,17 +102,20 @@
 </div>
 
 <script>
-  let currentSectionId = 4405255977106;
-  let currentArticleId = 4405701856018;
+  let currentSectionId = 4405255977106; // Just for Test
+  let currentArticleId = 4405701856018; // Just for Test
   let host = 'https://support.kainero.com'
   if (window.location.href.indexOf('localhost') === -1) {
     currentSectionId = Number('{{section.id}}');
     currentArticleId = Number('{{article.id}}');
     host = '';
   }
-  const startSection = 4405250695314;
-  const shopSection = 4405250697106;
-  const earnSection = 4405250711058;
+  const lang = document.querySelector('html').getAttribute('lang').toLowerCase();
+  const data = [
+    { id: 4405250695314 }, // Start Section
+    { id: 4405250697106 }, // Shop Section
+    { id: 4405250711058 }, // Earn Section
+  ];
 
   async function getAjax(url) {
     try {
@@ -166,13 +169,6 @@
     const validResults = results.filter((result) => !(result instanceof Error));
     return validResults;
   }
-
-  var lang = document.querySelector('html').getAttribute('lang').toLowerCase();
-  const data = [
-    { id: startSection },
-    { id: shopSection },
-    { id: earnSection }
-  ];
   function getParents(elem, cls) {
     var parents = [];
     try {
@@ -187,6 +183,7 @@
       return parents;
     }
   }
+
   function getChildSection(objs, sections, articles) {
     objs.forEach(obj => {
       const sectionItem = sections.find((sec) => sec.id === obj.id);
@@ -195,16 +192,12 @@
       const childSectionObjs = sections.filter((section) => section.parent_section_id === obj.id);
       if (childSectionObjs.length > 0) {
         obj.childSections = childSectionObjs.map((sec) => {
-          return {
-            id: sec.id
-          }
+          return { id: sec.id }
         });
         getChildSection(obj.childSections, sections, articles);
       }
       else {
-        let articleList = articles.filter((article) => {
-          return article.section_id === obj.id
-        })
+        let articleList = articles.filter((article) => article.section_id === obj.id);
         articleList = articleList.map((article) => {
             return {
               id: article.id,
@@ -229,9 +222,6 @@
     const loaders = parentElm.querySelectorAll('.js-loader');
     Array.prototype.slice.call(loaders).forEach((loader) => loader.remove());
   }
-
-  const asideArticleItem = '<li><a href="{url}" class="{activeArticle}">{title}</a></li>';
-
   function checkToBindChild(secId) {
     const sectionGadgetAndOutdoor = 4405671829394
     const sectionHousehold = 4406639139346
@@ -267,11 +257,7 @@
         $html += '<div class="accordion-body"><ul class="article-list">'
         obj.articles.forEach((article) => {
           const activeArticleCls = article.id === currentArticleId ? 'current-article' : '';
-          $html += asideArticleItem
-                    .replace('{url}', article.html_url)
-                    .replace('{title}', article.name)
-                    .replace('{activeArticle}', activeArticleCls)
-
+          $html += `<li><a href="${article.html_url}" class="${activeArticleCls}">${article.name}</a></li>`;
         });
         $html += '</ul></div>'
       }
@@ -286,7 +272,7 @@
   }
   function setActiveAsideItemBaseOnBreadCrumbs() {
     const breadcrumbs = document.querySelector('.breadcrumbs');
-    if (breadcrumbs) {
+    if (breadcrumbs && !document.querySelector('.articles-nav .current-article')) {
       const links = breadcrumbs.querySelectorAll('a');
       const sectionIds = [];
       Array.prototype.slice.call(links).forEach((link) => {
