@@ -142,6 +142,9 @@
                         phoneNumber = phoneNumber.join('');
                         let checkPhoneAPI = `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneNumber}`;
                         const isInternationalNumber = isInternationalNumbers(phoneNumber);
+                        if (window.localStorage.getItem('ctr__countryCode')) {
+                            countryCode = window.localStorage.getItem('ctr__countryCode');
+                        }
                         if (countryDdl && countryDdl.value) {
                             countryCode = countryDdl.value;
                         }
