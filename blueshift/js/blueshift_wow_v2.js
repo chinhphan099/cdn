@@ -160,13 +160,12 @@
                         window.ctrwowUtils
                             .callAjax(checkPhoneAPI)
                             .then((result) => {
-                                if (!window.res) {
-                                    window.res = result;
+                                if (result.valid) {
+                                    window.phoneRes = result;
                                 }
                                 if (result.country_code.toLowerCase() === countryCode.toLowerCase() || isRecall) {
-                                    if (isRecall && result.country_code === '') {
-                                        result = {...window.res};
-                                        window.res = undefined;
+                                    if (isRecall && !result.valid && window.phoneRes) {
+                                        result = {...window.phoneRes};
                                     }
                                     phone_valid = result.valid;
                                     phone_linetype = result.line_type;
@@ -183,6 +182,7 @@
                                 } else {
                                     isRecall = true;
                                     callAPICheckPhone();
+                                    return;
                                 }
 
                                 if (getQueryParameter('validPhone') === '1') {
