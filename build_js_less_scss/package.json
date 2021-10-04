@@ -18,6 +18,7 @@
   "dependencies": {
     "gulp": "4.0.2",
     "gulp-jshint": "^2.0.4",
+    "gulp-less": "^5.0.0",
     "gulp-rename": "~1.2",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-uglify": "~2.1",
@@ -29,6 +30,9 @@
     "@babel/preset-env": "^7.9.5",
     "gulp-babel": "^8.0.0",
     "gulp-clean": "^0.4.0",
-    "ip": "^1.1.5"
+    "gulp-sass": "^5.0.0",
+    "gulp-autoprefixer": "^7.0.1",
+    "ip": "^1.1.5",
+    "sass": "^1.42.1"
   }
 }
