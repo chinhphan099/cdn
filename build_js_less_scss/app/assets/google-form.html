@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <!-- https://docs.google.com/forms/d/e/1FAIpQLSe0h3_tNR68TqFY9vEmR0Jirz5EPafbDEgadVFHhIQUL5PHjQ/formResponse -->
+  <form id="bootstrapForm">
+    <fieldset>
+      <h2>Verve Affiliate Contest 2021<br><small></small></h2>
+    </fieldset>
+    <!-- Field type: "short" id: "895989937" -->
+    <fieldset>
+      <legend for="895989937">Full Name</legend>
+      <div class="form-group">
+        <input id="273018554" type="text" name="entry.273018554" class="form-control" required>
+      </div>
+    </fieldset>
+    <!-- Field type: "short" id: "253495096" -->
+    <fieldset>
+      <legend for="253495096">Company Name</legend>
+      <div class="form-group">
+        <input id="453628194" type="text" name="entry.453628194" class="form-control" required>
+      </div>
+    </fieldset>
+    <!-- Field type: "short" id: "1890902567" -->
+    <fieldset>
+      <legend for="1890902567">Email</legend>
+      <div class="form-group">
+        <input id="1423132082" type="text" name="entry.1423132082" class="form-control" required>
+      </div>
+    </fieldset>
+    <!-- Field type: "short" id: "1522708514" -->
+    <fieldset>
+      <legend for="1522708514">Nickname</legend>
+      <div class="form-group">
+        <input id="1094226487" type="text" name="entry.1094226487" class="form-control" required>
+      </div>
+    </fieldset>
+    <!-- Field type: "short" id: "963166002" -->
+    <fieldset>
+      <legend for="963166002">Verve Affiliate ID</legend>
+      <div class="form-group">
+        <input id="1080265360" type="text" name="entry.1080265360" class="form-control" required>
+      </div>
+    </fieldset>
+    <button class="btn btn-primary" type="submit">Submit ne</button>
+  </form>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.min.js"
+    integrity="sha256-2Pjr1OlpZMY6qesJM68t2v39t+lMLvxwpa8QlRjJroA=" crossorigin="anonymous"></script>
+  <script>
+    $('#bootstrapForm').submit(function (e) {
+      e.preventDefault();
+      const formData = new FormData($('#bootstrapForm'))
+      var request = new XMLHttpRequest()
+      request.open('POST', 'https://docs.google.com/forms/d/e/1FAIpQLSe0h3_tNR68TqFY9vEmR0Jirz5EPafbDEgadVFHhIQUL5PHjQ/formResponse')
+      request.onreadystatechange = function () {
+        if (request.readyState === 4) {
+          switch (request.status) {
+            case 0:
+            case 200:
+              alert('success')
+              break
+            case 403:
+              alert('fail')
+              break
+          }
+        }
+      }
+      request.send(formData)
+    });
+  </script>
+</body>
+</html>
