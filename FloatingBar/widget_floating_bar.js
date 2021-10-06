@@ -118,7 +118,7 @@
         }
 
         let bodyRect = document.body.getBoundingClientRect(),
-            elemRect = document.querySelector (elmTick).getBoundingClientRect(),
+            elemRect = document.querySelector(elmTick).getBoundingClientRect(),
             tickPos = elemRect.top - bodyRect.top;
 
         if (winPos >= tickPos) {

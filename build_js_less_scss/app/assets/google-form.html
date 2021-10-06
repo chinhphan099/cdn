@@ -55,7 +55,8 @@
   <script>
     $('#bootstrapForm').submit(function (e) {
       e.preventDefault();
-      const formData = new FormData($('#bootstrapForm'))
+      const formData = new FormData(document.querySelector('#bootstrapForm'))
+      formData.append('entry.1478848469', 'Checked T&C Box before Submission');
       var request = new XMLHttpRequest()
       request.open('POST', 'https://docs.google.com/forms/d/e/1FAIpQLSe0h3_tNR68TqFY9vEmR0Jirz5EPafbDEgadVFHhIQUL5PHjQ/formResponse')
       request.onreadystatechange = function () {
