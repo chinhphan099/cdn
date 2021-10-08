@@ -133,15 +133,20 @@ Plugin.prototype = {
       fakeSrc = this.element.find('.slick').find('img').first().attr('src');
     }
 
-    $('<img />')
-      .attr('src', fakeSrc)
-      .css('display', 'none')
-      .on('load.' + pluginName, () => {
-        this.initSlider();
-      })
-      .on('error.' + pluginName, () => {
-        this.initSlider();
-      });
+    if (fakeSrc) {
+      $('<img />')
+        .attr('src', fakeSrc)
+        .css('display', 'none')
+        .on('load.' + pluginName, () => {
+          this.initSlider();
+        })
+        .on('error.' + pluginName, () => {
+          this.initSlider();
+        });
+    }
+    else {
+      this.initSlider();
+    }
   },
   updateSetting: function () {
     let newOption = {};
