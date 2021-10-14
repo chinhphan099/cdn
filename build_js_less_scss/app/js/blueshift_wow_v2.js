@@ -47,7 +47,7 @@
     if (urlPath.indexOf('/index') > -1) { blueshift.interstitial_load(); }
     if (urlPath.indexOf('/special-offer-') > -1) { blueshift.upsell_load(); }
 
-    if(blueshift.constructor===Array){(function(){var b=document.createElement('script');b.type='text/javascript',b.async=!0,b.src=('https:'===document.location.protocol?'https:':'http:')+'//cdn.getblueshift.com/blueshift.js',b.defer=true;var c=document.getElementsByTagName('script')[0];c.parentNode.insertBefore(b,c);})();}
+    if(blueshift.constructor===Array){(function(){var b=document.createElement('script');b.type='text/javascript',b.src=('https:'===document.location.protocol?'https:':'http:')+'//cdn.getblueshift.com/blueshift.js',b.defer=true;var c=document.getElementsByTagName('script')[0];c.parentNode.insertBefore(b,c);})();}
 
     let campaignName = JSON.parse(window.__CTR_FP_TRACKING_SETTINGS.FP_TRACKING_CUSTOM_DATA).campaignName;
     let campaignInfo;
