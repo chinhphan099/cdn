@@ -1,0 +1,7 @@
+.ordered-item {
+  opacity: 0;
+  animation: _fadeIn 500ms ease forwards;
+  @for $i from 2 to 11 {
+    &:nth-child(#{$i}) { animation-delay: $i * 150ms; }
+  }
+}
