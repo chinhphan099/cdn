@@ -337,7 +337,7 @@ Plugin.prototype = {
     if (!this.handle.hasClass('slick-initialized')) {
       return;
     }
-    this.element.find('.slick-arrow').length && this.element.find('.slick-arrow').removeAttr('style');
+    // this.element.find('.slick-arrow').length && this.element.find('.slick-arrow').removeAttr('style');
     this.handle.slick('unslick').off('afterChange.' + pluginName);
     this.element.find('.slick-track > .slick-list, .slick-dots').remove();
     // if (window.ctrwowUtils.isBuilderMode()) {
