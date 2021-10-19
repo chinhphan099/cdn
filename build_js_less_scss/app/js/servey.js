@@ -1,5 +1,5 @@
 function defineRules() {
-    $('[name="users"]').rules("add", {
+    $('[name="user"]').rules("add", {
         required: true
     });
 
@@ -48,10 +48,38 @@ function registerButtonFunc() {
     });
 }
 function handleUserCheckbox() {
-    $('[name="users"]').attr('type', 'radio');
+    $('[name="user"]').attr('type', 'radio');
+}
+function handleErr() {
+    alert('Something wrong! Please try again.');
+    $('.step-2, .step-3, .thank-you').addClass('hidden');
+    $('.step-1').removeClass('hidden');
+    window.ctrwowUtils.hideGlobalLoading();
 }
 function submitDataFnc(data) {
-    console.log(data);
+    try {
+        console.log(data);
+        const url = 'https://dfoglobal-prod-pwrsystem-microservice.azurewebsites.net/api/contestregistrations'
+        window.ctrwowUtils.showGlobalLoading();
+        const postData = {
+            method: 'POST',
+            'Content-Type': 'application/json',
+            body: JSON.stringify(data)
+        }
+        window.ctrwowUtils
+        .callAjax(url, postData)
+        .then((result) => {
+            console.log(result);
+            $('.step-3').addClass('hidden');
+            $('.thank-you').removeClass('hidden');
+            window.scrollTo(0, 0);
+            window.ctrwowUtils.hideGlobalLoading();
+        }).catch((e) => {
+            handleErr();
+        })
+    } catch(e) {
+        handleErr();
+    }
 }
 function handleFirstStep() {
     window.PubSub.subscribe('firstStep', (msg, data) => {
@@ -88,12 +116,8 @@ function handleSecondStep() {
 }
 function handleThirdStep() {
     window.PubSub.subscribe('submitEntry', (msg, data) => {
-        $('.step-3').addClass('hidden');
-        $('.thank-you').removeClass('hidden');
-        window.scrollTo(0, 0);
-
         // Custom firstStepForm Obj
-        data.firstStepForm['users'] = $('[name="users"]:checked').closest('label').text().trim();
+        data.firstStepForm['user'] = $('[name="user"]:checked').closest('label').text().trim();
 
         // Custom secondStepForm Obj
         const names = getCheckboxValues($('[name="brandName"]:checked'));
@@ -115,7 +139,7 @@ function handleThirdStep() {
         delete submitData.brandName;
 
         submitData = Object.assign(submitData, {
-            'moreInfo': surveys
+            'brandInfo': surveys
         });
         submitDataFnc(submitData);
     });
