@@ -59,7 +59,8 @@ function handleErr() {
 function submitDataFnc(data) {
     try {
         console.log(data);
-        const url = 'https://dfoglobal-prod-pwrsystem-microservice.azurewebsites.net/api/contestregistrations'
+        const url = 'https://dfoglobal-prod-pwrsystem-microservice.azurewebsites.net/api/contestregistrations?code=e0f06eaf-2a52-44d7-b461-d22395a46042';
+
         window.ctrwowUtils.showGlobalLoading();
         const postData = {
             method: 'POST',
@@ -70,10 +71,14 @@ function submitDataFnc(data) {
         .callAjax(url, postData)
         .then((result) => {
             console.log(result);
-            $('.step-3').addClass('hidden');
-            $('.thank-you').removeClass('hidden');
-            window.scrollTo(0, 0);
-            window.ctrwowUtils.hideGlobalLoading();
+            if(result && result.isActive) {
+                $('.step-3').addClass('hidden');
+                $('.thank-you').removeClass('hidden');
+                window.scrollTo(0, 0);
+                window.ctrwowUtils.hideGlobalLoading();
+            } else {
+                handleErr();
+            }
         }).catch((e) => {
             handleErr();
         })
