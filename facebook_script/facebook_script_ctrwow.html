@@ -21,7 +21,8 @@
         });
       }
     }
-    //Next Button
+
+    // Next Button
     var nextBtns = Array.prototype.slice.call(document.querySelectorAll('.btn-next, .btn_display_form'));
     nextBtns.forEach(function(nextBtn) {
         nextBtn.addEventListener('click', function() {
@@ -31,41 +32,31 @@
             }
         });
     });
-    //CTA button
-    var ctaButton = document.querySelector('[name="checkoutWithCreditCard"]');
-    if (ctaButton) {
+
+    //CTA buttons
+    var ctaButtons = document.querySelectorAll('button[type="submit"], .checkoutWithPaypal');
+    ctaButtons.forEach(() => {
       ctaButton.addEventListener('click', function() {
         if (!isFireInitiateCheckout) {
           isFireInitiateCheckout = true;
           fbq('track', 'InitiateCheckout');
         }
       });
-    }
-    //Paypal button
-    var ctaPaypal = document.querySelector('.checkoutWithPaypal');
-    if (ctaPaypal) {
-      ctaPaypal.addEventListener('click', function() {
-        if (!isFireInitiateCheckout) {
-          isFireInitiateCheckout = true;
-          fbq('track', 'InitiateCheckout');
-        }
-      });
-    }
-    // End Order
+    });
   }
 
   // For first upsell or confirm(if no upsell)
-  var orderInfo_mini = JSON.parse(localStorage.getItem('orderInfo'));
-  var currencyCode_mini = localStorage.getItem('currencyCode');
-  var isFiredFBPurchase = localStorage.getItem('isFiredFBPurchase');
-  if (!isFiredFBPurchase && orderInfo_mini && currencyCode_mini) {
-    localStorage.setItem('isFiredFBPurchase', true);
+  var orderInfo = JSON.parse(localStorage.getItem('orderInfo'));
+  var currencyCode = localStorage.getItem('currencyCode');
+  var isFiredFBPurchase = localStorage.getItem('isFbPurchaseFired');
+  if (!isFiredFBPurchase && orderInfo && currencyCode) {
+    localStorage.setItem('isFbPurchaseFired', true);
     fbq('track', 'Purchase', {
-      value: orderInfo_mini.orderTotal,
-      currency: currencyCode_mini,
+      value: orderInfo.orderTotal,
+      currency: currencyCode,
       contents: [{
-        id: orderInfo_mini.orderedProducts[0].pid,
-        quantity: orderInfo_mini.quantity
+        id: orderInfo.orderedProducts[0].pid,
+        quantity: orderInfo.quantity
       }],
       content_type: 'product'
     });
@@ -73,4 +64,5 @@
 </script>
 <noscript>
   <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=927712684329812&ev=PageView&noscript=1" />
-</noscript> <!-- /Facebook Pixel -->
+</noscript>
+<!-- /Facebook Pixel -->
