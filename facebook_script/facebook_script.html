@@ -1,19 +1,11 @@
-#if($UtilMethods.isSet($siteData.footer.facebookPixelIds))
-    #set($fbIds = $siteData.footer.facebookPixelIds)
 
-    #if($UtilMethods.isSet($siteData.footer.facebookPixelIds))
-      <script>
+    <script>
         !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','//connect.facebook.net/en_US/fbevents.js');
 
-        #if($dotPageContent.url.indexOf('/index') > -1 || $dotPageContent.url.indexOf('/order') > -1 || $dotPageContent.url.indexOf('/pre') > -1)
-            #foreach($fbId in $fbIds.split(','))
-            fbq('init', '$fbId.trim()');
-            #end
-        #end
-
+        fbq('init', '519721265526001');
         fbq('track', 'PageView');
 
-        #if($dotPageContent.url.indexOf('/order') > -1)
+        if (window.location.pathname.indexOf('/order') > -1) {
             fbq('track', 'AddToCart')
             var isFireInitiateCheckout = false;
             if (document.querySelector('.btn-next')) {
@@ -58,7 +50,7 @@
                     }
                 });
             }
-        #end
+        }
 
         // For first upsell or confirm(if no upsell)
         var orderInfo_mini = JSON.parse(localStorage.getItem('orderInfo'));
@@ -81,11 +73,8 @@
                 }
             );
         }
-      </script>
-      <noscript>
-        #foreach($fbId in $fbIds.split(','))
-          <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=$fbId.trim()&ev=PageView&noscript=1" />
-        #end
-      </noscript>
-    #end
-#end
+    </script>
+    <noscript>
+        <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=519721265526001&ev=PageView&noscript=1" />
+    </noscript>
+
