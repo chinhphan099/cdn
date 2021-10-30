@@ -1,67 +1,73 @@
 <!-- Facebook Pixel -->
 <script>
-  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','//connect.facebook.net/en_US/fbevents.js');
+  try {
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','//connect.facebook.net/en_US/fbevents.js');
 
-  fbq('init', '927712684329812');
-  fbq('track', 'PageView');
+    fbq('init', '927712684329812');
+    fbq('track', 'PageView');
 
-  // Order
-  if (window.location.pathname.indexOf('/order') > -1) {
-    var getProductInfo = function() {
-      var data = window.ctrwowCheckout.checkoutData.getProduct();
-      return {
-        value: data.productPrices.DiscountedPrice.Value,
-        currency: window.localStorage.getItem('currencyCode'),
-        content_type: 'product'
-      }
-    };
+    // Order
+    if (window.location.pathname.indexOf('/order') > -1) {
+      window.addEventListener('DOMContentLoaded', () => {
+        var getProductInfo = function() {
+          var data = window.ctrwowCheckout.checkoutData.getProduct();
+          return {
+            value: data.productPrices.DiscountedPrice.Value,
+            currency: window.localStorage.getItem('currencyCode'),
+            content_type: 'product'
+          }
+        };
 
-    window.ctrwowUtils.getDependencies([window.ctrwowUtils.getCtrLibLink('ctrwowCheckout')], { delayUntilInteract: false }).then(() => {
-      window.ctrwowCheckout.ready().then(() => {
-        window.ctrwowCheckout.checkoutData.onProductChange((data) => {
-          var cartInfo = getProductInfo();
-          fbq('track', 'AddToCart', cartInfo);
+        window.ctrwowUtils.getDependencies([window.ctrwowUtils.getCtrLibLink('ctrwowCheckout')], { delayUntilInteract: false }).then(() => {
+          window.ctrwowCheckout.ready().then(() => {
+            window.ctrwowCheckout.checkoutData.onProductChange((data) => {
+              var cartInfo = getProductInfo();
+              fbq('track', 'AddToCart', cartInfo);
+            })
+          })
         })
-      })
-    })
 
-    var isFireInitiateCheckout = false;
-    var initiateCheckout = function() {
-      if (!isFireInitiateCheckout) {
-        isFireInitiateCheckout = true;
-        var initiateCheckoutInfo = getProductInfo();
-        fbq('track', 'InitiateCheckout', initiateCheckoutInfo);
-      }
-    };
-    var inputs = document.querySelectorAll('input');
-    inputs.forEach((input) => {
-      input.addEventListener('keydown', function() {
-        initiateCheckout();
+        var isFireInitiateCheckout = false;
+        var initiateCheckout = function() {
+          if (!isFireInitiateCheckout) {
+            isFireInitiateCheckout = true;
+            var initiateCheckoutInfo = getProductInfo();
+            fbq('track', 'InitiateCheckout', initiateCheckoutInfo);
+          }
+        };
+        var inputs = document.querySelectorAll('input');
+        inputs.forEach((input) => {
+          input.addEventListener('keydown', function() {
+            initiateCheckout();
+          });
+        });
+        var buttons = Array.prototype.slice.call(document.querySelectorAll('.btn-next, .btn_display_form, button[type="submit"], .checkoutWithPaypal'));
+        buttons.forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            initiateCheckout();
+          });
+        });
       });
-    });
-    var buttons = Array.prototype.slice.call(document.querySelectorAll('.btn-next, .btn_display_form, button[type="submit"], .checkoutWithPaypal'));
-    buttons.forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        initiateCheckout();
-      });
-    });
-  }
+    }
 
-  // For first upsell or confirm(if no upsell)
-  var orderInfo = JSON.parse(localStorage.getItem('orderInfo'));
-  var currencyCode = localStorage.getItem('currencyCode');
-  var isFiredFBPurchase = localStorage.getItem('isFbPurchaseFired');
-  if (!isFiredFBPurchase && orderInfo && currencyCode) {
-    localStorage.setItem('isFbPurchaseFired', true);
-    fbq('track', 'Purchase', {
-      value: orderInfo.orderTotal,
-      currency: currencyCode,
-      contents: [{
-        id: orderInfo.orderedProducts[0].pid,
-        quantity: orderInfo.quantity
-      }],
-      content_type: 'product'
-    });
+    // For first upsell or confirm(if no upsell)
+    var orderInfo = JSON.parse(localStorage.getItem('orderInfo'));
+    var currencyCode = localStorage.getItem('currencyCode');
+    var isFiredFBPurchase = localStorage.getItem('isFbPurchaseFired');
+    if (!isFiredFBPurchase && orderInfo && currencyCode) {
+      localStorage.setItem('isFbPurchaseFired', true);
+      fbq('track', 'Purchase', {
+        value: orderInfo.orderTotal,
+        currency: currencyCode,
+        contents: [{
+          id: orderInfo.orderedProducts[0].pid,
+          quantity: orderInfo.quantity
+        }],
+        content_type: 'product'
+      });
+    }
+  } catch(e) {
+    console.log(e);
   }
 </script>
 <noscript>
