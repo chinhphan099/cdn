@@ -7,40 +7,42 @@
 
   // Order
   if (window.location.pathname.indexOf('/order') > -1) {
-    fbq('track', 'AddToCart');
+    var getProductInfo = function() {
+      var data = window.ctrwowCheckout.checkoutData.getProduct();
+      return {
+        value: data.productPrices.DiscountedPrice.Value,
+        currency: window.localStorage.getItem('currencyCode'),
+        content_type: 'product'
+      }
+    };
+
+    window.ctrwowUtils.getDependencies([window.ctrwowUtils.getCtrLibLink('ctrwowCheckout')], { delayUntilInteract: false }).then(() => {
+      window.ctrwowCheckout.ready().then(() => {
+        window.ctrwowCheckout.checkoutData.onProductChange((data) => {
+          var cartInfo = getProductInfo();
+          fbq('track', 'AddToCart', cartInfo);
+        })
+      })
+    })
 
     var isFireInitiateCheckout = false;
-    var inputs = document.querySelectorAll('input');
-    if (!!inputs.length) {
-      for (var i = 0; i < inputs.length; i++) {
-        inputs[i].addEventListener('keydown', function() {
-          if (!isFireInitiateCheckout) {
-            isFireInitiateCheckout = true;
-            fbq('track', 'InitiateCheckout');
-          }
-        });
+    var initiateCheckout = function() {
+      if (!isFireInitiateCheckout) {
+        isFireInitiateCheckout = true;
+        var initiateCheckoutInfo = getProductInfo();
+        fbq('track', 'InitiateCheckout', initiateCheckoutInfo);
       }
-    }
-
-    // Next Button
-    var nextBtns = Array.prototype.slice.call(document.querySelectorAll('.btn-next, .btn_display_form'));
-    nextBtns.forEach(function(nextBtn) {
-        nextBtn.addEventListener('click', function() {
-            if (!isFireInitiateCheckout) {
-                isFireInitiateCheckout = true;
-                fbq('track', 'InitiateCheckout');
-            }
-        });
+    };
+    var inputs = document.querySelectorAll('input');
+    inputs.forEach((input) => {
+      input.addEventListener('keydown', function() {
+        initiateCheckout();
+      });
     });
-
-    //CTA buttons
-    var ctaButtons = document.querySelectorAll('button[type="submit"], .checkoutWithPaypal');
-    ctaButtons.forEach(() => {
-      ctaButton.addEventListener('click', function() {
-        if (!isFireInitiateCheckout) {
-          isFireInitiateCheckout = true;
-          fbq('track', 'InitiateCheckout');
-        }
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('.btn-next, .btn_display_form, button[type="submit"], .checkoutWithPaypal'));
+    buttons.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        initiateCheckout();
       });
     });
   }
