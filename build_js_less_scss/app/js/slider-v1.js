@@ -110,7 +110,7 @@ Plugin.prototype = {
             $(this)[pluginName]('setPositionArrows');
             $(this)[pluginName]('slickNoSlide');
 
-            // Just only have on Resize event.
+            // Just have on Resize event.
             if ($('.slick', this).hasClass('no-slide')) {
               $(this)[pluginName]('destroy');
               $(this)[pluginName]('initWidget');
@@ -176,7 +176,8 @@ Plugin.prototype = {
           settings: {
             slidesToShow: this.options.mobileItems,
             rows: this.options.mbRows || 1,
-            slidesToScroll: this.options.mbScrollItems || 1
+            slidesToScroll: this.options.mbScrollItems || 1,
+            variableWidth: false
           }
         };
         responsiveOps.push(mobile);
@@ -213,6 +214,7 @@ Plugin.prototype = {
       fade: this.options.fade,
       infinite: this.options.infinite,
       adaptiveHeight: this.options.adaptiveHeight,
+      variableWidth: this.options.variableWidth || false,
       prevArrow: this.options.prevArrow,
       nextArrow: this.options.nextArrow,
       arrowWrapper: this.options.arrowWrapper,
