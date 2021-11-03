@@ -252,6 +252,7 @@ Plugin.prototype = {
 
     window._wq = window._wq || [];
     this.handle.on('init', () => {
+      window.ctrwowUtils.events.emit('onInitSlider_' + this.element.attr('id'));
       window.CTR_IMG_LAZY_LOADER && window.CTR_IMG_LAZY_LOADER.revalidate();
       this.handle.find('.slick-track > .slick-list').remove();
       if ($('.slick-current', this.element).find('.w_wistia').length) {
