@@ -187,10 +187,7 @@
     position: relative;
     width: 100%;
     pointer-events: auto;
-    // .popup_widget_outer--scrollable & {
-    //   height: 100%;
-    // }
-    & > .icon-close {
+    .close {
       position: absolute;
       top: -15px;
       right: -10px;
@@ -202,11 +199,8 @@
       background-color: black;
       -webkit-border-radius: 50%;
       border-radius: 50%;
-      border: 2px solid white;
+      border: 2px solid #bdbdbd;
       cursor: pointer;
-      img {
-        max-width: 100%;
-      }
     }
   }
   &_content {
@@ -224,17 +218,9 @@
     border-radius: 10px;
     outline: 0;
     pointer-events: auto;
-    .icon-close {
-      position: absolute;
+    .close {
       right: 10px;
       top: 10px;
-      width: 30px;
-      height: 30px;
-      cursor: pointer;
-      img {
-        max-width: 100%;
-        vertical-align: middle;
-      }
     }
   }
   &_header {
@@ -242,10 +228,11 @@
   }
 }
 
-//! Fix Scroll inside position middle for IE11
-.popup_widget--theme_1 .popup_widget_outer--scrollable.popup_widget_outer--centered .popup_widget_inner {
+.popup_widget_outer--scrollable.popup_widget_outer--centered .popup_widget_inner {
   height: auto;
 }
+
+//! Fix Scroll inside position middle for IE11
 _:-ms-fullscreen, :root .popup_widget--theme_1 .popup_widget_outer--scrollable.popup_widget_outer--centered .popup_widget_content {
   max-height: calc(~"100vh - 60px");
   overflow-y: auto;
