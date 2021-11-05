@@ -37,9 +37,9 @@
     }
     document.getElementById(id).classList.add('popup_widget--opened');
 
-    const scrollBar = getScrollbarWidth();
     if (!bodyElm.classList.contains('show-popup_widget')) {
       bodyElm.classList.add('show-popup_widget');
+      const scrollBar = getScrollbarWidth();
       bodyElm.style.paddingRight = `${scrollBar}px`;
     }
   }

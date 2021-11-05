@@ -734,7 +734,7 @@
 <script>
   var hash = location.hash;
   if (hash && document.querySelector(hash)) {
-    document.querySelector(hash).style.display = 'block';
+    document.querySelector(hash).classList.add('popup_widget--opened');
     document.querySelector('body').classList.add('show-popup_widget');
   }
 </script>
