@@ -5,9 +5,10 @@
   @-o-keyframes @name {@arguments();}
   @keyframes @name {@arguments();}
 }
-.scrollbar(@width: 10px, @thumbBg: #999, @trackBg: #ddd) {
+.scrollbar(@scrollSize: 10px, @thumbBg: #999, @trackBg: #ddd) {
   &::-webkit-scrollbar {
-    width: @width;
+    width: @scrollSize;
+    height: @scrollSize;
   }
   &::-webkit-scrollbar-thumb {
     -webkit-border-radius: 0;
@@ -55,7 +56,7 @@
   .popup_widget_outer {
     max-width: 670px;
   }
-  .edit_mode & {
+  &[data-gjs-type] {
     display: block !important;
     position: static;
     height: 400px;
@@ -236,7 +237,7 @@
 }
 
 //! Fix Scroll inside position middle for IE11
-_:-ms-fullscreen, :root .popup_widget--theme_1 .popup_widget_outer--scrollable.popup_widget_outer--centered .popup_widget_content {
+_:-ms-fullscreen, :root .popup_widget--theme_1_Chinh .popup_widget_outer--scrollable.popup_widget_outer--centered .popup_widget_content {
   max-height: calc(~"100vh - 60px");
   overflow-y: auto;
 }
