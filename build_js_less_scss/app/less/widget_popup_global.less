@@ -197,14 +197,16 @@
       z-index: 2;
       width: 30px;
       height: 30px;
+      padding: 5px;
       text-align: center;
-      line-height: 26px;
-      color: white;
       background-color: black;
       -webkit-border-radius: 50%;
       border-radius: 50%;
       border: 2px solid white;
       cursor: pointer;
+      img {
+        max-width: 100%;
+      }
     }
   }
   &_content {
@@ -226,10 +228,13 @@
       position: absolute;
       right: 10px;
       top: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #999;
+      width: 30px;
+      height: 30px;
       cursor: pointer;
+      img {
+        max-width: 100%;
+        vertical-align: middle;
+      }
     }
   }
   &_header {
