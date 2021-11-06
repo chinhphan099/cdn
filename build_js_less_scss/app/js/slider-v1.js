@@ -255,9 +255,11 @@ Plugin.prototype = {
       window.ctrwowUtils.events.emit('onInitSlider_' + this.element.attr('id'));
       window.CTR_IMG_LAZY_LOADER && window.CTR_IMG_LAZY_LOADER.revalidate();
       this.handle.find('.slick-track > .slick-list').remove();
-      if ($('.slick-current', this.element).find('.w_wistia').length) {
+
+      const wistiaVideoElm = $('.slick-current', this.element).find('.js-wistia') || $('.slick-current', this.element).find('.w_wistia');
+      if (wistiaVideoElm.length) {
         window._wq.push({
-          id: $('.slick-current', this.element).find('.w_wistia').data('videoid'),
+          id: wistiaVideoElm.data('videoid'),
           onReady: () => {
             $(window).resize();
             this.setPositionArrows();
