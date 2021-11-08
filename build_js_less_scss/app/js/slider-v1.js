@@ -256,7 +256,7 @@ Plugin.prototype = {
       window.CTR_IMG_LAZY_LOADER && window.CTR_IMG_LAZY_LOADER.revalidate();
       this.handle.find('.slick-track > .slick-list').remove();
 
-      const wistiaVideoElm = $('.slick-current', this.element).find('.js-wistia') || $('.slick-current', this.element).find('.w_wistia');
+      const wistiaVideoElm = $('.slick-current', this.element).find('.w_wistia');
       if (wistiaVideoElm.length) {
         window._wq.push({
           id: wistiaVideoElm.data('videoid'),
