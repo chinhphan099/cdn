@@ -261,7 +261,7 @@ Plugin.prototype = {
         window._wq.push({
           id: wistiaVideoElm.data('videoid'),
           onReady: () => {
-            $(window).resize();
+            $('.slick', this.element)[0].slick.animateHeight();
             this.setPositionArrows();
           }
         });
