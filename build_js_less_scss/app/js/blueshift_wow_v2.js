@@ -230,9 +230,11 @@
 
               if (e.currentTarget.getAttribute('name') === 'email' && document.querySelector('[name="email"]').classList.contains('valid')) {
                 console.log('BlueShift - Fire identify');
-                blueshift.identify(identifyData);
                 checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
-                blueshift.track('add_to_cart', getItemDataForCart(checkedItemData));
+                const getCheckedDataForCart = getItemDataForCart(checkedItemData);
+
+                blueshift.identify(identifyData);
+                blueshift.track('add_to_cart', getCheckedDataForCart);
               }
 
               if (e.currentTarget.getAttribute('name') === 'phoneNumber') {
@@ -312,12 +314,14 @@
 
             if (currentItem.productId === checkedItemData.productId) { return; }
 
+            const getCheckedDataForCart = getItemDataForCart(checkedItemData);
+            const getCurrentDataForCart = getItemDataForCart(currentItem);
             if (
               document.querySelector('[name="email"]') &&
               document.querySelector('[name="email"]').classList.contains('valid')
             ) {
-              blueshift.track('remove_from_cart', getItemDataForCart(checkedItemData));
-              blueshift.track('add_to_cart', getItemDataForCart(currentItem));
+              blueshift.track('remove_from_cart', getCheckedDataForCart);
+              blueshift.track('add_to_cart', getCurrentDataForCart);
             }
 
             checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
