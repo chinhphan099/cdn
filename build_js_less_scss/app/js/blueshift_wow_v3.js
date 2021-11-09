@@ -271,6 +271,7 @@
             console.log(e);
           }
         });
+
         window.ctrwowUtils.events.on('beforeSubmitOrder', function() {
           try {
             identifyData = getIdentifyData();
