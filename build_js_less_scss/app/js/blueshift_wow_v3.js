@@ -1,6 +1,7 @@
 (() => {
   try {
     console.log('BlueShift');
+    let phone_valid = '', phone_linetype = '', phone_carrier = '', international_format = '';
     const getQueryParameter = function(param) {
       let href = '';
       if (location.href.indexOf('?')) {
@@ -23,6 +24,101 @@
         return 'mobile';
       }
       return 'desktop';
+    };
+    const getIdentifyData = function() {
+      try {
+        const data = {
+          email: document.querySelector('[name="email"]').value,
+          firstname: document.querySelector('[name="firstName"]').value || '',
+          lastname: document.querySelector('[name="lastName"]').value || '',
+          phone_number: international_format || document.querySelector('[name="phoneNumber"]').value,
+          phone_valid: phone_valid,
+          phone_linetype: phone_linetype,
+          phone_carrier: phone_carrier,
+          ship_city: document.querySelector('[name="city"]').value,
+          ship_address: document.querySelector('[name="address1"]').value,
+          ship_state: document.querySelector('[name="state"]').value,
+          ship_zip: document.querySelector('[name="zipCode"]').value,
+          ship_country: document.querySelector('[name="countryCode"]').value,
+          customer_language: document.querySelector('html').getAttribute('lang') || '',
+          joined_at: getCurrentDate(),
+          fingerprint_id: window._EA_ID,
+          referrer: document.referrer
+        };
+        if (window.CC_Code) {
+          data.coupon = window.CC_Code;
+        }
+        return data;
+      } catch (e) {
+        console.log(e);
+        return {};
+      }
+    };
+    const getItemDataForCart = function(checkedItem) {
+      try {
+        const quantity = window.localStorage.getItem('realDoubleQuantity') ? checkedItem.quantity / 2 : checkedItem.quantity;
+        const landingurl = window.location.href;
+        const landingBaseUrl = landingurl.split('?')[0];
+        return {
+          email: document.querySelector('[name="email"]').value || '',
+          product_ids: [checkedItem.productId],
+          items: [
+            {
+              productId: checkedItem.productId,
+              sku: checkedItem.sku,
+              total_usd: (checkedItem.productPrices.DiscountedPrice.Value + checkedItem.shippings[window.shippingIndex || 0].price).toFixed(2),
+              quantity: quantity
+            }
+          ],
+          sku: checkedItem.sku,
+          currency: window.localStorage.getItem('currencyCode'),
+          landing_base_url: landingBaseUrl,
+          customer_language: document.querySelector('html').getAttribute('lang') || ''
+        };
+      } catch (e) {
+        console.log(e);
+        return {};
+      }
+    };
+    const checkValidEmail = function(email) {
+      const isEmailValid = email.value && !email.classList.contains('error');
+      const emailAPI = `//globalemail.melissadata.net/v4/WEB/GlobalEmail/doGlobalEmail?&id=hC8qipiUVyc5vn9j0hgqMR**&opt=VerifyMailbox:Premium,DomainCorrection:ON,TimeToWait:25&WhoIsLookup=OFF&format=JSON&email=${email.value}`;
+      if (isEmailValid) {
+        window.ctrwowUtils
+          .callAjax(emailAPI)
+          .then((result) => {
+            if (!result || !result.Records || !result.Records.length) {
+              // eslint-disable-next-line no-throw-literal
+              throw 'Error';
+            }
+
+            const record = result.Records[0];
+            const deliverabilityConfidenceScore = Number(record.DeliverabilityConfidenceScore);
+
+            if (deliverabilityConfidenceScore < 101 && deliverabilityConfidenceScore > 60 && record.Results.indexOf('EE') === -1) {
+              if (record.Results.indexOf('ES01') > -1) {
+                window.ctrwowUtils.events.emit('onValidEmail');
+                window.localStorage.removeItem('isInvalidEmail');
+                window.isInvalidEmail = false;
+
+                const identifyData = getIdentifyData();
+                blueshift.identify(identifyData);
+
+                const checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
+                const getCheckedDataForCart = getItemDataForCart(checkedItemData);
+                blueshift.track('add_to_cart', getCheckedDataForCart);
+              }
+            } else {
+              window.localStorage.setItem('isInvalidEmail', true);
+              window.isInvalidEmail = true;
+            }
+          })
+          .catch((e) => {
+            window.localStorage.setItem('isInvalidEmail', true);
+            window.isInvalidEmail = true;
+            console.log(e);
+          });
+      }
     };
 
     const blueshiftID = getQueryParameter('isCardTest') === '1' ? 'fa8307145a64f9484defb6d8a18940f0' : '13c25a652e2a0c05cb06a3b1dba09a85';
@@ -69,66 +165,9 @@
 
         window.orderFired = true;
 
-        let phone_valid = '', phone_linetype = '', phone_carrier = '', international_format = '';
-        const getIdentifyData = function() {
-          try {
-            const data = {
-              email: document.querySelector('[name="email"]').value,
-              firstname: document.querySelector('[name="firstName"]').value || '',
-              lastname: document.querySelector('[name="lastName"]').value || '',
-              phone_number: international_format || document.querySelector('[name="phoneNumber"]').value,
-              phone_valid: phone_valid,
-              phone_linetype: phone_linetype,
-              phone_carrier: phone_carrier,
-              ship_city: document.querySelector('[name="city"]').value,
-              ship_address: document.querySelector('[name="address1"]').value,
-              ship_state: document.querySelector('[name="state"]').value,
-              ship_zip: document.querySelector('[name="zipCode"]').value,
-              ship_country: document.querySelector('[name="countryCode"]').value,
-              customer_language: document.querySelector('html').getAttribute('lang') || '',
-              joined_at: getCurrentDate(),
-              fingerprint_id: window._EA_ID,
-              referrer: document.referrer
-            };
-            if (window.CC_Code) {
-              data.coupon = window.CC_Code;
-            }
-            return data;
-          } catch (e) {
-            console.log(e);
-            return {};
-          }
-        };
-        const getItemDataForCart = function(checkedItem) {
-          try {
-            const quantity = window.localStorage.getItem('doubleQuantity') ? checkedItem.quantity / 2 : checkedItem.quantity;
-            const landingurl = window.location.href;
-            const landingBaseUrl = landingurl.split('?')[0];
-            return {
-              email: document.querySelector('[name="email"]').value || '',
-              product_ids: [checkedItem.productId],
-              items: [
-                {
-                  productId: checkedItem.productId,
-                  sku: checkedItem.sku,
-                  total_usd: (checkedItem.productPrices.DiscountedPrice.Value + checkedItem.shippings[window.shippingIndex || 0].price).toFixed(2),
-                  quantity: quantity
-                }
-              ],
-              sku: checkedItem.sku,
-              currency: window.localStorage.getItem('currencyCode'),
-              landing_base_url: landingBaseUrl,
-              customer_language: document.querySelector('html').getAttribute('lang') || ''
-            };
-          } catch (e) {
-            console.log(e);
-            return {};
-          }
-        };
-
         var inputs = Array.prototype.slice.call(document.querySelectorAll('[name="email"], [name="firstName"], [name="lastName"], [name="phoneNumber"]'));
         let identifyData = getIdentifyData();
-        blueshift.identify(identifyData);
+        // blueshift.identify(identifyData);
 
         const phoneNumberElm = $('input[name="phoneNumber"]');
         const countryDdl = document.querySelector('[name="shippingAddress"] [name="countryCode"]');
@@ -232,13 +271,7 @@
 
               if (e.currentTarget.getAttribute('name') === 'email' && document.querySelector('[name="email"]').classList.contains('valid')) {
                 console.log('BlueShift - Fire identify');
-                checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
-                const getCheckedDataForCart = getItemDataForCart(checkedItemData);
-
-                if (!window.isInvalidEmail) {
-                  blueshift.identify(identifyData);
-                  blueshift.track('add_to_cart', getCheckedDataForCart);
-                }
+                checkValidEmail(e.currentTarget);
               }
 
               if (e.currentTarget.getAttribute('name') === 'phoneNumber') {
@@ -263,14 +296,14 @@
           }
         });
 
-        window.ctrwowUtils.events.on('onValidEmail', function() {
-          try {
-            identifyData = getIdentifyData();
-            blueshift.identify(identifyData);
-          } catch (e) {
-            console.log(e);
-          }
-        });
+        // window.ctrwowUtils.events.on('onValidEmail', function() {
+        //   try {
+        //     identifyData = getIdentifyData();
+        //     blueshift.identify(identifyData);
+        //   } catch (e) {
+        //     console.log(e);
+        //   }
+        // });
 
         window.ctrwowUtils.events.on('beforeSubmitOrder', function() {
           try {
