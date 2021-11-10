@@ -269,12 +269,14 @@
             try {
               identifyData = getIdentifyData();
 
-              if (e.currentTarget.getAttribute('name') === 'email' && e.currentTarget.classList.contains('valid')) {
+              if (e.currentTarget.getAttribute('name') === 'email' && e.currentTarget.classList.contains('valid') && window.currentEmail !== e.currentTarget.value) {
                 console.log('BlueShift - Fire identify');
+                window.currentEmail = e.currentTarget.value;
                 checkValidEmail(e.currentTarget);
               }
 
-              if (e.currentTarget.getAttribute('name') === 'phoneNumber') {
+              if (e.currentTarget.getAttribute('name') === 'phoneNumber' && window.currentPhone !== e.currentTarget.value) {
+                window.currentPhone = e.currentTarget.value;
                 isRecall = false;
                 callAPICheckPhone();
               }
