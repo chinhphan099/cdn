@@ -237,8 +237,8 @@
 
                 if (!window.isInvalidEmail) {
                   blueshift.identify(identifyData);
+                  blueshift.track('add_to_cart', getCheckedDataForCart);
                 }
-                blueshift.track('add_to_cart', getCheckedDataForCart);
               }
 
               if (e.currentTarget.getAttribute('name') === 'phoneNumber') {
@@ -337,8 +337,10 @@
               document.querySelector('[name="email"]') &&
               document.querySelector('[name="email"]').classList.contains('valid')
             ) {
-              blueshift.track('remove_from_cart', getCheckedDataForCart);
-              blueshift.track('add_to_cart', getCurrentDataForCart);
+              if (!window.isInvalidEmail) {
+                blueshift.track('remove_from_cart', getCheckedDataForCart);
+                blueshift.track('add_to_cart', getCurrentDataForCart);
+              }
             }
 
             checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
@@ -369,6 +371,7 @@
 
         var orderInfo = window.localStorage.getItem('orderInfo');
         var _location = window.localStorage.getItem('location');
+        var _isInvalidEmail = window.localStorage.getItem('isInvalidEmail');
         var isFiredMainOrderBlueshift = window.localStorage.getItem('isFiredMainOrderBlueshift');
         var __EA_ID = window._EA_ID || window.localStorage.getItem('_vid');
         if (!window.localStorage.getItem('referrerUrl')) {
@@ -455,7 +458,9 @@
               identifyData.customer_id = orderInfo.customerId;
             }
             window.localStorage.setItem('identifyData', JSON.stringify(identifyData));
-            blueshift.identify(identifyData);
+            if (_isInvalidEmail !== 'true') {
+              blueshift.identify(identifyData);
+            }
           }
 
           if (!isFiredMainOrderBlueshift) {
@@ -463,7 +468,9 @@
             if (orderInfo.upsellUrls && orderInfo.upsellUrls.length > 0) {
               localStorage.setItem('subOrderNumber', orderInfo.upsellUrls[0].orderNumber);
             }
-            blueshift.track('purchase', getPurchasedData(orderInfo));
+            if (_isInvalidEmail !== 'true') {
+              blueshift.track('purchase', getPurchasedData(orderInfo));
+            }
             window.localStorage.setItem('isFiredMainOrderBlueshift', true);
           }
           else if (orderInfo.upsellUrls && orderInfo.upsellUrls.length > 0) {
@@ -473,7 +480,9 @@
             if (!orderInfo.upsellUrls[latestUpsellIndex].isFired && orderInfo.upsellUrls[latestUpsellIndex].orderNumber !== subOrderNumber) {
               orderInfo.upsellUrls[latestUpsellIndex].isFired = 'fired';
               console.log('BlueShift - Fire Purchase');
-              blueshift.track('purchase', getPurchasedData(orderInfo, upsellInfo));
+              if (_isInvalidEmail !== 'true') {
+                blueshift.track('purchase', getPurchasedData(orderInfo, upsellInfo));
+              }
             }
           }
           window.localStorage.setItem('orderInfo', JSON.stringify(orderInfo));
