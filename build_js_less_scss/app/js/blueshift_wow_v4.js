@@ -265,11 +265,11 @@
         // }
 
         inputs.forEach(function(input) {
-          input.addEventListener('change', function (e) {
+          input.addEventListener('blur', function (e) {
             try {
               identifyData = getIdentifyData();
 
-              if (e.currentTarget.getAttribute('name') === 'email' && document.querySelector('[name="email"]').classList.contains('valid')) {
+              if (e.currentTarget.getAttribute('name') === 'email' && e.currentTarget.classList.contains('valid')) {
                 console.log('BlueShift - Fire identify');
                 checkValidEmail(e.currentTarget);
               }
