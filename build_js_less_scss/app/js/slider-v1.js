@@ -220,6 +220,7 @@ Plugin.prototype = {
       arrowWrapper: this.options.arrowWrapper,
       appendDots: this.options.dotWrapper,
       initialSlide: this.options.initialSlide,
+      rtl: $('html').attr('dir') === 'rtl' || this.options.dir === 'rtl',
       speed: this.options.slideSpeed
     });
 
@@ -370,7 +371,6 @@ $.fn[pluginName].defaults = {
     slidesToShow: 1,
     slidesToScroll: 1,
     zIndex: 5,
-    rtl: $('html').attr('dir') === 'rtl',
     accessibility: false
   }
 };
