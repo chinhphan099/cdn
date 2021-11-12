@@ -9,8 +9,6 @@ const TypeSliders = {
 
 function Plugin(element) {
   this.element = $(element);
-  // this.options = $.extend({}, $.fn[pluginName].defaults, this.element.data(pluginName))
-  // this.handle = this.element.find(this.options.handle)
   this.initWidget();
 }
 
@@ -24,13 +22,13 @@ Plugin.prototype = {
         if (win.width() < this.options.initUnder) {
           this.element.removeClass('wrap-no-slide');
           this.handle.removeClass('no-slide');
-          this.initialize();
+          this.initSlider();
         } else {
           this.element.addClass('wrap-no-slide');
           this.handle.addClass('no-slide');
         }
       } else {
-        this.initialize();
+        this.initSlider();
       }
 
       win.off(resize).on(resize, function () {
@@ -120,34 +118,6 @@ Plugin.prototype = {
       }
     });
   },
-  initialize: function () {
-    if (this.element.find('.slick').find('img').length) {
-      this.checkImgLoad();
-    } else {
-      this.initSlider();
-    }
-  },
-  checkImgLoad: function () {
-    let fakeSrc = this.element.find('.slick').find('img').first().attr('data-ctr-lazy-src');
-    if (!fakeSrc) {
-      fakeSrc = this.element.find('.slick').find('img').first().attr('src');
-    }
-
-    if (fakeSrc) {
-      $('<img />')
-        .attr('src', fakeSrc)
-        .css('display', 'none')
-        .on('load.' + pluginName, () => {
-          this.initSlider();
-        })
-        .on('error.' + pluginName, () => {
-          this.initSlider();
-        });
-    }
-    else {
-      this.initSlider();
-    }
-  },
   updateSetting: function () {
     let newOption = {};
     const responsiveOps = [];
@@ -229,7 +199,8 @@ Plugin.prototype = {
       option = $.extend(option, {
         autoplay: true,
         pauseOnHover: true,
-        autoplaySpeed: this.options.autoplaySpeed || 3000
+        cssEase: this.options.autoplaySpeed === 0 ? 'linear' : 'ease',
+        autoplaySpeed: this.options.hasOwnProperty('autoplaySpeed') ? this.options.autoplaySpeed : 3000
       });
     }
 
