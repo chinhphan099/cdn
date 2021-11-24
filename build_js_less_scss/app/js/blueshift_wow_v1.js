@@ -142,7 +142,7 @@
             // const deliverabilityConfidenceScore = Number(record.DeliverabilityConfidenceScore);
 
             // if (deliverabilityConfidenceScore < 101 && deliverabilityConfidenceScore > 60 && record.Results.indexOf('EE') === -1 && record.Results.indexOf('ES01') > -1) {
-            if (result.isValid) {
+            if (result.isVerified && result.isValid) {
               window.ctrwowUtils.events.emit('onValidEmail'); // Emit event to trigger leadgen API - Not yet
               window.localStorage.removeItem('isInvalidEmail');
               window.isInvalidEmail = false;
