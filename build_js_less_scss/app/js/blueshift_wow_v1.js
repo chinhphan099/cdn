@@ -113,34 +113,46 @@
       }
     };
     const checkValidEmail = function(email) {
-      if (!email) return
+      if (!email) {
+        return;
+      }
       const isEmailValid = email.value && !email.classList.contains('error');
-      const emailAPI = `//globalemail.melissadata.net/v4/WEB/GlobalEmail/doGlobalEmail?&id=hC8qipiUVyc5vn9j0hgqMR**&opt=VerifyMailbox:Premium,DomainCorrection:ON,TimeToWait:25&WhoIsLookup=OFF&format=JSON&email=${email.value}`;
+      // const emailAPI = `//globalemail.melissadata.net/v4/WEB/GlobalEmail/doGlobalEmail?&id=hC8qipiUVyc5vn9j0hgqMR**&opt=VerifyMailbox:Premium,DomainCorrection:ON,TimeToWait:25&WhoIsLookup=OFF&format=JSON&email=${email.value}`;
+      const emailAPI = `https://sales-prod.tryemanagecrm.com/api/validation/verify-email/?email=${email.value}`;
       if (isEmailValid) {
         window.ctrwowUtils
-          .callAjax(emailAPI)
+          .callAjax(emailAPI, {
+            headers: {
+              X_CID: window.__CTRWOW_CONFIG.X_CID,
+              'Content-Type': 'application/json'
+            }
+          })
           .then((result) => {
-            if (!result || !result.Records || !result.Records.length) {
+            /* if (!result || !result.Records || !result.Records.length) {
+              // eslint-disable-next-line no-throw-literal
+              throw 'Error';
+            } */
+
+            if (!result) {
               // eslint-disable-next-line no-throw-literal
               throw 'Error';
             }
 
-            const record = result.Records[0];
-            const deliverabilityConfidenceScore = Number(record.DeliverabilityConfidenceScore);
+            // const record = result.Records[0];
+            // const deliverabilityConfidenceScore = Number(record.DeliverabilityConfidenceScore);
 
-            if (deliverabilityConfidenceScore < 101 && deliverabilityConfidenceScore > 60 && record.Results.indexOf('EE') === -1) {
-              if (record.Results.indexOf('ES01') > -1) {
-                window.ctrwowUtils.events.emit('onValidEmail');
-                window.localStorage.removeItem('isInvalidEmail');
-                window.isInvalidEmail = false;
+            // if (deliverabilityConfidenceScore < 101 && deliverabilityConfidenceScore > 60 && record.Results.indexOf('EE') === -1 && record.Results.indexOf('ES01') > -1) {
+            if (result.isValid) {
+              window.ctrwowUtils.events.emit('onValidEmail'); // Emit event to trigger leadgen API - Not yet
+              window.localStorage.removeItem('isInvalidEmail');
+              window.isInvalidEmail = false;
 
-                const identifyData = getIdentifyData();
-                blueshift.identify(identifyData);
+              const identifyData = getIdentifyData();
+              blueshift.identify(identifyData);
 
-                const checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
-                const getCheckedDataForCart = getItemDataForCart(checkedItemData);
-                blueshift.track('add_to_cart', getCheckedDataForCart);
-              }
+              const checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
+              const getCheckedDataForCart = getItemDataForCart(checkedItemData);
+              blueshift.track('add_to_cart', getCheckedDataForCart);
             } else {
               window.localStorage.setItem('isInvalidEmail', true);
               window.isInvalidEmail = true;
@@ -402,8 +414,7 @@
 
         window.pauseCheckoutProcessing = {
           isPause: true,
-          delay: 500,
-          deplay: 500,
+          delay: 500
         };
         document.querySelector('body').insertAdjacentHTML('beforeend', '<span class="custom-loading" style="display: none;"></span>');
 
