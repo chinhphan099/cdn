@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+@keyframes placeHolderShimmer {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+@keyframes placeHolderShimmer1 {
+  0% {
+    background-position: 200% 0%;
+  }
+  100% {
+    background-position: 0% 0;
+  }
+}
+.js-loader {
+  height: 110px;
+  position: relative;
+  margin-bottom: 30px;
+  animation: placeHolderShimmer 1s linear infinite forwards;
+  background: linear-gradient(to right, #eee 8%, #ddd 18%, #eee 33%) 0% 0%/50% 100% content-box;
+  padding: 0px 10px 0px 0px;
+  background-position: 0% 0%;
+}
+.js-loader .background-masker {
+  position: absolute;
+  height: 10px;
+  background: white;
+}
+.js-loader .load-title {
+  right: 0px;
+  width: 50%;
+}
+.js-loader .load-section-title-1 {
+  top: 10px;
+  width: 100%;
+}
+.js-loader .load-section-title-2 {
+  top: 30px;
+  width: 100%;
+}
+.js-loader .load-section-title-3 {
+  top: 50px;
+  width: 100%;
+}
+.js-loader .load-section-title-4 {
+  top: 70px;
+  width: 100%;
+}
+.js-loader .load-section-title-5 {
+  top: 90px;
+  width: 100%;
+}
+  </style>
+</head>
+<body>
+  <div class="tabs-block">
+    <ul class="nav">
+      <li class="active">
+        <a href="#deviceReset"><strong>Device Reset &amp; <br>Firmware </strong></a>
+      </li>
+      <li>
+        <a href="#aboutKore"><strong>About <br>Kore 2.0</strong></a>
+      </li>
+      <li>
+        <a href="#healthApp"><strong>Kore 2.0 &amp; the <br>Kore Health App</strong></a>
+      </li>
+      <li>
+        <a href="#functions"><strong>Kore 2.0 Watch <br>Functions</strong></a>
+      </li>
+      <li>
+        <a href="#resources"><strong>Additional <br>Resources</strong></a>
+      </li>
+    </ul>
+    <div class="content">
+      <div id="deviceReset">
+        <div class="js-loader">
+          <div class="background-masker load-section-title-1"></div>
+          <div class="background-masker load-section-title-2"></div>
+          <div class="background-masker load-section-title-3"></div>
+          <div class="background-masker load-section-title-4"></div>
+          <div class="background-masker load-section-title-5"></div>
+        </div>
+      </div>
+      <div id="aboutKore">
+        <div class="js-loader">
+          <div class="background-masker load-section-title-1"></div>
+          <div class="background-masker load-section-title-2"></div>
+          <div class="background-masker load-section-title-3"></div>
+          <div class="background-masker load-section-title-4"></div>
+          <div class="background-masker load-section-title-5"></div>
+        </div>
+      </div>
+      <div id="healthApp">
+        <div class="js-loader">
+          <div class="background-masker load-section-title-1"></div>
+          <div class="background-masker load-section-title-2"></div>
+          <div class="background-masker load-section-title-3"></div>
+          <div class="background-masker load-section-title-4"></div>
+          <div class="background-masker load-section-title-5"></div>
+        </div>
+      </div>
+      <div id="functions">
+        <div class="js-loader">
+          <div class="background-masker load-section-title-1"></div>
+          <div class="background-masker load-section-title-2"></div>
+          <div class="background-masker load-section-title-3"></div>
+          <div class="background-masker load-section-title-4"></div>
+          <div class="background-masker load-section-title-5"></div>
+        </div>
+      </div>
+      <div id="resources">
+        <div class="js-loader">
+          <div class="background-masker load-section-title-1"></div>
+          <div class="background-masker load-section-title-2"></div>
+          <div class="background-masker load-section-title-3"></div>
+          <div class="background-masker load-section-title-4"></div>
+          <div class="background-masker load-section-title-5"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="js/korehealth_getArticl_multi_section.js"></script>
+</body>
+</html>

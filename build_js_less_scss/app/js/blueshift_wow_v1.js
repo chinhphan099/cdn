@@ -168,7 +168,7 @@
     const onAfterSubmitOrder = function() {
       // Blueshift identify event
       const identifyData = getIdentifyData();
-      identifyData.one_click_purchase_reference = referenceId;
+      identifyData.guid = referenceId;
       blueshift.identify(identifyData);
 
       // Blueshift add_to_cart event
