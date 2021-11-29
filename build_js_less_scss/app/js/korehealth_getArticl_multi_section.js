@@ -76,14 +76,16 @@ function handleScrollContent(id) {
 const prefixAPI = `https://support.korehealthofficial.com/api/v2/help_center/${lang}/sections/`;
 function renderArticleList(articles, elmId) {
   var wrap = document.querySelector(elmId);
-  if (!wrap) return
+  if (!wrap) {
+    return;
+  }
   for(var i = 0, n = articles.length; i < n; i++) {
     wrap.insertAdjacentHTML('beforeend', `<p><a href="${articles[i].html_url}">${articles[i].title}</a></p>`);
   }
-  removeLoader(wrap)
+  removeLoader(wrap);
 }
 function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 fetchUrlsParallel([
   { url: prefixAPI + deviceResetId + '/articles?page[size]=100'},
