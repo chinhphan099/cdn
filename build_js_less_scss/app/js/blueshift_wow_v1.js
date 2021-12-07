@@ -34,10 +34,11 @@
     };
     // End Helper function
 
-    let phone_valid = '', phone_linetype = '', phone_carrier = '', international_format = '';
+    let phone_valid = false, phone_linetype = '', phone_carrier = '', international_format = '';
+    let isInvalidEmail = true;
     let campaignName = JSON.parse(window.__CTR_FP_TRACKING_SETTINGS.FP_TRACKING_CUSTOM_DATA).campaignName;
     let campaignInfo;
-    window.orderFired = false;
+    let orderFired = false;
     let countryCode = '';
     let referenceId = getQueryParameter('guid');
 
@@ -145,22 +146,24 @@
             if (result.isVerified && result.isValid) {
               window.ctrwowUtils.events.emit('onValidEmail'); // Emit event to trigger leadgen API - Not yet
               window.localStorage.removeItem('isInvalidEmail');
-              window.isInvalidEmail = false;
+              isInvalidEmail = false;
 
               const identifyData = getIdentifyData();
-              blueshift.identify(identifyData);
+              if (phone_valid) {
+                blueshift.identify(identifyData);
+              }
 
               const checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
               const getCheckedDataForCart = getItemDataForCart(checkedItemData);
               blueshift.track('add_to_cart', getCheckedDataForCart);
             } else {
               window.localStorage.setItem('isInvalidEmail', true);
-              window.isInvalidEmail = true;
+              isInvalidEmail = true;
             }
           })
           .catch((e) => {
             window.localStorage.setItem('isInvalidEmail', true);
-            window.isInvalidEmail = true;
+            isInvalidEmail = true;
             console.log(e);
           });
       }
@@ -169,7 +172,9 @@
       // Blueshift identify event
       const identifyData = getIdentifyData();
       identifyData.guid = referenceId;
-      blueshift.identify(identifyData);
+      if (!isInvalidEmail && phone_valid) {
+        blueshift.identify(identifyData);
+      }
 
       // Blueshift add_to_cart event
       const checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
@@ -281,10 +286,10 @@
 
         let checkedItemData = window.__checkoutData.data.product;
 
-        if (!campaignInfo || !window._EA_ID || window.orderFired || !checkedItemData) { return; }
+        if (!campaignInfo || !window._EA_ID || orderFired || !checkedItemData) { return; }
         console.log('BlueShift', campaignInfo, window._EA_ID);
 
-        window.orderFired = true;
+        orderFired = true;
 
         var inputs = Array.prototype.slice.call(document.querySelectorAll('[name="email"], [name="firstName"], [name="lastName"], [name="phoneNumber"]'));
         let identifyData = getIdentifyData();
@@ -331,10 +336,15 @@
                   phone_linetype = result.line_type;
                   phone_carrier = result.carrier;
                   if (phone_valid) {
+                    window.localStorage.setItem('isValidPhone', true);
+                  } else {
+                    window.localStorage.removeItem('isValidPhone');
+                  }
+                  if (phone_valid) {
                     phoneNumberElm.addClass('correct-phone');
                     international_format = result.international_format;
                     identifyData = getIdentifyData();
-                    if (!window.isInvalidEmail) {
+                    if (!isInvalidEmail && phone_valid) {
                       blueshift.identify(identifyData);
                     }
                   }
@@ -437,7 +447,7 @@
           try {
             window.CC_Code = window.ctrwowCheckout.checkoutData.getCouponCode();
             identifyData = getIdentifyData();
-            if (!window.isInvalidEmail) {
+            if (!isInvalidEmail && phone_valid) {
               blueshift.identify(identifyData);
             }
           } catch (e) {
@@ -448,7 +458,7 @@
         window.ctrwowUtils.events.on('beforeSubmitOrder', function() {
           try {
             identifyData = getIdentifyData();
-            if (!window.isInvalidEmail) {
+            if (!isInvalidEmail && phone_valid) {
               blueshift.identify(identifyData);
             }
             window.localStorage.setItem('identifyData', JSON.stringify(identifyData));
@@ -494,7 +504,7 @@
               document.querySelector('[name="email"]') &&
               document.querySelector('[name="email"]').classList.contains('valid')
             ) {
-              if (!window.isInvalidEmail) {
+              if (!isInvalidEmail && phone_valid) {
                 blueshift.track('remove_from_cart', getCheckedDataForCart);
                 blueshift.track('add_to_cart', getCurrentDataForCart);
               }
@@ -530,6 +540,7 @@
         var orderInfo = window.localStorage.getItem('orderInfo');
         var _location = window.localStorage.getItem('location');
         var _isInvalidEmail = window.localStorage.getItem('isInvalidEmail');
+        var _isValidPhone = window.localStorage.getItem('isValidPhone');
         var isFiredMainOrderBlueshift = window.localStorage.getItem('isFiredMainOrderBlueshift');
         var __EA_ID = window._EA_ID || window.localStorage.getItem('_vid');
         if (!window.localStorage.getItem('referrerUrl')) {
@@ -616,7 +627,7 @@
               identifyData.customer_id = orderInfo.customerId;
             }
             window.localStorage.setItem('identifyData', JSON.stringify(identifyData));
-            if (_isInvalidEmail !== 'true') {
+            if (_isInvalidEmail !== 'true' && _isValidPhone === 'true') {
               blueshift.identify(identifyData);
             }
           }
@@ -626,7 +637,7 @@
             if (orderInfo.upsellUrls && orderInfo.upsellUrls.length > 0) {
               localStorage.setItem('subOrderNumber', orderInfo.upsellUrls[0].orderNumber);
             }
-            if (_isInvalidEmail !== 'true') {
+            if (_isInvalidEmail !== 'true' && _isValidPhone === 'true') {
               blueshift.track('purchase', getPurchasedData(orderInfo));
             }
             window.localStorage.setItem('isFiredMainOrderBlueshift', true);
@@ -638,7 +649,7 @@
             if (!orderInfo.upsellUrls[latestUpsellIndex].isFired && orderInfo.upsellUrls[latestUpsellIndex].orderNumber !== subOrderNumber) {
               orderInfo.upsellUrls[latestUpsellIndex].isFired = 'fired';
               console.log('BlueShift - Fire Purchase');
-              if (_isInvalidEmail !== 'true') {
+              if (_isInvalidEmail !== 'true' && _isValidPhone === 'true') {
                 blueshift.track('purchase', getPurchasedData(orderInfo, upsellInfo));
               }
             }
