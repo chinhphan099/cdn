@@ -115,7 +115,6 @@ Plugin.prototype = {
             }
           }
         }
-        $(this).find('.slick-track > .slick-list').remove();
       }
     });
   },
@@ -317,7 +316,7 @@ Plugin.prototype = {
     }
     // this.element.find('.slick-arrow').length && this.element.find('.slick-arrow').removeAttr('style');
     this.handle.slick('unslick').off('afterChange.' + pluginName);
-    this.element.find('.slick-track > .slick-list, .slick-dots').remove();
+    this.element.find('.slick-track, .slick-list, .slick-dots').remove();
     // if (window.ctrwowUtils.isBuilderMode()) {
     //   $.removeData(this.element[0], pluginName);
     // }
