@@ -115,6 +115,7 @@ Plugin.prototype = {
             }
           }
         }
+        $(this).find('.slick-track > .slick-list').remove();
       }
     });
   },
