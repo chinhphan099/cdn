@@ -83,13 +83,13 @@
             phone_valid: phone_valid,
             phone_linetype: phone_linetype,
             phone_carrier: phone_carrier
-          }
+          };
         }
         if (!isInvalidEmail) {
           data = {
             ...data,
             email: document.querySelector('[name="email"]').value
-          }
+          };
         }
         return data;
       } catch (e) {
