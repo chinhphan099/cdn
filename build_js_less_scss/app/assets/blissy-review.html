@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+
+
+
+<!-- Custom Code -->
+<div class="section-stamped-reviews">
+  <div class="custom-container stamped-reviews">
+    <div class="w-embed">
+      <div style="padding:10px" id="stamped-reviews-widget" data-widget-type="full-page" data-min-rating="5" data-fill-empty="false" data-product-image="false"></div>
+    </div>
+  </div>
+</div>
+<div class="w-embed w-script">
+  <div id="stamped-reviews-widget" data-widget-type="drawer" data-show-avatar="false" data-position="right" data-min-rating="5" data-fill-empty="true" data-random="false"></div>
+  <style type="text/css">
+    .stamped-products-reviews-title {
+      display: none !important;
+    }
+    #stamped-reviews-widget[data-widget-type="full-page"] span.stamped-pagination-page {
+      background: blue;
+      color: white !important;
+      width: 40px;
+      min-width: 40px;
+      display: inline-block;
+      height: 40px;
+      line-height: 40px;
+      padding: 0 !important;
+      font-weight: bold;
+      font-size: 16px;
+      vertical-align: middle;
+    }
+    #stamped-reviews-widget[data-widget-type="full-page"] .stamped-pagination a {
+      color: white !important;
+    }
+    #stamped-reviews-widget[data-widget-type="full-page"] span.stamped-pagination-page.is-active {
+      background: #333;
+    }
+    .stamped-full-page-tabs ul li {
+      font-size: 12px !important;
+    }
+  </style>
+</div>
+<!-- End Custom Code -->
+
+<!-- Snipped code inside Page Settings -->
+<script>
+  const w2 = document.getElementById('stamped-reviews-widget-2');
+  w2 && w2.setAttribute('id', 'stamped-reviews-widget');
+</script>
+<script type="text/javascript" src="https://cdn-stamped-io.azureedge.net/files/widget.min.js"></script>
+<script type="text/javascript">
+  StampedFn.init({ apiKey: 'pubkey-We892Cnbjs075jO8sg47Kn9i5I5Q6j', storeUrl: 'blissy-brand.myshopify.com' });
+</script>
+
+
+
+</body>
+</html>
