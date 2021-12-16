@@ -315,7 +315,7 @@ Plugin.prototype = {
       return;
     }
     // this.element.find('.slick-arrow').length && this.element.find('.slick-arrow').removeAttr('style');
-    this.handle.slick('unslick').off('afterChange.' + pluginName);
+    this.handle.slick('unslick').off('beforeChange.' + pluginName).off('afterChange.' + pluginName);
     this.element.find('.slick-track, .slick-list, .slick-dots').remove();
     // if (window.ctrwowUtils.isBuilderMode()) {
     //   $.removeData(this.element[0], pluginName);
