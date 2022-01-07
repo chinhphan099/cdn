@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+picture {
+  display: contents;
+}
+img {
+  max-width: 100%;
+  max-height: 100%;
+}
+:focus {
+  outline: none;
+}
+
+
+
+body {
+  --heightHeader: 70px;
+  --heightHeaderMobile: 40px;
+  overflow-x: hidden;
+  color: #1e2f1c;
+}
+header, footer {
+  height: 70px;
+  background-color: #241b1bcb;
+}
+@media (max-width: 812px) and (orientation: landscape) {
+  header {
+    height: 40px;
+  }
+}
+@media (max-width: 812px) {
+  header {
+    height: 40px;
+  }
+}
+.block-wrap {
+  text-align: center;
+  line-height: 0;
+  overflow-x: hidden;
+}
+.block-1 {
+  position: relative;
+  display: inline-block;
+}
+.block-1 .img1 {
+  width: auto;
+  height: auto;
+}
+.block-1 .content {
+  position: absolute;
+  top: -20px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.134;
+}
+.block-1 .content .inner {
+  width: 100%;
+  max-width: 53%;
+  margin: 0 auto;
+}
+.block-1 .content a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.block-1 .content input {
+  width: 80%;
+  padding-left: 15px;
+  border-radius: 999px;
+  border: none;
+  color: #696b68;
+  background-color: #e8e8e8;
+  margin-bottom: 1vh;
+}
+.block-1 .content button {
+  width: 80%;
+  background-color: #e23e4e;
+  border-radius: 999px;
+  border: none;
+  color: white;
+  font-weight: bold;
+}
+.block-1 .content .social {
+  margin-top: 1vh;
+}
+.social-mb {
+  background-color: black;
+  color: white;
+  display: none;
+}
+.block-1 .content .social a {
+  color: inherit;
+  text-decoration: none;
+}
+.block-1 .content .social a img {
+  margin-right: 3px;
+}
+.block-1 .content .social a div {
+  font-size: 1.5vh;
+  font-weight: bold;
+}
+@media (orientation: landscape) {
+  .block-1 {
+    height: calc(100vh - var(--heightHeader));
+    max-height: 1205px;
+  }
+  .block-1 .content input, .block-1 .content button {
+    height: 5vh;
+    font-size: 2vh;
+  }
+  .block-1 .content h1 {
+    font-size: 5vh;
+    line-height: 1;
+  }
+  .block-1 .content p {
+    font-size: 3vh;
+    margin-bottom: 2vh;
+  }
+  .block-1 .content .social a img {
+    width: 4vh;
+    height: 4vh;
+  }
+  .block-1 .content .social a div {
+    font-size: 1.5vh;
+  }
+}
+@media (orientation: portrait) {
+  .block-1 .content h1 {
+    font-size: 5vw;
+  }
+  .block-1 .content p {
+    font-size: 2vw;
+    margin-bottom: 2vw;
+  }
+}
+@media (max-width: 767px) {
+  .social-mb {
+    display: block;
+  }
+  .social {
+    display: none;
+  }
+}
+/* Tablet portrait */
+@media (max-width: 992px) and (orientation: portrait) {
+  .block-1 .content h1 {
+    font-size: 6vw;
+  }
+  .block-1 .content p {
+    font-size: 3vw;
+    margin-bottom: 1vw;
+  }
+  .block-1 .content input, .block-1 .content button {
+    height: 5vw;
+  }
+  .block-1 .content .social a img {
+    width: 4vw;
+    height: 4vw;
+  }
+}
+/* Mobile landscape */
+@media (max-width: 812px) and (orientation: landscape) {
+  .social-mb {
+    display: block;
+  }
+  .social {
+    display: none;
+  }
+  .block-1 {
+    height: auto;
+  }
+  .block-1 .img1 {
+    max-height: 150vh;
+  }
+  .block-1 .content {
+    top: 0;
+  }
+  .block-1 .content .inner {
+    max-width: 53%;
+  }
+  .block-1 .content h1 {
+    font-size: 10vh;
+  }
+  .block-1 .content p {
+    font-size: 4vh;
+    margin-bottom: 2vh;
+  }
+  .block-1 .content input, .block-1 .content button {
+    width: 70%;
+    height: 9vh;
+    font-size: 4vh;
+  }
+}
+/* Mobile portrait */
+@media (max-width: 767px) and (orientation: portrait) {
+  .block-1 {
+    width: 100%;
+  }
+  .block-1 .img1 {
+    position: relative;
+    margin-left: -999px;
+    margin-right: -999px;
+    max-width: 150vw;
+  }
+  .block-1 .content {
+    top: 0;
+  }
+  .block-1 .content .inner {
+    max-width: 80%;
+  }
+  .block-1 .content h1 {
+    font-size: 10vw;
+  }
+  .block-1 .content p {
+    font-size: 4vw;
+    margin-bottom: 2vw;
+  }
+  .block-1 .content input, .block-1 .content button {
+    width: 70%;
+    height: 8vw;
+    font-size: 3vw;
+  }
+}
+  </style>
+</head>
+<body>
+  <header>Header</header>
+  <main>
+    <div class="block-wrap">
+      <div class="block-1">
+        <img width="1214" height="1205" class="img1" src="https://publish.ctrwow.com/61d3ed3612eb100b58c6bb88/assets/image/584ea331-0cd2-4c48-85d9-737f9dddfa0b/61d3ed3612eb100b58c6bb88/4c2dc7d5-0852-4b4e-b20b-e969974e71c0/mushroom-1-.png.webp?t=20220104T070841676" alt="">
+        <div class="content">
+          <div class="inner">
+            <h1>COMMON <br>SOON</h1>
+            <p>Sign up for early access deals, updates on our launch and everything VeraVida Naturals!</p>
+            <input type="text" placeholder="Email Address">
+            <button>SUBMIT</button>
+            <div class="social">
+              <a href="https://www.facebook.com/VeraVida-Naturals-237334921580316" ctr-type-link="external" id="i9wx8"
+                target="_blank">
+                <picture class="ctr-generated">
+                  <img
+                    data-ctr-islazy="" id="ivnep" loading="lazy" class="ctr-lazy-image b-loaded" width="56" height="56"
+                    src="https://publish.ctrwow.com/61d3ed3612eb100b58c6bb88/assets/image/584ea331-0cd2-4c48-85d9-737f9dddfa0b/61d3ed3612eb100b58c6bb88/c3198d5a-7a28-462a-8339-b2bfad6b3700/fb.png.webp">
+                </picture>
+                <div id="ic0ls">Share</div>
+              </a>
+              <a href="https://www.instagram.com/veravidanaturals/" ctr-type-link="external" target="_blank" id="icqtnt">
+                <picture class="ctr-generated">
+                  <img
+                    data-ctr-islazy="" id="ief3c6" loading="lazy" class="ctr-lazy-image b-loaded" width="54" height="54"
+                    src="https://publish.ctrwow.com/61d3ed3612eb100b58c6bb88/assets/image/584ea331-0cd2-4c48-85d9-737f9dddfa0b/61d3ed3612eb100b58c6bb88/dd8b596f-81c3-4465-bac2-6d0f250ad5b8/ig.png.webp">
+                </picture>
+                <div id="i472vl">FOLLOW</div>
+              </a>
+              <a href="mailto:support@veravidanaturals.com" ctr-type-link="external" id="iwcuwt" target="_blank">
+                <picture class="ctr-generated">
+                  <img
+                    data-ctr-islazy="" id="icjavj" loading="lazy" class="ctr-lazy-image b-loaded" width="54" height="54"
+                    src="https://publish.ctrwow.com/61d3ed3612eb100b58c6bb88/assets/image/584ea331-0cd2-4c48-85d9-737f9dddfa0b/61d3ed3612eb100b58c6bb88/6357284e-0cc6-4cdf-a196-bcd8e7200e04/mail.png.webp">
+                </picture>
+                <div id="i0w8n1">CONTACT</div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="social-mb">
+      Social Mobile
+    </div>
+  </main>
+  <footer>
+    Footer
+  </footer>
+</body>
+</html>
