@@ -237,6 +237,20 @@ Plugin.prototype = {
             this.setPositionArrows();
           }
         });
+
+        try {
+          const wistiaEmbedElm = $('.slick-current', this.element).find('.wistia_embed');
+          const wistiaEmbedId = wistiaEmbedElm.attr('id');
+          const wistiaEmbedCls = wistiaEmbedElm.attr('class');
+          if (wistiaEmbedId && (wistiaEmbedCls.indexOf('autoPlay=true') > -1 || wistiaEmbedCls.indexOf('autoPlay=1') > -1)) {
+            wistiaVideo = window.Wistia && window.Wistia.api(wistiaEmbedId);
+            setTimeout(() => {
+              wistiaVideo && wistiaVideo.play();
+            }, 100);
+          }
+        } catch(e) {
+          console.log(e);
+        }
       } else {
         this.setPositionArrows();
       }
@@ -246,11 +260,10 @@ Plugin.prototype = {
 
     this.handle.on('beforeChange.' + pluginName, () => {
       try {
-        const currentSlideElm = $('.slick-current', this.element);
-        const wistiaVideoId = currentSlideElm.find('.wistia_embed').attr('id');
-        if (wistiaVideoId) {
-          wistiaVideo = window.Wistia.api(wistiaVideoId);
-          wistiaVideo.pause();
+        const wistiaEmbedId = $('.slick-current', this.element).find('.wistia_embed').attr('id');
+        if (wistiaEmbedId) {
+          wistiaVideo = window.Wistia && window.Wistia.api(wistiaEmbedId);
+          wistiaVideo && wistiaVideo.pause();
         }
 
         // TODO: Will update when I meet and vimeo video should use API Vimeo
@@ -267,7 +280,18 @@ Plugin.prototype = {
       window.CTR_IMG_LAZY_LOADER && window.CTR_IMG_LAZY_LOADER.revalidate();
       try {
         if (wistiaVideo) {
-          wistiaVideo.pause();
+          wistiaVideo && wistiaVideo.pause(); // Re-pause for sure
+        }
+
+        const wistiaVideoElm = $('.slick-current', this.element).find('.w_wistia');
+        if (wistiaVideoElm.length && !window.ctrwowUtils.isBuilderMode()) {
+          const wistiaEmbedElm = $('.slick-current', this.element).find('.wistia_embed');
+          const wistiaEmbedId = wistiaEmbedElm.attr('id');
+          const wistiaEmbedCls = wistiaEmbedElm.attr('class');
+          if (wistiaEmbedId && (wistiaEmbedCls.indexOf('autoPlay=true') > -1 || wistiaEmbedCls.indexOf('autoPlay=1') > -1)) {
+            wistiaVideo = window.Wistia && window.Wistia.api(wistiaEmbedId);
+            wistiaVideo && wistiaVideo.play();
+          }
         }
       } catch (e) {
         console.log(e);
