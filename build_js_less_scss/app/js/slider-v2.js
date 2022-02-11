@@ -131,7 +131,7 @@ Plugin.prototype = {
     if (typeof this.options.tabletItems !== 'undefined' || typeof this.options.mobileItems !== 'undefined') {
       if (typeof this.options.tabletItems !== 'undefined') {
         const tablet = {
-          breakpoint: 1024,
+          breakpoint: 1025,
           settings: {
             slidesToShow: this.options.tabletItems,
             rows: this.options.tbRows || 1,
@@ -144,6 +144,7 @@ Plugin.prototype = {
         const mobile = {
           breakpoint: 768,
           settings: {
+            centerPadding: 0,
             slidesToShow: this.options.mobileItems,
             rows: this.options.mbRows || 1,
             slidesToScroll: this.options.mbScrollItems || 1,
