@@ -144,13 +144,15 @@ Plugin.prototype = {
         const mobile = {
           breakpoint: 768,
           settings: {
-            centerPadding: 0,
             slidesToShow: this.options.mobileItems,
             rows: this.options.mbRows || 1,
             slidesToScroll: this.options.mbScrollItems || 1,
             variableWidth: false
           }
         };
+        if (window.location.pathname.indexOf('warranty') === -1) {
+          mobile.settings.centerPadding = 0
+        }
         responsiveOps.push(mobile);
       }
       newOption = $.extend(newOption, { responsive: responsiveOps });
