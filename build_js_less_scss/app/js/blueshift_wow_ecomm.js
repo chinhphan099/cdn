@@ -1,5 +1,34 @@
 (() => {
     console.log('BlueShift');
+    const clientDomain = [
+      // 'publish.ctrwow.com', // Test
+      'azzurogroup.com',
+      'getpurechill.com',
+      'arctoscooler.com',
+      'batteryvaultshop.com',
+      'everbladeshop.com',
+      'hulkheater.com',
+      'powerpodshop.com',
+      'mystarbellyshop.com',
+      'buycircaknee.com',
+      'buy.noobru.com',
+      'getshinearmor.com',
+      'shop.tryseedwell.com',
+      'shopcontoursrx.com',
+      'shopclipperpro.com',
+      'theclipperpro.com',
+      'sleepconnectionstore.com',
+      'yoursleepconnection.com',
+      'buy.joyspringvitamins.com',
+      'try.fruily.com',
+      'officialshinearmor.com',
+      'yourshinearmor.com',
+      'buymiraclebrand.com',
+      'theofficialbarxbuddy.com',
+      'ultraradianceskin.com',
+    ];
+    const hostName = window.location.host.replace(/www./, '');
+    const isClient = clientDomain.includes(hostName);
     function getQueryParameter(param) {
         let href = '';
         if (location.href.indexOf('?')) {
@@ -78,12 +107,20 @@
             }
         };
     }
-    blueshift.load();
-    blueshift.pageload();
-    if (urlPath.indexOf('/index') > -1) { blueshift.interstitial_load(); }
-    if (urlPath.indexOf('/shop') > -1) { blueshift.shop_load(); }
-    if (urlPath.indexOf('/cart') > -1) { blueshift.cart_load(); }
-    if (urlPath.indexOf('/checkout') > -1) { blueshift.checkout_load(); }
+    isClient ? blueshift.load({ client: true }) : blueshift.load();
+    isClient ? blueshift.pageload({ client: true }) : blueshift.pageload();
+    if (urlPath.indexOf('/index') > -1) {
+        isClient ? blueshift.interstitial_load({ client: true }) : blueshift.interstitial_load();
+    }
+    if (urlPath.indexOf('/shop') > -1) {
+        isClient ? blueshift.shop_load({ client: true }) : blueshift.shop_load();
+    }
+    if (urlPath.indexOf('/cart') > -1) {
+        isClient ? blueshift.cart_load({ client: true }) : blueshift.cart_load();
+    }
+    if (urlPath.indexOf('/checkout') > -1) {
+        isClient ? blueshift.checkout_load({ client: true }) : blueshift.checkout_load();
+    }
     // if (document.querySelector('.product-details-page')) { blueshift.product_details_load(); }
 
     if(blueshift.constructor===Array){(function(){var b=document.createElement('script');b.type='text/javascript',b.async=!0,b.src=('https:'===document.location.protocol?'https:':'http:')+'//cdn.getblueshift.com/blueshift.js',b.defer=true;var c=document.getElementsByTagName('script')[0];c.parentNode.insertBefore(b,c);})();}
@@ -203,6 +240,7 @@
                 landing_base_url: landingBaseUrl,
                 customer_language: document.querySelector('html').getAttribute('lang') || ''
             };
+            isClient && (data.client = isClient);
 
             return data;
         } catch (e) {
@@ -222,7 +260,7 @@
             let phone_valid = '', phone_linetype = '', phone_carrier = '', international_format = '';
             const getIdentifyData = function() {
                 try {
-                    return {
+                    const data = {
                         email: document.querySelector('[name="email"]').value,
                         firstname: document.querySelector('[name="firstName"]').value || '',
                         lastname: document.querySelector('[name="lastName"]').value || '',
@@ -240,6 +278,8 @@
                         fingerprint_id: window._EA_ID,
                         referrer: document.referrer
                     };
+                    isClient && (data.client = isClient);
+                    return data;
                 } catch(e) {
                     console.log(e);
                 }
@@ -303,7 +343,7 @@
                         totalQty += items[i].quantity;
                         totalPrice += Number(items[i].total_usd);
                     }
-                    blueshift.track('checkout', {
+                    const checkoutData = {
                         fingerprintId: window._EA_ID,
                         referrer: document.referrer,
                         countryCode: identifyData.ship_country,
@@ -313,7 +353,9 @@
                         items: items,
                         sku: skus,
                         currency: campaignInfo.location.currencyCode
-                    });
+                    };
+                    isClient && (checkoutData.client = isClient);
+                    blueshift.track('checkout', checkoutData);
                 } catch (e) {
                     console.log(e);
                 }
@@ -398,6 +440,7 @@
                         revenue: totalPrice.toFixed(2),
                         currency: campaignInfo.location.currencyCode
                     };
+                    isClient && (data.client = isClient);
                     return data;
                 } catch(e) {
                     console.log(e);
@@ -463,6 +506,7 @@
                     // quantity: totalQty,
                     currency: campaignInfo.location.currencyCode,
                 };
+                isClient && (declineData.client = isClient);
                 blueshift.track('decline', declineData);
             }
         } catch(e) {

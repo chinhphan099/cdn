@@ -3,6 +3,35 @@
     console.log('BlueShift');
 
     const urlPath = window.location.pathname;
+    const clientDomain = [
+      // 'publish.ctrwow.com', // Test
+      'azzurogroup.com',
+      'getpurechill.com',
+      'arctoscooler.com',
+      'batteryvaultshop.com',
+      'everbladeshop.com',
+      'hulkheater.com',
+      'powerpodshop.com',
+      'mystarbellyshop.com',
+      'buycircaknee.com',
+      'buy.noobru.com',
+      'getshinearmor.com',
+      'shop.tryseedwell.com',
+      'shopcontoursrx.com',
+      'shopclipperpro.com',
+      'theclipperpro.com',
+      'sleepconnectionstore.com',
+      'yoursleepconnection.com',
+      'buy.joyspringvitamins.com',
+      'try.fruily.com',
+      'officialshinearmor.com',
+      'yourshinearmor.com',
+      'buymiraclebrand.com',
+      'theofficialbarxbuddy.com',
+      'ultraradianceskin.com',
+    ];
+    const hostName = window.location.host.replace(/www./, '');
+    const isClient = clientDomain.includes(hostName);
 
     // Helper functions
     var regexInternationNumbers = new RegExp(/^(93|355|213|684|376|244|809|268|54|374|297|247|61|672|43|994|242|246|973|880|375|32|501|229|975|284|591|387|267|55|673|359|226|257|855|237|238|345|236|235|56|86|886|57|269|682|506|385|53|357|420|45|767|253|593|20|503|240|291|372|251|500|298|679|358|33|596|594|241|220|995|49|233|350|30|299|473|671|502|224|245|592|509|504|852|36|354|91|62|98|964|353|972|39|225|876|81|962|7|254|686|82|850|965|996|371|856|961|266|231|370|218|423|352|853|389|261|265|60|960|223|356|692|222|230|52|691|373|976|212|258|95|264|674|977|31|599|869|687|64|505|227|234|683|1670|47|968|92|680|507|675|595|51|63|48|351|1787|974|262|40|250|670|378|239|966|221|381|248|232|65|421|386|677|252|27|34|94|290|508|249|597|46|41|963|689|255|66|228|690|676|1868|216|90|993|688|256|380|971|44|598|1|678|58|84|1340|681|685|967|243|260|263)\d+/);
@@ -73,6 +102,8 @@
           fingerprint_id: window._EA_ID,
           referrer: document.referrer
         };
+        isClient && (data.client = isClient);
+
         if (window.CC_Code) {
           data.coupon = window.CC_Code;
         }
@@ -102,7 +133,7 @@
         const quantity = window.localStorage.getItem('realDoubleQuantity') ? checkedItem.quantity / 2 : checkedItem.quantity;
         const landingurl = window.location.href;
         const landingBaseUrl = landingurl.split('?')[0];
-        return {
+        const dataForCart = {
           email: document.querySelector('[name="email"]').value || '',
           product_ids: [checkedItem.productId],
           items: [
@@ -118,6 +149,9 @@
           landing_base_url: landingBaseUrl,
           customer_language: document.querySelector('html').getAttribute('lang') || ''
         };
+        isClient && (dataForCart.client = isClient);
+
+        return dataForCart;
       } catch (e) {
         console.log(e);
         return {};
@@ -198,7 +232,7 @@
       for (let i = 0, n = items.length; i < n; i++) {
         product_ids.push(items[i].productId);
       }
-      blueshift.track('checkout', {
+      const checkoutData = {
         one_click_purchase_reference: referenceId,
         fingerprintId: window._EA_ID,
         referrer: document.referrer,
@@ -209,7 +243,9 @@
         items: items,
         sku: productsInCart.sku,
         currency: window.localStorage.getItem('currencyCode')
-      });
+      };
+      isClient && (checkoutData.client = isClient);
+      blueshift.track('checkout', checkoutData);
     };
     const getDeclineInfo = function() {
       let prevItem = JSON.parse(window.localStorage.getItem('prevItem'));
@@ -260,6 +296,8 @@
           declineData.one_click_purchase_reference = referenceId;
         }
 
+        isClient && (declineData.client = isClient);
+
         return declineData;
       }
       return false;
@@ -278,12 +316,19 @@
         }
       };
     }
-    blueshift.load();
-    blueshift.pageload();
+    isClient ? blueshift.load({ client: true }) : blueshift.load();
 
-    if (urlPath.indexOf('/pre') > -1) { blueshift.presale_load(); }
-    if (urlPath.indexOf('/index') > -1) { blueshift.interstitial_load(); }
-    if (urlPath.indexOf('/special-offer-') > -1) { blueshift.upsell_load(); }
+    isClient ? blueshift.pageload({ client: true }) : blueshift.pageload();
+
+    if (urlPath.indexOf('/pre') > -1) {
+      isClient ? blueshift.presale_load({ client: true }) : blueshift.presale_load();
+    }
+    if (urlPath.indexOf('/index') > -1) {
+      isClient ? blueshift.interstitial_load({ client: true }) : blueshift.interstitial_load();
+    }
+    if (urlPath.indexOf('/special-offer-') > -1) {
+      isClient ? blueshift.upsell_load({ client: true }) : blueshift.upsell_load();
+    }
 
     const loadBlueShiftLib = function() {
       if(blueshift.constructor===Array){(function(){var b=document.createElement('script');b.type='text/javascript',b.src=('https:'===document.location.protocol?'https:':'http:')+'//cdn.getblueshift.com/blueshift.js',b.defer=true;var c=document.getElementsByTagName('script')[0];c.parentNode.insertBefore(b,c);})();}
@@ -478,7 +523,7 @@
             for (let i = 0, n = items.length; i < n; i++) {
               product_ids.push(items[i].productId);
             }
-            blueshift.track('checkout', {
+            const checkoutData = {
               fingerprintId: window._EA_ID,
               referrer: document.referrer,
               countryCode: identifyData.ship_country,
@@ -488,7 +533,9 @@
               items: items,
               sku: productsInCart.sku,
               currency: window.localStorage.getItem('currencyCode')
-            });
+            };
+            isClient && (checkoutData.client = isClient);
+            blueshift.track('checkout', checkoutData);
           } catch (e) {
             console.log(e);
           }
@@ -612,6 +659,7 @@
               revenue: revenue.toFixed(2),
               currency: window.localStorage.getItem('currencyCode')
             };
+            isClient && (data.client = isClient);
             return data;
           } catch (e) {
             console.log(e);
