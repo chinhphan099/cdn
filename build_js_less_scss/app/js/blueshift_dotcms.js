@@ -2,6 +2,7 @@
     console.log('BlueShift');
     const clientDomain = [
       // 'publish.ctrwow.com', // Test
+      'beautystatcosmetics.com',
       'azzurogroup.com',
       'getpurechill.com',
       'arctoscooler.com',
@@ -29,6 +30,12 @@
     ];
     const hostName = window.location.host.replace(/www./, '');
     const isClient = clientDomain.includes(hostName);
+    const _customerId = localStorage.getItem('customerId');
+
+    let prefix = '';
+    if (hostName === 'beautystatcosmetics.com') {
+      prefix = 'BST-';
+    }
 
     function getQueryParameter(param) {
         let href = '';
@@ -167,10 +174,10 @@
                 const data = {
                     // fingerprintId: window._EA_ID,
                     email: window._qById('customer_email').value || '',
-                    product_ids: [checkedItem.productId],
+                    product_ids: [prefix + checkedItem.productId],
                     items: [
                         {
-                            productId: checkedItem.productId,
+                            productId: prefix + checkedItem.productId,
                             sku: checkedItem.sku,
                             total_usd: (checkedItem.productPrices.DiscountedPrice.Value + checkedItem.shippings[window.shippingIndex || 0].price).toFixed(2),
                             quantity: quantity
@@ -265,7 +272,7 @@
                     const quantity = window.localStorage.getItem('doubleQuantity') ? currentItem.quantity / 2 : currentItem.quantity;
                     const products = [
                         {
-                            productId: currentItem.productId,
+                            productId: prefix + currentItem.productId,
                             sku: currentItem.sku,
                             total_usd: (currentItem.productPrices.DiscountedPrice.Value + currentItem.shippings[window.shippingIndex || 0].price).toFixed(2),
                             quantity: quantity
@@ -363,7 +370,7 @@
                     revenue = Number(orderInfo.orderTotalFull),
                     items = [
                         {
-                            productId: orderInfo.orderedProducts[0].pid,
+                            productId: prefix + orderInfo.orderedProducts[0].pid,
                             sku: orderInfo.orderedProducts[0].sku,
                             total_usd: orderInfo.orderTotalFull,
                             quantity: quantity
@@ -390,7 +397,7 @@
                     campaignName = upsellInfo.campaignName;
                     items = [
                         {
-                            productId: upsellInfo.orderedProducts[0].pid,
+                            productId: prefix + upsellInfo.orderedProducts[0].pid,
                             sku: upsellInfo.orderedProducts[0].sku,
                             total_usd: upsellInfo.price,
                             quantity: upsellInfo.orderedProducts[0].quantity
@@ -409,7 +416,7 @@
                 }
                 const data = {
                     order_id: orderNumber,
-                    customer_id: orderInfo.customerId,
+                    customer_id: orderInfo.customerId || _customerId,
                     email: orderInfo.cusEmail,
                     order_create_date: getCurrentDate(),
                     ip_address: _location.ip || '',
@@ -446,7 +453,7 @@
                 if (identifyData) {
                     identifyData = JSON.parse(identifyData);
                     if (!identifyData.customer_id) {
-                        identifyData.customer_id = orderInfo.customerId;
+                        identifyData.customer_id = orderInfo.customerId || _customerId;
                     }
                     window.localStorage.setItem('identifyData', JSON.stringify(identifyData));
                     blueshift.identify(identifyData);
@@ -486,7 +493,7 @@
                     const quantity = window.localStorage.getItem('doubleQuantity') ? prevItem.quantity / 2 : prevItem.quantity;
                     const failProducts = [
                         {
-                            productId: prevItem.productId,
+                            productId: prefix + prevItem.productId,
                             sku: prevItem.sku,
                             total_usd: (prevItem.productPrices.DiscountedPrice.Value + prevItem.shippings[window.shippingIndex || 0].price).toFixed(2),
                             quantity: quantity
@@ -531,7 +538,7 @@
                         declineData = {
                             ...declineData,
                             order_id: orderInfo.orderNumber,
-                            customer_id: orderInfo.customerId,
+                            customer_id: orderInfo.customerId || _customerId,
                             customer_language: document.querySelector('html').getAttribute('lang') || ''
                             // customer_language: orderInfo.cusCountry
                         };

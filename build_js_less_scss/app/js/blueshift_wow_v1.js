@@ -5,6 +5,7 @@
     const urlPath = window.location.pathname;
     const clientDomain = [
       // 'publish.ctrwow.com', // Test
+      'beautystatcosmetics.com',
       'azzurogroup.com',
       'getpurechill.com',
       'arctoscooler.com',
@@ -32,6 +33,12 @@
     ];
     const hostName = window.location.host.replace(/www./, '');
     const isClient = clientDomain.includes(hostName);
+    const _customerId = localStorage.getItem('customerId');
+
+    let prefix = '';
+    if (hostName === 'beautystatcosmetics.com') {
+      prefix = 'BST-';
+    }
 
     // Helper functions
     var regexInternationNumbers = new RegExp(/^(93|355|213|684|376|244|809|268|54|374|297|247|61|672|43|994|242|246|973|880|375|32|501|229|975|284|591|387|267|55|673|359|226|257|855|237|238|345|236|235|56|86|886|57|269|682|506|385|53|357|420|45|767|253|593|20|503|240|291|372|251|500|298|679|358|33|596|594|241|220|995|49|233|350|30|299|473|671|502|224|245|592|509|504|852|36|354|91|62|98|964|353|972|39|225|876|81|962|7|254|686|82|850|965|996|371|856|961|266|231|370|218|423|352|853|389|261|265|60|960|223|356|692|222|230|52|691|373|976|212|258|95|264|674|977|31|599|869|687|64|505|227|234|683|1670|47|968|92|680|507|675|595|51|63|48|351|1787|974|262|40|250|670|378|239|966|221|381|248|232|65|421|386|677|252|27|34|94|290|508|249|597|46|41|963|689|255|66|228|690|676|1868|216|90|993|688|256|380|971|44|598|1|678|58|84|1340|681|685|967|243|260|263)\d+/);
@@ -76,7 +83,7 @@
       const quantity = window.localStorage.getItem('doubleQuantity') ? currentItem.quantity / 2 : currentItem.quantity;
       const products = [
         {
-          productId: currentItem.productId,
+          productId: prefix + currentItem.productId,
           sku: currentItem.sku,
           total_usd: (currentItem.productPrices.DiscountedPrice.Value + currentItem.shippings[window.shippingIndex || 0].price).toFixed(2),
           quantity: quantity
@@ -135,10 +142,10 @@
         const landingBaseUrl = landingurl.split('?')[0];
         const dataForCart = {
           email: document.querySelector('[name="email"]').value || '',
-          product_ids: [checkedItem.productId],
+          product_ids: [prefix + checkedItem.productId],
           items: [
             {
-              productId: checkedItem.productId,
+              productId: prefix + checkedItem.productId,
               sku: checkedItem.sku,
               total_usd: (checkedItem.productPrices.DiscountedPrice.Value + checkedItem.shippings[window.shippingIndex || 0].price).toFixed(2),
               quantity: quantity
@@ -256,7 +263,7 @@
         const quantity = window.localStorage.getItem('doubleQuantity') ? prevItem.quantity / 2 : prevItem.quantity;
         const failProducts = [
           {
-            productId: prevItem.productId,
+            productId: prefix + prevItem.productId,
             sku: prevItem.sku,
             total_usd: (prevItem.productPrices.DiscountedPrice.Value + prevItem.shippings[window.shippingIndex || 0].price).toFixed(2),
             quantity: quantity
@@ -288,7 +295,7 @@
           declineData = {
             ...declineData,
             order_id: orderInfo.orderNumber,
-            customer_id: orderInfo.customerId,
+            customer_id: orderInfo.customerId || _customerId,
             customer_language: document.querySelector('html').getAttribute('lang') || ''
           };
         }
@@ -603,7 +610,7 @@
               revenue = Number(orderInfo.orderTotalFull),
               items = [
                 {
-                  productId: orderInfo.orderedProducts[0].pid,
+                  productId: prefix + orderInfo.orderedProducts[0].pid,
                   sku: orderInfo.orderedProducts[0].sku,
                   total_usd: orderInfo.orderTotalFull,
                   quantity: quantity
@@ -624,7 +631,7 @@
               campaignName = upsellInfo.campaignName;
               items = [
                 {
-                  productId: upsellInfo.orderedProducts[0].pid,
+                  productId: prefix + upsellInfo.orderedProducts[0].pid,
                   sku: upsellInfo.orderedProducts[0].sku,
                   total_usd: upsellInfo.price,
                   quantity: upsellInfo.orderedProducts[0].quantity
@@ -640,7 +647,7 @@
             const landingBaseUrl = landingurl.split('?')[0];
             const data = {
               order_id: orderNumber,
-              customer_id: orderInfo.customerId,
+              customer_id: orderInfo.customerId || _customerId,
               email: orderInfo.cusEmail,
               order_create_date: getCurrentDate(),
               ip_address: _location.ip || '',
@@ -675,7 +682,7 @@
           if (identifyData) {
             identifyData = JSON.parse(identifyData);
             if (!identifyData.customer_id) {
-              identifyData.customer_id = orderInfo.customerId;
+              identifyData.customer_id = orderInfo.customerId || _customerId;
             }
             window.localStorage.setItem('identifyData', JSON.stringify(identifyData));
             if (_isInvalidEmail !== 'true') {
