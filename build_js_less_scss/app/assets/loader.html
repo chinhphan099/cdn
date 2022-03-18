@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #141414;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    .container {}
+    .content {}
+    .stage {
+    }
+    .pyramid3d {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      transform-style: preserve-3d;
+      transform: rotateX(75deg) rotate(65deg);
+      animation: pyramid 10s linear infinite;
+    }
+    @keyframes pyramid {}
+    .triangle {
+      transform-style: preserve-3d;
+      width: 0;
+      height: 0;
+      background: none;
+    }
+    .triangle:before {
+      content: "";
+      border-style: solid;
+      border-width: 176px 75px 0 75px;
+      position: absolute;
+      width: 0;
+      height: 0;
+    }
+    .side1 {
+      transform: translateX(0) rotateY(115.2deg) rotateZ(90deg);
+    }
+    .side2 {
+      transform: translateX(150px) rotateY(90deg) rotateZ(64.8deg);
+    }
+    .side3 {
+      transform: translateZ(0) rotateX(64.8deg);
+    }
+    .side4 {
+      transform: translateX(0) rotateY(115.2deg) rotateZ(90deg);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="content">
+      <div class="stage">
+        <div class="pyramid3d">
+          <div class="triangle side1"></div>
+          <div class="triangle side2"></div>
+          <div class="triangle side3"></div>
+          <div class="triangle side4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
