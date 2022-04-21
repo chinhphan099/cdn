@@ -63,6 +63,18 @@ task('releaseScripts', () =>
       this.emit('end');
     })
     .pipe(dest(PUB.js))
+    .pipe(rename(function(path) {
+      if (path.basename === 'blueshift_wow_v1') {
+        path.basename = 'blueshift_wow'
+      }
+    }))
+    .pipe(dest(PUB.js))
+    .pipe(rename(function(path) {
+      if (path.basename === 'blueshift_wow') {
+        path.basename = 'blueshift_wow_v2'
+      }
+    }))
+    .pipe(dest(PUB.js))
 );
 
 task('less', () =>

@@ -1,11 +1,12 @@
 (() => {
   try {
-    console.log('BlueShift');
+    console.log('BlueShift-Wow-Mar-24-2022');
 
     const urlPath = window.location.pathname;
     const clientDomain = [
       // 'publish.ctrwow.com', // Test
       'beautystatcosmetics.com',
+      'try.beautystat.com',
       'azzurogroup.com',
       'getpurechill.com',
       'arctoscooler.com',
@@ -14,6 +15,10 @@
       'hulkheater.com',
       'powerpodshop.com',
       'mystarbellyshop.com',
+      'buychillwell.com',
+      'chillwellcooler.com',
+      'chillwelloffer.com',
+      'chillwellorder.com',
       'buycircaknee.com',
       'buy.noobru.com',
       'getshinearmor.com',
@@ -33,11 +38,15 @@
     ];
     const hostName = window.location.host.replace(/www./, '');
     const isClient = clientDomain.includes(hostName);
-    const _customerId = localStorage.getItem('customerId');
+    //const _customerId = localStorage.getItem('customerId');
 
     let prefix = '';
-    if (hostName === 'beautystatcosmetics.com') {
-      prefix = 'BST-';
+    if (hostName === 'beautystatcosmetics.com' || hostName === 'try.beautystat.com') {
+      prefix = 'BS-';
+    }
+
+    if (hostName === 'arctoscooler.com' || hostName === 'buychillwell.com' || hostName === 'chillwellcooler.com' || hostName === 'chillwelloffer.com' || hostName === 'chillwellorder.com') {
+      prefix = 'ON-';
     }
 
     // Helper functions
@@ -77,6 +86,10 @@
     let orderFired = false;
     let countryCode = '';
     let referenceId = getQueryParameter('guid');
+    let ext_scripts = getQueryParameter('ext_scripts');
+    if (ext_scripts === 'false') {
+      return;
+    }
 
     const getProductsInCart = function() {
       const currentItem = window.ctrwowCheckout.checkoutData.getProduct();
@@ -175,25 +188,16 @@
         window.ctrwowUtils
           .callAjax(emailAPI, {
             headers: {
-              X_CID: window.__CTRWOW_CONFIG.X_CID,
+              X_CID: '584ea331-0cd2-4c48-85d9-737f9dddfa0b',
               'Content-Type': 'application/json'
             }
           })
           .then((result) => {
-            /* if (!result || !result.Records || !result.Records.length) {
-              // eslint-disable-next-line no-throw-literal
-              throw 'Error';
-            } */
-
             if (!result) {
               // eslint-disable-next-line no-throw-literal
               throw 'Error';
             }
 
-            // const record = result.Records[0];
-            // const deliverabilityConfidenceScore = Number(record.DeliverabilityConfidenceScore);
-
-            // if (deliverabilityConfidenceScore < 101 && deliverabilityConfidenceScore > 60 && record.Results.indexOf('EE') === -1 && record.Results.indexOf('ES01') > -1) {
             if (result.isVerified && result.isValid) {
               window.ctrwowUtils.events.emit('onValidEmail'); // Emit event to trigger leadgen API - Not yet
               window.localStorage.removeItem('isInvalidEmail');
@@ -218,7 +222,6 @@
       }
     };
     const onAfterSubmitOrder = function() {
-      // Blueshift identify event
       const identifyData = getIdentifyData();
       identifyData.guid = referenceId;
       if (!isInvalidEmail) {
@@ -291,19 +294,29 @@
           items: failProducts,
           sku: sku
         };
-        if (orderInfo) {
-          declineData = {
-            ...declineData,
-            order_id: orderInfo.orderNumber,
-            customer_id: orderInfo.customerId || _customerId,
-            customer_language: document.querySelector('html').getAttribute('lang') || ''
-          };
-        }
         if (paymentType === 'creditcard' && referenceId) {
           declineData.one_click_purchase_reference = referenceId;
         }
-
         isClient && (declineData.client = isClient);
+
+        if (orderInfo) {
+          orderInfo = JSON.parse(orderInfo);
+          const email = orderInfo.cusEmailPP || orderInfo.cusEmail;
+          if (!email) {
+            return false;
+          }
+          if (email && window.localStorage.getItem('isInvalidEmail') === 'true') {
+            return false;
+          }
+          declineData = {
+            ...declineData,
+            order_id: prefix + orderInfo.orderNumber,
+            //customer_id: orderInfo.customerId || _customerId,
+            customer_language: document.querySelector('html').getAttribute('lang') || ''
+          };
+        } else if (!window.localStorage.getItem('customer_email')) {
+          return false;
+        }
 
         return declineData;
       }
@@ -349,6 +362,7 @@
 
         if (!campaignInfo || !window._EA_ID || orderFired || !checkedItemData) { return; }
         console.log('BlueShift', campaignInfo, window._EA_ID);
+        window.localStorage.setItem('_vid', window._EA_ID);
 
         orderFired = true;
 
@@ -581,7 +595,7 @@
     const init = function() {
       try {
         loadBlueShiftLib();
-        if (window.location.href.indexOf('/order') > -1) {
+        if (urlPath.indexOf('/order') > -1) {
           orderPageEvents();
           let count = 0;
           const orderPage = setInterval(() => {
@@ -646,8 +660,8 @@
             const landingurl = window.location.href;
             const landingBaseUrl = landingurl.split('?')[0];
             const data = {
-              order_id: orderNumber,
-              customer_id: orderInfo.customerId || _customerId,
+              order_id: prefix + orderNumber,
+              //customer_id: orderInfo.customerId || _customerId,
               email: orderInfo.cusEmail,
               order_create_date: getCurrentDate(),
               ip_address: _location.ip || '',
@@ -681,9 +695,9 @@
           let identifyData = window.localStorage.getItem('identifyData');
           if (identifyData) {
             identifyData = JSON.parse(identifyData);
-            if (!identifyData.customer_id) {
-              identifyData.customer_id = orderInfo.customerId || _customerId;
-            }
+            // if (!identifyData.customer_id) {
+            //   identifyData.customer_id = orderInfo.customerId || _customerId;
+            // }
             window.localStorage.setItem('identifyData', JSON.stringify(identifyData));
             if (_isInvalidEmail !== 'true') {
               blueshift.identify(identifyData);
@@ -716,7 +730,12 @@
         }
 
         window.ctrwowUtils.events.on('onBeforePlaceUpsellOrder', function() {
-          const upsellItem = window.ctrwowUpsell.productListData.getProductList().prices[window.upsell_productindex];
+          let upsellItem;
+          if (typeof window.upsells === 'object' && window.upsells.length > 0) {
+            upsellItem = window.upsells[window.upsell_productindex || 0];
+          } else {
+            upsellItem = window.ctrwowUpsell.productListData.getProductList().prices[window.upsell_productindex || 0];
+          }
           upsellItem.campaignName = campaignName;
           window.localStorage.setItem('prevItem', JSON.stringify(upsellItem));
         });
@@ -746,14 +765,13 @@
           pt: 'Por favor insira um número de telefone válido.'
         };
         window.phoneMsg = invalidPhoneNumberMsg.en;
-        const path = window.location.pathname;
-        if (path.indexOf('/de/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.de; }
-        if (path.indexOf('/fr/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.fr; }
-        if (path.indexOf('/jp/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.jp; }
-        if (path.indexOf('/cn/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.cn; }
-        if (path.indexOf('/br/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.br; }
-        if (path.indexOf('/es/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.es; }
-        if (path.indexOf('/pt/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.pt; }
+        if (urlPath.indexOf('/de/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.de; }
+        if (urlPath.indexOf('/fr/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.fr; }
+        if (urlPath.indexOf('/jp/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.jp; }
+        if (urlPath.indexOf('/cn/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.cn; }
+        if (urlPath.indexOf('/br/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.br; }
+        if (urlPath.indexOf('/es/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.es; }
+        if (urlPath.indexOf('/pt/') > -1) { window.phoneMsg = invalidPhoneNumberMsg.pt; }
 
         $.validator.addMethod('cphone', function(value, element) {
           return $(element).hasClass('correct-phone');
