@@ -1,0 +1,49 @@
+.menu-page .menu-item {
+    order: 3;
+}
+.menu-page .menu-item.active {
+    order: 2;
+}
+.ant-btn.ant-btn-primary.ant-btn-lg.ant-dropdown-trigger.dfoSizing__width--100 {
+    order: 1;
+    margin-bottom: 10px !important;
+}
+.dfoPad__half--b {
+    max-height: calc(100vh - 510px) !important;
+    overflow-y: auto !important;
+}
+
+.dfoPad__half--b .ant-table-row-level-0 {
+  display: flex;
+  align-content: stretch;
+  justify-content: stretch;
+  flex-direction: row;
+  order: 2;
+}
+.dfoPad__half--b .ant-table-tbody {
+  display: flex;
+  flex-direction: column;
+}
+.dfoPad__half--b .ant-table-thead {
+  display: flex;
+  align-content: stretch;
+  justify-content: stretch;
+  flex-direction: row;
+}
+.dfoPad__half--b .ant-table-thead > tr {
+  display: contents;
+}
+.dfoPad__half--b table {
+  display: flex;
+  flex-direction: column;
+}
+.dfoPad__half--b .ant-table-row-selected {
+  order: 1;
+}
+.dfoPad__half--b .ant-table-thead > tr > th,
+.dfoPad__half--b .ant-table-tbody > tr > td {
+  flex: 1 0 0;
+}
+.dfoPad__half--b .ant-table-selection-column {
+    flex: none !important;
+}
