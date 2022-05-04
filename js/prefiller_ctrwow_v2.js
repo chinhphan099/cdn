@@ -45,7 +45,7 @@
             this.cardNo = '4000000000000010';
             if (doc.querySelector('.js-29next-product-list')) {
                 this.cardNo = '6011111111111117';
-                this.phone = '+' + _rand(10000000000, 19000000000);
+                this.phone = '+8490' + _rand(1111111, 9999999);
             }
             this.cvv = _rand(100, 999);
             this.cardExpiryYear = fixRandMonth(_rand(1, 12)) + '/' + _rand(17, 37);

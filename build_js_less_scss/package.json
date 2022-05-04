@@ -16,7 +16,7 @@
     "email": "chinhphan099@gmail.com"
   },
   "dependencies": {
-    "gulp": "4.0.2",
+    "gulp": "^4.0.2",
     "gulp-jshint": "^2.0.4",
     "gulp-less": "^5.0.0",
     "gulp-sourcemaps": "^2.6.5",
