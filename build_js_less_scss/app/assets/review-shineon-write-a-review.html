@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://loox.io/css/pure-min.css">
+  <script src="js/jquery.min.js"></script>
+  <style>
+    @font-face {
+      font-family: 'Catamaran';
+      font-style: normal;
+      font-weight: 300;
+      src: local('Catamaran Light'), local('Catamaran-Light'), url(https://fonts.gstatic.com/s/catamaran/v1/Aaag4ccR7Oh_4eai-jbrYOgdm0LZdjqr5-oayXSOefg.woff2) format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+    }
+
+    * {
+      font-family: 'Catamaran', sans-serif;
+    }
+
+    * {
+      border: 0;
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+  </style>
+  <title>Write a review</title>
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    * {
+      font-family: "Poppins", sans-serif;
+    }
+
+  </style>
+  <style>
+    .float {
+      float: left;
+      clear: none;
+    }
+
+    .breaker {
+      float: none;
+      clear: both;
+    }
+
+    .disabled {
+      color: #c3c3c3 !important;
+      border-color: #c3c3c3 !important;
+      cursor: not-allowed;
+    }
+
+    body {
+      background-color: transparent;
+      overflow: hidden;
+    }
+
+    #wizard {
+      height: 550px;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #wizard.rtl {
+      direction: rtl;
+    }
+
+    .close-icon {
+      color: #333;
+      line-height: 25px;
+      position: absolute;
+      right: 10px;
+      text-align: center;
+      top: 10px;
+      width: 24px;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .slide {
+      display: none;
+      position: absolute;
+      width: 100%;
+      border: solid 1px #a2a2a2;
+      border-radius: 2px;
+      top: 0;
+      transition-property: top, opacity;
+      transition-duration: 0.5s;
+      transition-timing-function: ease-in-out;
+      background-color: #fff;
+      padding: 20px 20px 50px 20px;
+      opacity: 0.2;
+    }
+
+    .slide.first {
+      opacity: 1;
+      display: block;
+    }
+
+    .slide h3,
+    .slide h4 {
+      text-align: center;
+      max-width: 500px;
+      margin: 0 auto;
+      font-weight: normal;
+    }
+
+    .slide h3 {
+      margin-bottom: 3px;
+      font-size: 24px;
+      color: #1C1C1C;
+      font-weight: bold;
+    }
+
+    .slide h4 {
+      color: #888;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .button,
+    .numpad td {
+      background-color: #0078e7;
+      color: white;
+      border: solid 1px #129FEA;
+      margin: 15px 0;
+      padding: 5px;
+      font-size: 22px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .button {
+      max-width: 400px;
+      margin: 15px auto 0;
+      display: block;
+      text-align: center;
+      width: 100%;
+    }
+
+    .button.small {
+      width: 69px;
+      height: 50px;
+      margin: 5px;
+      display: inline-block;
+      padding: 3px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    span.star {
+      font-size: 0.5vw;
+      line-height: 36px;
+      vertical-align: middle;
+      width: 100px;
+    }
+
+    span.text {
+      width: 162px;
+    }
+
+    span.star,
+    span.text {
+      display: inline-block;
+      text-align: left;
+      font-size: 18px;
+    }
+
+    #wizard.rtl span.star,
+    #wizard.rtl span.text {
+      text-align: right;
+    }
+
+    .numpad,
+    .numpad table {
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+
+    .numpad .numpad-result {
+      text-align: center;
+      font-size: 36px;
+      font-weight: bold;
+      padding: 10px;
+      margin: 40px auto;
+      border: solid 1px #444;
+      height: 71px;
+      width: 100%;
+    }
+
+    .numpad .button {
+      width: 100%;
+    }
+
+    .numpad td {
+      width: 33.33%;
+      text-align: center;
+      border: solid 1px black;
+      border-radius: 0;
+    }
+
+    .invalid,
+    .invalid:focus {
+      border: solid 1px #ff0000 !important;
+    }
+
+    .switch {
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .skip,
+    .back {
+      position: absolute;
+      bottom: 8px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .skip {
+      right: 20px;
+    }
+
+    .back {
+      left: 20px;
+    }
+
+    .errormsg {
+      display: none;
+      color: red;
+      font-weight: bold;
+      font-style: italic;
+    }
+
+    .progressor {
+      position: absolute;
+      border: solid 1px #282828;
+      height: 10px;
+      bottom: 20px;
+      left: 35%;
+      width: 30%;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .progressor .full {
+      position: absolute;
+      width: 0;
+      height: 100%;
+      background-color: #282828;
+    }
+
+    .progressor .text {
+      color: #000;
+      position: relative;
+    }
+
+    .field-wrap {
+      padding: 0 0 20px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .field-wrap input {
+      padding: 10px 15px;
+      font-size: 20px;
+      width: 100%;
+      display: block;
+      border: solid 1px #c1c1c1;
+    }
+
+    .message {
+      visibility: hidden;
+    }
+
+    .field-wrap.error .message {
+      visibility: visible;
+      color: #ff0000;
+      font-weight: bold;
+    }
+
+    .review-text {
+      height: 200px;
+      width: 100%;
+      font-size: 18px;
+      border: solid 1px #282828;
+      padding: 10px;
+      outline: 0;
+    }
+
+    #media-buttons-container {
+      background: #F7F7F7;
+      text-align: center;
+      padding: 16px;
+      max-width: 400px;
+      margin: 38px auto 0;
+    }
+
+    #media-buttons-container .button {
+      margin: 0;
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    #media-buttons-container .discount-text {
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    #video-duration-alert {
+      align-items: flex-start;
+      text-align: left;
+      color: #C10909;
+      font-size: 14px;
+      margin-top: 15px;
+    }
+
+    .or-seperator-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      align-content: center;
+    }
+
+    .or-text {
+      margin: 4px;
+      color: #999999;
+      padding: 0 8px;
+    }
+
+    .hr-alike {
+      border-top: 1px solid #999999;
+      width: 100%;
+    }
+
+    @media only screen and (min-width: 680px) {
+      .review-text {
+        height: 255px;
+      }
+    }
+
+    textarea:focus,
+    input:focus {
+      outline: 0;
+    }
+
+    .button,
+    .numpad td {
+      border: solid 1px #282828;
+      color: #282828;
+      background: #fff;
+      border-radius: 2px;
+      transition-property: background, color;
+      transition-duration: 0.2s;
+      transition-timing-function: ease-in-out;
+    }
+
+    .button.active,
+    .button:focus,
+    .button:hover {
+      background: #282828;
+      color: #fff;
+      outline: 0;
+    }
+
+    .legal {
+      max-width: 400px;
+      margin: 12px auto 0;
+      text-align: center;
+    }
+
+    .legal,
+    .legal a {
+      font-size: 13px;
+      color: #999;
+    }
+
+    .legal a {
+      text-decoration: underline;
+    }
+
+  </style>
+  <style>
+    .ft-lbs {
+      display: none;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div id="wizard">
+    <div data-phase-title="rate-item" data-pos='0' class="slide">
+      <h3>HOW WOULD YOU RATE THIS ITEM?</h3>
+      <div onclick="nav(this, 2, 'rating', 5);" class="button"><span class="star"><i class="fa star fa-star"></i><i
+            class="fa star fa-star"></i><i class="fa star fa-star"></i><i class="fa star fa-star"></i><i
+            class="fa star fa-star"></i></span><span class="text">Love it!</span></div>
+      <div onclick="nav(this, 2, 'rating', 4);" class="button"><span class="star"><i class="fa star fa-star"></i><i
+            class="fa star fa-star"></i><i class="fa star fa-star"></i><i class="fa star fa-star"></i><i
+            class="fa star fa-star-o"></i></span><span class="text">Like it</span></div>
+      <div onclick="nav(this, 2, 'rating', 3);" class="button"><span class="star"><i class="fa star fa-star"></i><i
+            class="fa star fa-star"></i><i class="fa star fa-star"></i><i class="fa star fa-star-o"></i><i
+            class="fa star fa-star-o"></i></span><span class="text">It's okay</span></div>
+      <div onclick="nav(this, 2, 'rating', 2);" class="button"><span class="star"><i class="fa star fa-star"></i><i
+            class="fa star fa-star"></i><i class="fa star fa-star-o"></i><i class="fa star fa-star-o"></i><i
+            class="fa star fa-star-o"></i></span><span class="text">Didn't like it</span></div>
+      <div onclick="nav(this, 2, 'rating', 1);" class="button"><span class="star"><i class="fa star fa-star"></i><i
+            class="fa star fa-star-o"></i><i class="fa star fa-star-o"></i><i class="fa star fa-star-o"></i><i
+            class="fa star fa-star-o"></i></span><span class="text">Hate it</span></div>
+    </div>
+    <div data-phase-title="image-upload" data-pos='1' class="slide">
+      <h3>SHOW IT OFF</h3>
+      <h4>WE'D LOVE TO SEE IT IN ACTION!</h4>
+      <div id="media-buttons-container">
+        <div class="discount-text">Get 15% off your next purchase!</div>
+        <form method="POST" action="/-/post/img-update" target="fileuploader" enctype="multipart/form-data"><input
+            type="hidden" name="hash"
+            value="V1dTIliH3.1651640231.a2858bbe16196df18e8cc3d9265fee7dbc4bf22e2f9fff54877ed89cee2331da"><label
+            for="imageupload" class="button">Add photo</label><input type="file" name="img" id="imageupload"
+            style="display:none;" accept="image/x-png,image/jpeg,image/jpg"></form>
+        <div class="or-seperator-container">
+          <div class="hr-alike"></div>
+          <div class="or-text">Or</div>
+          <div class="hr-alike"></div>
+        </div>
+        <form method="POST" action="/-/post/video-upload" target="fileuploader" enctype="multipart/form-data">
+          <input type="hidden" name="hash"
+            value="V1dTIliH3.1651640231.a2858bbe16196df18e8cc3d9265fee7dbc4bf22e2f9fff54877ed89cee2331da"><label
+            for="videoupload" class="button">Add video</label><input type="file" name="videofile" id="videoupload"
+            style="display:none;" accept="video/*">
+          <div id="video-duration-alert" style="display: none;">
+            <div style="display: flex; margin-right: 10px">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M12 22C6.477 22 2 17.523 2 12C2 6.477 6.477 2 12 2C17.523 2 22 6.477 22 12C22 17.523 17.523 22 12 22ZM12 20C14.1217 20 16.1566 19.1571 17.6569 17.6569C19.1571 16.1566 20 14.1217 20 12C20 9.87827 19.1571 7.84344 17.6569 6.34315C16.1566 4.84285 14.1217 4 12 4C9.87827 4 7.84344 4.84285 6.34315 6.34315C4.84285 7.84344 4 9.87827 4 12C4 14.1217 4.84285 16.1566 6.34315 17.6569C7.84344 19.1571 9.87827 20 12 20ZM11 15H13V17H11V15ZM11 7H13V13H11V7Z"
+                  fill="#C10909"></path>
+              </svg>
+            </div>
+            <span>Videos are limited to 15 minutes. Please upload a shorter video</span>
+          </div>
+        </form>
+      </div>
+      <div onclick="move(1)" class="back">Back</div>
+      <div onclick="move(3)" class="skip">Skip</div>
+    </div>
+    <div data-phase-title="textual-review" data-pos='2' class="slide">
+      <h3 title="Review">TELL US MORE!</h3>
+      <textarea id="review" placeholder="Share your experience" class="review-text"></textarea>
+      <div class="errormsg">Required field</div>
+      <div onclick="nav(this, 4, 'review');" class="button">Next</div>
+      <div onclick="move(2)" class="back">Back</div>
+    </div>
+    <div data-phase-title="personal-details" data-pos='3' class="slide">
+      <h3 style="padding-bottom:20px;">About you</h3>
+      <div style="margin:0 auto;max-width:400px;">
+        <div style="display: flex;" class="name-wrapper">
+          <div class="field-wrap">
+            <input type="text" id="first_name" placeholder="First name *" required>
+            <div class="message">Required field</div>
+          </div>
+          <div style="flex-basis: 16px"></div>
+          <div class="field-wrap"><input type="text" id="last_name" placeholder="Last name"></div>
+        </div>
+      </div>
+      <div class="breaker"></div>
+      <div class="field-wrap">
+        <input type="email" id="email" placeholder="Email *" required>
+        <div class="message">Please fill a valid email address</div>
+      </div>
+      <div class="legal">By submitting, I acknowledge the <a href='https://loox.app/legal/terms-of-service-end-users'
+          target='_blank'>Terms of Service</a> and <a href='https://loox.app/legal/privacy-policy-end-users'
+          target='_blank'>Privacy Policy</a> and that my review will be publicly posted and shared online</div>
+      <button onclick="finish_noreq(this)" class="button submit-review">Done</button>
+      <div onclick="move(3)" class="back">Back</div>
+    </div>
+  </div>
+  <script>/**
+   * Returns the video duration of a file from a file input dialog (prior to upload)
+   *
+   * @param {htmlFileElement} file - The file from the native html file upload dialog
+   * @param {function} callback - The callback that would be called once the duration calculation is complete - with the
+   *                              duration as the callback parameter (float)
+   * @return {void}
+   */
+    function getVideoDuration(file, callback) {
+      var video = document.createElement('video');
+      video.preload = 'metadata';
+
+      video.onloadedmetadata = function () {
+        window.URL.revokeObjectURL(video.src);
+        var duration = video.duration;
+        return callback(duration);
+      }
+
+      video.src = URL.createObjectURL(file);
+    }
+
+    /**
+    * Uploads a given video file
+    *
+    * @param {string} hash - The hash input value (of the post)
+    * @param {htmlFileElement} file - The file from the native html file upload dialog
+    * @param {number} duration - The video duration (the post would be updated according to it)
+    * @param {function} onUploadSuccess - The callback that would be called once the upload is successful
+    * @param {function} onUploadError - The callback that would be called in case of error in the process
+    * @param {function} onUploadProgress - The callback that would be called on upload progress reporting
+    * @param {object=} options (Optional) - Options object: isReminder (bool).
+    * @return {void}
+    */
+    function uploadVideoFile(hash, file, duration, onUploadSuccess, onUploadError, onUploadProgress, options) {
+      if (typeof ga !== 'undefined') {
+        ga('send', { hitType: 'event', eventCategory: 'Wrote-Review-Phase', eventAction: "video-upload-started" });
+      }
+      var uploader = new VideoUploader(file);
+      uploader.getUploadURL(function (uploadUrlData) {
+        uploader.uploadVideoFile(uploadUrlData, file, function () {
+          var videoId = uploadUrlData.uid;
+
+          uploader.updateVideoDataOnPost(videoId, duration, hash, function () {
+            onUploadSuccess();
+            if (typeof ga !== 'undefined') {
+              ga('send', { hitType: 'event', eventCategory: 'Wrote-Review-Phase', eventAction: "video-upload-finished" });
+            }
+          }, onUploadError, options)
+        }, onUploadError, onUploadProgress)
+      }, onUploadError);
+    }
+
+    var VideoUploader = function (file) {
+      this.file = file;
+    };
+
+    VideoUploader.prototype.getUploadURL = function (successCb, errorCb) {
+      $.ajax({
+        type: "POST",
+        url: 'https://loox.io/-/post/video-upload',
+        success: successCb ? successCb : function (result) { console.log('Successfully got URL', result); },
+        error: errorCb,
+        async: true,
+        cache: false,
+        contentType: false,
+        processData: false,
+        timeout: 60000
+      });
+    };
+
+    VideoUploader.prototype.updateVideoDataOnPost = function (videoId, duration, postHash, successCb, errorCb, options) {
+      const formData = new FormData();
+      formData.append("id", videoId);
+      formData.append("hash", postHash);
+
+      $.ajax({
+        type: "POST",
+        url: options && options.isReminder ? 'https://loox.io/-/post/update-video-data-from-reminder' : 'https://loox.io/-/post/update-video-data',
+        data: {
+          id: videoId,
+          duration,
+          hash: postHash
+        },
+        success: successCb,
+        error: errorCb,
+        timeout: 60000
+      });
+    }
+
+    VideoUploader.prototype.uploadVideoFile = function (uploadUrlData, file, successCb, errorCb, progressCb) {
+      var that = this;
+      if (!uploadUrlData || !uploadUrlData.uploadURL) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+      var request = new XMLHttpRequest();
+      request.open('POST', uploadUrlData.uploadURL);
+
+      request.upload.addEventListener('progress', function (e) {
+        that.progressHandling(e, progressCb);
+      });
+
+      request.addEventListener('load', function (e) {
+        if (request.status !== 200) return errorCb ? errorCb() : undefined;
+
+        successCb();
+      });
+
+      request.send(formData);
+    };
+
+    VideoUploader.prototype.progressHandling = function (event, cb) {
+      var percent = 0;
+      var position = event.loaded || event.position;
+      var total = event.total;
+      if (event.lengthComputable) {
+        percent = Math.ceil(position / total * 100);
+      }
+
+      if (cb) return cb(percent)
+    };
+  </script>
+  <script>function dialogFrame(iframe, height) {
+      if (iframe) {
+        $('<div class="close-icon">&#10005</div>')
+          .click(function () { window.parent.postMessage(JSON.stringify({ type: "closeModal", frame: "looxDialog" }), "*"); })
+          .appendTo('.slide:first');
+        return;
+      }
+
+      document.body.style.background = 'rgba(238, 238, 238, 0.9)';
+      $('#wizard').css('margin-top', Math.max(0, window.innerHeight - height - 50) / 2 + 'px');
+    };
+
+    function cssForDialog(height) {
+      var slides = $('.slide');
+      for (var i = 0; i < slides.length; i++) {
+        var slide = $(slides[i]);
+
+        if (i === 0)
+          slide.addClass('first');
+        else
+          if (i + 1 < slides.length)
+            $("<div class='progressor'><div class='full'></div><div class='text'></div></div>").appendTo(slide);
+
+        slide
+          .css('height', height + 'px')
+          .css('top', (i * (height + 50)) + 'px')
+          .css('display', 'block');
+      }
+    };
+
+    function exportsFunc(height, iframe, exports) {
+      var has_img = false;
+      var posting = false;
+
+      var result = {
+        clientId: 'EJlV1y_Juo',
+        hash: 'V1dTIliH3.1651640231.a2858bbe16196df18e8cc3d9265fee7dbc4bf22e2f9fff54877ed89cee2331da',
+        reqId: '',
+        productId: '6802396381369'
+      };
+
+      var Upload = function (file) {
+        this.file = file;
+      };
+      Upload.prototype.getName = function () {
+        return this.file.name;
+      };
+      Upload.prototype.doUpload = function (toUrl, parameters, successCb, errorCb, progressCb) {
+        var that = this;
+        var formData = new FormData;
+        var mediaType = parameters && parameters.type ? parameters.type : 'img';
+
+        // add assoc key values, this will be posts values
+        formData.append(mediaType, this.file, this.getName());
+        if (parameters && !$.isEmptyObject(parameters)) {
+          for (var key in parameters) {
+            formData.append(key, parameters[key]);
+          }
+        }
+
+        $.ajax({
+          type: "POST",
+          url: toUrl,
+          xhr: function () {
+            var myXhr = $.ajaxSettings.xhr();
+            if (myXhr.upload) {
+              myXhr.upload.addEventListener('progress', function (event) {
+                that.progressHandling(event, progressCb)
+              }, false);
+            }
+            return myXhr;
+          },
+          success: successCb ? successCb : null,
+          error: errorCb ? errorCb : null,
+          async: true,
+          data: formData,
+          cache: false,
+          contentType: false,
+          processData: false,
+          timeout: 60000
+        });
+      };
+
+      Upload.prototype.progressHandling = function (event, cb) {
+        var percent = 0;
+        var position = event.loaded || event.position;
+        var total = event.total;
+        if (event.lengthComputable) {
+          percent = Math.ceil(position / total * 100);
+        }
+
+        if (cb) return cb(percent)
+      };
+
+      function uploadProgress(percent) {
+        if (percent > 0)
+          $('#upload-spinner').show().html(percent + '% <div style="width:15px;display:inline-block"></div> Uploading...');
+        if (percent == 100)
+          $('#upload-spinner').show().html('<div style="width:35px;display:inline-block"></div> Processing...');
+      }
+
+      function uploadSuccess(data) {
+        $('#upload-spinner')
+          .css({ background: 'none', color: 'green' })
+          .html('<i class="fa fa-2x fa-check"></i>');
+
+        setTimeout(function () {
+          $('#upload-spinner').remove();
+        }, 1500);
+        $('.submit-review')
+          .removeAttr('disabled')
+          .removeClass('disabled')
+          .html("Done");
+        has_img = true;
+      }
+
+      function uploadError(data) {
+        $('#upload-spinner').css({ background: 'none', color: 'red' }).text('');
+        $('.submit-review')
+          .removeAttr('disabled')
+          .removeClass('disabled')
+          .html("Done");
+      }
+
+      function uploadImage($form, file, type) {
+        new Upload(file).doUpload(
+          $form.attr('action'),
+          {
+            hash: $form.find('input[name="hash"]').val(),
+            type: type
+          },
+          uploadSuccess,
+          uploadError,
+          uploadProgress
+        );
+      }
+
+      function showUploadSpinnerAndAdvanceSlide(media) {
+        var uploadingMediaPlaceholder = (media === "video") ? "Uploading video, please wait..." : "Uploading image, please wait...";
+        $('#upload-spinner').remove();
+        var spinner = document.createElement('div');
+        spinner.id = 'upload-spinner';
+        spinner.style.cssText = [
+          'vertical-align: middle',
+          'position: absolute',
+          'top: 5px',
+          'left: 5px',
+          'min-width: 38px',
+          'height: 41px',
+          'line-height: 41px',
+          'text-align: center',
+          'font-size: 10px',
+          'color:#0496FC',
+          'opacity: 0.4',
+          'padding-left: 10px',
+          'display:none',
+          'background: url(/img/spinner.gif) center left no-repeat'
+        ].join(';');
+        spinner.innerText = '0%';
+        $('#wizard').get(0).appendChild(spinner);
+
+        var durationAlert = document.getElementById('video-duration-alert');
+        if (durationAlert) durationAlert.style.display = 'none';
+
+        $('.submit-review').attr('disabled', 'disabled').addClass('disabled').text(uploadingMediaPlaceholder);
+        move(3);
+      }
+
+      function handleUpload() {
+        var $form = $(this).closest('form');
+        var file = $(this)[0].files[0];
+        var isVideo = $(this)[0].accept.startsWith("video");
+
+        if (isVideo) {
+          getVideoDuration(file, function (duration) {
+            var FIFTEEN_MINUTES = 15 * 60;
+
+         if (duration > FIFTEEN_MINUTES) {
+              var durationAlert = document.getElementById('video-duration-alert');
+              if (durationAlert) durationAlert.style.display = 'flex';
+
+         if (typeof ga !== 'undefined') {
+                ga('send', {
+                  hitType: 'event',
+                  eventCategory: 'Wrote-Review-Phase',
+                  eventAction: "video-length-alert",
+                  eventLabel: duration.toString()
+                });
+              }
+              return;
+            }
+
+         showUploadSpinnerAndAdvanceSlide('video');
+            $('#upload-spinner').show();
+            var hash = $form.find('input[name="hash"]').val();
+            uploadVideoFile(hash, file, duration, uploadSuccess, uploadError, uploadProgress);
+          });
+        } else {
+          showUploadSpinnerAndAdvanceSlide();
+          uploadImage($form, file, 'img');
+        }
+
+      }
+
+      $('#imageupload').change(handleUpload);
+      $('#videoupload').change(handleUpload);
+
+      function save(sender, field, value) {
+        result[field] = value;
+
+        var parent = $(sender).parents('.scope');
+        if (parent.length == 0)
+          parent = $(sender).parents('.slide');
+
+        parent.find('.button').removeClass('active');
+        $(sender).addClass('active');
+        $.ajax({
+          url: 'https://loox.io/-/post/update',
+          method: 'POST',
+          data: result,
+          success: function () {
+          },
+          error: function (err) {
+            alert('CORs error');
+          }
+        });
+      }
+
+      function finish(sender) {
+        if (posting) return;
+
+        var e = document.getElementById('review');
+        if (e.value == "") {
+          $(e).addClass('invalid');
+          $(e).focus();
+          posting = false;
+          return;
+        }
+        result.review = e.value;
+        sender.disabled = 'disabled';
+
+        posting = true;
+        $.ajax({
+          url: 'https://loox.io/-/post/finish',
+          method: 'POST',
+          data: result,
+          success: function (data) {
+            if (typeof ga !== 'undefined') {
+              ga('send', { hitType: 'event', eventCategory: 'Wrote-Review', eventAction: (iframe ? "Iframe" : "On-site") });
+              ga('send', { hitType: 'event', eventCategory: 'Wrote-Review', eventAction: (has_img ? "Image" : "No-image") });
+            }
+            setTimeout(function () {
+              if (data.indexOf('http') === 0)
+                return window.top.location = data;
+
+         window.location = data;
+            }, 500);
+          },
+          error: function () {
+            posting = false;
+            alert('CORs error');
+          }
+        });
+      }
+
+      function nav(sender, index, field, value) {
+        var e = document.getElementById(field);
+        if (field && !value)
+          value = e.value || e.innerHTML;
+
+        if (field && value) {
+          $(e).removeClass('invalid');
+          $(e).parent().find('.errormsg').hide();
+          save(sender, field, value);
+        } else {
+          $(e).parent().find('.errormsg').show();
+          return $(e).addClass('invalid').focus();
+        }
+
+        move(index);
+      }
+
+      function move(index) {
+        var steps = document.getElementsByClassName('slide');
+        var current = null;
+        for (var i = 0; i < steps.length; i++) {
+          var step = steps[i];
+          var top = (i - index + 1) * (height + 50);
+          var style = step.style;
+          style.top = top + 'px';
+          style.opacity = top == 0 ? 1.0 : 0.3;
+          if (top == 0)
+            current = step;
+        }
+
+        var width = Math.ceil(index * 100 / steps.length) + '%';
+        $('.progressor .full').css('width', width);
+
+        (function (e) {
+          if (typeof ga === 'undefined') return;
+          var phaseTitle = e.getAttribute('data-phase-title')
+          if (phaseTitle == 0) return;
+          ga('send', { hitType: 'event', eventCategory: 'Wrote-Review-Phase', eventAction: phaseTitle });
+        })(current);
+      }
+
+      var emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      exports.finish_noreq = function (sender) {
+        if (posting) return;
+
+        result.email = $('#email').val();
+        result.first_name = $('#first_name').val();
+        result.last_name = $('#last_name').val();
+
+        if (!result.first_name || result.first_name == "")
+          return $('#first_name').focus().parent().addClass('error');
+        else
+          $('#first_name').parent().removeClass('error');
+
+        /*if (!result.last_name || result.last_name == "")
+          return $('#last_name').focus().parent().addClass('error');
+        else
+          $('#last_name').parent().removeClass('error');*/
+
+        if (!result.email || result.email == "" || !emailRegex.test(result.email))
+          return $('#email').focus().parent().addClass('error');
+        else
+          $('#email').parent().removeClass('error');
+
+        posting = true;
+        $.ajax({
+          url: 'https://loox.io/-/post/finish',
+          method: 'POST',
+          data: result,
+          success: function (data) {
+            setTimeout(function () {
+              window.location = data;
+            }, 500);
+
+         if (typeof ga !== 'undefined') {
+              ga('send', { hitType: 'event', eventCategory: 'Wrote-Review', eventAction: (iframe ? "Iframe" : "On-site") });
+              ga('send', { hitType: 'event', eventCategory: 'Wrote-Review', eventAction: (has_img ? "Image" : "No-image") });
+            }
+          },
+          error: function () {
+            posting = false;
+            alert('CORs error');
+          }
+        });
+      };
+
+      exports.navif = function (sender, index, field, value, fields) {
+        save(sender, field, value);
+
+        for (var i = 0; i < fields.length; i++) {
+          var v = result[fields[i]];
+          if (!v || v == "")
+            return;
+        }
+
+        move(index);
+      };
+
+      exports.nav_validate = function (sender, index, field, from, to) {
+        var e = document.getElementById(field);
+        $(e).removeClass('invalid');
+        $(e).parent().find('.errormsg').hide();
+
+        var value = Number(e.value);
+        if (value >= from && value <= to) {
+          save(sender, field, value);
+          move(index);
+          return;
+        }
+
+        $(e).addClass('invalid').focus();
+        $(e).parent().find('.errormsg').show();
+      };
+
+      exports.save = save;
+      exports.nav = nav;
+      exports.move = move;
+      exports.finish = finish;
+      exports.in_iframe = iframe;
+    };
+
+    $(function () {
+      var start = function () {
+        var iframe = window != window.top;
+        var height = Math.min(500, window.innerHeight - 50);
+        if (height <= 0) return setTimeout(start, 500);
+
+        dialogFrame(iframe, height);
+        cssForDialog(height);
+        exportsFunc(height, iframe, window);
+      };
+      start();
+    });
+  </script>
+  <script>function setSystem(sender, units) {
+      if (units == 'ft' || units == 'lbs') {
+        $('.cm-kg').hide();
+        $('.ft-lbs').show();
+      }
+      else {
+        $('.cm-kg').show();
+        $('.ft-lbs').hide();
+      }
+    }
+  </script>
+  <script>(function (i, s, o, g, r, a, m) { i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () { (i[r].q = i[r].q || []).push(arguments) }, i[r].l = 1 * new Date(); a = s.createElement(o), m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m) })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga'); ga('create', 'UA-62776784-3', { cookieFlags: 'SameSite=None;Secure' }); ga('send', 'pageview');</script>
+  <script>if (typeof ga != 'undefined')
+      ga('send', { hitType: 'event', eventCategory: 'Wrote-Review', eventAction: (window.in_iframe ? "Started-Iframe" : "Started-On-site") });
+  </script>
+</body>
+
+</html>
+
