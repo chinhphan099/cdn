@@ -9,7 +9,7 @@ const { task, watch, src, dest, parallel, series } = require('gulp'),
   clean = require('gulp-clean'),
   webserver = require('gulp-webserver'),
   gutil = require('gulp-util'),
-  // ip = require('ip'),
+  ip = require('ip'),
   autoprefixer = require('gulp-autoprefixer'),
   babel = require('gulp-babel');
 
@@ -131,7 +131,7 @@ task('clean', () => {
 task('webserver', (done) => {
   src(PUB.root)
     .pipe(webserver({
-      // host: ip.address(),
+      host: ip.address(),
       port: process.env.PORT || 2223,
       directoryListing: true
     }));
