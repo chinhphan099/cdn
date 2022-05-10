@@ -1,0 +1,240 @@
+<script type="text/javascript" async="" src="https://loox.io/widget/EJlV1y_Juo/loox.1637253059252.js?shop=bitsmo.myshopify.com"></script>
+<script>
+  function replaceSavePrice(dataProducts) {
+    const listProducts = document.querySelectorAll('.js-list-item');
+    if(dataProducts.length > 0) {
+      for (let i = 0, n = dataProducts.length; i < n; i++) {
+        if (listProducts.length > 0) {
+          Array.prototype.slice.call(listProducts).forEach(item=>{
+              var productId = parseInt(item.dataset.id),
+                  product = dataProducts[i];
+
+              if(productId == product.productId) {
+                var fullPriceValue = Number((product.productPrices.FullRetailPrice.Value).toFixed(2)),
+                discountPriceValue = Number((product.productPrices.DiscountedPrice.Value).toFixed(2)),
+                discountPriceFormat = product.productPrices.DiscountedPrice.FormattedValue,
+                savePriceValue = Number((fullPriceValue - discountPriceValue).toFixed(2)),
+                savePriceFormat = ctrwowUtils.number.formaterNumberByFormattedValue(savePriceValue, discountPriceFormat),
+                listPrice = item.querySelector('.js-save-price');
+
+                listPrice.innerText = savePriceFormat;
+              }
+          });
+        }
+      }
+    }
+  }
+
+  function detectQty4Package(){
+    let txtQty= document.querySelector('.custom-number-wrap .numberTxt');
+    let qty = txtQty ? (parseInt(txtQty.value) - 1) : 0;
+    let listProduct = document.querySelectorAll('.js-list .js-list-item:not(.hidden)');
+    if(listProduct[qty]){
+      listProduct[qty].click()
+    }
+  }
+  function toggleActiveThumbImage(index) {
+    const images = _qAll('.thumbnail img');
+    if (index === 0) {
+      images[1] && !images[1].classList.contains('hidden') && images[1].classList.add('hidden');
+    } else {
+      images[0] && !images[0].classList.contains('hidden') && images[0].classList.add('hidden');
+    }
+    images[index] && images[index].classList.contains('hidden') && images[index].classList.remove('hidden');
+  }
+
+  function detectDouble(){
+    let elmPlug = document.querySelectorAll('.group-product li');
+    Array.prototype.slice.call(elmPlug).forEach((elm, index) => {
+      elm.addEventListener('click', function(e){
+        toggleActiveThumbImage(index);
+
+        if(e.currentTarget.classList.contains('isdouble')) {
+          window.ctrwowUtils.localStorage().set('fkDouble', true);
+        } else {
+          window.ctrwowUtils.localStorage().set('fkDouble', true);
+        }
+      });
+    });
+  }
+
+  window.addEventListener('load', function(){
+    window.ctrwowUtils.events.on('triggerDoubleQuantity_FinishedChangeQty', detectQty4Package);
+    detectDouble();
+  })
+
+  window.ctrwowUtils.getDependencies([
+      'https://cdnjs.cloudflare.com/ajax/libs/pubsub-js/1.7.0/pubsub.min.js',
+      window.ctrwowUtils.getCtrLibLink('ctrwowCheckout')
+  ], {delayUntilInteract:false}).then(() => {
+    window.ctrwowCheckout.ready().then(()=> {
+      window.ctrwowCheckout.productListData.onProductListChange((productList) => {
+        const products = productList.prices ? productList.prices : [];
+        replaceSavePrice(products);
+      })
+
+      window.ctrwowCheckout.checkoutData.onProductChange(function(product){
+        let unitFullPrice = document.querySelectorAll('.js-unit-fullprice');
+        unitFullPrice && unitFullPrice.forEach(item => {
+          let fullPriceValue = window.ctrwowCheckout.checkoutData.getProduct().productPrices.FullRetailPrice.Value;
+          let qty = window.ctrwowCheckout.checkoutData.getProduct().quantity;
+          let fullPriceFormat = window.ctrwowCheckout.checkoutData.getProduct().productPrices.FullRetailPrice.FormattedValue;
+          item.innerText = window.ctrwowUtils.number.formaterNumberByFormattedValue(fullPriceValue / qty,fullPriceFormat);
+        })
+
+        // bind discount percent from product list to order summary
+        const jsDiscountPercent = document.querySelector(`div[data-id="${product.productId}"] .js-discount-percent`)
+        const targetElement = document.querySelector('.target-js-discount-percent')
+        if (jsDiscountPercent && targetElement) {
+          targetElement.innerText = jsDiscountPercent.innerText
+        }
+      })
+    })
+  })
+
+  function mobileCheck() {
+    const summaryCol = document.querySelector('.summary-col');
+    if(window.innerWidth < 1024 ) {
+      summaryCol.classList.add('mobile-summary');
+      summaryCol.querySelector('.order-summary__total').addEventListener('click',function(){
+        if(summaryCol.querySelector('.order-summary__list').style.display === 'none' || summaryCol.querySelector('.order-summary__list').style.display === ''){
+          summaryCol.querySelector('.order-summary__list').style.display = 'block';
+          summaryCol.querySelector('.order-summary__total .summary-arrow').classList.add('open');
+          summaryCol.querySelector('.order-summary__total .summary-text').innerHTML = 'Hide order summary';
+          summaryCol.querySelector('.order-summary__total').style.borderBottom = '1px solid #e5e5e5';
+
+        }else{
+          summaryCol.querySelector('.order-summary__list').style.display = 'none'
+          summaryCol.querySelector('.order-summary__total .summary-arrow').classList.remove('open');
+          summaryCol.querySelector('.order-summary__total .summary-text').innerHTML = 'Show order summary';
+          summaryCol.querySelector('.order-summary__total').style.borderBottom = 'none';
+        }
+      });
+    } else {
+      summaryCol.classList.remove('mobile-summary');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=> {
+    try{
+      mobileCheck();
+    } catch(err) {
+      console.log(err)
+    }
+
+    window.addEventListener('resize', () => {
+      mobileCheck();
+    })
+  });
+</script>
+
+<script>
+  function convertNumberToCurrency(valuePrice, stringPrice, targetValuePrice) {
+    return stringPrice.replace(valuePrice, targetValuePrice.toFixed(2));
+  }
+  function handleDisplayCheckoutSection() {
+    const arr__ElmSectionInformation = document.querySelectorAll('.information-section');
+    if (arr__ElmSectionInformation.length > 0) {
+      Array.prototype.slice.call(arr__ElmSectionInformation).forEach(item => {
+        item.classList.add('hidden');
+        item.style.display = 'none';
+      })
+    }
+    const arr__ElmSectionCheckout = document.querySelectorAll('.checkout-section');
+    if (arr__ElmSectionCheckout.length > 0) {
+      Array.prototype.slice.call(arr__ElmSectionCheckout).forEach((item, index) => {
+        item.classList.remove('hidden');
+        item.style.display = 'inherit';
+        index === 0 && item.scrollIntoView({ behavior: 'smooth' });
+      })
+    }
+  }
+  function addClass(el, className) {
+    !el.classList.contains(className) && el.classList.add(className);
+  }
+  function removeClass(el, className) {
+    el.classList.contains(className) && el.classList.remove(className);
+  }
+  let upgradeProduct;
+  function generatePopup() {
+    const objPIDs = {
+      108: 109,
+      119: 123,
+      120: 124,
+      121: 125,
+      122: 126
+    };
+    const currentProduct = window.ctrwowCheckout.checkoutData.getProduct();
+    upgradeProduct = window.ctrwowCheckout.productListData.getProductList().prices.find(item => item.productId === objPIDs[currentProduct.productId]);
+    const formatedPrice = upgradeProduct.productPrices.FullRetailPrice.FormattedValue;
+
+    const additionFullPriceElm = document.querySelector('.modal-js-product-fullprice');
+    if (additionFullPriceElm) {
+      const upgradeFullPrice = upgradeProduct.productPrices.FullRetailPrice.Value - currentProduct.productPrices.FullRetailPrice.Value;
+      additionFullPriceElm.textContent = window.ctrwowUtils.number.formaterNumberByFormattedValue(upgradeFullPrice, formatedPrice);
+    }
+
+    const additionPriceElm = document.querySelector('.modal-js-product-discountprice');
+    if (additionPriceElm) {
+      const upgradePrice = upgradeProduct.productPrices.DiscountedPrice.Value - currentProduct.productPrices.DiscountedPrice.Value;
+      additionPriceElm.textContent = window.ctrwowUtils.number.formaterNumberByFormattedValue(upgradePrice, formatedPrice);
+    }
+  }
+  function modalPopupCustomProduct() {
+    const addToBagBtn = document.querySelector('.vtl-button');
+    addToBagBtn && addToBagBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (window._q('.group-product .type-2.active')) {
+        handleDisplayCheckoutSection();
+        return;
+      }
+      generatePopup();
+
+      window._q('.show-popup').click();
+    });
+
+    const elm__ModalButtonAccept = document.querySelector('.take-it-btn')
+    elm__ModalButtonAccept && elm__ModalButtonAccept.addEventListener('click', (e) => {
+      e.preventDefault();
+      ctrwowCheckout.checkoutData.setProduct(upgradeProduct);
+      window._q('.popup_widget').click();
+      handleDisplayCheckoutSection();
+    });
+
+    const elm__ModalButtonCancel = document.querySelector('.js-close-popup');
+    elm__ModalButtonCancel && elm__ModalButtonCancel.addEventListener('click', (e) => {
+      e.preventDefault();
+      window._q('.popup_widget').click();
+      handleDisplayCheckoutSection();
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    modalPopupCustomProduct();
+    //handleChange();
+  })
+   function handleSliderZoom() {
+    const tabs = window._qAll('.group-product li')
+    Array.prototype.slice.call(tabs).forEach((tab) => {
+      tab.addEventListener('click', (e) => {
+        if(e.currentTarget.classList.contains('type-1')) {
+          $('.target-js-discount-percent').text('54%');
+          $('.gallery-slider .thumb-slider').slick('slickGoTo', 0);
+        } else if(e.currentTarget.classList.contains('type-2')) {
+          $('.target-js-discount-percent').text('53%');
+          $('.gallery-slider .thumb-slider').slick('slickGoTo', 10);
+        }
+      })
+    });
+
+    window.ctrwowUtils.events.on('onInitSlider_iyibo0e', () => {
+      (function(o){var t={url:!1,callback:!1,target:!1,duration:120,on:"mouseover",touch:!0,onZoomIn:!1,onZoomOut:!1,magnify:1};o.zoom=function(t,n,e,i){var u,c,a,r,m,l,s,f=o(t),h=f.css("position"),d=o(n);return t.style.position=/(absolute|fixed)/.test(h)?h:"relative",t.style.overflow="hidden",e.style.width=e.style.height="",o(e).addClass("zoomImg").css({position:"absolute",top:0,left:0,opacity:0,width:e.width*i,height:e.height*i,border:"none",maxWidth:"none",maxHeight:"none"}).appendTo(t),{init:function(){c=f.outerWidth(),u=f.outerHeight(),n===t?(r=c,a=u):(r=d.outerWidth(),a=d.outerHeight()),m=(e.width-c)/r,l=(e.height-u)/a,s=d.offset()},move:function(o){var t=o.pageX-s.left,n=o.pageY-s.top;n=Math.max(Math.min(n,a),0),t=Math.max(Math.min(t,r),0),e.style.left=t*-m+"px",e.style.top=n*-l+"px"}}},o.fn.zoom=function(n){return this.each(function(){var e=o.extend({},t,n||{}),i=e.target&&o(e.target)[0]||this,u=this,c=o(u),a=document.createElement("img"),r=o(a),m="mousemove.zoom",l=!1,s=!1;if(!e.url){var f=u.querySelector("img");if(f&&(e.url=f.getAttribute("data-src")||f.currentSrc||f.src),!e.url)return}c.one("zoom.destroy",function(o,t){c.off(".zoom"),i.style.position=o,i.style.overflow=t,a.onload=null,r.remove()}.bind(this,i.style.position,i.style.overflow)),a.onload=function(){function t(t){f.init(),f.move(t),r.stop().fadeTo(o.support.opacity?e.duration:0,1,o.isFunction(e.onZoomIn)?e.onZoomIn.call(a):!1)}function n(){r.stop().fadeTo(e.duration,0,o.isFunction(e.onZoomOut)?e.onZoomOut.call(a):!1)}var f=o.zoom(i,u,a,e.magnify);"grab"===e.on?c.on("mousedown.zoom",function(e){1===e.which&&(o(document).one("mouseup.zoom",function(){n(),o(document).off(m,f.move)}),t(e),o(document).on(m,f.move),e.preventDefault())}):"click"===e.on?c.on("click.zoom",function(e){return l?void 0:(l=!0,t(e),o(document).on(m,f.move),o(document).one("click.zoom",function(){n(),l=!1,o(document).off(m,f.move)}),!1)}):"toggle"===e.on?c.on("click.zoom",function(o){l?n():t(o),l=!l}):"mouseover"===e.on&&(f.init(),c.on("mouseenter.zoom",t).on("mouseleave.zoom",n).on(m,f.move)),e.touch&&c.on("touchstart.zoom",function(o){o.preventDefault(),s?(s=!1,n()):(s=!0,t(o.originalEvent.touches[0]||o.originalEvent.changedTouches[0]))}).on("touchmove.zoom",function(o){o.preventDefault(),f.move(o.originalEvent.touches[0]||o.originalEvent.changedTouches[0])}).on("touchend.zoom",function(o){o.preventDefault(),s&&(s=!1,n())}),o.isFunction(e.callback)&&e.callback.call(a)},a.setAttribute("role","presentation"),a.alt="",a.src=e.url})},o.fn.zoom.defaults=t})(window.jQuery);
+
+      $('.gallery-slider .main-slider .slide-thumb').zoom();
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=> {
+    handleSliderZoom();
+  })
+</script>

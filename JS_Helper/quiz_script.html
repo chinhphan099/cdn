@@ -1,0 +1,466 @@
+<style>
+  .needsclick {
+    display: none !important;
+  }
+  .popup_widget {
+    pointer-events: none !important;
+  }
+  label {
+    cursor: pointer;
+  }
+  label.error {
+    font-size: .8rem;
+    word-break: break-word;
+    color: #cc4b37;
+    display: block;
+    width: 100%;
+  }
+  [type=radio]:checked~label {
+    color: #fff !important;
+    position: static !important;
+  }
+  [type=radio]:checked~label,
+  [type=radio]:not(:checked)~label {
+    padding: 18px !important;
+    width: 100%;
+    /* font-weight: 500 !important; */
+  }
+  [type="radio"]:checked~label:before,
+  [type="radio"]:not(:checked)~label:before {
+    display: none !important;
+  }
+  [type=radio]:checked~label:after {
+    width: 100% !important;
+    height: 100% !important;
+    background: #000 !important;
+    top: 0 !important;
+    left: 0 !important;
+    border-radius: 0 !important;
+    border: 1px solid rgb(0, 0, 0);
+    z-index: -1;
+  }
+  [type="radio"]:checked~label:after,
+  [type="radio"]:not(:checked)~label:after {
+    transition: none !important;
+  }
+  .googleSubmitBtn {
+    background-image: unset !important;
+    box-shadow: unset !important;
+  }
+  .progressBar-active {
+    background: #11CC9E !important;
+  }
+  .DMCA_Logo {
+    display: none !important;
+  }
+  .form-group {
+    padding: 0 !important;
+  }
+  .check-img {
+    position: absolute;
+    top: 0;
+    right: 3px;
+  }
+  @media (max-width: 767px) {
+    .check-img {
+      right: 0px !important;
+    }
+  }
+  .sticky-bar {
+    transform: translateZ(0);
+    transition: all .6s ease-out .12s;
+  }
+  .sticky-bar.hidden {
+    display: block !important;
+    transform: translateY(-101%) !important;
+    transition: transform .6s ease-in 0s !important;
+  }
+  @keyframes dot-pulse {
+    0% {
+      transform: scale(0);
+      opacity: 0
+    }
+    25% {
+      opacity: 1
+    }
+    70% {
+      opacity: 0;
+      transform: scale(1.3)
+    }
+  }
+
+  .question-box {
+    transition: opacity 125ms ease;
+    opacity: 1;
+  }
+  .question-box:not(.has-answered) {
+    opacity: 0.4;
+  }
+  .question-box.final-step,
+  .question-box.has-answered,
+  .question-box.is-next {
+    opacity: 1 !important;
+  }
+  .bg > div {
+    position: relative;
+    z-index: 2;
+  }
+  .is-next .bg:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fac8c8;
+    border-radius: 50%;
+    transform: scale(0);
+    opacity: 0;
+    animation: dot-pulse 1s linear infinite 0s forwards;
+  }
+  .has-answered .bg:before {
+    content: none;
+  }
+  .loading .dot {
+    transform: scale(0);
+    transition: transform 0.6s ease;
+  }
+  .loading.completed .box-percent {
+    display: none !important;
+  }
+  .loading.completed .box-complete {
+    display: block !important;
+  }
+  .box-complete .dot {
+    float: right;
+  }
+  .box-complete .completed-text {
+    clear: both;
+  }
+  .loading .percent {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .loading-active {
+    transition: width 0.6s ease;
+  }
+  .loading.active .dot {
+    transform: scale(1);
+  }
+  .loading.active .percent {
+    opacity: 1;
+  }
+  .loading .mess {
+    transition: opacity 0.6s ease;
+  }
+  .loading.completed .mess {
+    opacity: 1;
+  }
+  .box130 label {
+    height: 130px;
+  }
+  .box130 > div {
+    pointer-events: none;
+  }
+  .box130 [type=radio] ~ label:after {
+    content: '';
+    position: absolute;
+  }
+  [type=radio]:checked ~ div {
+    color: #fff !important;
+  }
+</style>
+
+<script>
+  const divName = window._qAll('div[name]')
+  divName.forEach((div) => {
+    div.removeAttribute('name');
+  });
+
+  let isInvalidEmail = true;
+  let phone_valid = false, phone_linetype = '', phone_carrier = '', international_format = '';
+  const emailElm = document.querySelector('[name="entry.942623568"]');
+  const phoneElm = document.querySelector('[name="entry.1175465838"]');
+  let countryCode = '';
+  let interval;
+  function getCountry() {
+    window.ctrwowUtils.callAjax('https://geo.risk3sixty.com/me').then((result) => {
+      countryCode = result.country
+    })
+  }
+  function generateSuccessPopup() {
+    window._q('.show-popup').click();
+
+    const timer = 2000;
+    const percent = timer / 100;
+    let step = 0;
+    if (interval) { clearInterval(interval); }
+
+    interval = setInterval(() => {
+      ++step;
+      window._q('.progress-inner').style.width = step + '%';
+      if (step === 100) {
+        clearInterval(interval);
+        window.location.href = window._q('.get-result-btn').getAttribute('successurl') + window.location.search
+        sessionStorage.removeItem('qaList');
+        return;
+      }
+    }, percent)
+  }
+  function sendEmailToLeadgens() {
+    if (isInvalidEmail) return;
+
+    const configData = window.ctrwowCheckout.getCheckoutConfig()
+    const { webKey, cid, websaleApiUrl } = configData
+    if (webKey && cid) {
+      window.ctrwowUtils.getUserAnalyticsInfo().then(function (analyticsV2Data) {
+        const payload = {
+          analyticsV2: analyticsV2Data,
+          email: emailElm.value,
+          phoneNumber: phoneElm.value,
+          isFromEmailWidget: 'false'
+        };
+        if (phone_valid) {
+          payload.phoneNumber = international_format;
+        }
+        window.fetch(websaleApiUrl + '/leadgens/' + webKey, {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            X_CID: cid
+          },
+          body: JSON.stringify(payload)
+        })
+      })
+    }
+  }
+  function pushBlueshift() {
+    if (isInvalidEmail) return;
+
+    // const checkedItemData = window.ctrwowCheckout.checkoutData.getProduct();
+    const email = emailElm.value;
+    const obj = {
+      email: emailElm.value,
+      campaignname: __ctrPageConfiguration.offerName,
+      // product_ids: [checkedItemData.productId],
+      // items: [
+      //   {
+      //     productId: checkedItemData.productId,
+      //     sku: checkedItemData.sku,
+      //     total_us: (checkedItemData.productPrices.DiscountedPrice.Value + checkedItemData.shippings[window.shippingIndex || 0].price).toFixed(2),
+      //     quantity: checkedItemData.quantity
+      //   }
+      // ],
+      // sku: checkedItemData.sku,
+      // currency: 'USD',
+      landing_base_url: window.location.href.split('?')[0]
+      // customer_language: 'en'
+    };
+    if (phone_valid) {
+      obj.phone_number = international_format || phoneElm.value,
+      obj.phone_valid = phone_valid,
+      obj.phone_linetype = phone_linetype,
+      obj.phone_carrier = phone_carrier
+    }
+    blueshift.track('add_to_cart', obj);
+  }
+  function checkValidEmail(email) {
+    const isEmailValid = email.value && !email.classList.contains('error');
+    const emailAPI = `https://sales-prod.tryemanagecrm.com/api/validation/verify-email/?email=${email.value}`;
+    if (isEmailValid) {
+      window.ctrwowUtils
+        .callAjax(emailAPI, {
+          headers: {
+            X_CID: '584ea331-0cd2-4c48-85d9-737f9dddfa0b',
+            'Content-Type': 'application/json'
+          }
+        })
+        .then((result) => {
+          if (!result) {
+            throw 'Error';
+          }
+
+          if (result.isVerified && result.isValid) {
+            isInvalidEmail = false;
+            // pushBlueshift();
+            sendEmailToLeadgens();
+          } else {
+            isInvalidEmail = true;
+          }
+        })
+        .catch((e) => {
+          isInvalidEmail = true;
+        });
+    }
+  }
+  function checkPhoneNumber(phone) {
+    const phoneNumber = phone.value.trim();
+    if (!phoneNumber) return
+    let checkPhoneAPI = `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneNumber}&country_code=${countryCode.toLowerCase()}`;
+    window.ctrwowUtils
+      .callAjax(checkPhoneAPI)
+      .then((result) => {
+        phone_valid = result.valid;
+        phone_linetype = result.line_type;
+        phone_carrier = result.carrier;
+        international_format = result.international_format;
+        // pushBlueshift();
+        sendEmailToLeadgens();
+      })
+      .catch((e) => {
+        phone_valid = false;
+        console.log(e);
+      });
+  }
+  function updatePercentStep() {
+    const totalQuestionBox = $('.question-box').length;
+    const hasAnswered = $('.has-answered').length;
+    const percent = Math.ceil(hasAnswered / totalQuestionBox * 100);
+    if (percent > 0) {
+      $('.loading').addClass('active').removeClass('completed');
+    }
+    if (percent === 100) {
+      $('.loading').addClass('completed');
+    }
+    $('.loading-active').css('width', percent + '%');
+    $('.loading .percent').text(percent + '%');
+  }
+  function getStartButtonEvent() {
+    window._q('.get-start-btn').addEventListener('click', (e) => {
+      e.preventDefault()
+      $([document.documentElement, document.body]).animate({
+        scrollTop: $(".question-box").offset().top - $('.header').outerHeight(true) - 20
+      }, 300);
+    });
+  }
+  function saveQaList(input) {
+    if (input.attr('type') !== 'radio' && input.attr('type') !== 'checkbox') {
+      return;
+    }
+    let qaList = sessionStorage.getItem('qaList');
+    if (qaList) {
+      qaList = JSON.parse(qaList);
+    } else {
+      qaList = [];
+    }
+    const currentQuestion = input.closest('.question-box');
+    const questionIndex = $('.question-box').index(currentQuestion);
+
+    const currentAnswer = input.closest('.form-group');
+    const currentAnswerIndex = currentQuestion.find('.form-group').index(currentAnswer);
+
+    qaList = qaList.filter((q) => {
+      return !q.hasOwnProperty(questionIndex)
+    })
+
+    qaList.push({
+      [questionIndex]: currentAnswerIndex
+    });
+    sessionStorage.setItem('qaList', JSON.stringify(qaList));
+  }
+  function handleQuestionBox() {
+    // Add attr required for input
+    $('.question-box').each(function (elm) {
+      $($(this).find('input')[0]).attr('required', '');
+    });
+
+    // Remove click event of label
+    $('.question-box label').each(function () {
+      const inputId = $(this).closest('.form-group').find('input').attr('id');
+      $(this).attr('for', inputId);
+      $(this).replaceWith($(this).clone());
+    });
+
+    $('.question-box input').on('change', function (e) {
+      const currentInput = e.currentTarget;
+      const questionBox = currentInput.closest('.question-box');
+      if (questionBox) {
+        setTimeout(() => {
+          questionBox.querySelector('img') && (questionBox.querySelector('img').style.display = 'block');
+          questionBox.querySelector('.bg') && (questionBox.querySelector('.bg').style.backgroundColor = 'rgba(17, 204, 158, 0.21)');
+          if (!currentInput.value || currentInput.classList.contains('error')) {
+            $(questionBox).removeClass('has-answered').addClass('not-answer is-next');
+            updatePercentStep();
+            return
+          }
+
+          $(questionBox).removeClass('not-answer is-next').addClass('has-answered');
+          $('.is-next').removeClass('is-next');
+
+          var nextQuestion = $(questionBox).nextAll('.question-box:not(.has-answered):first');
+          var findFirstUnansweredQuestion = $('.question-box:not(.has-answered):not(.final-step):first');
+          if (nextQuestion.hasClass('final-step') && findFirstUnansweredQuestion.length) {
+            nextQuestion = findFirstUnansweredQuestion;
+          }
+          if (nextQuestion.length) {
+            nextQuestion.addClass('is-next');
+          }
+
+          // ! update Percent Step
+          updatePercentStep();
+
+          if (nextQuestion.length) {
+            $([document.documentElement, document.body]).animate({
+              scrollTop: nextQuestion.offset().top - $('.header').outerHeight(true) - 20
+            }, 450);
+          }
+
+          saveQaList($(currentInput));
+        }, 100);
+      }
+    });
+  }
+  function handleChangeEmail() {
+    emailElm.addEventListener('blur', (e) => {
+      checkValidEmail(e.currentTarget);
+    });
+    phoneElm.addEventListener('blur', (e) => {
+      checkPhoneNumber(e.currentTarget);
+    });
+  }
+  function renderAnswer() {
+    let qaList = sessionStorage.getItem('qaList');
+    if (!qaList) return;
+
+    qaList = JSON.parse(qaList);
+    $('.question-box').each(function (index) {
+      const getQuestion = qaList.find((item) => item.hasOwnProperty(index));
+      if (getQuestion) {
+        $(this).removeClass('is-next').addClass('has-answered');
+        $(this).find('img').css('display', 'block');
+        $(this).find('.bg').css('background-color', 'rgba(17, 204, 158, 0.21)');
+
+        const getAnswerIndex = getQuestion[index];
+        const getAnswerItem = $(this).find('.form-group')[getAnswerIndex];
+        $(getAnswerItem).find('input').prop('checked', true);
+      }
+    });
+
+    updatePercentStep();
+
+    var findFirstUnansweredQuestion = $('.question-box:not(.has-answered):first');
+    if (findFirstUnansweredQuestion.length) {
+      findFirstUnansweredQuestion.addClass('is-next');
+      $([document.documentElement, document.body]).animate({
+        scrollTop: findFirstUnansweredQuestion.offset().top - $('.header').outerHeight(true) - 20
+      }, 450);
+    } else {
+      $([document.documentElement, document.body]).animate({
+        scrollTop: $('.final-step').offset().top - $('.header').outerHeight(true) - 20
+      }, 450);
+    }
+  }
+  window.addEventListener('DOMContentLoaded', () => {
+    window.ctrwowUtils.events.on('onSubmitDone', () => {
+      generateSuccessPopup();
+      pushBlueshift();
+    });
+  });
+  window.addEventListener('load', () => {
+    getCountry();
+    renderAnswer();
+    getStartButtonEvent();
+    handleQuestionBox();
+    handleChangeEmail();
+  });
+</script>

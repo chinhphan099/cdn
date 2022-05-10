@@ -1,0 +1,116 @@
+#if($dotPageContent.url.indexOf('confirm.html') > -1)
+    <script>
+        (function() {
+            function getQueryParameter(param) {
+                let href = '';
+                if (location.href.indexOf('?')) {
+                    href = location.href.substr(location.href.indexOf('?'));
+                }
+
+                const value = href.match(new RegExp('[\?\&]' + param + '=([^\&]*)(\&?)', 'i'));
+                return value ? value[1] : '';
+            }
+
+            function initial_pixel_scripts() {
+                var iframe = document.createElement('iframe'),
+                    orderId = !!localStorage.orderInfo ? JSON.parse(localStorage.orderInfo).orderNumber : null;
+
+                if(!orderId || localStorage.getItem('orderId') === orderId || !localStorage.getItem('orderNumberUpsell')) {
+                    return;
+                }
+                localStorage.setItem('orderId', orderId);
+                iframe.src = 'https://www.drgnshrt.com/?nid=273&adv_event_id=56&transaction_id=' + getQueryParameter('s5') +
+                            '&adv1=' + orderId + '&coupon_code=';
+                iframe.scrolling = 'no';
+                iframe.frameborder = '0';
+                iframe.width = '1';
+                iframe.height = '1';
+                iframe.style.position = 'absolute';
+                iframe.style.bottom = '0';
+                document.querySelector('body').appendChild(iframe);
+
+                #*
+                // DFSB-4332
+                var imgCpa = document.createElement('img'),
+                    randomNumber = Math.floor(100000000 + Math.random() * 900000000), // 9 digits
+                    orderNumber = JSON.parse(localStorage.getItem('orderInfo')).orderNumber || 0,
+                    transactionId = localStorage.getItem('upsellPrice'),
+                    description = localStorage.getItem('upsellTitle');
+
+                imgCpa.id = '1000183331_cpa_testing';
+                imgCpa.width = '1';
+                imgCpa.height = '1';
+                imgCpa.border = '0';
+                imgCpa.src = 'https://ads.trafficjunky.net/tj_ads_pt?a=1000183331&member_id=1001941571&cb=' +
+                            randomNumber + '&cti=' + orderNumber + '&ctv=' + transactionId + '&ctd=' + description;
+                document.querySelector('body').appendChild(imgCpa);
+                *#
+            }
+            initial_pixel_scripts();
+        })();
+    </script>
+#end
+
+#if($dotPageContent.url.indexOf('special-offer-iconic') > -1)
+    <script>
+        (function() {
+            function getQueryParameter(param) {
+                let href = '';
+                if (location.href.indexOf('?')) {
+                    href = location.href.substr(location.href.indexOf('?'));
+                }
+
+                const value = href.match(new RegExp('[\?\&]' + param + '=([^\&]*)(\&?)', 'i'));
+                return value ? value[1] : '';
+            }
+
+            function trafficJunkyPixelAddition() {
+                var imgCpa = document.createElement('img'),
+                    randomNumber = Math.floor(100000000 + Math.random() * 900000000), // 9 digits
+                    orderNumber = JSON.parse(localStorage.getItem('orderInfo')).orderNumber || 0,
+                    transactionId = getQueryParameter('s5') || 0,
+                    description = (document.title.charAt(0).toUpperCase() + document.title.slice(1)).replace(/ /g, '').replace(/[^a-zA-Z ]/g, '');
+
+                imgCpa.id = '1000176091_cpa_testing';
+                imgCpa.width = '1'; imgCpa.height = '1'; imgCpa.border = '0';
+                imgCpa.src = 'https://ads.trafficjunky.net/tj_ads_pt?a=1000176091&member_id=1001652871&cb=' +
+                            randomNumber + '&cti=' + orderNumber + '&ctv=' + transactionId + '&ctd=' + description;
+
+                document.querySelector('body').appendChild(imgCpa);
+            }
+            trafficJunkyPixelAddition();
+
+            function trafficJunkyPixelAdditionV1(id, aId, mId) {
+                var imgCpa = document.createElement('img'),
+                    randomNumber = Math.floor(100000000 + Math.random() * 900000000), // 9 digits
+                    orderNumber = JSON.parse(localStorage.getItem('orderInfo')).orderNumber || 0,
+                    description = (document.title.charAt(0).toUpperCase() + document.title.slice(1)).replace(/ /g, '').replace(/[^a-zA-Z ]/g, '');
+
+                imgCpa.id = id;
+                imgCpa.width = '1'; imgCpa.height = '1'; imgCpa.border = '0';
+                // localStorage.setItem('upsellTitle', description);
+
+                var intervalTimer = setInterval(function() {
+                    if(!!document.querySelector('.spanUpsellPrice') && !!document.querySelector('.spanUpsellPrice').textContent) {
+                        clearInterval(intervalTimer);
+                        var jsCurrency = localStorage.getItem('jsCurrency') || '$\#\#\#\#\#\#',
+                            currencySign = jsCurrency.replace('\#\#\#\#\#\#', ''),
+                            upsellPrice = document.querySelector('.spanUpsellPrice').textContent;
+
+                        imgCpa.src = 'https://ads.trafficjunky.net/tj_ads_pt?a=' + aId + '&member_id=' + mId + '&cb=' +
+                            randomNumber + '&cti=' + orderNumber + '&ctv=' + upsellPrice.replace(currencySign, '') + '&ctd=' + description;
+                        document.querySelector('body').appendChild(imgCpa);
+                    }
+                }, 1000);
+            }
+
+            // DFSB-4332
+            trafficJunkyPixelAdditionV1('1000183321_cpa_testing', '1000183321', '1001941571');
+
+            // DFSB-4437
+            if(getQueryParameter('afid') === '3') {
+                trafficJunkyPixelAdditionV1('1000183331_cpa_testing', '1000183331', '1001941571');
+            }
+        })();
+    </script>
+#end

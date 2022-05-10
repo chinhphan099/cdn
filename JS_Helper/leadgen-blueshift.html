@@ -1,0 +1,194 @@
+<style>
+  .disable-animation-delay {
+    animation-delay: 0s !important;
+  }
+</style>
+<script>
+  (() => {
+    /* Helper */
+    async function getAjax(url, settings) {
+      try {
+        let headersOptions = {}
+        if (settings && settings['content-type']) {
+          headersOptions = {
+            'content-type': settings['content-type']
+          }
+        }
+        const res = await fetch(url, {
+          method: 'GET',
+          headers: settings && settings.headers ? Object.assign(headersOptions, settings.headers) : headersOptions
+        })
+        if (res.ok) {
+          try {
+            const jsonData = await res.json()
+            return jsonData
+          } catch (err) {
+            return Promise.resolve('Get ajax successfully')
+          }
+        } else {
+          return Promise.reject(`Error code : ${res.status} - ${res.statusText}`)
+        }
+      } catch (err) {
+        return err
+      }
+    }
+    async function fetchUrlsParallel(objs) {
+      const results = await Promise.all(
+        objs.map((obj) => {
+          return getAjax(obj.url, obj.settings)
+        })
+      )
+      const validResults = results.filter((result) => !(result instanceof Error))
+      return validResults
+    }
+    /* Helper */
+
+    let isInvalidEmail = true;
+    let phone_valid = false, phone_linetype = '', phone_carrier = '', international_format = '';
+    const nameElm = document.querySelector('[name="Name"]');
+    const emailElm = document.querySelector('[name="Email"]');
+    const phoneElm = document.querySelector('[name="Phone"]');
+    let countryCode = '';
+
+    function getCountry() {
+      getAjax('https://geo.risk3sixty.com/me').then((result) => {
+        countryCode = result.country
+      })
+    }
+    function onAfterSubmit() {
+      window.q('.step-1').display('none');
+      window.q('.success').display('block');
+      window.isSubmited = true;
+      window.ctrwowUtils.hideGlobalLoading();
+    }
+    function sendEmailToLeadgens() {
+      if (isInvalidEmail) return;
+
+      const { webKey, cid, websaleApiUrl } = __ctrPageConfiguration
+      if (webKey && cid) {
+        window.ctrwowUtils.getUserAnalyticsInfo().then(function (analyticsV2Data) {
+          const obj = {
+            analyticsV2: analyticsV2Data,
+            email: emailElm.value,
+            isFromEmailWidget: 'true'
+          };
+          if (nameElm && nameElm.value.trim()) {
+            obj.name = nameElm.value;
+          }
+          if (phoneElm) {
+            obj.phoneNumber = phoneElm.value;
+          }
+          if (phone_valid) {
+            obj.phoneNumber = international_format;
+          }
+          window.fetch(websaleApiUrl + '/leadgens/' + webKey, {
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json',
+              X_CID: cid
+            },
+            body: JSON.stringify(obj)
+          }).then(() => {
+            onAfterSubmit();
+          }).catch(() => {
+            onAfterSubmit();
+          })
+        })
+      }
+    }
+    function pushBlueshift() {
+      if (isInvalidEmail) return;
+
+      const email = emailElm.value;
+      const obj = {
+        email: emailElm.value,
+        campaignname: __ctrPageConfiguration.offerName,
+        landing_base_url: window.location.href.split('?')[0]
+      };
+      if (nameElm && nameElm.value.trim()) {
+        obj.name = nameElm.value;
+      }
+      if (phone_valid) {
+        obj.phone_number = international_format,
+          obj.phone_valid = phone_valid,
+          obj.phone_linetype = phone_linetype,
+          obj.phone_carrier = phone_carrier
+      }
+      blueshift.track('add_to_cart', obj);
+    }
+    function getUrlAPI() {
+      const urlArr = [];
+      if (emailElm && emailElm.value) {
+        urlArr.push({
+          url: `https://sales-prod.tryemanagecrm.com/api/validation/verify-email/?email=${emailElm.value}`,
+          settings: {
+            headers: {
+              X_CID: '584ea331-0cd2-4c48-85d9-737f9dddfa0b',
+              'Content-Type': 'application/json'
+            }
+          }
+        })
+      }
+
+      if (phoneElm && phoneElm.value) {
+        urlArr.push({ url: `//apilayer.net/api/validate?access_key=755a648d3837cf3adb128f29d322879a&number=${phoneElm.value}&country_code=${countryCode.toLowerCase()}` });
+      }
+      return urlArr;
+    }
+    function onPopupOpenOrClose() {
+      const collectionPopupId = window._q('.collection-popup').id;
+      window.ctrwowUtils.events.on('openedPopup_' + collectionPopupId, () => {
+        window.q('.collection-popup .show-popup').display('none');
+        window.q('.collection-popup .show-popup').addClass('disable-animation-delay');
+      });
+
+      window.ctrwowUtils.events.on('closedPopup_' + collectionPopupId, () => {
+        if (window.isSubmited) {
+          window.q('.collection-popup .show-popup').display('none');
+        } else {
+          window.q('.collection-popup .show-popup').display('block');
+        }
+      });
+    }
+    function handleSubmitData() {
+      window.ctrwowUtils.showGlobalLoading();
+
+      const urlArr = getUrlAPI();
+      fetchUrlsParallel(urlArr).then((results) => {
+        const emailResult = results[0];
+        if (emailResult) {
+          if (emailResult.isVerified && emailResult.isValid) {
+            isInvalidEmail = false;
+          } else {
+            isInvalidEmail = true;
+          }
+        } else {
+          isInvalidEmail = true;
+        }
+
+        const phoneResult = results[1];
+        if (phoneResult) {
+          phone_valid = phoneResult.valid;
+          phone_linetype = phoneResult.line_type;
+          phone_carrier = phoneResult.carrier;
+          international_format = phoneResult.international_format;
+        } else {
+          phone_valid = false;
+        }
+
+        pushBlueshift();
+        sendEmailToLeadgens();
+      });
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+      getCountry();
+      onPopupOpenOrClose();
+
+      window.ctrwowUtils.getDependencies(['//cdnjs.cloudflare.com/ajax/libs/pubsub-js/1.7.0/pubsub.min.js']).then(() => {
+        window.PubSub.subscribe('subscribeNow', (msg, data) => {
+          handleSubmitData();
+        });
+      });
+    });
+  })();
+</script>
