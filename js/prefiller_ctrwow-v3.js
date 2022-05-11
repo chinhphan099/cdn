@@ -73,7 +73,7 @@
             //var email = getScriptEmail();
             //var random = this.randomWord + _rand(1, 10000);
             //el.value = email.split('@')[0] + '+' + random + '@' + email.split('@')[1];
-            el.value = 'dfoqcteam+' + _rand(1, 10000) + '@dfo.global';
+            el.value = 'dfoqcteam' + _rand(1, 10000) + '@dfo.global';
             el.dispatchEvent(new Event('blur'));
         };
 
