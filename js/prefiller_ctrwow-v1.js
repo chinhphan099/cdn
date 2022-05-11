@@ -50,7 +50,7 @@
             }
             if (doc.querySelector('.js-konnektive-product-list')) {
                 this.cardNo = '7111111111111111';
-                this.phone = '+8490' + _rand(1111111, 9999999);
+                this.phone = '090' + _rand(1111111, 9999999);
                 this.cvv = 100;
             }
             this.cardExpiryYear = fixRandMonth(_rand(1, 12)) + '/' + _rand(17, 37);
