@@ -43,11 +43,16 @@
             this.phone = _rand(1000, 120000);
 
             this.cardNo = '4000000000000010';
+            this.cvv = _rand(100, 999);
             if (doc.querySelector('.js-29next-product-list')) {
                 this.cardNo = '6011111111111117';
                 this.phone = '+8490' + _rand(1111111, 9999999);
             }
-            this.cvv = _rand(100, 999);
+            if (doc.querySelector('.js-konnektive-product-list')) {
+                this.cardNo = '7111111111111111';
+                this.phone = '+8490' + _rand(1111111, 9999999);
+                this.cvv = 100;
+            }
             this.cardExpiryYear = fixRandMonth(_rand(1, 12)) + '/' + _rand(17, 37);
         };
 
@@ -170,7 +175,7 @@
             }
 
             var dt = new Date();
-            var mm = _rand(1, 12), yy = dt.getFullYear() - 2000 + _rand(2, 10);
+            var mm = _rand(1, 12), yy = dt.getFullYear() - 2000 + _rand(3, 10);
             mm = (mm < 10 ? '0' : '') + mm, yy = (yy < 10 ? '0' : '') + yy;
             if(doc.getElementsByName('creditcard_expirydate').length) {
                 doc.getElementsByName('creditcard_expirydate')[0].value = mm + '/' + yy;
