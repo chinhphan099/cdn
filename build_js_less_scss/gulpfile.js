@@ -131,7 +131,7 @@ task('clean', () => {
 task('webserver', (done) => {
   src(PUB.root)
     .pipe(webserver({
-      host: ip.address(),
+      // host: ip.address(),
       port: process.env.PORT || 2223,
       directoryListing: true
     }));

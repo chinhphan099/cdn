@@ -175,7 +175,7 @@ Plugin.prototype = {
         if (this.options.view) {
           option = $.extend({}, this.options.normal, navFor);
         } else {
-          option = $.extend({}, this.options.normal, { focusOnSelect: true }, navFor, this.updateSetting());
+          option = $.extend({}, this.options.normal, navFor, this.updateSetting());
         }
         break;
       default:
@@ -370,6 +370,7 @@ $.fn[pluginName].defaults = {
     slidesToShow: 1,
     slidesToScroll: 1,
     zIndex: 5,
+    focusOnSelect: true,
     accessibility: false
   }
 };
