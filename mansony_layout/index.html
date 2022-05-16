@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="theme-color" content="#ffffff"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <title>Isolde - Masonry plugin</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/isolde.css">
+</head>
+<body>
+  <header class="header">
+    <h1 class="header__title">
+      Isol<span class="header__title--high">de</span>
+    </h1>
+  </header>
+  <main class="sortable">
+    <div class="container">
+      <div class="wrapper">
+        <ul class="sortable__nav nav">
+          <li>
+            <a data-isolde-link="all" class="nav__link">
+              All
+            </a>
+          </li>
+          <li>
+            <a data-isolde-link="flatty" class="nav__link">
+              Flatty
+            </a>
+          </li>
+          <li>
+            <a data-isolde-link="funny" class="nav__link">
+              Funny
+            </a>
+          </li>
+        </ul>
+        <div id="isolde" class="isolde-default">
+          <div data-isolde-el="flatty">
+            <div class="card">
+              <img class="card__picture" src="./assets/images/item-1.jpg" alt="">
+              <div class="card-infos">
+                <h2 class="card__title">Example 1</h2>
+                <p class="card__text">
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eveniet, eius, asperiores. Incidunt sapiente est quae iure...
+                </p>
+              </div>
+            </div>
+          </div>
+          <div data-isolde-el="flatty">
+            <div class="card">
+              <img class="card__picture" src="./assets/images/item-2.jpg" alt="">
+              <div class="card-infos">
+                <h2 class="card__title">Example 2</h2>
+                <p class="card__text">
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nostrum vitae necessitatibus, dolorem similique vero explicabo...
+                </p>
+              </div>
+            </div>
+          </div>
+          <div data-isolde-el="funny">
+            <div class="card">
+              <img class="card__picture" src="./assets/images/item-3.jpg" alt="">
+              <div class="card-infos">
+                <h2 class="card__title">Example 3</h2>
+                <p class="card__text">
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quo, placeat voluptate, fuga tenetur eos ducimus animi porro...
+                </p>
+              </div>
+            </div>
+          </div>
+          <div data-isolde-el="flatty">
+            <div class="card">
+              <img class="card__picture" src="./assets/images/item-4.jpg" alt="">
+              <div class="card-infos">
+                <h2 class="card__title">Example 4</h2>
+                <p class="card__text">
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit doloremque quisquam, obcaecati unde nam est quos...
+                </p>
+              </div>
+            </div>
+          </div>
+          <div data-isolde-el="flatty">
+            <div class="card">
+              <img class="card__picture" src="./assets/images/item-5.jpg" alt="">
+              <div class="card-infos">
+                <h2 class="card__title">Example 5</h2>
+                <p class="card__text">
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Esse corporis hic minima nisi reprehenderit...
+                </p>
+              </div>
+            </div>
+          </div>
+          <div data-isolde-el="funny">
+            <div class="card">
+              <img class="card__picture" src="./assets/images/item-6.jpg" alt="">
+              <div class="card-infos">
+                <h2 class="card__title">Example 6</h2>
+                <p class="card__text">
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel voluptatibus, id, deserunt inventore...
+                </p>
+              </div>
+            </div>
+          </div>
+          <div data-isolde-el="flatty">
+            <div class="card">
+              <img class="card__picture" src="./assets/images/item-7.jpg" alt="">
+              <div class="card-infos">
+                <h2 class="card__title">Example 7</h2>
+                <p class="card__text">
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rerum enim beatae vero culpa, fuga, magni sunt dolores nam...
+                </p>
+              </div>
+            </div>
+          </div>
+          <div data-isolde-el="flatty">
+            <div class="card">
+              <img class="card__picture" src="./assets/images/item-8.jpg" alt="">
+              <div class="card-infos">
+                <h2 class="card__title">Example 8</h2>
+                <p class="card__text">
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Repudiandae numquam, blanditiis necessitatibus...
+                </p>
+              </div>
+            </div>
+          </div>
+          <div data-isolde-el="funny">
+            <div class="card">
+              <img class="card__picture" src="./assets/images/item-9.jpg" alt="">
+              <div class="card-infos">
+                <h2 class="card__title">Example 9</h2>
+                <p class="card__text">
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequuntur adipisci voluptatum laborum officiis...
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script src="assets/js/isolde.js"></script>
+  <script>
+    new isolde({
+      parent: document.querySelector('.isolde-default'),
+      links: document.querySelectorAll('[data-isolde-link]'),
+      active: 'is-active',
+      margin: 20,
+      responsive: {
+        1023: {
+          columns: 4
+        },
+        767: {
+          columns: 3
+        },
+        575: {
+          columns: 2
+        },
+        0: {
+          columns: 1
+        }
+      },
+      fadeDuration: {
+        in: 300,
+        out: 0
+      }
+    });
+  </script>
+</body>
+</html>
