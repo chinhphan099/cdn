@@ -399,7 +399,9 @@
   }
 }
 
-
+.hidden {
+  display: none !important;
+}
 .sortable__nav {
   display: flex;
   align-items: center;
@@ -422,7 +424,7 @@ body {
 .mansony-default {
   position: relative;
   padding: 0;
-  margin: 0;
+  margin: 0 0 30px;
   min-height: 300px;
   transition: height .2s ease-out, opacity .2s ease-out .2s;
   opacity: 0;

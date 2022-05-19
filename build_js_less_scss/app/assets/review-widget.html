@@ -37,7 +37,7 @@
         <div data-mansony-link="picture" class="nav__link">Picture</div>
       </div>
       <div class="review-items mansony-default">
-        <div class="review-item" data-url="https://immsonline.wistia.com/medias/i6dk6fth8t" data-gjs-type="reviewItem" data-mansony-el="">
+        <div class="review-item hidden" data-url="https://immsonline.wistia.com/medias/i6dk6fth8t" data-gjs-type="reviewItem" data-mansony-el="">
           <div class="thumb">
             <img src="imgs/item-1.jpg" alt="">
           </div>
@@ -255,7 +255,7 @@
     <script src="js/widget_popup_global.js"></script>
     <script src="js/mansony.min.js"></script>
     <script>
-      new mansony({
+      const ab = new mansony({
         parent: document.querySelector('.mansony-default'),
         links: document.querySelectorAll('[data-mansony-link]'),
         active: 'is-active',
@@ -284,6 +284,11 @@
           out: 0
         }
       });
+
+      // Rerender Mansony
+      /* ab.setBlockWidth(() => {
+        ab.orderElements();
+      }); */
     </script>
   </div>
 </body>

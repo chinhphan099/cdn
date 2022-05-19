@@ -29,6 +29,7 @@
     "startSection": true,
     "currentArticleId": true,
     "currentSectionId": true,
+    "mansony": true,
     "onYouTubeIframeAPIReady": true
   }
 }
