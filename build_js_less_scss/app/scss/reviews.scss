@@ -455,3 +455,15 @@ body {
     }
   }
 }
+
+.loadmore-wrap {
+  text-align: center;
+  .loadmore-btn {
+    padding: 15px;
+    font-size: 17px;
+    border-radius: 999px;
+    cursor: pointer;
+    color: white;
+    background-color: green;
+  }
+}
