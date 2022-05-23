@@ -15,6 +15,8 @@
     }
     if (i < countShowItems) {
       reviewItemElms[i].classList.remove('hidden');
+    } else {
+      reviewItemElms[i].classList.add('hidden');
     }
   }
 
@@ -23,7 +25,6 @@
     links: element.querySelectorAll('[data-mansony-link]'),
     active: 'is-active',
     margin: 30,
-    dataLink: 'video',
     responsive: {
       1023: {
         columns: 4,
