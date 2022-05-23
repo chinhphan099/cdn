@@ -72,10 +72,6 @@
   }
 }
 
-//! Add class .show-popup_widget into BODY tag
-.show-popup_widget {
-  overflow: hidden;
-}
 //! Popup Style: popup_widget
 .popup_widget {
   --z-index: 10;
@@ -363,11 +359,6 @@
   }
 }
 
-// .popup_widget_outer--scrollable.popup_widget_outer--centered .popup_widget_inner {
-//   height: auto;
-// }
-
-
 //! Popup Content styles
 .popup_widget {
   .review-item {
@@ -398,7 +389,6 @@
     }
   }
 }
-
 .hidden {
   display: none !important;
 }
@@ -418,9 +408,6 @@
     }
   }
 }
-body {
-  overflow-x: hidden;
-}
 .mansony-default {
   position: relative;
   padding: 0;
@@ -438,7 +425,6 @@ body {
     transition: transform .2s ease-out;
   }
 }
-
 .review-items {
   .review-item {
     break-inside: avoid;
@@ -455,7 +441,6 @@ body {
     }
   }
 }
-
 .loadmore-wrap {
   text-align: center;
   .loadmore-btn {
