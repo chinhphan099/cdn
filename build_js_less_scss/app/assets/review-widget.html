@@ -221,44 +221,37 @@
       <div class="loadmore-wrap">
         <div class="loadmore-btn">Load More</div>
       </div>
-    </div>
 
-    <h2>Note</h2>
-    <ul style="list-style: none">
-      <li>
-        <h3>Items show at begin</h3>
-        <p>Count of Item for Desktop</p>
-        <p>Count of Item for Mobile</p>
-      </li>
-      <li>
-        <h3>Load More</h3>
-        <p>Load more items for Desktop</p>
-        <p>Load more items for Mobile</p>
-      </li>
-    </ul>
-
-
-    <!-- <div class="popup_widget popup_widget--opened" data-gjs-type="wrapperPopup"> -->
-    <div class="popup_widget" id="reviewPopup" data-gjs-type="wrapperPopup">
-      <div class="popup_widget_outer popup_widget_outer--scrollable popup_widget_outer--centered" data-gjs-custom-name="Outer" data-gjs-type="outerPopup">
-        <div class="popup_widget_inner" data-gjs-custom-name="Inner" data-gjs-type="innerPopup">
-          <div class="popup_widget_content" data-gjs-custom-name="Content" data-gjs-type="contentPopup">
-            <div class="close close-popup" data-gjs-custom-name="Close" data-gjs-type="closePopup" data-gjs-removable="false">
-              <img src="https://d16hdrba6dusey.cloudfront.net/sitecommon/images/icon-close-white.svg" class="no-lazy" alt="" />
+      <a href="" data-gjs-removable="false" data-gjs-copyable="false" class="show-popup hidden">Show Popup</a>
+      <div class="popup_widget">
+        <div class="popup_widget_outer popup_widget_outer--scrollable popup_widget_outer--centered"
+          data-gjs-custom-name="Outer">
+          <div class="popup_widget_inner" data-gjs-custom-name="Inner">
+            <div class="close close-popup" data-gjs-custom-name="Close" data-gjs-removable="false">
+              <img src="https://d16hdrba6dusey.cloudfront.net/sitecommon/images/icon-close-white.svg" class="no-lazy"
+                alt="" />
             </div>
-            <div class="popup_widget_body" data-gjs-custom-name="Body" data-gjs-type="bodyPopup">
-              <div class="popup_widget_main" data-gjs-custom-name="Main Popup" data-gjs-type="mainPopup" data-gjs-removable="false">
-                <div class="review-item">
-                  <div class="thumb">
-                    <img src="imgs/item-1.jpg" alt="">
-                  </div>
-                  <div class="content">
-                    <div class="name">Joe M.</div>
-                    <img src="https://i.gyazo.com/33796d1ce75a44b9e639d6663a8f5cb8.png" alt="">
-                    <div class="desc">Much nicer than I expected <br></div>
-                    Thanks so much for the quick shipping
+            <div class="popup_widget_content" data-gjs-custom-name="Content">
+              <div class="popup_widget_body" data-gjs-custom-name="Body">
+                <!-- <div class="popup_widget_header" data-gjs-custom-name="Header Popup">
+                      <div>Header</div>
+                    </div> -->
+                <div class="popup_widget_main" data-gjs-custom-name="Main Popup" data-gjs-removable="false">
+                  <div class="review-item">
+                    <div class="thumb">
+                      <img src="https://i.gyazo.com/8e757354b2917abe5dde088cbc82dae6.jpg" alt="">
+                    </div>
+                    <div class="content">
+                      <div class="name">Joe M.</div>
+                      <img src="https://i.gyazo.com/33796d1ce75a44b9e639d6663a8f5cb8.png" alt="">
+                      <div class="desc">Much nicer than I expected <br></div>
+                      Thanks so much for the quick shipping
+                    </div>
                   </div>
                 </div>
+                <!-- <div class="popup_widget_footer" data-gjs-custom-name="Footer Popup" data-gjs-type="footerPopup">
+                      <div>Footer</div>
+                    </div> -->
               </div>
             </div>
           </div>
@@ -266,13 +259,31 @@
       </div>
     </div>
 
-
     <script src="js/widget_popup_global.js"></script>
     <script src="js/mansony.min.js"></script>
     <script>
-      const ab = new mansony({
-        parent: document.querySelector('.mansony-default'),
-        links: document.querySelectorAll('[data-mansony-link]'),
+      const element = document.querySelector('.review-block');
+      const reviewItemElms = element.querySelectorAll('.review-item');
+
+      const showDk = Number(element.getAttribute('data-show-dk'));
+      const showMb = Number(element.getAttribute('data-show-mb'));
+      const loadMoreDk = Number(element.getAttribute('data-loadmore-dk'));
+      const loadMoreMb = Number(element.getAttribute('data-loadmore-mb'));
+      const loadMoreBtn = element.querySelector('.loadmore-btn');
+
+      for (let i = 0, n = reviewItemElms.length; i < n; i++) {
+        let countShowItems = showDk;
+        if (window.innerWidth < 768) {
+          countShowItems = showMb;
+        }
+        if (i < countShowItems) {
+          reviewItemElms[i].classList.remove('hidden');
+        }
+      }
+
+      const newMansony = new mansony({
+        parent: element.querySelector('.mansony-default'),
+        links: element.querySelectorAll('[data-mansony-link]'),
         active: 'is-active',
         margin: 30,
         dataLink: 'video',
@@ -300,20 +311,35 @@
         }
       });
 
+      loadMoreBtn.addEventListener('click', (e) => {
+        let countLoadMoreItems = loadMoreDk;
+        if (window.innerWidth < 768) {
+          countLoadMoreItems = loadMoreMb;
+        }
+        const nextElms = element.querySelectorAll('.review-item.hidden');
+        if (nextElms.length <= countLoadMoreItems) {
+          e.currentTarget.classList.add('hidden');
+        }
+        for(let j = 0, m = nextElms.length; j < m; j++) {
+          if (j < countLoadMoreItems) {
+            nextElms[j].classList.remove('hidden');
+          }
+        }
 
-      // Rerender Mansony
-      /* ab.winWidth = window.innerWidth;
-      ab.filterElements(() => {
-        ab.setBlockWidth(() => {
-          ab.orderElements();
+        // Rerender Mansony
+        newMansony.winWidth = window.innerWidth;
+        newMansony.filterElements(() => {
+          newMansony.setBlockWidth(() => {
+            newMansony.orderElements();
+          });
         });
-      }); */
+      });
 
-      const element = document.querySelector('.review-block');
-      const showDk = Number(element.getAttribute('data-show-dk'));
-      const showMb = Number(element.getAttribute('data-show-mb'));
-      const loadMoreDk = Number(element.getAttribute('data-loadmore-dk'));
-      const loadMoreMb = Number(element.getAttribute('data-loadmore-mb'));
+      reviewItemElms.forEach((item) => {
+        item.addEventListener('click', () => {
+          // TODO - Render and Show Popup
+        });
+      });
     </script>
   </div>
 </body>
