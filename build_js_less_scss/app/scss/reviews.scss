@@ -392,11 +392,126 @@
 .hidden {
   display: none !important;
 }
+
+@include keyframes(progressBarGrowAnimation) {
+  0% {
+    width: 0%;
+  }
+}
+@include keyframes(growOut) {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@include keyframes(mobileGrowOut) {
+  0% {
+    opacity: 0;
+    max-height: 0px;
+    margin: 0px auto;
+  }
+  100% {
+    opacity: 1;
+    max-height: 500px;
+    margin: 20px auto 24px auto;
+  }
+}
+@include keyframes(fadeContent) {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.review-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 15px 0 10px;
+  margin: 0 0 5px;
+  position: relative;
+  .heading {
+    display: flex;
+    align-items: center;
+    img {
+      margin-right: 4px;
+    }
+  }
+  .tooltip-inner {
+    animation: fadeContent 350ms ease-in-out forwards;
+  }
+  .tooltip-review {
+    display: none;
+    position: absolute;
+    width: 400px;
+    max-width: 100%;
+    padding: 20px 20px 25px 20px;
+    box-shadow: 0 0 2px black;
+    -webkit-animation: growOut 0.2s ease-in-out forwards;
+    animation: growOut 0.2s ease-in-out forwards;
+    top: 100%;
+    left: 0;
+    z-index: 2;
+    background: white;
+    transform-origin: top center;
+    box-shadow: 0px 6px 14px -4px rgb(0 0 0 / 14%);
+    @media (max-width: 767px) {
+      margin: 0px auto;
+      position: static;
+      border: 0px;
+      box-shadow: unset;
+      padding: 0px;
+      animation: mobileGrowOut 300ms ease-in-out forwards;
+    }
+  }
+  .star-rate {
+    display: flex;
+    align-items: center;
+    font-size: 40px;
+    font-weight: 600;
+    margin: 0 auto;
+    width: 100px;
+    img {
+      margin-right: 5px;
+    }
+  }
+  .progress-block {
+    .progress-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+    .loox-progress {
+      height: 10px;
+      border-radius: 2px;
+      background-color: rgba(0, 0, 0, 0.04);
+      flex: 1 0 auto;
+      margin: 0 15px;
+    }
+    .loox-progress-value {
+      width: 0%;
+      height: 100%;
+      background-color: #7B7B7B;
+      animation: progressBarGrowAnimation .6s ease;
+      border-radius: 2px;
+    }
+    .reviews-num {
+      width: 30px;
+      text-align: center;
+    }
+  }
+}
 .sortable__nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-bottom: 20px;
   .nav__link {
     padding: 0 15px;
     cursor: pointer;
