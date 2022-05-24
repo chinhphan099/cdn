@@ -78,4 +78,13 @@
       // TODO - Render and Show Popup
     });
   });
+
+  document.querySelector('.heading').addEventListener('click', () => {
+    document.querySelector('.review-head').classList.toggle('show')
+  });
+  document.querySelector('body').addEventListener('click', (e) => {
+    if (!e.target.closest('.heading')) {
+      document.querySelector('.review-head').classList.remove('show')
+    }
+  });
 })();

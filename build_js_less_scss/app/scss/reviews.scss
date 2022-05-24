@@ -446,6 +446,9 @@
   .tooltip-inner {
     animation: fadeContent 350ms ease-in-out forwards;
   }
+  &.show .tooltip-review {
+    display: block;
+  }
   .tooltip-review {
     display: none;
     position: absolute;
